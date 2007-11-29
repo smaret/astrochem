@@ -27,6 +27,8 @@ AC_CHECK_HEADERS([stdlib.h string.h signal.h setjmp.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
+AX_OPENMP
+AC_SUBST([OPENMP_CFLAGS])
 
 # Checks for library functions.
 AC_FUNC_MALLOC

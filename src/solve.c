@@ -406,7 +406,7 @@ solve (double chi, double pdyield, double cosmic,
      /* Solve the system for each time step. Return if an interruption
 	signal is encountered. */
      
-     orig_interrupt_handler = signal (SIGINT, interrupt_handler);
+     /*orig_interrupt_handler = signal (SIGINT, interrupt_handler);
 
      if (setjmp(env) == 0)
        {
@@ -418,7 +418,7 @@ solve (double chi, double pdyield, double cosmic,
 	 CVodeFree (&cvode_mem);
 
 	 return (1);
-       }
+	 } */
      
      for (i = 0; i < time_steps; i++)
        {
@@ -479,7 +479,7 @@ solve (double chi, double pdyield, double cosmic,
 
      /* Restore original signal handler */
      
-     signal (SIGINT, orig_interrupt_handler);
+     /* signal (SIGINT, orig_interrupt_handler); */
    }
 
    N_VDestroy_Serial (y);

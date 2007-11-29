@@ -12,6 +12,10 @@
 #include <getopt.h>
 #include <math.h>
 
+#ifdef HAVE_OPENMP
+#include <omp.h>
+#endif
+
 #include "astrochem.h"
 
 char chem_file[MAX_LINE];
@@ -175,10 +179,11 @@ main (int argc, char *argv[])
 		   time_steps, abundances, trace_routes,
 		   routes, verbose) == 1)
 	  {
-	    /* Interruption encountered */
-	    if (verbose >= 1)
+	    /* FixMe: jumps are not allowed in openmp loops.
+	       Interruption encountered */
+	    /*if (verbose >= 1)
 	      fprintf (stdout, "Error encountered in shell %d.\n", shell_index);
-	    break;
+	      break; */
 	  }
 	if (verbose >= 1)
 	  fprintf (stdout, "Done with shell %d.\n", shell_index);
