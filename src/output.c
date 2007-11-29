@@ -36,8 +36,11 @@ output (int n_shells, double tim[], int time_steps,
 	  /* Open the file or exit if an error occurs. */
 
 	  strncpy (filename, output_species[i], MAX_CHAR_FILENAME);
-	  strncat (filename, "_", MAX_CHAR_FILENAME - strlen (filename) - 1);
-	  strncat (filename, suffix, MAX_CHAR_FILENAME - strlen (filename) - 1);
+	  if (strlen (suffix) != 0)
+	    {
+	      strncat (filename, "_", MAX_CHAR_FILENAME - strlen (filename) - 1);
+	      strncat (filename, suffix, MAX_CHAR_FILENAME - strlen (filename) - 1);
+	    }
 	  strncat (filename, ".abun", MAX_CHAR_FILENAME - strlen (filename) -1
 		   - strlen (suffix));
 	  if ((f = fopen (filename, "w")) == NULL)
