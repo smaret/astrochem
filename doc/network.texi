@@ -1,0 +1,312 @@
+@cindex network files
+
+Astrochem comes with several chemical networks files. You can also write
+your own networks. This chapter describes the networks files provided
+with Astrochem, as well as the network file format and reaction scheme
+used by Astrochem.
+
+@menu
+* Networks provided with Astrochem::
+* Reaction types and rates::
+* Network file format::
+* Convert networks to Astrochem format::
+@end menu
+
+@node Networks provided with Astrochem
+@section Networks provided with Astrochem
+@cindex chemical network file, default
+@cindex Ohio State University chemical network
+@cindex UMIST database for astrochemistry network
+
+Three different networks are distributed with Astrochem.  These networks
+can be found in the network directory of the source distribution.
+
+@itemize
+@item
+@code{osu2007.chm}: This network file contains the reactions and rates
+from the Ohio State University astrochemistry database, that is maintain
+by Eric Herbst. In correspond to the January 2007 version of the
+database. This network contains 4429 and 452 species.
+@item
+@code{udfa2006.chm}: This networks contains the reactions and rate from
+the UMIST Database for Astrochemistry (UDFA) 2006, that is maintained
+Tom Millar and collaborators. This file correspond to the non-dipole
+version, that is it does not includes the enhancement of ion-neutral
+rates for reactions in which the neutral has a large, permanent dipole
+moment.
+@item
+@code{udfa2006_dipole.chm}: This network correspond to the dipole
+enhanced version of the UDFA 2006 database. It should be preferred to
+the non-dipole version for low temperaratures (a few tens Kelvins).
+@end itemize
+
+@node Reaction types and rates
+@section Reaction types and rates
+@cindex reaction types
+@cindex reaction rates
+
+This section describes the type of reactions that Astrochem supports,
+and how their rates are computed. Astrochem follows the nomenclature
+used in the Ohio Astrochemistry database, but also include gas grain
+interactions, such as the freeze-out of molecules on the grain surfaces
+and the desorption by different mechanisms.
+
+@itemize
+@item
+Type 0: Gas-grain interaction (excluding depletion and desorption), and
+electron-grain recombination. The rate is given by
+@iftex
+@tex
+\beforedisplay
+$$
+k = \alpha \left( T_{\rm gas} \over 300 \right)^{\beta} N_{gd}
+$$
+\afterdisplay
+@end tex
+@end iftex
+@ifinfo
+
+@example
+k = \alpha * (T_@{gas@} / 300)^@{\beta@} N_@{gd@}
+@end example
+
+@end ifinfo
+@noindent where @math{N_{\rm gd}} is the gas to dust number ratio, assumed to be
+@math{7.57 \times 10^{11}}.
+
+@item
+Type 1: Cosmic-ray ionization (direct process) and cosmic-ray induced
+photo-reactions (indirect process). The rate is 
+@iftex
+@tex
+\beforedisplay
+$$
+k = \alpha \, \chi
+$$
+\afterdisplay
+@end tex
+@end iftex
+@ifinfo
+
+@example
+k = alpha * \chi
+@end example
+
+@end ifinfo
+@noindent where @math{\chi} is the cosmic ray ionization rate set in the
+input file (@pxref{Input file}).
+
+@item
+Type 3: Radiative association. The rate is 
+@iftex
+@tex
+\beforedisplay
+$$
+k = \alpha \left( T_{gas} \over 300 \right)^\beta {\rm exp} \left( -\gamma
+\over T_{\rm gas} \right)
+$$
+\afterdisplay
+@end tex
+@end iftex
+
+@ifinfo
+
+@example
+k = \alpha * (T_@{gas@} / 300)^\beta * exp (-\gamma / T_@{gas@})
+@end example
+
+@end ifinfo
+
+@item
+Type 4: Radiative association. The rate is the same that the one of type
+3 reactions.
+
+@item
+Type 5: Associative ejection. The rate is the same that the one of type
+3 reactions.
+
+@item
+Type 6: Neutral + neutral @math{\rightarrow} ion + electron. The rate is
+the same that the one of type 3 reactions.
+
+@item
+Type 7: Neutral-neutral reactions. The rate is the same that the one of
+type 3 reactions.
+
+@item
+Type 8: Neutral-neutral radiative association.  The rate is the same
+that the one of type 3 reactions.
+
+@item
+Type 9: Dissociative recombination. The rate is the same that the one of
+type 3 reactions.
+
+@item
+Type 10: Radiative recombination. The rate is the same that the one of
+type 3 reactions.
+
+@item
+Type 11: Dissociative recombination. The rate is the same that the one
+of type 3 reactions.
+
+@item
+Type 12: Electron attachment. The rate is the same that the one of type
+3 reactions.
+
+@item
+Type 13: Photo-ionization and photo-dissociation reactions. The rate is
+given by:
+@iftex
+@tex
+\beforedisplay
+$$
+k = \chi \, \alpha \, {\rm exp} \left( -\gamma \over A_{v} \right)
+$$
+\afterdisplay
+@end tex
+@end iftex
+@ifinfo
+
+@example
+k = \chi \, alpha \, exp \left(-\gamma \over A_@{v@}\right)
+@end example
+
+@end ifinfo
+@noindent where @math{\chi} is the interstellar radiation field (in
+Habing units) given in the input file (@pxref{Input file}), and
+@math{A_@{v@}} is the visual extinction.
+
+@item
+Type 20: Depletion on the grains. The rate is given by
+@iftex
+@tex
+\beforedisplay 
+$$
+k = \alpha \, \pi \, \gamma^2 \, \left( 8 k_{b} \, T_{\rm gas} \over
+  \pi \, \beta \, m_{p} \right)^{1/2}
+$$
+\afterdisplay
+@end tex
+@end iftex
+@ifinfo
+
+@example
+k = \alpha * \pi * \gamma^@{2@} * (8 * k_@{b@} * T_@{gas@})/(\pi * \beta * m_@{p@})^@{0.5@}
+@end example
+
+@end ifinfo
+@noindent where @math{\alpha} is the sticking coefficient on the grain,
+@math{\gamma} is the grain cross section, @math{k_{b}} is the Boltzman
+constant, @math{\beta} is the mass of the atom or molecule considered,
+expressed in atomic mass units, and @math{m_{p}} is the proton mass.
+
+@item
+Type 21: Thermal desorption.
+@iftex
+@tex
+\beforedisplay
+$$
+k = \nu_{0} \, {\rm exp} \left( -\gamma \over T_{\rm dust}\right)
+$$
+\afterdisplay
+@end tex
+@end iftex
+@ifinfo
+
+@example
+k = nu0 * exp \left( -gamma \over Tdust \right)
+@end example
+
+@end ifinfo
+@noindent where @math{\nu_{0}} is latice vibration frequency for the
+absorbed atom or molecule, and @math{\gamma} is the binding energy of
+the absorbed specie.
+
+@item
+Type 22: Cosmic rays desorption. The rate is:
+@iftex
+@tex
+\beforedisplay
+$$
+k = \nu_{0} \, {\rm exp} \left( -\gamma \over T_{\rm cr} \right)
+$$
+\afterdisplay
+@end tex
+@end iftex
+@ifinfo
+
+@example
+k = nu0 * exp (-gamma / Tcr )
+@end example
+
+@end ifinfo
+@noindent where @math{T_{\rm cr}} is the spot temperature of a grain that is
+heated by a cosmic ray, taken to be 70 K.
+
+@item
+Type 23: Photo-desorption. The rate is:
+@iftex
+@tex
+\beforedisplay
+$$
+k = Y \chi {\rm exp} (-2\, A_{v}) \pi \gamma^2
+$$
+\afterdisplay
+@end tex
+@end iftex
+@ifinfo
+
+@example
+k = Y * chi * exp (-2 Av) pi gamma**2
+@end example
+
+@end ifinfo
+@noindent where @math{Y} is the photo-desorption yield given in the
+input file (@pxref{Input file}) and @math{gamma} is the grain radius.
+
+@end itemize
+
+@node Network file format
+@section Network file format
+
+This section describes the file format for Astrochem network files
+(@code{.chm}). Here is an example of a network file:
+
+@example
+@verbatiminclude examples/network.chm
+@end example
+
+Lines that starts with the @code{#} character are comments.
+
+Each reactant and each products are separated by a @code{+} sign
+preceded and followed by one or more white space or tab. Up to three
+reactants can be specified. Ions charges must be put between
+paranthesis.
+
+Reactants and products are separated by the @code{->} characters. Up to
+four products can be specified.
+
+The four following numbers are @code{\alpha}, @code{\beta}, and
+@code{\gamma}. Their physical meaning depend on the type of the reaction
+(see previous section). The following number is the reaction type
+number, and the last one is the reaction number. These numbers can be
+separated by any number of white spaces or tabs.
+
+@code{cosmic-ray}, @code{uv-photon} and @code{photon} are not actual
+reactant or products, but just make the reading of the network
+easier. They are ignored by Astrochem.
+
+@node Convert networks to Astrochem format
+@section Convert networks to Astrochem format
+
+Astrochem comes with a tool called @code{chmconvert} to convert network
+files to @code{.chm} files. This tool support formats of the UMIST and
+OSU database. The type of file is determined from the file extension,
+which should be @code{.udfa} for UMIST database files, and @code{.osu}
+for Ohio State University database files. Networks can be converted as
+follows:
+
+@code{% chmconvert -o osu2007.chm osu2007.osu}
+
+The @code{-o} option is used to select the name of the output file. If
+not specified, the network is copied to the standard output.

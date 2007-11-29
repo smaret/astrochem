@@ -1,0 +1,69 @@
+.\" -*- nroff -*-
+.Dd August 1, 2006
+.Os
+.Dt CHMCONVERT 1
+.Sh NAME
+.Nm chmconvert
+.Nd convert chemical networks into .chm format
+.Sh SYNOPSIS
+.Nm
+.Op Ar option
+.Op Ar file
+.\"
+.\" Description
+.\"
+.Sh DESCRIPTION
+.Nm
+is a tool to convert chemical network files from different formats to
+.Xr astrochem 1 
+native format
+.Em .chm .
+The format of the input file is determined
+from the extension of the input file. Supported formats are
+.Em .udfa
+(UMIST Database for Astrochemistry) and
+.Em .osu
+(Ohio State University astrochemistry database).
+.\"
+.\" Options
+.\"
+.Sh OPTIONS
+.Bl -tag -width flag
+.It Cm -h, --help
+Display help text.
+.It Cm -V, --version
+Display astrochem version information.
+.It Cm -o Ar file , Cm --output Ar file
+Write the converted network in
+.Ar file "."
+Default is the standard output.
+.El
+.\"
+.\" Authors, copyright, and see also
+.\"
+.Sh AUTHOR
+Written by Sebastien Maret.
+.Sh "REPORTING BUGS"
+Report bugs to
+.Aq smaret@umich.edu .
+.Sh COPYRIGHT
+Copyright \(co 2006-2007 Sebastien Maret
+.Pp
+This is free software. You may redistribute copies of it under the
+terms of the GNU General Public License. There is NO WARRANTY, to the
+extent permitted by law.
+.Sh "SEE ALSO"
+.Xr astrochem 1 ","
+.Xr plabun 1
+.Pp
+The full documentation for
+.Cm astrochem
+is maintained as a Texinfo manual. If the 
+.Xr info 1
+and
+.Xr astrochem 1
+programs are properly installed at your site, the command
+.Cm info astrochem
+should give you access to the complete manual.
+
+

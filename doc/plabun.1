@@ -1,0 +1,65 @@
+.\" -*- nroff -*-
+.Dd June 29, 2006
+.Os
+.Dt PLABUN 1
+.Sh NAME
+.Nm plabun
+.Nd plot abundances computed by astrochem
+.Sh SYNOPSIS
+.Nm
+.Op Ar option
+.Op Ar file1
+.Op Ar file2 ...
+.\"
+.\" Description
+.\"
+.Sh DESCRIPTION
+.Nm
+is a 
+.Xr python 1
+script to plot the abundances computed by
+.Xr astrochem 1
+.\"
+.\" Options
+.\"
+.Sh OPTIONS
+.Bl -tag -width flag
+.It Cm -h, --help
+Display help text.
+.It Cm -V, --version
+Display astrochem version information.
+.It Cm -o Ar file , Cm --output=Ar file
+Create a PostScript file.
+.It Cm -s Ar shell-number , Cm --shell= Ar shell-number
+Set the shell number. Default is 0.
+.It Cm -x Ar xmin,xmax , Cm --xrange= Ar xmin,xmax
+Set the x axis range
+.It Cm -y Ar ymin,ymax , Cm --yrange= Ar ymin,ymax
+Set the y axis range 
+.\"
+.\" Authors, copyright, and see also
+.\"
+.Sh AUTHOR
+Written by Sebastien Maret.
+.Sh "REPORTING BUGS"
+Report bugs to <smaret@umich.edu>.
+.Sh COPYRIGHT
+Copyright \(co 2006-2007 Sebastien Maret
+.Pp
+This is free software. You may redistribute copies of it under the
+terms of the GNU General Public License. There is NO WARRANTY, to the
+extent permitted by law.
+.Sh "SEE ALSO"
+.Xr astrochem 1 ","
+.Xr chmconvert 1
+.Pp
+The full documentation for
+.Cm astrochem
+is maintained as a Texinfo manual. If the 
+.Xr info 1
+and
+.Xr astrochem 1
+programs are properly installed at your site, the command
+.Cm info astrochem
+should give you access to the complete manual.
+

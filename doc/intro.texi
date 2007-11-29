@@ -1,0 +1,97 @@
+@cindex license of Astrochem
+@cindex GNU General Public License
+Astrochem is a code to compute the abundances of chemical species in the
+interstellar medium, as function of time. It is designed to study the
+chemistry in a variety of astronomical objects, including diffuse
+clouds, dense clouds, photodissociation regions, prestellar cores,
+protostars, and protostellar disks. Astrochem reads a chemical reaction
+network from a file, builds up a system of kinetic equations, and solve
+it using a stiff ordinary differential equation (ODE) solver. The
+computed abundances are written in text files, and can be plotted in
+different ways with the tools provided with Astrochem. In addition, a
+tool to convert chemical network files from various formats into
+Astrochem native format is also provided. Astrochem is written in C, and
+its source code is distributed under the terms of the GNU General Public
+License (GPL).
+
+@menu
+* Astrochem is Free Software::  
+* Obtaining and installing Astrochem::  
+* Reporting Bugs::              
+* Contributing to Astrochem::   
+* Further Information::         
+@end menu
+
+@node Astrochem is Free Software
+@section Astrochem is Free Software
+@cindex free software, explanation of
+
+Astrochem is Free Software, released under the GNU General Public
+License (@pxref{GNU General Public License}). It means that you have the
+right to copy it, to modify it, and to redistribute it. For example, you
+may want to modify the code to solve your particular problem, and to
+redistribute the modified version to your colleagues under the terms of
+this license. Further information about the license is available from
+the GNU Project webpage @cite{Frequently Asked Questions about the GNU
+GPL}.
+
+@node Obtaining and installing Astrochem
+@section Obtaining and installing Astrochem
+@cindex obtaining Astrochem
+@cindex downloading Astrochem
+@cindex installing Astrochem
+
+The source code of Astrochem can be downloaded from the following webpage:
+
+@itemize @asis
+@item 
+@uref{http://www.astro.lsa.umich.edu/~smaret/astrochem}
+@end itemize
+
+The @file{INSTALL} file included in the Astrochem distribution contains
+instructions to install Astrochem on your computer. Astrochem is
+portable, and should compile on most platforms with a C compiler,
+including GNU/Linux, and MacOSX.
+
+@node Reporting Bugs
+@section Reporting Bugs
+@cindex reporting bugs in Astrochem
+@cindex bugs, how to report
+
+A list of known bugs can be found in the @file{BUGS} file included in
+the Astrochem distribution. If you find a bug which is not listed in
+this file, please report it to @email{smaret@@umich.edu}.
+
+@node Contributing to Astrochem
+@section Contributing to Astrochem
+@cindex contributing to Astrochem
+@cindex contribute, how to
+
+Astrochem is a volunteer project. You can help the project in a number of
+ways:
+
+@itemize
+@item
+By testing the code and reporting any bug you find
+
+@item
+By making any improvements or extensions to the code that you develop
+available to other users
+
+@item
+By working on the problem listed in the @file{BUGS} or @file{TODO} files
+in the Astrochem distribution.
+@end itemize 
+
+@node  Further Information
+@section Further Information
+@cindex website, developer information
+@cindex contacting the Astrochem developers
+Additional information is available from the website mentioned above.
+Any questions about the use and installation of the code can be asked to
+@email{smaret@@umich.edu}.
+
+@c Local Variables: 
+@c mode: texinfo
+@c TeX-master: "astrochem"
+@c End: 

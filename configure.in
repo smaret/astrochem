@@ -1,0 +1,39 @@
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.59)
+AC_INIT(astrochem, 0.1, smaret@umich.edu)
+AM_INIT_AUTOMAKE(astrochem, 0.1)
+AC_CONFIG_SRCDIR([config.h.in])
+AC_CONFIG_HEADER([config.h])
+
+# Check for programs
+AC_PROG_CC
+AM_PATH_PYTHON
+AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != :])
+if test $PYTHON = ":"; then
+   AC_MSG_WARN(could not find Python.)
+fi
+
+# Checks for libraries.
+AC_CHECK_LIB(sundials_cvode, main)
+AC_CHECK_LIB(sundials_nvecserial, main)
+if test $ac_cv_lib_sundials_cvode_main = "no"; then
+   AC_MSG_ERROR(could not find SUNDIALS library.)
+fi
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([stdlib.h string.h signal.h setjmp.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([pow exp fabs])
+
+AC_CONFIG_FILES([Makefile
+                 doc/Makefile
+                 src/Makefile
+		 networks/Makefile])
+AC_OUTPUT

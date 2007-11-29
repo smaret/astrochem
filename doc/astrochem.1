@@ -1,0 +1,62 @@
+.\" -*- nroff -*-
+.Dd July 3, 2006
+.Os
+.Dt ASTROCHEM 1
+.Sh NAME
+.Nm astrochem
+.Nd compute interstellar medium abundances
+.Sh SYNOPSIS
+.Nm
+.Op Ar option
+.Op Ar file
+.\"
+.\" Description
+.\"
+.Sh DESCRIPTION
+.Nm
+is a code to compute the abundances of chemical species in the
+interstellar medium. It reads a chemical network file, create a system
+of ordinary differential equations (ODE), and solve it.
+.\"
+.\" Options
+.\"
+.Sh OPTIONS
+.Bl -tag -width flag
+.It Cm -h, --help
+Display help text.
+.It Cm -V, --version
+Display astrochem version information.
+.It Cm -v, --verbose
+Causes astrochem to be more verbose. This option display detailled
+information about the computations that are being done.
+.It Cm -q, --quiet
+Causes astrochem to be completely silent. Only error messages are
+displayed.
+.El
+.\"
+.\" Authors, bug reports, copyright, and other information
+.\"
+.Sh AUTHOR
+Written by Sebastien Maret.
+.Sh "REPORTING BUGS"
+Report bugs to <smaret@umich.edu>.
+.Sh COPYRIGHT
+Copyright \(co 2006-2007 Sebastien Maret
+.Pp
+This is free software. You may redistribute copies of it under the
+terms of the GNU General Public License. There is NO WARRANTY, to the
+extent permitted by law.
+.Sh "SEE ALSO"
+.Xr plabun 1 ","
+.Xr chmconvert 1 ","
+.Pp
+The full documentation for
+.Cm astrochem
+is maintained as a Texinfo manual. If the 
+.Xr info 1
+and
+.Xr astrochem 1
+programs are properly installed at your site, the command
+.Cm info astrochem
+should give you access to the complete manual.
+

@@ -1,0 +1,262 @@
+\input texinfo @c -*-texinfo-*-
+@c This will be for the printing version of the manual
+@c @input config-local.texi
+@c %**start of header
+@setfilename astrochem.info
+@settitle Astrochem
+@finalout
+@set frontcontents
+@ifset publish
+@setchapternewpage odd
+@end ifset
+@c %**end of header
+
+@dircategory Scientific software
+@direntry
+* Astrochem: (astrochem).                   Astrochem
+@end direntry
+
+@c How to use the math macros
+@c ==========================
+@c 
+@c For simple expressions, simply use the @math{} command, e.g.
+@c
+@c     @math{\exp(x)/(1+x^2)}
+@c 
+@c but if the expression includes characters that need to be 'escaped'
+@c in texinfo, like '{' or '}', or needs different output for TeX and info,
+@c then use the following form,
+@c
+@c     blah blah blah @c{$y^{1+b} \le \pi$}
+@c     @math{y^@{1+b@} <= \pi}
+@c
+@c The first part using @c{} must appear at the end of a line (it reads
+@c up to the line end -- as far as texinfo is concerned it's actually
+@c a 'comment').  The comment command @c has been modified to capture
+@c a TeX expression which is output by the next @math.
+@c
+@c For ordinary comments use the @comment command.
+
+@tex
+% Mathematical macros taken from the GNU Calc Manual
+% ==================================================
+%
+% Some special kludges to make TeX formatting prettier.
+% Because makeinfo.c exists, we can't just define new commands.
+% So instead, we take over little-used existing commands.
+%
+% Redefine @cite{text} to act like $text$ in regular TeX.
+% Info will typeset this same as @samp{text}.
+\gdef\goodtex{\tex \let\rm\goodrm \let\t\ttfont \turnoffactive}
+\gdef\goodrm{\fam0\tenrm}
+\gdef\math{\goodtex$\mathxxx}
+\gdef\mathxxx#1{#1$\endgroup}
+\global\let\oldxrefX=\xrefX
+\gdef\xrefX[#1]{\begingroup\let\math=\dfn\oldxrefX[#1]\endgroup}
+%
+% Redefine @i{text} to be equivalent to @cite{text}, i.e., to use math mode.
+% This looks the same in TeX but omits the surrounding ` ' in Info.
+%\global\let\i=\cite
+%\global\let\math=\cite
+%
+% Redefine @c{tex-stuff} \n @whatever{info-stuff}.
+\gdef\c{\futurelet\next\mycxxx}
+\gdef\mycxxx{%
+  \ifx\next\bgroup \goodtex\let\next\mycxxy
+  \else\ifx\next\mindex \let\next\relax
+  \else\ifx\next\kindex \let\next\relax
+  \else\ifx\next\starindex \let\next\relax \else \let\next\comment
+  \fi\fi\fi\fi \next
+}
+\gdef\mycxxy#1#2{#1\endgroup\mycxxz}
+\gdef\mycxxz#1{}
+%
+% Define \Hat to take over from \hat as an accent
+\gdef\Hat{\mathaccent "705E}
+%
+%\gdef\beforedisplay{\vskip-10pt}
+%\gdef\afterdisplay{\vskip-5pt}
+\gdef\beforedisplay{}
+\gdef\afterdisplay{}
+{\globaldefs = 1
+\abovedisplayskip=7pt plus 2pt minus 1pt
+\belowdisplayskip=7pt plus 2pt minus 1pt
+\abovedisplayshortskip=7pt plus 2pt minus 1pt
+\belowdisplayshortskip=7pt plus 2pt minus 1pt}
+%\abovedisplayskip=12pt plus 3pt minus 3pt
+%\belowdisplayskip=12pt plus 3pt minus 3pt
+%\abovedisplayshortskip=7pt plus 1pt minus 1pt
+%\belowdisplayshortskip=7pt plus 1pt minus 1pt
+%\gdef\beforedisplayh{\vskip-25pt}
+%\gdef\afterdisplayh{\vskip-10pt}
+%
+\gdef\arcsec{\hbox{\rm arcsec}}
+\gdef\arccsc{\hbox{\rm arccsc}}
+\gdef\arccot{\hbox{\rm arccot}}
+\gdef\sech{\hbox{\rm sech}}
+\gdef\csch{\hbox{\rm csch}}
+\gdef\coth{\hbox{\rm coth}}
+\gdef\arcsinh{\hbox{\rm arcsinh}}
+\gdef\arccosh{\hbox{\rm arccosh}}
+\gdef\arctanh{\hbox{\rm arctanh}}
+\gdef\arcsech{\hbox{\rm arcsech}}
+\gdef\arccsch{\hbox{\rm arccsch}}
+\gdef\arccoth{\hbox{\rm arccoth}}
+%
+\gdef\Re{\hbox{\rm Re}}
+\gdef\Im{\hbox{\rm Im}}
+\gdef\Sin{\hbox{\rm Sin}}
+\gdef\Cos{\hbox{\rm Cos}}
+\gdef\Log{\hbox{\rm Log}}
+%
+\gdef\erf{\hbox{\rm erf}}
+\gdef\erfc{\hbox{\rm erfc}}
+\gdef\sinc{\hbox{\rm sinc}}
+\gdef\sgn{\hbox{\rm sgn}}
+\gdef\sign{\hbox{\rm sign}}
+\gdef\det{\hbox{\rm det}}
+\gdef\Var{\hbox{\rm Var}}
+\gdef\arg{\hbox{\rm arg}} % avoid temporary clobbering of arg in texinfo-4.8
+@end tex
+
+@set VERSION 0.1
+@set UPDATED 29 June 2006
+
+@copying
+Copyright @copyright{} 2006-2007 Sebastien Maret.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.2 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being ``GNU General Public License'' and ``Free
+Software Needs Free Documentation'', the Front-Cover text being ``A GNU
+Manual'', and with the Back-Cover Text being (a) (see below).  A copy of
+the license is included in the section entitled ``GNU Free Documentation
+License''.
+
+(a) The Back-Cover Text is: ``You have freedom to copy and modify this
+GNU Manual, like GNU software.''
+@end copying
+
+@titlepage
+@title Astrochem
+@subtitle Reference Manual
+@subtitle For Astrochem version @value{VERSION}
+@subtitle @value{UPDATED}
+
+@author Sebastien Maret 
+Department of Astronomy, University of Michigan
+@comment @email{smaret@@umich.edu}
+@sp 1
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@ifset frontcontents
+@contents
+@end ifset
+
+@ifnottex
+@node Top, Introduction, (dir), (dir)
+@top Astrochem
+
+Astrochem is a code to compute the abundance of chemical species in th
+interstellar medium. This manual describe how to use Astrochem. It
+corresponds to Astrochem version @value{VERSION}.
+
+@insertcopying
+@sp 1
+@end ifnottex
+
+@menu
+* Introduction::                    An introduction of Astrochem concepts.
+* Using Astrochem::                 Simple example of the use of Astrochem.
+* Input file::                      What Astrochem expects to find in an input file.
+* Source description::              How to describe the physical properties of a source.
+* Chemical networks::               Understanding chemical network files.
+* Plotting results::                Plot the abundances computed by Astrochem.
+* Contributors to Astrochem::       Who contributed to Astrochem.        
+* GNU General Public License::      Copying Astrochem.
+* GNU Free Documentation License::  Copying this manual. 
+* Concept Index::                   An item for each concept used in this manual.
+@end menu
+
+@node Introduction, Using Astrochem, Top, Top
+@chapter Introduction
+@include intro.texi
+
+@node Using Astrochem, Input file, Introduction, Top
+@chapter Using Astrochem
+@include using.texi
+
+@node Input file, Source description, Using Astrochem, Top
+@chapter Input file
+@include input.texi
+
+@node Source description, Chemical networks, Input file, Top
+@chapter Source description
+
+@node Chemical networks, Plotting results, Source description, Top
+@chapter Chemical networks
+@include network.texi
+
+@node Plotting results, Contributors to Astrochem, Chemical networks, Top
+@chapter Plotting results
+
+@node Contributors to Astrochem, GNU General Public License, Plotting results, Top
+@appendix Contributors to Astrochem
+
+@table @strong
+@item Sebastien Maret
+@comment @email{smaret@@umich.edu}
+Wrote Astrochem.
+
+@item Ted Bergin
+@comment @email{ebergin@@umich.edu}
+Wrote the original version of this code in Fortran. Although the
+present version does not share any code with the Fortran version,
+many ideas about its implementation were borrowed from it.
+
+@end table
+
+@node  GNU General Public License, GNU Free Documentation License, Contributors to Astrochem, Top
+@unnumbered GNU General Public License
+@include gpl.texi
+
+@node GNU Free Documentation License, Concept Index, GNU General Public License, Top
+@unnumbered GNU Free Documentation License
+@include fdl.texi
+
+@comment htmlhelp: @bye
+
+@iftex
+@normalbottom
+@end iftex
+
+@node Concept Index, , GNU Free Documentation License, Top
+@unnumbered Concept Index
+
+@printindex cp
+
+@ifclear frontcontents
+@comment Use @setchapternewpage odd to ensure that the contents starts 
+@comment on an odd page so that it can always be moved to the front when 
+@comment printing two-up.
+@setchapternewpage odd
+@contents
+@end ifclear
+
+@ifset extrablankpages
+@comment final page must be blank for printed version
+@page
+@headings off
+@*
+@page
+@*
+@comment @page
+@comment @*
+@comment @page
+@comment @*
+@end ifset
+@bye
