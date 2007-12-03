@@ -6,25 +6,24 @@ import getopt
 
 VERSION = "0.1"
 
-# Display usage.
+
 
 def usage():
-    print """Usage: chmconvert [option] command [file]
+    """Display usage."""
+
+    print """Usage: chmconvert [option] [file]
 
 Common options:
    -h, --help         Display this help
    -V, --version      Display chemutil version information
    -o, --output       Write the edited network in a file
 
-Commands:
-   convert            Convert file to astrochem native format
-
 See chmconvert(1) man page for a complete list of commands and options.
 Report bugs to <smaret@umich.edu>."""
 
-# Display version number.
-
 def version():
+    """Display version number."""
+
     print "This is chmconvert, version %s" % VERSION
     print """Copyright (c) 2006-2007 Sebastien Maret
 
@@ -32,45 +31,55 @@ This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent
 permitted by law."""
 
-# Format a specie name in astrochem format
-    
-def format_specie(specie, charge = True):
+def format_specie(specie, format):
+    """Format a specie name to astrochem format."""
 
     specie = specie.strip()
 
-    # Put the charge of ions in parenthesis.
-    if charge:
+    if format == "osu":
+
+        # In astrochem format, the charge of ions is in parenthesis.
         specie = specie.replace("+", "(+)")
         specie = specie.replace("-", "(-)")
 	
-    # For elements that have two letters in their names,
-    # put the second one in lower case.
-    specie = specie.replace("HE", "He")
-    specie = specie.replace("NA", "Na")
-    specie = specie.replace("MG", "Mg")
-    specie = specie.replace("CL", "Cl")
-    specie = specie.replace("SI", "Si")
-    specie = specie.replace("FE", "Fe")
+        # For elements that have two letters in their names, the
+        # second one is in lower case.
+        specie = specie.replace("HE", "He")
+        specie = specie.replace("NA", "Na")
+        specie = specie.replace("MG", "Mg")
+        specie = specie.replace("CL", "Cl")
+        specie = specie.replace("SI", "Si")
+        specie = specie.replace("FE", "Fe")
 	
-    # Electrons grains, photons and cosmic rays
-    if specie == "E": specie = "e"
-    if specie == "e(-)": specie = "e"
-    if specie == "GRAIN": specie = "grain"
-    if specie == "GRAIN0": specie = "grain"
-    if specie == "GRAIN(+)": specie = "grain(+)"
-    if specie == "GRAIN(-)": specie = "grain(-)"
-    if specie == "gr": specie = "grain"
-    if specie == "PHOTON": specie = "photon"
-    if specie == "CRPHOT": specie = "cosmic-ray"
+        # Grains are in lowercase. Neutral grains are simply noted
+        # 'grain'
+        specie = specie.replace("GRAIN0", "grain")
+        specie = specie.replace("GRAIN", "grain")
+
+        # Electrons are noted as e(-)
+        if specie == "E": specie = "e(-)"
+
+    elif format == "udfa":
+
+        specie = specie.replace("+", "(+)")
+        specie = specie.replace("-", "(-)")
+
+        # Both cosmic-rays and cosmic-ray induced photons
+        # cosmic-ray-photons are noted 'cosmic-ray'
+        # FixMe: should we distinguish between the two?
+        specie = specie.replace("CRPHOT", "cosmic-ray")
+        specie = specie.replace("CRP", "cosmic-ray")
+
+        # Photons are noted 'photon'
+        specie = specie.replace("PHOTON", "photon") 
 
     return specie
-
-# Format a reaction to astrochem format.
 
 def format_react(reactant1, reactant2, reactant3,
                  product1, product2, product3, product4,
                  alpha, beta, gamma, reaction_type,
                  reaction_number):
+    """Format a reaction to astrochem format."""
     
     # In .chm format, we have one, two or three reactants,
     # and one, two, three or four products
@@ -107,9 +116,8 @@ def format_react(reactant1, reactant2, reactant3,
 
     return reaction
 
-# Convert a chemical network file to astrochem native format.
-
 def convert(filein, format, fileout, ignore_unknown = True):
+    """Convert a chemical network file to astrochem native format."""
 
     # Read the input file and convert it
     
@@ -125,13 +133,13 @@ def convert(filein, format, fileout, ignore_unknown = True):
 	for line in filein:
 	    if len(line) == 113 or len(line) == 119:
                 try:
-                    reactant1 = format_specie(line[0:8])
-                    reactant2 = format_specie(line[8:16])
-                    reactant3 = format_specie(line[16:24])
-                    product1 = format_specie(line[24:32])
-                    product2 = format_specie(line[32:40])
-                    product3 = format_specie(line[40:48])
-                    product4 = format_specie(line[48:56])
+                    reactant1 = format_specie(line[0:8], "osu")
+                    reactant2 = format_specie(line[8:16], "osu")
+                    reactant3 = format_specie(line[16:24], "osu")
+                    product1 = format_specie(line[24:32], "osu")
+                    product2 = format_specie(line[32:40], "osu")
+                    product3 = format_specie(line[40:48], "osu")
+                    product4 = format_specie(line[48:56], "osu")
                     alpha = float(line[64:73])
                     beta = float(line[73:82])
                     gamma = float(line[82:91])
@@ -194,13 +202,13 @@ def convert(filein, format, fileout, ignore_unknown = True):
             try:
                 reaction_number = int(line[0])
                 reaction_code = line[1]
-                reactant1 = format_specie(line[2])
-                reactant2 = format_specie(line[3])
-                reactant3 = format_specie(line[4])
-                product1 = format_specie(line[5])
-                product2 = format_specie(line[6])
-                product3 = format_specie(line[7])
-                product4 = format_specie(line[8])
+                reactant1 = format_specie(line[2], "udfa")
+                reactant2 = format_specie(line[3], "udfa")
+                reactant3 = format_specie(line[4], "udfa")
+                product1 = format_specie(line[5], "udfa")
+                product2 = format_specie(line[6], "udfa")
+                product3 = format_specie(line[7], "udfa")
+                product4 = format_specie(line[8], "udfa")
                 alpha = float(line[9])
                 beta = float(line[10])
                 gamma = float(line[11])
@@ -231,14 +239,22 @@ def convert(filein, format, fileout, ignore_unknown = True):
                                   % line_number)
                 exit(1)
 
+            # In astrochem reaction scheme, the rate of type 1
+            # reactions is k = \alpha * \chi, where \chi is the H2
+            # direct cosmic-ray ionization rate. In the OSU, it is
+            # simply k = \alpha. Therefore \alpha should be divided by
+            # the H2 cosmic-ray ionization value adopted in the UDFA
+            # network, i.e. 1.2e-17 s^-1, for type 1 reactions.
+
+            if reaction_type == 1:
+                alpha = alpha / 1.2e-17
+
             reaction = format_react(reactant1, reactant2, reactant3,
                                     product1, product2, product3, product4,
                                     alpha, beta, gamma, reaction_type,
                                     reaction_number)
             fileout.write(reaction)
 
-# Main function.
-	
 def main():
 
     # Parse options and check arguments. Display help message if
