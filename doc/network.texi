@@ -26,7 +26,13 @@ can be found in the network directory of the source distribution.
 @code{osu2007.chm}: This network file contains the reactions and rates
 from the Ohio State University astrochemistry database, that is maintain
 by Eric Herbst. In correspond to the January 2007 version of the
-database. This network contains 4429 and 452 species.
+database. This network contains 4429 reactions and 452 species.
+@item
+@code{osu2005.chm}: This network corresponds to the 2005 version of the
+Ohio State University astrochemistry database.
+@item
+@code{osu2003.chm}: This network corresponds to the 2003 version of the
+Ohio State University astrochemistry database.
 @item
 @code{udfa2006.chm}: This networks contains the reactions and rate from
 the UMIST Database for Astrochemistry (UDFA) 2006, that is maintained
