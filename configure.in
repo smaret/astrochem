@@ -35,5 +35,6 @@ AC_CHECK_FUNCS([pow exp fabs])
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  src/Makefile
-		 networks/Makefile])
+		 networks/Makefile
+		 tests/Makefile])
 AC_OUTPUT
