@@ -4,7 +4,7 @@ astrochem_TEXINFOS = intro.texi using.texi examples/input.ini \
 	examples/source.mdl examples/CO.abun examples/H3(+).abun \
 	examples/HCO(+).abun examples/e.abun examples/abundances.eps \
 	examples/abundances.pdf examples/abundances.eps input.texi \
-	gpl.texi fdl.texi
+	network.texi examples/network.chm gpl.texi fdl.texi
 
 man_MANS = astrochem.1 plabun.1 plconv.1 chmconvert.1
 
