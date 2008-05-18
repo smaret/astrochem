@@ -24,9 +24,6 @@ release. They are ordered by descending order of priority.
 
 * Check for the Biggles Python module in the configure script.
 
-* Include the license terms in each file. See: 
-  http://www.gnu.org/licenses/gpl-howto.html
-
 * Write a README file. The file should explain briefly what the code
   does, and give some succinct instructions on how to compile it. It
   should also say what its dependency are, and where they can be

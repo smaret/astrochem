@@ -1,5 +1,22 @@
 /* 
-   Read the input files needed by astrochem.
+   input.c - Read the input files needed by Astrochem.
+
+   Copyright (c) 2006-2008 Sebastien Maret
+   
+   This file is part of Astrochem.
+   
+   Astrochem is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published
+   by the Free Software Foundation, either version 3 of the License,
+   or (at your option) any later version.
+   
+   Astrochem is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifdef HAVE_CONFIG_H
@@ -9,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "astrochem.h"
 
 /*
@@ -33,6 +51,7 @@ read_input (char *input_file, char *chem_file, char *source_file,
   char value[MAX_LINE];
   int  line_number = 0;
   int  i = 0, j = 0;
+  errno = 0;
   
   /* Open the input file or exit if we can't open it. */
 
@@ -41,8 +60,9 @@ read_input (char *input_file, char *chem_file, char *source_file,
   f = fopen (input_file, "r" );
   if (!f)
     {
-      fprintf (stderr, "astrochem: error: can't open %s.\n", input_file);
-      exit (1);
+      fprintf (stderr, "astrochem: error: Can't open %s: %s\n", input_file,
+	       strerror (errno));
+      exit (EXIT_FAILURE);
     }
 
   /* Set the default values for parameters in the input file, in case
@@ -259,7 +279,7 @@ read_source (char *source_file, int shell[], int *n_shells,
 
   /* Open the input file or exit if we can't open it */
 
-  if (verbose > 0)
+  if (verbose == 1)
     fprintf (stdout, "Reading source model from %s.\n", source_file);
   f = fopen (source_file, "r" );
   if (!f)
