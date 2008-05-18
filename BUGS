@@ -1,0 +1,2 @@
+* On some platforms, -lm is not added automatically. Add it in the
+  Makefile.

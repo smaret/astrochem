@@ -22,8 +22,6 @@ release. They are ordered by descending order of priority.
   of command-line options for each program that come with
   astrochem. See: http://www.gnu.org/prep/standards/standards.html
 
-* Check for the Biggles Python module in the configure script.
-
 * Write a README file. The file should explain briefly what the code
   does, and give some succinct instructions on how to compile it. It
   should also say what its dependency are, and where they can be
