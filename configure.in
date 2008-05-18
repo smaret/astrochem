@@ -11,6 +11,7 @@ AC_PROG_CC
 AM_PATH_PYTHON([2.4])
 
 # Checks for libraries.
+AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(sundials_cvode, main)
 AC_CHECK_LIB(sundials_nvecserial, main)
 if test $ac_cv_lib_sundials_cvode_main = "no"; then
