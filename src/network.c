@@ -47,14 +47,14 @@ read_network (char *chem_file, struct react reactions[],
     }
 
   /* Open the input file. We first look in the current directory, and 
-     then in the DATADIR directory. Exit if we can't find it. */
+     then in the PKGDATADIR directory. Exit if we can't find it. */
   
   f = fopen (chem_file, "r");
   if ( !f )
     {
       char chem_file1[MAX_LINE];
       
-      strncpy (chem_file1, DATADIR, sizeof (chem_file1));
+      strncpy (chem_file1, PKGDATADIR, sizeof (chem_file1));
       strncat (chem_file1, "/", sizeof (chem_file1));
       strncat (chem_file1, chem_file, sizeof (chem_file1));
       f = fopen (chem_file1, "r");

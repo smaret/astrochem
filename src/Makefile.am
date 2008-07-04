@@ -1,4 +1,4 @@
-AM_CFLAGS = -DDATADIR=\"$(datadir)\"
+AM_CFLAGS = -DPKGDATADIR=\"$(pkgdatadir)\"
 
 AM_CFLAGS += ${OPENMP_CFLAGS}
 
