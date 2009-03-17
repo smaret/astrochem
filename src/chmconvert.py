@@ -2,7 +2,7 @@
 #
 #  chmconvert - Convert chemical networks into .chm format
 #
-#  Copyright (c) 2006-2008 Sebastien Maret
+#  Copyright (c) 2006-2009 Sebastien Maret
 # 
 #  This file is part of Astrochem.
 #
@@ -39,13 +39,13 @@ Common options:
    -o, --output       Write the edited network in a file
 
 See chmconvert(1) man page for a complete list of commands and options.
-Report bugs to <smaret@umich.edu>."""
+Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>."""
 
 def version():
     """Display version number."""
 
     print "This is chmconvert, version %s" % VERSION
-    print """Copyright (c) 2006-2007 Sebastien Maret
+    print """Copyright (c) 2006-2009 Sebastien Maret
 
 This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent

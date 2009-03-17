@@ -2,7 +2,7 @@
 #
 #  plabun - Plot the abundances computed by Astrochem
 #
-#  Copyright (c) 2006-2008 Sebastien Maret
+#  Copyright (c) 2006-2009 Sebastien Maret
 # 
 #  This file is part of Astrochem.
 #
@@ -23,7 +23,7 @@ import sys
 import getopt
 import string
 import biggles
-from numarray import *
+from numpy import *
 
 VERSION = "0.1"
 
@@ -41,19 +41,19 @@ Options:
    -V, --version            Display plabun version information
    -o, --output             Create a postscript file
 
-   -s, --shell=index        Plot abundance in a given shell
-   -t, --time=index         Plot abundance at a given time
+   -s, --shell=index        Set the shell number (default 0)
+   -t, --time=time          Set the time
    -x, --xrange=xmin,xmax   Set the x axis range
    -y, --yrange=ymin,ymax   Set the y axis range
    
 See the plabun(1) man page for more information
-Report bugs to <smaret@umich.edu>."""
+Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>."""
 
 # Display version number.
 
 def version():
     print "This is plabun, version %s" % VERSION
-    print """Copyright (c) 2006-2007 Sebastien Maret
+    print """Copyright (c) 2006-2009 Sebastien Maret
 
 This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent
@@ -116,7 +116,7 @@ def speciename(filename):
 
     return specie
 
-# Parse options and check comands and arguments
+# Parse options and check commands and arguments
 	
 def main():
 
@@ -213,7 +213,7 @@ def main():
 	    linecolor = linecolor_stack.pop(0)
 	    linecolor_stack.append(linecolor)
 	    try:
-		c = biggles.Curve(time, abund[:, s], linecolor = linecolor)
+		c = biggles.Curve(time, abund[:, s], linecolor = linecolor, linewidth = 2)
 	    except IndexError:
 		sys.stderr.write("plabun: error: shell index is out of bounds.\n")
 		sys.exit(1)

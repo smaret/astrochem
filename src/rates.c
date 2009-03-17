@@ -1,22 +1,22 @@
 /*
-  rates.c - Compute the reaction rates.
+   rates.c - Compute the reaction rates.
 
-  Copyright (c) 2006-2008 Sebastien Maret
-   
-  This file is part of Astrochem.
-  
-  Astrochem is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published
-  by the Free Software Foundation, either version 3 of the License,
-  or (at your option) any later version.
-  
-  Astrochem is distributed in the hope that it will be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License
-  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
+   Copyright (c) 2006-2009 Sebastien Maret
+
+   This file is part of Astrochem.
+
+   Astrochem is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published
+   by the Free Software Foundation, either version 3 of the License,
+   or (at your option) any later version.
+
+   Astrochem is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifdef HAVE_CONFIG_H
@@ -33,8 +33,9 @@
 
 double 
 rate(double alpha, double beta, double gamm, int reaction_type,
-     int reaction_no, double av, double tgas, double tdust,
-     double chi, double pdyield, double cosmic) 
+     int reaction_no __attribute__ ((unused)), double av,
+     double tgas, double tdust, double chi, double pdyield,
+     double cosmic) 
 {  
   double k; /* Reaction rate (cm^-3 s^-1) */
 
