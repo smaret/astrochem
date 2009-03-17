@@ -1,0 +1,79 @@
+.\" -*- nroff -*-
+.Dd January 20, 2009
+.Os
+.Dt PLROUTE 1
+.Sh NAME
+.Nm plroute
+.Nd plot the destruction/formation routes computed by astrochem for a given specie
+.Sh SYNOPSIS
+.Nm
+.Op Ar option
+.Ar command
+.Ar file
+.\"
+.\" Description
+.\"
+.Sh DESCRIPTION
+.Nm
+is a
+.Xr python 1
+script to plot the main destruction/formation routes computed by
+.Xr astrochem 1
+.\"
+.\" Commands
+.\"
+.Sh COMMANDS
+.Bl -tag -width flag
+.It Cm av Ar file
+Plot the formation/destruction rates of a given molecule as a function
+of the shell number at a given time
+.It Cm time Ar file
+Plot the formation/destruction rates of a given molecule as a function
+of time, in a given shell
+.\"
+.\" Options
+.\"
+.Sh OPTIONS
+.Bl -tag -width flag
+.It Cm -h, --help
+Display help text.
+.It Cm -V, --version
+Display astrochem version information.
+.It Cm -o Ar file , Cm --output=Ar file
+Create a PostScript file.
+.It Cm -s Ar shell-number , Cm --shell= Ar shell-number
+Set the shell number. Default is 0.
+.It Cm -s Ar time , Cm --time= Ar time
+Set the time.
+.It Cm -x Ar xmin,xmax , Cm --xrange= Ar xmin,xmax
+Set the x axis range
+.It Cm -y Ar ymin,ymax , Cm --yrange= Ar ymin,ymax
+Set the y axis range 
+.\"
+.\" Authors, copyright, and see also
+.\"
+.Sh AUTHOR
+Written by Sebastien Maret.
+.Sh "REPORTING BUGS"
+Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>
+.Sh COPYRIGHT
+Copyright \(co 2006-2009 Sebastien Maret
+.Pp
+This is free software. You may redistribute copies of it under the
+terms of the GNU General Public License. There is NO WARRANTY, to the
+extent permitted by law.
+.Sh "SEE ALSO"
+.Xr astrochem 1 ","
+.Xr chmconvert 1 ","
+.Xr plabun 1
+.Pp
+The full documentation for
+.Cm astrochem
+is maintained as a Texinfo manual. If the 
+.Xr info 1
+and
+.Xr astrochem 1
+programs are properly installed at your site, the command
+.Cm info astrochem
+should give you access to the complete manual.
+

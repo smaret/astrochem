@@ -2,18 +2,18 @@
    Astrochem - compute the abundances of chemical species in the
    interstellar medium as as function of time.
 
-   Copyright (c) 2006-2008 Sebastien Maret
+   Copyright (c) 2006-2009 Sebastien Maret
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -166,16 +166,7 @@ main (int argc, char *argv[])
 
   /* Solve the ODE system for each shell. */
 
-#ifdef HAVE_OPENMP  
-#pragma omp parallel shared (abundances) private (shell_index)
-#endif
-
   {
-
-#ifdef HAVE_OPENMP
-#pragma omp for schedule (dynamic, 1) nowait
-#endif
-
     for (shell_index = 0; shell_index < n_shells; shell_index++)
       {
 	if (verbose >= 1)
@@ -203,7 +194,8 @@ main (int argc, char *argv[])
   /* Write the abundances in output files */
 
   output (n_shells, tim, time_steps, output_species, n_output_species,
-	  abundances, species, n_species, suffix, verbose);
+	  abundances, species, n_species, trace_routes, routes, suffix,
+	  verbose);
 
   exit (0);
 }
@@ -223,7 +215,7 @@ usage (void)
   fprintf (stdout, "   -q, --quiet        Suppress all messages\n");
   fprintf (stdout, "\n");
   fprintf (stdout, "See the astrochem(1) manual page for more information.\n");
-  fprintf (stdout, "Report bugs to <smaret@umich.edu>.\n");
+  fprintf (stdout, "Report bugs to <%s>.\n", PACKAGE_BUGREPORT);
 }
 
 /*
@@ -234,7 +226,7 @@ void
 version (void)
 {
   fprintf (stdout, "This is astrochem, version %s\n", VERSION);
-  fprintf (stdout, "Copyright (c) 2006-2007 Sebastien Maret\n");
+  fprintf (stdout, "Copyright (c) 2006-2009 Sebastien Maret\n");
   fprintf (stdout, "\n");
   fprintf (stdout, "This is free software. You may redistribute copies of it under the terms\n");
   fprintf (stdout, "of the GNU General Public License. There is NO WARRANTY, to the extent\n");

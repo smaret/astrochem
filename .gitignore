@@ -46,13 +46,16 @@ doc/texinfo.tex
 src/astrochem
 src/chmconvert
 src/plabun
+src/plroute
 
 # Ignore example files and figures
 doc/examples/*.abun
+doc/examples/*.rout
 doc/examples/*.eps
 
 # Input files and logs in tests/
 tests/*.abun
+tests/*.rout
 tests/*.mdl
 tests/*.log
 

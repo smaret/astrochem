@@ -2,20 +2,20 @@
    astrochem.h - Function prototypes, various constant and data
    structures for Astrochem.
 
-   Copyright (c) 2006-2008 Sebastien Maret
-   
+   Copyright (c) 2006-2009 Sebastien Maret
+
    This file is part of Astrochem.
-   
+
    Astrochem is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published
    by the Free Software Foundation, either version 3 of the License,
    or (at your option) any later version.
-   
+
    Astrochem is distributed in the hope that it will be useful, but
    WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -78,8 +78,8 @@ struct r {
 };
 
 struct rout {
-  struct r dest;
-  struct r from;
+  struct r destruction;
+  struct r formation;
 };
 
 #define MAX_REACTIONS 8192
@@ -130,4 +130,6 @@ int solve (double chi, double pdyield, double cosmic,
 void output (int n_shells, double tim[], int time_steps,
 	     char *output_species[], int n_output_species,
 	     double abundances[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES],
-	     char *species[], int n_species, char *suffix, int verbose);
+	     char *species[], int n_species, int trace_routes, 
+	     struct rout routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES],
+	     char *suffix, int verbose);

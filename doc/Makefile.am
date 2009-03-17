@@ -6,7 +6,7 @@ astrochem_TEXINFOS = intro.texi using.texi examples/input.ini \
 	examples/abundances.pdf examples/abundances.eps input.texi \
 	network.texi examples/network.chm gpl.texi fdl.texi
 
-man_MANS = astrochem.1 plabun.1 plconv.1 chmconvert.1
+man_MANS = astrochem.1 plabun.1 plroute.1 chmconvert.1
 
 EXTRA_DIST = $(man_MANS)
 

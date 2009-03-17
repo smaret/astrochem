@@ -20,11 +20,16 @@ fi
 
 # Check for Python modules
 m4_include([m4/ac_python_module.m4])
+AC_PYTHON_MODULE(numpy)
 AC_PYTHON_MODULE(biggles)
+if test $HAVE_PYMOD_NUMPY = "no"; then
+   AC_MSG_WARN(could not find python module numpy.)
+fi
 if test $HAVE_PYMOD_BIGGLES = "no"; then
    AC_MSG_WARN(could not find python module biggles.)
 fi
 AM_CONDITIONAL([HAVE_PYMOD_BIGGLES], [test $HAVE_PYMOD_BIGGLES = "yes"])
+AM_CONDITIONAL([HAVE_PYMOD_NUMPY], [test $HAVE_PYMOD_NUMPY = "yes"])
 
 # Checks for header files.
 AC_HEADER_STDC

@@ -1,20 +1,20 @@
 /* 
    input.c - Read the input files needed by Astrochem.
 
-   Copyright (c) 2006-2008 Sebastien Maret
-   
+   Copyright (c) 2006-2009 Sebastien Maret
+
    This file is part of Astrochem.
-   
+
    Astrochem is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published
    by the Free Software Foundation, either version 3 of the License,
    or (at your option) any later version.
-   
+
    Astrochem is distributed in the hope that it will be useful, but
    WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 */
@@ -191,7 +191,7 @@ read_input (char *input_file, char *chem_file, char *source_file,
 		    j++;
 		  }
 	      }
-	    else if (strcmp (parameter, "time_steps") == 0)
+	    else if (strcmp (parameter, "trace_routes") == 0)
 	      *trace_routes = atoi (value);
 	    else if (strcmp (parameter, "suffix") == 0)
 	      strncpy (suffix, value, MAX_LINE);
