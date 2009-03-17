@@ -97,12 +97,14 @@ This section specifies the output files created by Astrochem.
 @item
 @code{output}: The name of the species for which Astrochem should create
 an output file containing the abundance as a function of time and
-position. Species names must be separated by a comma.
+position. Species names must be separated by a comma. File names are formed
+with the species name, possibly followed by a suffix (see below) and the
+@code{.abun} file extensition.
 @item
 @code{suffix}: A suffix to append to the name of the specie, before the
-file extension (@code{.abun}). This is usefull when you want to run
-astrochem for a number of different input files located in the same
-directory; this way the results of a given simulation won't be
+file extension (@code{.abun} or @code{.reac}). This is usefull when you
+want to run astrochem for a number of different input files located in
+the same directory; this way the results of a given simulation won't be
 overwritten by results of an other one. A leading underscore will be
 added to this suffix.
 @item
@@ -112,6 +114,17 @@ may increase this number. Note that this only affect the number of time
 steps in the output files. The internal time step size is set by the ODE
 solver in order to reach the specified absolute and relative errors on
 the abundances.
+@item
+@code{trace_routes}: This parameter is used to toggle the computation of
+the major formation and destruction routes of the species given in
+@code{output}. If this parameter is set to 1, Astrochem will create a
+file that contain the formation/destruction rate and reaction number of
+the 10 most important formation/destruction reaction for each specie, as
+a function of time position (i.e. shell). As for abundance files, file
+names for formation and destruction routes are formed with the species
+name, possibly followed by a suffix (see below) but with the
+@code{.reac} file extensition.
+
 @end itemize
 
 

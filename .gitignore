@@ -52,6 +52,7 @@ src/plroute
 doc/examples/*.abun
 doc/examples/*.rout
 doc/examples/*.eps
+doc/examples/*.pdf
 
 # Input files and logs in tests/
 tests/*.abun

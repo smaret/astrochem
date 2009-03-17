@@ -178,7 +178,6 @@ corresponds to Astrochem version @value{VERSION}.
 * Plotting results::                Plot the abundances computed by Astrochem.
 * Contributors to Astrochem::       Who contributed to Astrochem.        
 * GNU General Public License::      Copying Astrochem.
-* GNU Free Documentation License::  Copying this manual. 
 * Concept Index::                   An item for each concept used in this manual.
 @end menu
 
@@ -220,13 +219,9 @@ many ideas about its implementation were borrowed from it.
 
 @end table
 
-@node  GNU General Public License, GNU Free Documentation License, Contributors to Astrochem, Top
+@node  GNU General Public License, Concept Index, Contributors to Astrochem, Top
 @unnumbered GNU General Public License
 @include gpl.texi
-
-@node GNU Free Documentation License, Concept Index, GNU General Public License, Top
-@unnumbered GNU Free Documentation License
-@include fdl.texi
 
 @comment htmlhelp: @bye
 
@@ -234,7 +229,7 @@ many ideas about its implementation were borrowed from it.
 @normalbottom
 @end iftex
 
-@node Concept Index, , GNU Free Documentation License, Top
+@node Concept Index, , GNU General Public License, Top
 @unnumbered Concept Index
 
 @printindex cp

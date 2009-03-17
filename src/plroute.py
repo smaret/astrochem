@@ -358,9 +358,11 @@ def main():
     
     t[0,0] = p1
     t[0,1] = p2
-    t.show()
+
     if output:
 	t.write_eps(arg)
+    else:
+        t.show()
 
 main()  
 	

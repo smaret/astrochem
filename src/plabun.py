@@ -261,9 +261,10 @@ def main():
         sys.stderr.write("plabun: error: nothing to plot.\n")
         sys.exit(1)
     
-    p.show()
     if output:
 	p.write_eps(arg)
+    else:
+        p.show()
 
 main()			  
 	

@@ -1,8 +1,11 @@
 @cindex usage, example of astrochem
 
-This chapter describes how to use Astrochem on a simple problem. We
-compute the abundances in a isodense and isoterm cold molecular cloud,
-that is shielded from the interstellar radiation field.
+This chapter presents a simple example of Astrochem usage. Here we want
+use Astrochem to study the formation of carbon monoxyde in a dense
+interstellar cloud. We suppose that the cloud is isodense and
+isothermal, and that it is sheilded from the UV field from nearby stars,
+so photo-processes can be ignored. For a sake of simplicity, we also
+neglect the freeze-out of molecules on dust grains.
 
 @menu
 * Describing the problem::      
@@ -126,11 +129,11 @@ for the shell number.
 
 Astrochem comes with a program to plot the abundances computed by
 Astrochem. The following command plot the @math{\rm CO}, @math{\rm
-H_{3}^{+}}, @math{\rm HCO^{+}} and @math{\rm e^{-}} in our source as a
+C^{+}}, @math{\rm CO} and @math{\rm e^{-}} in our source as a
 function of time.
 
 @example
-% plabun CO.abun  H3\(+\).abun  HCO\(+\).abun  e.abun
+% plabun time CO.abun  C\(+\).abun  C.abun  e.abun
 @end example
 
 @iftex
