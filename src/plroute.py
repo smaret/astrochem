@@ -292,6 +292,8 @@ def main():
 
         f_reac = unique(formation_reac[s, :, :])
         d_reac = unique(destruction_reac[s, :, :])
+        f_reac = f_reac[f_reac.nonzero()]
+        d_reac = d_reac[d_reac.nonzero()]
         f_rate = zeros(len(f_reac) * len(time), dtype=float)
         d_rate = zeros(len(d_reac) * len(time), dtype=float)
         f_rate = f_rate.reshape(len(f_reac), len(time))
