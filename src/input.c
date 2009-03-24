@@ -37,7 +37,7 @@
   
 void 
 read_input (char *input_file, char *chem_file, char *source_file,
-	    double *chi, double *pdyield, double *cosmic,
+	    double *chi, double *cosmic, double *grain_size,
 	    double *ti, double *tf, double *abs_err,
 	    double *rel_err, struct abund initial_abundances[],
 	    int *n_initial_abundances, char *output_species[],
@@ -72,8 +72,8 @@ read_input (char *input_file, char *chem_file, char *source_file,
   strcpy(chem_file, "");
   strcpy(suffix, "");
   *chi = CHI_DEFAULT;
-  *pdyield = PDYIELD_DEFAULT;
   *cosmic = COSMIC_DEFAULT;
+  *grain_size = GRAIN_SIZE_DEFAULT;
   *ti = TI_DEFAULT;
   *tf = TF_DEFAULT;
   *abs_err = ABS_ERR_DEFAULT;
@@ -110,10 +110,10 @@ read_input (char *input_file, char *chem_file, char *source_file,
 	  {
 	    if (strcmp (parameter, "chi") == 0)
 	      *chi = atof (value);
-	    else if (strcmp (parameter, "pdyield") == 0)
-	      *pdyield = atof (value);
 	    else if (strcmp (parameter, "cosmic") == 0)
 	      *cosmic = atof (value);
+	    else if (strcmp (parameter, "grain_size") == 0)
+	      *grain_size = atof (value) * 1e-4;   /* microns -> cm */
 	    else
 	      input_error (input_file, line_number);
 	  }

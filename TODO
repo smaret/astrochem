@@ -12,11 +12,6 @@ release. They are ordered by descending order of priority.
   this is computed correctly. I need to check the original references
   on H2 formation.
 
-* Check gas-grain processes (depletion, desorption). This have been
-  implemented in the code, but hasn't been tested yet. Oberg et
-  al. (2005) mention that desorption is zeroth order process, while I
-  model it as a second order process. How to implement that?
-
 * Implement H2 and CO self-shielding.
 
 * Write the chapter of the manual on source description, and
@@ -61,6 +56,10 @@ random order.
 
 * Implement 2D (disk) geometry. The difficulty here is how to treat
   the irradiation from the star. Check references.
+
+* Oberg et al. (2005) mention that desorption is zeroth order process,
+  while it is currently modeled as a second order process in
+  astrochem. How to implement this?
 
 * Implement a sensitivity analysis. I think this can be done directly
   in CVODE. Check the manual.

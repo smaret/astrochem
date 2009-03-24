@@ -28,14 +28,14 @@
 #include <math.h>
 #include "astrochem.h"
 
-#define TEMPERATURE_COSMIC_RAY 70
+#define FRACTION_TIME_GRAIN_70K 3.16e-19
 #define GAS_DUST_NUMBER_RATIO 7.57e+11
 
 double 
 rate(double alpha, double beta, double gamm, int reaction_type,
      int reaction_no __attribute__ ((unused)), double av,
-     double tgas, double tdust, double chi, double pdyield,
-     double cosmic) 
+     double tgas, double tdust, double chi, double cosmic,
+     double grain_size) 
 {  
   double k; /* Reaction rate (cm^-3 s^-1) */
 
@@ -79,41 +79,35 @@ rate(double alpha, double beta, double gamm, int reaction_type,
       break;
       
     case 20:
-      /* Depletion on the grains 
-	 FixMe: Only the sticking coefficient should go in here. The
-	 grain size should be an input parameter. */
+      /* Depletion on the grains */
       {
 	double thermal_veloc = pow (8 * CONST_CGSM_BOLTZMANN * tgas
 				    / (M_PI * beta * CONST_CGSM_MASS_PROTON),
 				    0.5);
-	k = alpha * gamm * thermal_veloc;
+	k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc;
 	break;
       }
       
     case 21:
       /* Thermal desorption */
       {
-	double nu0 = pow (2 * alpha * CONST_CGSM_BOLTZMANN / 
-			  (pow (M_PI, 2) * CONST_CGSM_MASS_PROTON * beta),
-			  0.5);
-	k = nu0 * exp (-gamm / tdust );
+	k = alpha * exp (-gamm / tdust );
 	break;
       }
       
     case 22:
       /* Cosmic ray desorption */
       {
-	double nu0 = pow (2 * alpha * CONST_CGSM_BOLTZMANN / 
-			  (pow (M_PI, 2) * CONST_CGSM_MASS_PROTON * beta),
-			  0.5);
-	k = nu0 * exp (-gamm / TEMPERATURE_COSMIC_RAY);
+	k = alpha * FRACTION_TIME_GRAIN_70K * exp (-gamm / 70.);
 	break;
       }
       
     case 23:
       /* Photo-desorption */
-      k = chi * exp(-2 * av) * alpha * pdyield;
-      break;
+      {
+	k = chi * exp(-2 * av) * alpha * M_PI * pow (grain_size, 2);
+	break;
+      }
       
     default:
       fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__, 

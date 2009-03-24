@@ -24,8 +24,8 @@
 					line */
 
 #define CHI_DEFAULT 1
-#define PDYIELD_DEFAULT 1e3
 #define COSMIC_DEFAULT 1
+#define GRAIN_SIZE_DEFAULT 1e-5     /* Grain radius, in cm */
 #define TI_DEFAULT 1e-7
 #define TF_DEFAULT 1e7
 #define ABS_ERR_DEFAULT 1e-15
@@ -86,7 +86,7 @@ struct rout {
 #define MAX_SPECIES 1024
 
 void read_input (char *input_file, char *chem_file, char *source_file,
-		 double *chi, double *pdyield, double *cosmic,
+		 double *chi, double *cosmic, double *grain_size,
 		 double *ti, double *tf, double *abs_err,
 		 double *rel_err, struct abund initial_abundances[],
 		 int *n_initial_abundances, char *output_species[],
@@ -110,10 +110,10 @@ void read_network (char *chem_file, struct react reactions[],
 int specie_index (char specie[], char *species[], int n_species);
 
 double rate(double alpha, double beta, double gamm, int reaction_type,
-	     int reaction_no, double av, double tgas, double tdust,
-	     double chi, double pdyield, double cosmic);
+	    int reaction_no, double av, double tgas, double tdust,
+	    double chi, double cosmic, double grain_size);
   
-int solve (double chi, double pdyield, double cosmic,
+int solve (double chi, double cosmic, double grain_size,
 	   double abs_err, double rel_err,
 	   struct abund initial_abundances[],
 	   int n_initial_abundances, char *output_species[],

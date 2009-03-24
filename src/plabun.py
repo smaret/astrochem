@@ -113,6 +113,7 @@ def speciename(filename):
 	else:
 	    specie = specie + char
     specie = specie + "$"
+    specie = specie.replace("ice", " ice")
 
     return specie
 

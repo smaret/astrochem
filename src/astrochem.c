@@ -34,8 +34,8 @@ char source_file[MAX_LINE];
 char suffix[MAX_LINE];
 
 double chi;
-double pdyield;
 double cosmic;
+double grain_size;
 double ti;
 double tf;
 double abs_err;
@@ -122,8 +122,8 @@ main (int argc, char *argv[])
     
   /* Read the input file */
 
-  read_input (input_file, chem_file, source_file, &chi, &pdyield,
-	      &cosmic, &ti, &tf, &abs_err, &rel_err,
+  read_input (input_file, chem_file, source_file, &chi, &cosmic,
+	      &grain_size, &ti, &tf, &abs_err, &rel_err,
 	      initial_abundances, &n_initial_abundances,
 	      output_species, &n_output_species, &time_steps,
 	      &trace_routes, suffix, verbose);
@@ -171,8 +171,8 @@ main (int argc, char *argv[])
       {
 	if (verbose >= 1)
 	  fprintf (stdout, "Computing abundances in shell %d...\n", shell_index);
-	if (solve (chi, pdyield, cosmic, abs_err,
-		   rel_err, initial_abundances,
+	if (solve (chi, cosmic, grain_size,
+		   abs_err, rel_err, initial_abundances,
 		   n_initial_abundances, output_species,
 		   n_output_species, av[shell_index],
 		   nh[shell_index], tgas[shell_index],

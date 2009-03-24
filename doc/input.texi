@@ -34,8 +34,8 @@ network provided with Astrochem.
 @section Physical parameters
 @cindex physical parameters, specify
 @cindex external radiation field
-@cindex photo-desorption yield
 @cindex cosmic ray ionization rate
+@cindex grain size
 
 This section specifies the physical parameters of the problem.
 
@@ -47,9 +47,8 @@ This section specifies the physical parameters of the problem.
 expressed in @math{s^{-1}}. The default value is @math{1.3 \times
 10^{-17} \, s^{-1}}.
 @item
-@code{pdyield}: The photo-dissociation yield. This is the number of
-molecules that are desorbed from the grain mantle surfaces per UV photon
-absorbed by the grain. The default value is @math{10^{3}}.
+@code{grain_size}: The grain radius in microns. The default value is
+@math{0.1}.
 @end itemize
 
 @node Solver parameters

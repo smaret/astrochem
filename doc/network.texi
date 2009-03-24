@@ -180,7 +180,7 @@ k = \chi \, alpha \, exp \left(-\gamma \over A_@{v@}\right)
 @end ifinfo
 @noindent where @math{\chi} is the interstellar radiation field (in
 Habing units) given in the input file (@pxref{Input file}), and
-@math{A_@{v@}} is the visual extinction.
+@math{A_{v}} is the visual extinction.
 
 @item
 Type 20: Depletion on the grains. The rate is given by
@@ -188,7 +188,7 @@ Type 20: Depletion on the grains. The rate is given by
 @tex
 \beforedisplay 
 $$
-k = \alpha \, \pi \, \gamma^2 \, \left( 8 k_{b} \, T_{\rm gas} \over
+k = \alpha \, \pi \, a^2 \, \left( 8 k_{b} \, T_{\rm gas} \over
   \pi \, \beta \, m_{p} \right)^{1/2}
 $$
 \afterdisplay
@@ -197,14 +197,15 @@ $$
 @ifinfo
 
 @example
-k = \alpha * \pi * \gamma^@{2@} * (8 * k_@{b@} * T_@{gas@})/(\pi * \beta * m_@{p@})^@{0.5@}
+k = \alpha * \pi * a^@{2@} * (8 * k_@{b@} * T_@{gas@})/(\pi * \beta * m_@{p@})^@{0.5@}
 @end example
 
 @end ifinfo
 @noindent where @math{\alpha} is the sticking coefficient on the grain,
-@math{\gamma} is the grain cross section, @math{k_{b}} is the Boltzman
-constant, @math{\beta} is the mass of the atom or molecule considered,
-expressed in atomic mass units, and @math{m_{p}} is the proton mass.
+@math{a} is the grain radius, @math{k_{b}} is the Boltzman constant,
+@math{\beta} is the mass of the atom or molecule considered, expressed
+in atomic mass units, and @math{m_{p}} is the proton mass (Bergin,
+Langer & Goldsmith 1995).
 
 @item
 Type 21: Thermal desorption.
@@ -212,7 +213,7 @@ Type 21: Thermal desorption.
 @tex
 \beforedisplay
 $$
-k = \nu_{0} \, {\rm exp} \left( -\gamma \over T_{\rm dust}\right)
+k = \alpha \, {\rm exp} \left( -\gamma \over T_{\rm dust}\right)
 $$
 \afterdisplay
 @end tex
@@ -224,9 +225,9 @@ k = nu0 * exp \left( -gamma \over Tdust \right)
 @end example
 
 @end ifinfo
-@noindent where @math{\nu_{0}} is latice vibration frequency for the
+@noindent where @math{\alpha} is the latice vibration frequency for the
 absorbed atom or molecule, and @math{\gamma} is the binding energy of
-the absorbed specie.
+the absorbed specie (Tielens & Allamandola 1987).
 
 @item
 Type 22: Cosmic rays desorption. The rate is:
@@ -234,7 +235,7 @@ Type 22: Cosmic rays desorption. The rate is:
 @tex
 \beforedisplay
 $$
-k = \nu_{0} \, {\rm exp} \left( -\gamma \over T_{\rm cr} \right)
+k = \alpha \, f \left( 70 {\rm K} \right) {\rm exp} \left( -\gamma \over T_{\rm cr} \right)
 $$
 \afterdisplay
 @end tex
@@ -242,12 +243,18 @@ $$
 @ifinfo
 
 @example
-k = nu0 * exp (-gamma / Tcr )
+k = \alpha * f(70 K) exp (-gamma / 70 )
 @end example
 
 @end ifinfo
-@noindent where @math{T_{\rm cr}} is the spot temperature of a grain that is
-heated by a cosmic ray, taken to be 70 K.
+@noindent where @math{\alpha} is the latice vibration frequency for the
+absorbed atom or molecule, @math{f \left( 70 {\rm K} \right)} is the
+fraction of time spent by a grain at the vicinity of 70 K because of
+cosmic-ray heating, and @math{\gamma} is the binding energy of the
+absorbed specie. A value of @math{3.16 \times 10^{-19}} is assumed,
+which is appropriate for a standard cosmic-ray flux and a grain radius
+of 0.1 @math{\mu m} (Hasegawa & Herbst 1993). Note that no scaling with
+the cosmic ray ionization rate is performed.
 
 @item
 Type 23: Photo-desorption. The rate is:
@@ -255,7 +262,7 @@ Type 23: Photo-desorption. The rate is:
 @tex
 \beforedisplay
 $$
-k = Y \chi {\rm exp} (-2\, A_{v}) \pi \gamma^2
+k = \alpha \chi {\rm exp} (-2\, A_{v}) \pi a^2
 $$
 \afterdisplay
 @end tex
@@ -263,12 +270,14 @@ $$
 @ifinfo
 
 @example
-k = Y * chi * exp (-2 Av) pi gamma**2
+k = alpha * chi * exp (-2 Av) pi a**2
 @end example
 
 @end ifinfo
-@noindent where @math{Y} is the photo-desorption yield given in the
-input file (@pxref{Input file}) and @math{gamma} is the grain radius.
+@noindent where @math{\alpha} is the photo-desorption yield (i.e. the number of
+molecules that are desorbed from the grain mantle surfaces per UV photon
+absorbed by the grain) and @math{a} is the grain radius (d'Hendecourt et
+al. 1985).
 
 @end itemize
 
