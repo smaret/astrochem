@@ -170,7 +170,16 @@ main (int argc, char *argv[])
 
   /* Solve the ODE system for each shell. */
 
+#ifdef HAVE_OPENMP  
+#pragma omp parallel shared (abundances) private (shell_index)
+#endif
+
   {
+
+#ifdef HAVE_OPENMP
+#pragma omp for schedule (dynamic, 1) nowait
+#endif
+
     for (shell_index = 0; shell_index < n_shells; shell_index++)
       {
 	if (verbose >= 1)
