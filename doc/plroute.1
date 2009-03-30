@@ -1,34 +1,35 @@
 .\" -*- nroff -*-
 .Dd January 20, 2009
 .Os
-.Dt PLABUN 1
+.Dt PLROUTE 1
 .Sh NAME
-.Nm plabun
-.Nd plot abundances computed by astrochem
+.Nm plroute
+.Nd plot the destruction/formation routes computed by astrochem for a given specie
 .Sh SYNOPSIS
 .Nm
 .Op Ar option
 .Ar command
-.Ar file1
-.Op Ar file2 ...
+.Ar file
 .\"
 .\" Description
 .\"
 .Sh DESCRIPTION
 .Nm
-is a 
+is a
 .Xr python 1
-script to plot the abundances computed by
+script to plot the main destruction/formation routes computed by
 .Xr astrochem 1
 .\"
 .\" Commands
 .\"
 .Sh COMMANDS
 .Bl -tag -width flag
-.It Cm av Ar file1 Op Ar file2 ...
-Plot abundances as a function of the shell number at a given time
-.It Cm time Ar file1 Op Ar file2 ...
-Plot abundance as a function of time in a given shell
+.It Cm av Ar file
+Plot the formation/destruction rates of a given molecule as a function
+of the shell number at a given time
+.It Cm time Ar file
+Plot the formation/destruction rates of a given molecule as a function
+of time, in a given shell
 .\"
 .\" Options
 .\"
@@ -64,7 +65,7 @@ extent permitted by law.
 .Sh "SEE ALSO"
 .Xr astrochem 1 ","
 .Xr chmconvert 1 ","
-.Xr plroute 1
+.Xr plabun 1
 .Pp
 The full documentation for
 .Cm astrochem

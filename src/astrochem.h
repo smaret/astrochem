@@ -1,9 +1,31 @@
+/* 
+   astrochem.h - Function prototypes, various constant and data
+   structures for Astrochem.
+
+   Copyright (c) 2006-2009 Sebastien Maret
+
+   This file is part of Astrochem.
+
+   Astrochem is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published
+   by the Free Software Foundation, either version 3 of the License,
+   or (at your option) any later version.
+
+   Astrochem is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #define MAX_LINE 512                 /* Maximum number of characters in each input file
 					line */
 
 #define CHI_DEFAULT 1
-#define PDYIELD_DEFAULT 1e3
 #define COSMIC_DEFAULT 1
+#define GRAIN_SIZE_DEFAULT 1e-5     /* Grain radius, in cm */
 #define TI_DEFAULT 1e-7
 #define TF_DEFAULT 1e7
 #define ABS_ERR_DEFAULT 1e-15
@@ -56,15 +78,15 @@ struct r {
 };
 
 struct rout {
-  struct r dest;
-  struct r from;
+  struct r destruction;
+  struct r formation;
 };
 
 #define MAX_REACTIONS 8192
 #define MAX_SPECIES 1024
 
 void read_input (char *input_file, char *chem_file, char *source_file,
-		 double *chi, double *pdyield, double *cosmic,
+		 double *chi, double *cosmic, double *grain_size,
 		 double *ti, double *tf, double *abs_err,
 		 double *rel_err, struct abund initial_abundances[],
 		 int *n_initial_abundances, char *output_species[],
@@ -88,10 +110,10 @@ void read_network (char *chem_file, struct react reactions[],
 int specie_index (char specie[], char *species[], int n_species);
 
 double rate(double alpha, double beta, double gamm, int reaction_type,
-	     int reaction_no, double av, double tgas, double tdust,
-	     double chi, double pdyield, double cosmic);
+	    int reaction_no, double av, double tgas, double tdust,
+	    double chi, double cosmic, double grain_size);
   
-int solve (double chi, double pdyield, double cosmic,
+int solve (double chi, double cosmic, double grain_size,
 	   double abs_err, double rel_err,
 	   struct abund initial_abundances[],
 	   int n_initial_abundances, char *output_species[],
@@ -108,4 +130,6 @@ int solve (double chi, double pdyield, double cosmic,
 void output (int n_shells, double tim[], int time_steps,
 	     char *output_species[], int n_output_species,
 	     double abundances[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES],
-	     char *species[], int n_species, char *suffix, int verbose);
+	     char *species[], int n_species, int trace_routes, 
+	     struct rout routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES],
+	     char *suffix, int verbose);

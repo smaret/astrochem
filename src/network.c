@@ -1,5 +1,22 @@
-/*
-  Read the chemical network file.
+/* 
+   network.c - Read the chemical network file
+
+   Copyright (c) 2006-2009 Sebastien Maret
+
+   This file is part of Astrochem.
+
+   Astrochem is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published
+   by the Free Software Foundation, either version 3 of the License,
+   or (at your option) any later version.
+
+   Astrochem is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifdef HAVE_CONFIG_H
@@ -47,14 +64,14 @@ read_network (char *chem_file, struct react reactions[],
     }
 
   /* Open the input file. We first look in the current directory, and 
-     then in the DATADIR directory. Exit if we can't find it. */
+     then in the PKGDATADIR directory. Exit if we can't find it. */
   
   f = fopen (chem_file, "r");
   if ( !f )
     {
       char chem_file1[MAX_LINE];
       
-      strncpy (chem_file1, DATADIR, sizeof (chem_file1));
+      strncpy (chem_file1, PKGDATADIR, sizeof (chem_file1));
       strncat (chem_file1, "/", sizeof (chem_file1));
       strncat (chem_file1, chem_file, sizeof (chem_file1));
       f = fopen (chem_file1, "r");

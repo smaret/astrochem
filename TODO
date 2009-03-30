@@ -1,6 +1,75 @@
-* Implement H2 formation on grains.
+Main to-do items
+================
 
-* Implement a way to track the main formation and destructions
-  routes of a given specie.
- 
-* Write manual.
+Items to be completed before the first release
+----------------------------------------------
+
+The following tasks need to be completed before the first
+release. They are ordered by descending order of priority.
+
+* Check the implementation of H2 formation on the grains. For now I am
+  using the reaction rate from the OSU database, but I am not sure if
+  this is computed correctly. I need to check the original references
+  on H2 formation.
+
+* Implement H2 and CO self-shielding.
+
+* Write the chapter of the manual on source description, and
+  proof-read the manual. The chapter on chemical networks should give
+  references on how the rates are computed.  The manual should have a
+  section with a list of command-line options for each program that
+  come with astrochem. See:
+  http://www.gnu.org/prep/standards/standards.html
+
+* Write a README file. The file should explain briefly what the code
+  does, and give some succinct instructions on how to compile it. It
+  should also say what its dependency are, and where they can be
+  found. It should refer to the install file for more detailed
+  instructions.
+
+* Write a NEWS file.
+
+* Emulate the rstrip function so we can use older Python version
+
+Items for future releases
+-------------------------
+
+* Intercept convergence errors from CVODE, and exit gracefully if they
+  occurs, maybe with a message that suggests how to avoid them, or
+  that refer to a section in the manual.
+
+* Test different solver methods from CVODE. Some may take advantage of
+  the sparsity of the Jacobian matrix.
+
+* Allocate arrays dynamically instead of limiting their size
+  arbitrarily.
+
+* Pass structures to function that have a large number of arguments.
+
+* Make more self-tests.
+
+Wish list or vague ideas
+========================
+
+The following items are long-term goals, or just thoughts. They are in
+random order.
+
+* Implement 2D (disk) geometry. The difficulty here is how to treat
+  the irradiation from the star. Check references.
+
+* Oberg et al. (2005) mention that desorption is zeroth order process,
+  while it is currently modeled as a second order process in
+  astrochem. How to implement this?
+
+* Implement a sensitivity analysis. I think this can be done directly
+  in CVODE. Check the manual.
+
+* Write a program to re-order the reactions in a network to take
+  advantage of the sparsity of the Jacobian matrix. See the discussion
+  in Nejad et al, Astrophysics and Space Science, 299, 1-29, 2005.
+
+* Write a program that perform some tests on a network, such as the
+  value of rates at different temperature, duplicate reactions,
+  un-balanced reactions, holes in the network (i.e. check that each
+  specie has both a formation and a destruction route).
+

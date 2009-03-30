@@ -1,12 +1,13 @@
+SUBDIRS = examples
+
 info_TEXINFOS = astrochem.texi
 
-astrochem_TEXINFOS = intro.texi using.texi examples/input.ini \
-	examples/source.mdl examples/CO.abun examples/H3(+).abun \
-	examples/HCO(+).abun examples/e.abun examples/abundances.eps \
-	examples/abundances.pdf examples/abundances.eps input.texi \
-	gpl.texi fdl.texi
+astrochem_TEXINFOS = intro.texi using.texi examples/input.ini		\
+	examples/source.mdl examples/CO.abun examples/abundances.eps	\
+	examples/abundances.pdf examples/abundances.eps input.texi	\
+	network.texi examples/network.chm gpl.texi
 
-man_MANS = astrochem.1 plabun.1 plconv.1 chmconvert.1
+man_MANS = astrochem.1 plabun.1 plroute.1 chmconvert.1
 
 EXTRA_DIST = $(man_MANS)
 
@@ -26,3 +27,4 @@ $(DESTDIR)$(infodir)/foo.info: foo.info
 		install-info --dir-file=$(DESTDIR)$(infodir)/dir \
 		$(DESTDIR)$(infodir)/foo.info; \
 		else true; fi
+

@@ -1,6 +1,23 @@
-/* 
-   Build the ODE system and the jacobian matrix, and solve the
-   system with CVODE.
+/*
+   solve.c - Build the ODE system and the jacobian matrix, and solve
+   the system with CVODE.
+
+   Copyright (c) 2006-2009 Sebastien Maret
+
+   This file is part of Astrochem.
+
+   Astrochem is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published
+   by the Free Software Foundation, either version 3 of the License,
+   or (at your option) any later version.
+
+   Astrochem is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifdef HAVE_CONFIG_H
@@ -291,7 +308,7 @@ interrupt_handler (int sig __attribute__ ((unused)))
 */
  
 int
-solve (double chi, double pdyield, double cosmic,
+solve (double chi, double cosmic, double grain_size,
        double abs_err, double rel_err,
        struct abund initial_abundances[],
        int n_initial_abundances, char *output_species[],
@@ -357,7 +374,8 @@ solve (double chi, double pdyield, double cosmic,
 			       reactions[i].reaction_type,
 			       reactions[i].reaction_no,
 			       av, tgas, tdust,
-			       chi, pdyield, cosmic);
+			       chi, cosmic,
+			       grain_size);
        }
    }
    
@@ -463,14 +481,102 @@ solve (double chi, double pdyield, double cosmic,
 	       {
 		 int spec_index;
 		 int k;
-		 double r[MAX_REACTIONS][N_OUTPUT_ROUTES];
+		 int l;
+
+		 for (l = 0; l < N_OUTPUT_ROUTES; l++)
+		   {
+		     routes[shell_index][i][j][l].formation.rate = 0.;
+		     routes[shell_index][i][j][l].destruction.rate = 0.;
+		   }
 		 
 		 spec_index = specie_index (output_species [j], species, n_species);
 		 if (spec_index != -2)
 		   {
-		     for (k= 0; k < n_reactions; k++)
+		     for (k = 0; k < n_reactions; k++)
 		       {
-			 
+			 /* If the species is product of the reaction
+			    then compute the formation rate. If the
+			    rate is greater than the smallest rate in
+			    the formation route structure, we add the
+			    current reaction number and rate to that
+			    structure. */
+
+			 if ((reactions[k].product1 == spec_index) ||
+			     (reactions[k].product2 == spec_index) ||
+			     (reactions[k].product3 == spec_index) ||
+			     (reactions[k].product4 == spec_index))
+			   {
+			     struct r formation_route;
+			     double min_rate;
+			     unsigned int min_rate_index;
+
+			     formation_route.rate = reac_rates[k];
+			     formation_route.rate *= NV_Ith_S (y, reactions[k].reactant1);
+			     if (reactions[k].reactant2 != -1)
+			       formation_route.rate *= NV_Ith_S (y, reactions[k].reactant2);  
+			     if (reactions[k].reactant3 != -1)
+			       formation_route.rate *= NV_Ith_S (y, reactions[k].reactant3);
+			     formation_route.reaction_no = reactions[k].reaction_no;
+
+			     min_rate = routes[shell_index][i][j][0].formation.rate;
+			     min_rate_index = 0;
+			     for (l = 1; l < N_OUTPUT_ROUTES; l++)
+			       {
+				 if (routes[shell_index][i][j][l].formation.rate < min_rate)
+				   {
+				     min_rate = routes[shell_index][i][j][l].formation.rate;
+				     min_rate_index = l;
+				   }
+			       }
+			     if (formation_route.rate > min_rate)
+			       {
+				 routes[shell_index][i][j][min_rate_index].formation.rate = 
+				   formation_route.rate;
+				 routes[shell_index][i][j][min_rate_index].formation.reaction_no = 
+				   formation_route.reaction_no;
+			       }
+			   }
+
+			 /* If the species is reactant of the reaction
+			    then compute the destruction rate. */
+
+			 if ((reactions[k].reactant1 == spec_index) ||
+			     (reactions[k].reactant2 == spec_index) ||
+			     (reactions[k].reactant3 == spec_index))
+			   {
+			     struct r destruction_route;
+			     double min_rate;
+			     unsigned int min_rate_index;
+
+			     destruction_route.rate = reac_rates[k];
+			     if (reactions[k].reactant1 != spec_index)
+			       destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant1);
+			     if ((reactions[k].reactant2 != -1) &&
+				 (reactions[k].reactant2 != spec_index))
+			       destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant2);
+			     if ((reactions[k].reactant3 != -1) &&
+				 (reactions[k].reactant3 != spec_index))
+			       destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant3);
+			     destruction_route.reaction_no = reactions[k].reaction_no;
+
+			     min_rate = routes[shell_index][i][j][0].destruction.rate;
+			     min_rate_index = 0;
+			     for (l = 1; l < N_OUTPUT_ROUTES; l++)
+			       {
+				 if (routes[shell_index][i][j][l].destruction.rate < min_rate)
+				   {
+				     min_rate = routes[shell_index][i][j][l].destruction.rate;
+				     min_rate_index = l;
+				   }
+			       }
+			     if (destruction_route.rate > min_rate)
+			       {
+				 routes[shell_index][i][j][min_rate_index].destruction.rate = 
+				   destruction_route.rate;
+				 routes[shell_index][i][j][min_rate_index].destruction.reaction_no = 
+				   destruction_route.reaction_no;
+			       }
+			   }
 		       }
 		   }
 	       }
