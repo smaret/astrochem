@@ -26,7 +26,9 @@ script to plot the abundances computed by
 .Sh COMMANDS
 .Bl -tag -width flag
 .It Cm av Ar file1 Op Ar file2 ...
-Plot abundances as a function of the shell number at a given time
+Plot abundances as a function of the visual extinction at a given
+time. For this the model file (.mdl) must be specified with the
+--model option).
 .It Cm time Ar file1 Op Ar file2 ...
 Plot abundance as a function of time in a given shell
 .\"
@@ -43,11 +45,13 @@ Create a PostScript file.
 .It Cm -s Ar shell-number , Cm --shell= Ar shell-number
 Set the shell number. Default is 0.
 .It Cm -s Ar time , Cm --time= Ar time
-Set the time.
+Set the time index. Default is -1 (latest).
 .It Cm -x Ar xmin,xmax , Cm --xrange= Ar xmin,xmax
 Set the x axis range
 .It Cm -y Ar ymin,ymax , Cm --yrange= Ar ymin,ymax
-Set the y axis range 
+Set the y axis range
+.It Cm -m Ar file , Cm --model=Ar file
+Specify the model filename
 .\"
 .\" Authors, copyright, and see also
 .\"

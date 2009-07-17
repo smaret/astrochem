@@ -27,31 +27,35 @@ from numpy import *
 
 VERSION = "0.1"
 
-# Display usage.
-
 def usage():
+
+    # Display usage.
+
     print """Usage: plabun [options] command file1 [file2...]
 
 Commands:
    time   Plot abundances vs. time in a given shell
-   av     Plot abundance vs. visual extinction at a given time
+   av     Plot abundance vs. av at a given time
 
 Options:
    -h, --help               Display this help
    -V, --version            Display plabun version information
-   -o, --output             Create a postscript file
+   -o, --output=file        Create a postscript file
 
    -s, --shell=index        Set the shell number (default 0)
-   -t, --time=time          Set the time
+   -t, --time=time          Set the time index (default -1)
    -x, --xrange=xmin,xmax   Set the x axis range
    -y, --yrange=ymin,ymax   Set the y axis range
+
+   -m, --model=file         Specify the model filename
    
 See the plabun(1) man page for more information
 Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>."""
 
-# Display version number.
-
 def version():
+
+    # Display version number.
+
     print "This is plabun, version %s" % VERSION
     print """Copyright (c) 2006-2009 Sebastien Maret
 
@@ -59,10 +63,9 @@ This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent
 permitted by law."""
 
-# Read an abund file and return arrays of time, visual extinction 
-# and abundances
-
 def readabun(filename):
+
+    # Read an abund file and return arrays of time and abundances
     
     a = []
     try:
@@ -96,6 +99,26 @@ def readabun(filename):
 
     return time, abund
 
+def readmodel(filename):
+    
+    # Read a model file (.mdl) and returns the visual extinction
+
+    av = []
+    try:
+        f = open(filename)
+    except:
+        sys.stderr.write("plabun: error: can't open %s.\n" % filename)
+        sys.exit(1)
+
+    for line in f.readlines():
+        if line[0] == "#":
+            continue
+        av.append(float(line.split()[1]))
+
+    av = array(av)
+
+    return av
+
 def speciename(filename):
     
     # Guess the specie name from the filename
@@ -117,14 +140,15 @@ def speciename(filename):
 
     return specie
 
-# Parse options and check commands and arguments
-	
 def main():
+
+    # Parse options and check commands and arguments
 
     try:
 	opts, args = getopt.getopt(sys.argv[1:], "ho:s:t:x:y:",
 				   ["help", "output=", "shell=", 
-                                    "time=", "xrange=", "yrange="])
+                                    "time=", "xrange=", "yrange=",
+                                    "model="])
     except getopt.GetoptError:
 	usage()
 	sys.exit(1)
@@ -134,6 +158,7 @@ def main():
     t = -1
     xrange = None
     yrange = None
+    model = None
 
     for opt, arg in opts:
 	if opt in ("-h", "--help") :
@@ -164,7 +189,9 @@ def main():
                 yrange = [float(arg.split(",")[0]), float(arg.split(",")[1])]
             except:
                 sys.stderr.write("plabun: error: invalid y axis range.\n")
-                sys.exit(1)            
+                sys.exit(1)
+        if opt in ("-m", "--model"):
+            model = arg
 
     if len(args) < 2:
 	usage()
@@ -190,6 +217,10 @@ def main():
     # FixMe: use different symbols once we used
     # all colors. Set a maximum number of plots?
     linecolor_stack = ["red", "blue", "green", "yellow", "orange", "cyan"]
+
+    # Read the model file, if given
+    if model:
+        av = readmodel(model)
     
     # Plot the abundances in each file
     for filename in filenames:
@@ -198,11 +229,18 @@ def main():
 
 	if command == "time":
 
-	    p.xtitle = "Time"
+	    p.xtitle = "Time (yr)"
 	    p.xlog = 1
 
+            # Pick-up values that correspond to the given time index
+            try:
+                abund = abund[:, s]
+	    except IndexError:
+		sys.stderr.write("plabun: error: shell index is out of bounds.\n")
+		sys.exit(1)            
+
 	    # Drop zeros and negative values
-	    index = where(abund[:,s] > 0)[0]
+            index = abund > 0
 	    time = time[index]
 	    abund = abund[index]
 
@@ -213,39 +251,48 @@ def main():
         
 	    linecolor = linecolor_stack.pop(0)
 	    linecolor_stack.append(linecolor)
-	    try:
-		c = biggles.Curve(time, abund[:, s], linecolor = linecolor, linewidth = 2)
-	    except IndexError:
-		sys.stderr.write("plabun: error: shell index is out of bounds.\n")
-		sys.exit(1)
+            c = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
 	    c.label = speciename(filename)
 	    curves.append(c)
 	    p.add(c)
 
 	else:
 
-	    p.xtitle = "Shell index"
+            # Make sure that the model file was given
+            if not(model):
+		sys.stderr.write("plabun: error: no model file given.\n")
+                sys.exit(1)
+                
+	    p.xtitle = "$A_{v}$ (mag)"
 	    p.xlog = 0
 
+            # Pick-up values that correspond to the given time index
+            try:
+                abund = abund[t, :]
+	    except IndexError:
+		sys.stderr.write("plabun: error: time index is out of bounds.\n")
+		sys.exit(1)            
+
 	    # Drop zeros and negative values
-	    index = where(abund[t,:] > 0)[0]
-	    shell = shell[index]
+            index = abund > 0
+	    av = av[index]
+	    abund = abund[index]
+
+	    # Drop zeros and negative values
+            index = where(abund > 0)
+	    av = av[index]
 	    abund = abund[index]
 
 	    print abund.shape
 
-	    # Check that time and abund contain at least two points
-	    if len(shell) < 2:
+	    # Check that av and abund contain at least two points
+	    if len(av) < 2:
 		sys.stderr.write("plabun: warning: %s contains less than two non-zero abundances.\n" % filename)
 		continue
         
 	    linecolor = linecolor_stack.pop(0)
 	    linecolor_stack.append(linecolor)
-	    try:
-		c = biggles.Curve(shell, abund[t,:], linecolor = linecolor)
-	    except IndexError:
-		sys.stderr.write("plabun: error: time index is out of bounds.\n")
-		sys.exit(1)
+            c = biggles.Curve(av, abund, linecolor = linecolor)
 	    c.label = speciename(filename)
 	    curves.append(c)
 	    p.add(c)
@@ -253,7 +300,7 @@ def main():
     # Draw the plot key
     p.add(biggles.PlotKey(.1, .90, curves))
     if command == "av":
-        p.add(biggles.PlotLabel(.8,.9, "t=%3.1fx10$^{%i} yr" % 
+        p.add(biggles.PlotLabel(.8,.9, "t=%3.1f x 10$^{%i} yr" % 
                                  (time[t]/10**log10(time[t]),
                                   floor(log10(time[t])))))
 
