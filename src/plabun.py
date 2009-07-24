@@ -283,8 +283,6 @@ def main():
 	    av = av[index]
 	    abund = abund[index]
 
-	    print abund.shape
-
 	    # Check that av and abund contain at least two points
 	    if len(av) < 2:
 		sys.stderr.write("plabun: warning: %s contains less than two non-zero abundances.\n" % filename)
@@ -301,7 +299,7 @@ def main():
     p.add(biggles.PlotKey(.1, .90, curves))
     if command == "av":
         p.add(biggles.PlotLabel(.8,.9, "t=%3.1f x 10$^{%i} yr" % 
-                                 (time[t]/10**log10(time[t]),
+                                 (time[t]/10**floor(log10(time[t])),
                                   floor(log10(time[t])))))
 
     # Check that we have at least one abundance to plot
