@@ -101,9 +101,10 @@ def readabun(filename):
 
 def readmodel(filename):
     
-    # Read a model file (.mdl) and returns the visual extinction
+    # Read a model file (.mdl) and returns the visual extinction and
+    # radius (if present in the model file).
 
-    av = []
+    av, radius = [], []
     try:
         f = open(filename)
     except:
@@ -114,10 +115,12 @@ def readmodel(filename):
         if line[0] == "#":
             continue
         av.append(float(line.split()[1]))
+        if len(line.split()) >= 6:
+            radius.append(float(line.split()[5]))
 
-    av = array(av)
-
-    return av
+    av, radius = array(av), array(radius)
+                          
+    return av, radius
 
 def speciename(filename):
     
@@ -199,7 +202,7 @@ def main():
     command = args[0]
     filenames = args[1:]
 
-    if not command in ["time", "av"]:
+    if not command in ["time", "av", "radius"]:
 	sys.stderr.write("plabun: error: invalid command.\n")
 	sys.exit(1)
 	
@@ -220,7 +223,7 @@ def main():
 
     # Read the model file, if given
     if model:
-        av = readmodel(model)
+        av, radius = readmodel(model)
     
     # Plot the abundances in each file
     for filename in filenames:
@@ -262,9 +265,19 @@ def main():
             if not(model):
 		sys.stderr.write("plabun: error: no model file given.\n")
                 sys.exit(1)
-                
-	    p.xtitle = "$A_{v}$ (mag)"
-	    p.xlog = 0
+
+            if command == "av":
+                p.xtitle = "$A_{v}$ (mag)"
+                p.xlog = 0
+                xvalues = av
+            else:
+                # Make sure the radius values are in the model fiel
+                if radius.size == 0:
+                    sys.stderr.write("plabun: error: no radius in the model file.\n")
+                    sys.exit(1)
+                p.xtitle = "Radius (AU)"
+                p.xlog = 1
+                xvalues = radius
 
             # Pick-up values that correspond to the given time index
             try:
@@ -275,29 +288,29 @@ def main():
 
 	    # Drop zeros and negative values
             index = abund > 0
-	    av = av[index]
+	    xvalues = xvalues[index]
 	    abund = abund[index]
 
 	    # Drop zeros and negative values
             index = where(abund > 0)
-	    av = av[index]
+	    xvalues = xvalues[index]
 	    abund = abund[index]
 
-	    # Check that av and abund contain at least two points
-	    if len(av) < 2:
+	    # Check that xvalues and abund contain at least two points
+	    if len(xvalues) < 2:
 		sys.stderr.write("plabun: warning: %s contains less than two non-zero abundances.\n" % filename)
 		continue
         
 	    linecolor = linecolor_stack.pop(0)
 	    linecolor_stack.append(linecolor)
-            c = biggles.Curve(av, abund, linecolor = linecolor)
+            c = biggles.Curve(xvalues, abund, linecolor = linecolor)
 	    c.label = speciename(filename)
 	    curves.append(c)
 	    p.add(c)
     
     # Draw the plot key
     p.add(biggles.PlotKey(.1, .90, curves))
-    if command == "av":
+    if command == "av" or command == "radius":
         p.add(biggles.PlotLabel(.8,.9, "t=%3.1f x 10$^{%i} yr" % 
                                  (time[t]/10**floor(log10(time[t])),
                                   floor(log10(time[t])))))
