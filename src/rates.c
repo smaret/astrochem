@@ -1,7 +1,7 @@
 /*
    rates.c - Compute the reaction rates.
 
-   Copyright (c) 2006-2009 Sebastien Maret
+   Copyright (c) 2006-2010 Sebastien Maret
 
    This file is part of Astrochem.
 
@@ -30,6 +30,7 @@
 
 #define FRACTION_TIME_GRAIN_70K 3.16e-19
 #define GAS_DUST_NUMBER_RATIO 7.57e+11
+#define V0_PREFACTOR 1.58e+11
 
 double 
 rate(double alpha, double beta, double gamm, int reaction_type,
@@ -91,14 +92,14 @@ rate(double alpha, double beta, double gamm, int reaction_type,
     case 21:
       /* Thermal desorption */
       {
-	k = alpha * exp (-gamm / tdust );
+	k = V0_PREFACTOR * sqrt (gamm * beta) * exp (-gamm / tdust );
 	break;
       }
       
     case 22:
       /* Cosmic ray desorption */
       {
-	k = alpha * FRACTION_TIME_GRAIN_70K * exp (-gamm / 70.);
+	k = V0_PREFACTOR * sqrt (gamm * beta) * FRACTION_TIME_GRAIN_70K * exp (-gamm / 70.);
 	break;
       }
       
@@ -116,6 +117,3 @@ rate(double alpha, double beta, double gamm, int reaction_type,
     }
   return k;  
 }
-
-  
-  
