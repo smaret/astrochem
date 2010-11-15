@@ -3,7 +3,7 @@
 #  plroute - Plot the destruction/formation routes computed by
 #  astrochem for a given specie
 #
-#  Copyright (c) 2006-2009 Sebastien Maret
+#  Copyright (c) 2006-2010 Sebastien Maret
 # 
 #  This file is part of Astrochem.
 #
@@ -30,7 +30,8 @@ from numpy import *
 VERSION = "0.1"
 
 def usage():
-    """Display usage.
+    """
+    Display usage.
 
     """
 
@@ -51,24 +52,27 @@ Options:
    -n, --nroutes=number     Plot the rates of the first n routes
    -x, --xrange=xmin,xmax   Set the x axis range
    -y, --yrange=ymin,ymax   Set the y axis range
+   -c, --chmfile=file       Specify chemical network file
    
 See the plroute(1) man page for more information
 Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>."""
 
 def version():
-    """Display version number.
+    """
+    Display version number.
 
     """
 
     print "This is plroute, version %s" % VERSION
-    print """Copyright (c) 2006-2009 Sebastien Maret
+    print """Copyright (c) 2006-2010 Sebastien Maret
 
 This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent
 permitted by law."""
 
 def readrout(filename):
-    """Read a rout file and return arrays of time, shell number,
+    """
+    Read a rout file and return arrays of time, shell number,
     formation/destruction rates
 
     """
@@ -122,29 +126,18 @@ def readrout(filename):
     return time, shell, formation_reac, formation_rate, destruction_reac, destruction_rate
 
 def speciename(filename):
-    """Guess the specie name from the .abun or .rout file name
+    """
+    Guess the specie name from the .abun or .rout file name
 
     """
     
-    specie = "$"
-    filename = os.path.basename(filename)
-    for char in filename[:-5]:
-	if char == '(' or char == ')':
-	    continue
-        if char == '_':
-            break
-	elif (char == '+' or char == '-') and char == filename[-7]:
-	    specie = specie + "^{" + char + "}"
-	elif char.isdigit():
-	    specie = specie + "_{" + char + "}"
-	else:
-	    specie = specie + char
-    specie = specie + "$"
+    filename = os.path.basename(filename)[:-5]
 
-    return specie
+    return "$" + formatspecies(filename) + "$"
 
 def curveblank(xvalues, yvalues, blanking = 0, linecolor = "black"):
-    """Return a list of curves of yvalues vs. xvalues with blank values
+    """
+    Return a list of curves of yvalues vs. xvalues with blank values
 
     This function returns a list of curves of yvalues vs. xvalues
     ignoring blanked values. For example, if xvalues = [1,2,3,4,5] and
@@ -160,7 +153,7 @@ def curveblank(xvalues, yvalues, blanking = 0, linecolor = "black"):
        blanking:    blanking value for y (default 0)
        linecolor:   curve color (default "black")
        
-       """
+    """
 
     x = []
     y = []
@@ -178,17 +171,102 @@ def curveblank(xvalues, yvalues, blanking = 0, linecolor = "black"):
         c.append(biggles.Curve(x, y, linecolor = linecolor, linewidth = 2))
 
     return c
-	
+
+def getreact(react_number, chmfile):
+    """
+    Get the reactions corresponding to reaction numbers
+
+    Arguments:
+    react_number:   a list of reaction number
+    chmfile:        chemical network file
+
+    """
+
+    # Read the chemical network file
+    react_dict = {}
+    try:
+        f = open(chmfile, 'r')
+        for line in f:
+            if line[0] == "#":
+                continue
+            react = line.rsplit(None, 5)[0]
+            react_n = int(line.rsplit(None, 5)[5])
+            react_dict[react_n] = react
+    except:
+	sys.stderr.write("plroute: error: can't read %s.\n" % chmfile)
+	sys.exit(1)
+
+    react = []
+    for react_n in react_number:
+        try:
+            react.append(formatreact(react_dict[react_n]))
+        except KeyError:
+            sys.stderr.write("plroute: warning: can't find reaction %i in %s.\n" \
+                                 % (react_n, chmfile))
+            react.append(react_n)
+        
+    return react
+
+def formatreact(react):
+    """
+    Format a reaction in Biggles' TeX-like format
+
+    Arguments:
+    react:   reaction string
+
+    """
+
+    reaction = "$"
+
+    reactants = react.split("->")[0].split(" + ")
+    products = react.split("->")[1].split(" + ")
+
+    for i in range(len(reactants) - 1):
+        reaction = reaction + formatspecies(reactants[i].strip()) + " + "
+    reaction = reaction + formatspecies(reactants[-1].strip()) + " \\rightarrow  "
+    for i in range(len(products) - 1):
+        reaction = reaction + formatspecies(products[i].strip()) + " + "
+    reaction = reaction + formatspecies(products[-1].strip()) + "$"
+
+    return reaction
+
+def formatspecies(spec):
+    """
+    Format a species in Biggles' TeX-like format
+
+    Arguments:
+    species:   species string
+
+    """
+
+    if spec in ["cosmic-ray", "uv-photon"]:
+        return spec
+
+    species = ""
+    for char in spec:
+	if char == '(' or char == ')':
+	    continue
+	elif (char == '+' or char == '-'):
+	    species = species + "^{" + char + "}"
+	elif char.isdigit():
+	    species = species + "_{" + char + "}"
+	else:
+	    species = species + char
+
+    return species
+
 def main():
-    """Main program for plroute
+    """
+    Main program for plroute
 
     """
 
     # Parse options and check commands and arguments
     try:
-	opts, args = getopt.getopt(sys.argv[1:], "ho:s:t:x:y:",
+	opts, args = getopt.getopt(sys.argv[1:], "ho:s:t:x:y:c:",
 				   ["help", "output=", "shell=", 
-                                    "time=", "xrange=", "yrange="])
+                                    "time=", "xrange=", "yrange=",
+                                    "chmfile="])
     except getopt.GetoptError:
 	usage()
 	sys.exit(1)
@@ -199,6 +277,7 @@ def main():
     n = 8
     xrange = None
     yrange = None
+    chmfile = None
 
     for opt, arg in opts:
 	if opt in ("-h", "--help") :
@@ -235,7 +314,9 @@ def main():
                 yrange = [float(arg.split(",")[0]), float(arg.split(",")[1])]
             except:
                 sys.stderr.write("plroute: error: invalid y axis range.\n")
-                sys.exit(1)            
+                sys.exit(1)
+        if opt in ("-c", "--chmfile"):
+            chmfile = arg
 
     if len(args) != 2:
 	usage()
@@ -313,7 +394,7 @@ def main():
                 else:
                     d_rate[j, i] = 0.
 
-        # Find the most important formation/destruction routes.
+        # Find the most important formation/destruction routes
 
         max_f_rate = zeros(len(f_reac), dtype=float)
         max_d_rate = zeros(len(d_reac), dtype=float)
@@ -326,13 +407,21 @@ def main():
         index_f = max_f_rate.argsort()[::-1]
         index_d = max_d_rate.argsort()[::-1]
 
+        # Find the reaction corresponding to the reaction numbers
+        if chmfile:
+            f_reaction = getreact(f_reac, chmfile)
+            d_reaction = getreact(d_reac, chmfile)
+
         # Plot them, ignoring blanked values
             
         for j in index_f[0:6]:
             linecolor = linecolor_stack.pop(0)
             linecolor_stack.append(linecolor)
             c = curveblank(time, f_rate[j, :], linecolor = linecolor)
-            c[0].label = "%i" % f_reac[j]
+            if chmfile:
+                c[0].label = f_reaction[j]
+            else:
+                c[0].label = "%i" % f_reac[j]
             curves_f.append(c[0])
             for ci in c:
                 p1.add(ci)
@@ -341,7 +430,10 @@ def main():
             linecolor = linecolor_stack.pop(0)
             linecolor_stack.append(linecolor)
             c = curveblank(time, -d_rate[j, :], linecolor = linecolor)
-            c[0].label = "%i" % d_reac[j]
+            if chmfile:
+                c[0].label = d_reaction[j]
+            else:
+                c[0].label = "%i" % d_reac[j]
             curves_d.append(c[0])
             for ci in c:
                 p2.add(ci)
@@ -351,8 +443,12 @@ def main():
         sys.exit()
     
     # Draw the plot key
-    p1.add(biggles.PlotKey(.75, .4, curves_f))
-    p2.add(biggles.PlotKey(.75, .4, curves_d))
+    if chmfile:
+        xkey, ykey = .25, .4
+    else:
+        xkey, ykey = .75, .4
+    p1.add(biggles.PlotKey(xkey, ykey, curves_f))
+    p2.add(biggles.PlotKey(xkey, ykey, curves_d))
     if command == "av":
         p.add(biggles.PlotLabel(.8,.9, "t=%3.1fx10$^{%i} yr" % 
                                  (time[t]/10**log10(time[t]),
@@ -367,6 +463,5 @@ def main():
         t.show()
 
 main()  
-	
 	
     
