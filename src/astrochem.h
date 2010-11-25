@@ -24,7 +24,7 @@
 					line */
 
 #define CHI_DEFAULT 1
-#define COSMIC_DEFAULT 1
+#define COSMIC_DEFAULT 1.3e-17
 #define GRAIN_SIZE_DEFAULT 1e-5     /* Grain radius, in cm */
 #define TI_DEFAULT 1e-7
 #define TF_DEFAULT 1e7
