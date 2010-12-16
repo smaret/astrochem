@@ -54,11 +54,16 @@ doc/examples/*.rout
 doc/examples/*.eps
 doc/examples/*.pdf
 
-# Input files and logs in tests/
+# Object files, binaries, input files, and result files tests/
+tests/*.o
+tests/input_test
+tests/network_test
+tests/rate_test
+tests/source_test
+tests/input.ini
+tests/network.chm
+tests/source.mdl
 tests/*.abun
-tests/*.rout
-tests/*.mdl
-tests/*.log
 
 # Network files created by chmconvert
 networks/*.chm
