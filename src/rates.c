@@ -30,7 +30,7 @@
 
 #define FRACTION_TIME_GRAIN_70K 3.16e-19
 #define GAS_DUST_NUMBER_RATIO 7.57e+11
-#define V0_PREFACTOR 1.58e+11
+#define NUMBER_SITE_PER_GRAIN_SURFACE 3.00e+15
 
 double 
 rate(double alpha, double beta, double gamm, int reaction_type,
@@ -52,8 +52,7 @@ rate(double alpha, double beta, double gamm, int reaction_type,
     case 0:
       /* Gas-grain interaction (excluding depletion and desorption), 
 	 Electron-grain recombination. */
-      /*k = alpha * pow (tgas / 300, beta) * GAS_DUST_NUMBER_RATIO;*/
-      k = alpha * pow (tgas / 300, beta);
+      k = alpha * pow (tgas / 300, beta) * GAS_DUST_NUMBER_RATIO;
       break;
       
     case 1:
@@ -92,14 +91,22 @@ rate(double alpha, double beta, double gamm, int reaction_type,
     case 21:
       /* Thermal desorption */
       {
-	k = V0_PREFACTOR * sqrt (gamm * beta) * exp (-gamm / tdust );
+	double v0 = pow (2 * NUMBER_SITE_PER_GRAIN_SURFACE * gamm * CONST_CGSM_BOLTZMANN
+			 / (M_PI * M_PI * beta * CONST_CGSM_MASS_PROTON),
+			 0.5);
+	k = v0 * exp (-gamm / tdust );
+	k = 0.;
 	break;
       }
       
     case 22:
       /* Cosmic ray desorption */
       {
-	k = V0_PREFACTOR * sqrt (gamm * beta) * FRACTION_TIME_GRAIN_70K * exp (-gamm / 70.);
+	double v0 = pow (2 * NUMBER_SITE_PER_GRAIN_SURFACE * gamm * CONST_CGSM_BOLTZMANN
+			 / (M_PI * M_PI * beta * CONST_CGSM_MASS_PROTON),
+			 0.5);
+	k = v0 * FRACTION_TIME_GRAIN_70K * exp (-gamm / 70.);
+	k = 0.;
 	break;
       }
       
