@@ -95,7 +95,6 @@ rate(double alpha, double beta, double gamm, int reaction_type,
 			 / (M_PI * M_PI * beta * CONST_CGSM_MASS_PROTON),
 			 0.5);
 	k = v0 * exp (-gamm / tdust );
-	k = 0.;
 	break;
       }
       
@@ -106,7 +105,6 @@ rate(double alpha, double beta, double gamm, int reaction_type,
 			 / (M_PI * M_PI * beta * CONST_CGSM_MASS_PROTON),
 			 0.5);
 	k = v0 * FRACTION_TIME_GRAIN_70K * exp (-gamm / 70.);
-	k = 0.;
 	break;
       }
       
