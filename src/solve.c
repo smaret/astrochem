@@ -2,7 +2,7 @@
    solve.c - Build the ODE system and the jacobian matrix, and solve
    the system with CVODE.
 
-   Copyright (c) 2006-2009 Sebastien Maret
+   Copyright (c) 2006-2010 Sebastien Maret
 
    This file is part of Astrochem.
 
@@ -50,8 +50,8 @@ static jmp_buf env;
 
 static int f (realtype t, N_Vector y, N_Vector ydot, void *f_data);
 
-static int jacobian (long int N, DenseMat J, realtype t, N_Vector y,
-		     N_Vector fy, void *jacobian_data, N_Vector tmp1,
+static int jacobian (int N, realtype t, N_Vector y, N_Vector fy,
+		     DlsMat J, void *jacobian_data, N_Vector tmp1,
 		     N_Vector tmp2, N_Vector tmp3);
 
 void interrupt_handler (int sig);
@@ -127,9 +127,10 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
 */
 	  
 static int
-jacobian (long int N __attribute__ ((unused)), DenseMat J, 
+jacobian (int N __attribute__ ((unused)), 
 	  realtype t __attribute__ ((unused)), N_Vector y,
-	  N_Vector fy __attribute__ ((unused)), void *jacobian_data,
+	  N_Vector fy __attribute__ ((unused)),
+	  DlsMat J, void *jacobian_data,
 	  N_Vector tmp1 __attribute__ ((unused)), 
 	  N_Vector tmp2 __attribute__ ((unused)), 
 	  N_Vector tmp3 __attribute__ ((unused)))
@@ -404,18 +405,18 @@ solve (double chi, double cosmic, double grain_size,
 		__FILE__, __LINE__); 
        exit(1);
      }
-   
+
    abs_err = abs_err * nh;
-   if (CVodeMalloc (cvode_mem, f, 0.0, y, CV_SS, rel_err, &abs_err) != CV_SUCCESS)
+   if ((CVodeInit (cvode_mem, f, 0.0, y) != CV_SUCCESS)
+       || (CVodeSStolerances (cvode_mem, rel_err, abs_err) != CV_SUCCESS)
+       || ((CVDense (cvode_mem, n_species) != CV_SUCCESS))
+       || ((CVDlsSetDenseJacFn (cvode_mem, jacobian) != CV_SUCCESS))
+       || (CVodeSetUserData (cvode_mem, &params) != CV_SUCCESS))
      {
-       fprintf (stderr, "astrochem: %s:%d: solver memory initialization failed.\n",
+       fprintf (stderr, "astrochem: %s:%d: solver initialization failed.\n",
 		__FILE__, __LINE__); 
        exit(1);
      }
-
-   CVDense (cvode_mem, n_species);
-   CVDenseSetJacFn (cvode_mem, jacobian, &params);
-   CVodeSetFdata(cvode_mem, &params);
    
    {
      int i, j;
