@@ -1,30 +1,26 @@
 SUBDIRS = examples
 
-info_TEXINFOS = astrochem.texi
-
-astrochem_TEXINFOS = intro.texi using.texi examples/input.ini		\
-	examples/source.mdl examples/CO.abun examples/abundances.eps	\
-	examples/abundances.pdf examples/abundances.eps input.texi	\
-	network.texi examples/network.chm gpl.texi
-
 man_MANS = astrochem.1 plabun.1 plroute.1 chmconvert.1
 
-EXTRA_DIST = $(man_MANS)
+EXTRA_DIST = $(man_MANS), astrochem.tex
 
-$(DESTDIR)$(infodir)/foo.info: foo.info
-	$(POST_INSTALL)
-         # There may be a newer info file in . than in srcdir.
-	-if test -f foo.info; then d=.; \
-	          else d=$(srcdir); fi; \
-	$(INSTALL_DATA) $$d/foo.info $(DESTDIR)$@; \
-	# Run install-info only if it exists.
- 	# Use `if' instead of just prepending `-' to the
- 	# line so we notice real errors from install-info.
- 	# We use `$(SHELL) -c' because some shells do not
- 	# fail gracefully when there is an unknown command.
-	if $(SHELL) -c 'install-info --version' \
-		>/dev/null 2>&1; then \
-		install-info --dir-file=$(DESTDIR)$(infodir)/dir \
-		$(DESTDIR)$(infodir)/foo.info; \
-		else true; fi
+if HAVE_PDFLATEX
+if HAVE_BIBTEX
+
+all: pdf
+
+SUFFIXES = .pdf .tex
+
+pdf: astrochem.pdf
+
+astrochem.pdf: astrochem.tex examples/abundances.pdf
+	$(PDFLATEX) astrochem.tex
+	$(BIBTEX) astrochem.aux
+	$(PDFLATEX) astrochem.tex
+	$(PDFLATEX) astrochem.tex
+
+CLEANFILES = astrochem.aux astrochem.log astrochem.bbl astrochem.blg astrochem.pdf
+
+endif
+endif
 

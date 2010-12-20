@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(astrochem, 0.1, smaret@umich.edu)
+AC_INIT(astrochem, 0.1, sebastien.maret@obs.ujf-grenoble.fr)
 AM_INIT_AUTOMAKE(astrochem, 0.1)
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
@@ -12,6 +12,10 @@ AC_ARG_ENABLE([openmp],	AC_HELP_STRING([--enable-openmp], [enable openmp (defaul
 # Check for programs
 AC_PROG_CC
 AM_PATH_PYTHON([2.4])
+AC_CHECK_PROGS(PDFLATEX, pdflatex, no)
+AC_CHECK_PROGS(BIBTEX, bibtex, no)
+AM_CONDITIONAL(HAVE_PDFLATEX, test $PDFLATEX != no)
+AM_CONDITIONAL(HAVE_BIBTEX, test $BIBTEX != no)
 
 # Checks for libraries.
 AC_CHECK_LIB(m, main)
