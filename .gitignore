@@ -50,6 +50,7 @@ tests/*.o
 tests/input_test
 tests/network_test
 tests/rate_test
+tests/solve_test
 tests/source_test
 tests/input.ini
 tests/network.chm

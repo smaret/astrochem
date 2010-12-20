@@ -1,6 +1,6 @@
-TESTS = input_test source_test network_test rate_test
+TESTS = input_test source_test network_test rate_test solve_test
 
-check_PROGRAMS = input_test source_test network_test rate_test
+check_PROGRAMS = input_test source_test network_test rate_test solve_test
 
 input_test_SOURCES = input_test.c
 
@@ -18,5 +18,8 @@ rate_test_SOURCES = rate_test.c
 
 rate_test_LDADD = ../src/rates.o
 
-CLEANFILES = input.ini source.mdl network.chm *.abun
+solve_test_SOURCES = solve_test.c
 
+solve_test_LDADD = ../src/input.o ../src/network.o ../src/solve.o ../src/rates.o
+
+CLEANFILES = input.ini source.mdl network.chm *.abun
