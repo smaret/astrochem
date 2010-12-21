@@ -12,14 +12,11 @@ release. They are ordered by descending order of priority.
   this is computed correctly. I need to check the original references
   on H2 formation.
 
-* Implement H2 and CO self-shielding.
+* Oberg et al. (2005) mention that desorption is zeroth order process,
+  while it is currently modeled as a second order process in
+  astrochem. Fix this.
 
-* Write the chapter of the manual on source description, and
-  proof-read the manual. The chapter on chemical networks should give
-  references on how the rates are computed.  The manual should have a
-  section with a list of command-line options for each program that
-  come with astrochem. See:
-  http://www.gnu.org/prep/standards/standards.html
+* Complete and proof-read the documentation manual.
 
 * Write a README file. The file should explain briefly what the code
   does, and give some succinct instructions on how to compile it. It
@@ -29,14 +26,8 @@ release. They are ordered by descending order of priority.
 
 * Write a NEWS file.
 
-* Emulate the rstrip function so we can use older Python version
-
 Items for future releases
 -------------------------
-
-* Intercept convergence errors from CVODE, and exit gracefully if they
-  occurs, maybe with a message that suggests how to avoid them, or
-  that refer to a section in the manual.
 
 * Test different solver methods from CVODE. Some may take advantage of
   the sparsity of the Jacobian matrix.
@@ -46,7 +37,11 @@ Items for future releases
 
 * Pass structures to function that have a large number of arguments.
 
-* Make more self-tests.
+* Intercept convergence errors from CVODE, and exit gracefully if they
+  occurs, maybe with a message that suggests how to avoid them, or
+  that refer to a section in the manual.
+
+* Implement grain surface chemistry 
 
 Wish list or vague ideas
 ========================
@@ -54,22 +49,9 @@ Wish list or vague ideas
 The following items are long-term goals, or just thoughts. They are in
 random order.
 
-* Implement 2D (disk) geometry. The difficulty here is how to treat
-  the irradiation from the star. Check references.
+* Merge the 1D and 2D versions of the code.
 
-* Oberg et al. (2005) mention that desorption is zeroth order process,
-  while it is currently modeled as a second order process in
-  astrochem. How to implement this?
 
-* Implement a sensitivity analysis. I think this can be done directly
-  in CVODE. Check the manual.
 
-* Write a program to re-order the reactions in a network to take
-  advantage of the sparsity of the Jacobian matrix. See the discussion
-  in Nejad et al, Astrophysics and Space Science, 299, 1-29, 2005.
 
-* Write a program that perform some tests on a network, such as the
-  value of rates at different temperature, duplicate reactions,
-  un-balanced reactions, holes in the network (i.e. check that each
-  specie has both a formation and a destruction route).
 
