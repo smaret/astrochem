@@ -56,6 +56,30 @@ main ()
   double grain_size = 1e-5; /* cm */
   double k;
 
+  /* e(-) attachment on grains:
+     e(-) + grain -> grain(-) */
+  
+  reaction_type = -1;
+  alpha = 6.90e-15;
+  beta = .5;
+  gamm = 0;
+  k = rate (alpha, beta, gamm, reaction_type, reaction_no, av,
+	    tgas, tdust, chi, cosmic, grain_size);
+  if (equaltol (9.536397e-4, k, 1e-6) == 1)
+    return EXIT_FAILURE;
+
+  /* H2 formation on grains:
+     H + H -> H2 */
+  
+  reaction_type = 0;
+  alpha = 4.95e-17;
+  beta = .5;
+  gamm = 0;
+  k = rate (alpha, beta, gamm, reaction_type, reaction_no, av,
+	    tgas, tdust, chi, cosmic, grain_size);
+  if (equaltol (9.037422e-18, k, 1e-6) == 1)
+    return EXIT_FAILURE;
+
   /* Cosmic-ray ionisation reaction:
      H2 + cosmic-ray -> H2(+) + e(-) */
 
