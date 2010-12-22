@@ -7,11 +7,6 @@ Items to be completed before the first release
 The following tasks need to be completed before the first
 release. They are ordered by descending order of priority.
 
-* Check the implementation of H2 formation on the grains. For now I am
-  using the reaction rate from the OSU database, but I am not sure if
-  this is computed correctly. I need to check the original references
-  on H2 formation.
-
 * Oberg et al. (2005) mention that desorption is zeroth order process,
   while it is currently modeled as a second order process in
   astrochem. Fix this.

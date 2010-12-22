@@ -204,11 +204,74 @@ system\footnote{The Jacobian matrix is a $n_\mathrm{s}^2$ elements
 \subsection{Gas-grain interactions}
 \label{sec:gas-grain-inter}
 
-\subsubsection{Electron attachment and ion neutralization on grains}
-\label{sec:electr-attachm-ion}
+\subsubsection{H$_{2}$ formation on grains}
+\label{sec:h_2-formation-grains}
+
+The formation rate of H$_{2}$ on the grains is written as:
 
 \begin{equation}
-  k = \alpha \left( \frac{T}{300} \right)^\beta \frac{n_{H}}{n_{d}}
+  \frac{\mathrm{d} \conc{H_{2}}}{\mathrm{d} t} = k \conc{H}
+  \label{eq:h2-formation-rate}
+\end{equation}
+
+\noindent
+with:
+\begin{equation}
+  k = \alpha  \left( \frac{T}{300} \right)^\beta \, [\mathrm{s}^{-1}]
+  \label{eq:h2-formation-rate-coeff}
+\end{equation}
+
+This rate coefficient is usually obtained assuming that each H atom
+that strikes a grain will form H$_{2}$. The rate is then simply $1/2$
+of the collision rate between H atoms and grains. For 0.1$\mu m$
+olivine grains and gas-to-dust mass ratio of 100, we obtain a value of
+$\sim 10^{-17}$~s$^{-1}$ at 10~K. This is close to the value of $5
+\times 10^{-17}$~s$^{-1}$ determined observationally by
+\citet{Jura74}. However, because of the numerous uncertainties
+associated with the formation of H$_{2}$, in Astrochem the rate is not
+computed from the collision rate between H atoms and grains; instead
+we use the $\alpha$ and $\beta$ from the network file, and compute it
+with Eq.(\ref{eq:h2-formation-rate-coeff}).
+
+Note that unlike other two bodies reactions in Astrochem, this
+reaction has a first order kinetics: the formation rate of H$_{2}$
+depends on $\conc{H}$ and not on $\conc{H}^{2}$. Because of this, the
+reaction has its own type number, 0 (see
+\S~\ref{tab:react-type-numb}).
+
+\subsubsection{Electron attachment and ion recombination on grains}
+\label{sec:electr-attachm-ion}
+
+Electron may hit grains and charge them. Ions may them recombine on
+charged grains. For example:
+
+\begin{equation}
+  \mathrm{grain} + e^{-} \rightarrow \mathrm{grain}^{-}
+\end{equation}
+
+\noindent
+and:
+\begin{equation}
+  \mathrm{C^{+}} + \mathrm{grain}^{-} \rightarrow \mathrm{C} + \mathrm{grain}
+\end{equation}
+ 
+The formation rate of charged grains writes as:
+
+\begin{equation}
+  \frac{\conc{grain^{-}}}{\mathrm{d}t} = k_{1} \conc{grain} \conc{e^{-}}
+\end{equation}
+
+\noindent
+while the recombination rate of $\mathrm{C^{+}}$ writes:
+
+\begin{equation}
+  \frac{\conc{C^{+}}}{\mathrm{d}t} = - k_{2} \conc{grain^{-}} \conc{C^{+}}
+\end{equation}
+
+Both rates are computed from the following expression:
+
+\begin{equation}
+  k = \alpha \left( \frac{T}{300} \right)^\beta \, \frac{n_\mathrm{H}}{n_\mathrm{d}}
   \label{eq:grain-attach-neutralization}
 \end{equation}
 
@@ -216,6 +279,11 @@ system\footnote{The Jacobian matrix is a $n_\mathrm{s}^2$ elements
 and $n_{d}$ is the grain density. The $\frac{n_{H}}{n_{d}}$ ratio is
 assumed to be $7.57 \times 10^{11}$, a value adequate for olivine
 grains of 0.1~$\mu$m and a gas-to-dust mass ratio of 100.
+
+$k_{1}$ may be estimated by assuming that each electron that hits a
+grain will attach to it. For 0.1$\mu m$ olivine grains and gas-to-dust
+mass ratio of 100, we obtain a value of $\sim
+10^{-3}$~cm$^{-3}$~s$^{-1}$ at 10~K.
 
 \subsubsection{Depletion}
 \label{sec:depletion}
@@ -649,6 +717,7 @@ This section describes the file format for Astrochem network files
 
 \begin{verbatim}
 # A few reactions extracted from osu2008.chm
+H      + H           -> H2                   4.95e-17  5.00e-01  0.00e+00  0    1
 H2     + cosmic-ray  -> H2(+)  + e(-)        9.30e-01  0.00e+00  0.00e+00  1   39
 H3(+)  + CO          -> HCO(+) + H2          1.61e-09  0.00e+00  0.00e+00  2 1756
 H3(+)  + e(-)        -> H      + H      + H  4.36e-08 -5.20e-01  0.00e+00  9 3746
@@ -686,7 +755,8 @@ Table~\label{tab:rate-const-meaning}.
       \hline
       Type number & Reaction type\\
       \hline
-      0  & Gas-grain interaction, Electron-grain recombination\\
+      -1 & Electron attachment and ion recombination on grains\\
+      0  & H$_{2}$ formation on grains\\
       1  & Cosmic-ray ionization or cosmic-ray induced photo-reactions\\
       2  & Ion-molecule reactions, Charge exchange reactions\\
       3  & Negative ion - neutral species reactions\\
@@ -721,7 +791,8 @@ Table~\label{tab:rate-const-meaning}.
       \cline{3-5}
       & & $a$ & $b$ & $c$\\
       \hline
-      0     & (\ref{eq:grain-attach-neutralization}) & $\alpha$ & $\beta$\\
+      -1    & (\ref{eq:grain-attach-neutralization}) & $\alpha$ & $\beta$\\
+      0     & (\ref{eq:h2-formation-rate})) & $\alpha$ & $\beta$\\
       1     & (\ref{eq:cosmic-ray-ionization}) & $\alpha$ & - & -\\
       2-12  & (\ref{eq:arrhenius}) & $\alpha$ & $\beta$ & $\gamma$\\
       13    & (\ref{eq:photo-ionization}) & $\alpha$ & - & -\\

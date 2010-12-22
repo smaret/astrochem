@@ -201,6 +201,18 @@ def convert(filein, format, fileout, ignore_unknown = True):
                                           % line_number)
                         exit(1)
 
+                # H2 formation, electron attachement and ion
+                # recombination on grains have the same type in
+                # OSU. However, the rate are not computed in the same
+                # fashion. In Astrochem format, only H2 formation has
+                # type 0, other reactions have type -1.
+
+                if react.type == 0:
+                    if react.reactant1 == "H" and react.reactant2 == "H" and react.product1 == "H2":
+                        pass
+                    else:
+                        react.type = -1
+
 		fileout.write(format_react(react))
 
     elif format == "udfa":

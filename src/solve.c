@@ -44,6 +44,7 @@ struct par {
   struct react *reactions;
   int n_reactions;
   int n_species;
+  int spec_index_h;
 };
 
 static jmp_buf env;
@@ -72,6 +73,7 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
   struct react *reactions = ((struct par *)f_data)->reactions;
   int n_reactions = ((struct par *)f_data)->n_reactions;
   int n_species = ((struct par *)f_data)->n_species;
+  int spec_index_h =  ((struct par *)f_data)->spec_index_h;
 
   /* Loop over the reactions and build the right hand ODE system
      equations. */
@@ -97,6 +99,12 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
       if (reactions[i].reactant3 != -1)
 	y_product *= NV_Ith_S (y, reactions[i].reactant3);
       y_product *= reac_rates[i];
+
+      /* The formation of H2 is a first order reaction, so the product
+	 of the reactants needs to be divided by the H abundance. */
+      if (reactions[i].reaction_type == 0)
+	if (NV_Ith_S (y, spec_index_h) != 0)
+	  y_product = y_product / NV_Ith_S (y, spec_index_h);
 
       /* Add a production term for each product of the reaction. */
 
@@ -328,6 +336,8 @@ solve (double chi, double cosmic, double grain_size,
    void *cvode_mem;                    /* Memory space for the solver */
    double *reac_rates;                 /* Reaction rates */
 
+   int spec_index_h;                   /* Index for H */
+
    /* Allocate the work array and fill it with the initial
       concentrations. Ignore species that are not in the
       network. */
@@ -379,6 +389,10 @@ solve (double chi, double cosmic, double grain_size,
 			       grain_size);
        }
    }
+
+   /* Find the index of H */
+   
+   spec_index_h = specie_index ("H", species, n_species);
    
    /* Allocate and fill out a structure containing the parameters of
       the function defining the ODE system and the jacobian. */
@@ -393,6 +407,7 @@ solve (double chi, double cosmic, double grain_size,
    params.reactions = reactions;
    params.n_reactions = n_reactions;
    params.n_species = n_species;
+   params.spec_index_h = spec_index_h;
 
    /* Define the ODE system and solve it using the Backward
       Differential Formulae method (BDF) with a Newton Iteration. The

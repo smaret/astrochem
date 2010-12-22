@@ -44,15 +44,18 @@ rate(double alpha, double beta, double gamm, int reaction_type,
      of the Ohio State University database for astrochemistry, but it
      is extended to include depletion and desorption on/from the grain
      surfaces. */
-
-  /* FixMe: Should we check the values of rates with an exponential? */    
   
   switch (reaction_type)
     {
-    case 0:
+    case -1:
       /* Gas-grain interaction (excluding depletion and desorption), 
 	 Electron-grain recombination. */
       k = alpha * pow (tgas / 300, beta) * GAS_DUST_NUMBER_RATIO;
+      break;
+
+    case 0:
+      /* H2 formation on grains */
+      k = alpha * pow (tgas / 300, beta);
       break;
       
     case 1:
