@@ -87,7 +87,7 @@ struct rout {
 
 void read_input (char *input_file, char *chem_file, char *source_file,
 		 double *chi, double *cosmic, double *grain_size,
-		 double *ti, double *tf, double *abs_err,
+		 double *grain_abundance, double *ti, double *tf, double *abs_err,
 		 double *rel_err, struct abund initial_abundances[],
 		 int *n_initial_abundances, char *output_species[],
 		 int *n_output_abundances, int *time_steps, 
