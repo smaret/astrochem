@@ -140,7 +140,7 @@ main ()
   }
 
   shell_index = 0.;
-  solve (chi, cosmic, grain_size,
+  solve (chi, cosmic, grain_size, grain_abundance, 
 	 abs_err, rel_err, initial_abundances,
 	 n_initial_abundances, output_species,
 	 n_output_species, av[shell_index],

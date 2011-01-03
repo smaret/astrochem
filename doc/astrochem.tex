@@ -290,7 +290,7 @@ mass ratio of 100, we obtain a value of $\sim
 \label{sec:depletion}
 
 \begin{equation}
-  k = S \pi r_{d}^2 * v_{th}
+  k = S \pi r_{d}^2 * v_{th} * \conc{grain}
   \label{eq:depletion}
 \end{equation}
 
@@ -304,8 +304,13 @@ with:
 
 \noindent
 Here $S$ is a sticking probability (comprised between 0 and 1),
-$r_{d}$ is the grain radius, $v_{th}$ is the thermal velocity, and $m$
-is the mass of the accreting species \citep{Bergin95}.
+$r_{d}$ is the grain radius, $v_{th}$ is the thermal velocity,
+$\conc{grain}$ is the total grain concentration (neutral + charged)
+and $m$ is the mass of the accreting species
+\citep{Bergin95}. $\conc{grain}$, which does not vary with time
+because no grain destruction or formation reactions are considered in
+astrochem, is computed from initial abundances of neutral and charged
+grains given in the input file (see \S~\ref{sec:initial-abundances})
 
 \subsubsection{Thermal desorption}
 \label{sec:thermal-desorption}
@@ -678,7 +683,8 @@ the parameters needed by the ODE solver. These parameters are:
 This section specifies the initial abundances in the computation. Each
 line should contain a specie name followed by a equal sign and the
 initial abundance with respect to H nuclei. Species abundances that
-are not specified here are assumed to be zero.
+are not specified here are assumed to be zero. Grains must be written
+as \verb=grain=, \verb=grain(-)= or \verb=grain(+)=.
 
 \subsection{Output}
 \label{sec:output}

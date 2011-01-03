@@ -34,9 +34,9 @@
 
 double 
 rate(double alpha, double beta, double gamm, int reaction_type,
-     int reaction_no __attribute__ ((unused)), double av,
+     int reaction_no __attribute__ ((unused)), double nh, double av,
      double tgas, double tdust, double chi, double cosmic,
-     double grain_size) 
+     double grain_size, double grain_abundance) 
 {  
   double k; /* Reaction rate (cm^-3 s^-1) */
 
@@ -87,7 +87,7 @@ rate(double alpha, double beta, double gamm, int reaction_type,
 	double thermal_veloc = pow (8 * CONST_CGSM_BOLTZMANN * tgas
 				    / (M_PI * beta * CONST_CGSM_MASS_PROTON),
 				    0.5);
-	k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc;
+	k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc * grain_abundance * nh;
 	break;
       }
       

@@ -48,12 +48,14 @@ main ()
   double gamm = 0;
   int reaction_type = 0;
   int reaction_no = 0;
+  double nh  = 1e4;
   double av = 10;
   double tgas = 10;
   double tdust = 10;
   double chi = 1;
   double cosmic = 1.3e-17;
   double grain_size = 1e-5; /* cm */
+  double grain_abundance = 1.32e-12;
   double k;
 
   /* e(-) attachment on grains:
@@ -63,8 +65,8 @@ main ()
   alpha = 6.90e-15;
   beta = .5;
   gamm = 0;
-  k = rate (alpha, beta, gamm, reaction_type, reaction_no, av,
-	    tgas, tdust, chi, cosmic, grain_size);
+  k = rate (alpha, beta, gamm, reaction_type, reaction_no, nh,
+	    av, tgas, tdust, chi, cosmic, grain_size, grain_abundance);
   if (equaltol (9.536397e-4, k, 1e-6) == 1)
     return EXIT_FAILURE;
 
@@ -75,8 +77,8 @@ main ()
   alpha = 4.95e-17;
   beta = .5;
   gamm = 0;
-  k = rate (alpha, beta, gamm, reaction_type, reaction_no, av,
-	    tgas, tdust, chi, cosmic, grain_size);
+  k = rate (alpha, beta, gamm, reaction_type, reaction_no, nh,
+	    av, tgas, tdust, chi, cosmic, grain_size, grain_abundance);
   if (equaltol (9.037422e-18, k, 1e-6) == 1)
     return EXIT_FAILURE;
 
@@ -86,8 +88,8 @@ main ()
   reaction_type = 1;
   alpha = 9.3e-01;
 
-  k = rate (alpha, beta, gamm, reaction_type, reaction_no, av,
-	    tgas, tdust, chi, cosmic, grain_size);
+  k = rate (alpha, beta, gamm, reaction_type, reaction_no, nh,
+	    av, tgas, tdust, chi, cosmic, grain_size, grain_abundance);
   if (equaltol (1.209000e-17, k, 1e-6) == 1)
     return EXIT_FAILURE;
 
@@ -99,8 +101,8 @@ main ()
   beta = -.5;
   gamm = 0.;
 
-  k = rate (alpha, beta, gamm, reaction_type, reaction_no, av,
-	    tgas, tdust, chi, cosmic, grain_size);
+  k = rate (alpha, beta, gamm, reaction_type, reaction_no, nh,
+	    av, tgas, tdust, chi, cosmic, grain_size, grain_abundance);
   if (equaltol (2.464752e-8, k, 1e-6) == 1)
     return EXIT_FAILURE;
 
@@ -112,8 +114,8 @@ main ()
   beta = 0;
   gamm = 1.04e3;
 
-  k = rate (alpha, beta, gamm, reaction_type, reaction_no, av,
-	    tgas, tdust, chi, cosmic, grain_size);
+  k = rate (alpha, beta, gamm, reaction_type, reaction_no, nh,
+	    av, tgas, tdust, chi, cosmic, grain_size, grain_abundance);
   if (equaltol (5.723387e-58, k, 1e-6) == 1)
     return EXIT_FAILURE;
 
@@ -125,22 +127,22 @@ main ()
   beta = 0;
   gamm = 2.5;
 
-  k = rate (alpha, beta, gamm, reaction_type, reaction_no, av,
-	    tgas, tdust, chi, cosmic, grain_size);
+  k = rate (alpha, beta, gamm, reaction_type, reaction_no, nh,
+	    av, tgas, tdust, chi, cosmic, grain_size, grain_abundance);
   if (equaltol (4.305263e-22, k, 1e-6) == 1)
     return EXIT_FAILURE;
 
   /* Depletion
-     CO + grain -> CO(ice) + grain */
+     CO -> CO(ice) */
 
   reaction_type = 20;
   alpha = 1;
   beta = 28;
   gamm = 0;
 
-  k = rate (alpha, beta, gamm, reaction_type, reaction_no, av,
-	    tgas, tdust, chi, cosmic, grain_size);
-  if (equaltol (2.721974e-06, k, 1e-6) == 1)
+  k = rate (alpha, beta, gamm, reaction_type, reaction_no, nh,
+	    av, tgas, tdust, chi, cosmic, grain_size, grain_abundance);
+  if (equaltol (3.593005e-14, k, 1e-6) == 1)
     return EXIT_FAILURE;
 
   /* Thermal desorption
@@ -151,8 +153,8 @@ main ()
   beta = 28;
   gamm = 1180;
 
-  k = rate (alpha, beta, gamm, reaction_type, reaction_no, av,
-	    tgas, tdust, chi, cosmic, grain_size);
+  k = rate (alpha, beta, gamm, reaction_type, reaction_no, nh,
+	    av, tgas, tdust, chi, cosmic, grain_size, grain_abundance);
   if (equaltol (8.239140e-40, k, 1e-2) == 1)
     return EXIT_FAILURE;
 
@@ -164,8 +166,8 @@ main ()
   beta = 28;
   gamm = 1180;
 
-  k = rate (alpha, beta, gamm, reaction_type, reaction_no, av,
-	    tgas, tdust, chi, cosmic, grain_size);
+  k = rate (alpha, beta, gamm, reaction_type, reaction_no, nh,
+	    av, tgas, tdust, chi, cosmic, grain_size, grain_abundance);
   if (equaltol (2.194592e-14, k, 1e-6) == 1)
     return EXIT_FAILURE;
 

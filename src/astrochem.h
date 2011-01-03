@@ -110,10 +110,11 @@ void read_network (char *chem_file, struct react reactions[],
 int specie_index (char specie[], char *species[], int n_species);
 
 double rate(double alpha, double beta, double gamm, int reaction_type,
-	    int reaction_no, double av, double tgas, double tdust,
-	    double chi, double cosmic, double grain_size);
+	    int reaction_no, double nh, double av, double tgas, double tdust,
+	    double chi, double cosmic, double grain_size,
+	    double grain_abundance);
   
-int solve (double chi, double cosmic, double grain_size,
+int solve (double chi, double cosmic, double grain_size, double grain_abundance,
 	   double abs_err, double rel_err,
 	   struct abund initial_abundances[],
 	   int n_initial_abundances, char *output_species[],

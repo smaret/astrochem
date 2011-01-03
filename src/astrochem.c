@@ -185,7 +185,7 @@ main (int argc, char *argv[])
       {
 	if (verbose >= 1)
 	  fprintf (stdout, "Computing abundances in shell %d...\n", shell_index);
-	if (solve (chi, cosmic, grain_size,
+	if (solve (chi, cosmic, grain_size, grain_abundance,
 		   abs_err, rel_err, initial_abundances,
 		   n_initial_abundances, output_species,
 		   n_output_species, av[shell_index],

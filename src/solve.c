@@ -317,7 +317,7 @@ interrupt_handler (int sig __attribute__ ((unused)))
 */
  
 int
-solve (double chi, double cosmic, double grain_size,
+solve (double chi, double cosmic, double grain_size, double grain_abundance,
        double abs_err, double rel_err,
        struct abund initial_abundances[],
        int n_initial_abundances, char *output_species[],
@@ -384,9 +384,10 @@ solve (double chi, double cosmic, double grain_size,
 			       reactions[i].gamma,
 			       reactions[i].reaction_type,
 			       reactions[i].reaction_no,
-			       av, tgas, tdust,
+			       nh, av, tgas, tdust,
 			       chi, cosmic,
-			       grain_size);
+			       grain_size,
+			       grain_abundance);
        }
    }
 
