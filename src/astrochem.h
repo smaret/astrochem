@@ -2,7 +2,7 @@
    astrochem.h - Function prototypes, various constant and data
    structures for Astrochem.
 
-   Copyright (c) 2006-2009 Sebastien Maret
+   Copyright (c) 2006-2011 Sebastien Maret
 
    This file is part of Astrochem.
 

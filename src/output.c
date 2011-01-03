@@ -2,7 +2,7 @@
    output.c - Write the abundances and formation/destruction routes in
    output files.
 
-   Copyright (c) 2006-2009 Sebastien Maret
+   Copyright (c) 2006-2011 Sebastien Maret
 
    This file is part of Astrochem.
 

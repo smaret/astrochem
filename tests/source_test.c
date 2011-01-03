@@ -1,7 +1,7 @@
 /* 
-   tests/source_test.c - Test the read_source() function
+   source_test.c - Test the read_source() function
    
-   Copyright (c) 2006-2010 Sebastien Maret
+   Copyright (c) 2006-2011 Sebastien Maret
    
    This file is part of Astrochem.
 

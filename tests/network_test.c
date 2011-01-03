@@ -1,7 +1,7 @@
 /* 
-   tests/network_test.c - Test the read_network() function
+   network_test.c - Test the read_network() function
    
-   Copyright (c) 2006-2010 Sebastien Maret
+   Copyright (c) 2006-2011 Sebastien Maret
    
    This file is part of Astrochem.
 

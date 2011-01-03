@@ -2,7 +2,7 @@
 #
 #  plabun - Plot the abundances computed by Astrochem
 #
-#  Copyright (c) 2006-2009 Sebastien Maret
+#  Copyright (c) 2006-2011 Sebastien Maret
 # 
 #  This file is part of Astrochem.
 #
@@ -57,7 +57,7 @@ def version():
     # Display version number.
 
     print "This is plabun, version %s" % VERSION
-    print """Copyright (c) 2006-2009 Sebastien Maret
+    print """Copyright (c) 2006-2011 Sebastien Maret
 
 This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent

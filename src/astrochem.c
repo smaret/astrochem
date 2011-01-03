@@ -2,7 +2,7 @@
    Astrochem - compute the abundances of chemical species in the
    interstellar medium as as function of time.
 
-   Copyright (c) 2006-2009 Sebastien Maret
+   Copyright (c) 2006-2011 Sebastien Maret
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -240,7 +240,7 @@ void
 version (void)
 {
   fprintf (stdout, "This is astrochem, version %s\n", VERSION);
-  fprintf (stdout, "Copyright (c) 2006-2009 Sebastien Maret\n");
+  fprintf (stdout, "Copyright (c) 2006-2011 Sebastien Maret\n");
   fprintf (stdout, "\n");
   fprintf (stdout, "This is free software. You may redistribute copies of it under the terms\n");
   fprintf (stdout, "of the GNU General Public License. There is NO WARRANTY, to the extent\n");
