@@ -26,8 +26,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
-#include <setjmp.h>
 #include <string.h>
 #include <math.h>
 
@@ -47,15 +45,11 @@ struct par {
   int spec_index_h;
 };
 
-static jmp_buf env;
-
 static int f (realtype t, N_Vector y, N_Vector ydot, void *f_data);
 
 static int jacobian (int N, realtype t, N_Vector y, N_Vector fy,
 		     DlsMat J, void *jacobian_data, N_Vector tmp1,
 		     N_Vector tmp2, N_Vector tmp3);
-
-void interrupt_handler (int sig);
 
 /*
   Vector defining the ODE system.
@@ -303,16 +297,6 @@ jacobian (int N __attribute__ ((unused)),
 }
 
 /*
-  Handle interruption signal while solving equations.
-*/
-
-void
-interrupt_handler (int sig __attribute__ ((unused)))
-{
-  longjmp (env, 1);
-}
-
-/*
   Solve the ODE system.
 */
  
@@ -437,22 +421,7 @@ solve (double chi, double cosmic, double grain_size,
      int i, j;
      void (*orig_interrupt_handler)(int);
      
-     /* Solve the system for each time step. Return if an interruption
-	signal is encountered. */
-     
-     /*orig_interrupt_handler = signal (SIGINT, interrupt_handler);
-
-     if (setjmp(env) == 0)
-       {
-	 ;
-       }
-     else
-       {
-	 N_VDestroy_Serial (y);
-	 CVodeFree (&cvode_mem);
-
-	 return (1);
-	 } */
+     /* Solve the system for each time step. */
      
      for (i = 0; i < time_steps; i++)
        {
@@ -598,10 +567,6 @@ solve (double chi, double cosmic, double grain_size,
 	       }
 	   }
        }
-
-     /* Restore original signal handler */
-     
-     /* signal (SIGINT, orig_interrupt_handler); */
    }
 
    N_VDestroy_Serial (y);

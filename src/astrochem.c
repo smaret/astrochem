@@ -184,22 +184,17 @@ main (int argc, char *argv[])
       {
 	if (verbose >= 1)
 	  fprintf (stdout, "Computing abundances in shell %d...\n", shell_index);
-	if (solve (chi, cosmic, grain_size,
-		   abs_err, rel_err, initial_abundances,
-		   n_initial_abundances, output_species,
-		   n_output_species, av[shell_index],
-		   nh[shell_index], tgas[shell_index],
-		   tdust[shell_index], reactions, n_reactions,
-		   species, n_species, shell_index, tim,
-		   time_steps, abundances, trace_routes,
-		   routes, verbose) == 1)
-	  {
-	    /* FixMe: jumps are not allowed in openmp loops.
-	       Interruption encountered */
-	    /*if (verbose >= 1)
-	      fprintf (stdout, "Error encountered in shell %d.\n", shell_index);
-	      break; */
-	  }
+
+	solve (chi, cosmic, grain_size,
+	       abs_err, rel_err, initial_abundances,
+	       n_initial_abundances, output_species,
+	       n_output_species, av[shell_index],
+	       nh[shell_index], tgas[shell_index],
+	       tdust[shell_index], reactions, n_reactions,
+	       species, n_species, shell_index, tim,
+	       time_steps, abundances, trace_routes,
+	       routes, verbose);
+
 	if (verbose >= 1)
 	  fprintf (stdout, "Done with shell %d.\n", shell_index);
       }
