@@ -27,6 +27,7 @@
 \newcommand{\aap}{A\&A}
 \newcommand{\apj}{ApJ}
 \newcommand{\mnras}{MNRAS}
+\newcommand{\bain}{Bull.~Astron.~Inst.~Netherlands}
 
 % FixMe: Replace the following values with a Makefile
 \newcommand{\version}{0.1}
@@ -289,7 +290,7 @@ mass ratio of 100, we obtain a value of $\sim
 \label{sec:depletion}
 
 \begin{equation}
-  k = S \pi r_{d}^2 * v_{th}
+  k = S \pi r_{d}^2 * v_{th} * \conc{grain}
   \label{eq:depletion}
 \end{equation}
 
@@ -303,8 +304,13 @@ with:
 
 \noindent
 Here $S$ is a sticking probability (comprised between 0 and 1),
-$r_{d}$ is the grain radius, $v_{th}$ is the thermal velocity, and $m$
-is the mass of the accreting species \citep{Bergin95}.
+$r_{d}$ is the grain radius, $v_{th}$ is the thermal velocity,
+$\conc{grain}$ is the total grain concentration (neutral + charged)
+and $m$ is the mass of the accreting species
+\citep{Bergin95}. $\conc{grain}$, which does not vary with time
+because no grain destruction or formation reactions are considered in
+astrochem, is computed from initial abundances of neutral and charged
+grains given in the input file (see \S~\ref{sec:initial-abundances})
 
 \subsubsection{Thermal desorption}
 \label{sec:thermal-desorption}
@@ -346,15 +352,68 @@ ray ionization rate is performed.
 \subsubsection{Photo-desorption}
 \label{sec:photo-desorption}
 
+Photo-desorption is the process of ice evaparation on the action of UV
+photons. The UV photons can originate in the interstellar radiation
+field (ISRF), or in the ionisation of H$_{2}$ by cosmic-rays followed
+by recombination (secondary UV photons). At present only
+photo-desorption from IRSF UV photons is implemented in Astrochem.
+
+The photo-desorption rate of CO for example is
+\citep{Oberg09a,Oberg09b}:
+
 \begin{equation}
-  k = Y \chi \mathrm{exp} \left( -2 A_{v} \right) \pi r_{d}^{2}
+  \frac{\mathrm{d} \conc{CO}}{\mathrm{d} t} = k
+  \label{eq:photo-desorption-rate}
+\end{equation}  
+
+with:
+\begin{equation}
+  k = \chi G_{0} exp(-2 A_{v}) \pi r_{d}^{2} \conc{grains}
+  Y_\mathrm{PD} \, (cm^{-3}~s^{-1})
   \label{eq:photo-desorption}
 \end{equation}
 
 \noindent
-Here $Y$ is the photo-desorption yield of the considered species, i.e
-the number of molecule evaporated per indident UV photon
-\citep{dHendecourt85}.
+Here $G_{0}$ is the average UV IRSF \citep[assumed to be
+10$^{8}$~photons~cm$^{-2}$~s$^{-1}$;][]{Habing68}, and $Y_\mathrm{PD}$
+is the photo-desorption yield, i.e. the number of molecules ejected
+per incident photon. The latter is given by:
+
+\begin{equation}
+  Y_\mathrm{PD} = Y_{0} (1 - exp(-x / l))
+  \label{eq:photo-desorption-yield}
+\end{equation}
+
+\noindent
+where $x$ is the ice thickness of the considered species expressed in
+monolayers (ML), $l$ is the diffusion lenght in ML, and $Y_{0}$ is the
+photo-desorption yield for thick ices (i.e. $x >> l$). Typical values
+for $Y_{0}$ and $l$ are $10^{-3}$ molecules~photon$^{-1}$ and 2~ML,
+  respectively\footnote{For some species, $Y_{0}$ depends weakly on
+    the dust temperature \citep{Oberg09b}. This effect is not
+    implemented in Astrochem.}. The ice of e.g. CO ices is given by:
+
+\begin{equation}
+  x = \frac{n(\mathrm(CO(ice)))}{N_{s} \pi r_{d}^2 n_g}
+  \label{eq:ice-thickness}
+\end{equation}
+
+\noindent
+where $N_{s}$ is the number of site on grains per cm$^{-2}$. It is
+interesting to note that for thick ices, photo-desorption is zeroth
+order process: the desorption rate does not depends on the amount of
+e.g. CO ices on the grains. This because UV photons can penetrate only
+the first ices monolayers; the bulk of ice is not affected. On the
+other hand, for thin ices (i.e. $x >> l$) the desorption rate become
+linearly dependent on the ice thickness, and therefore on the ice
+abundance. Consequently for thin ices, photo-desorption becomes a
+first order process.
+
+Astrochem follows the ice thickness of each species as a function of
+time. The desorption rate is then computed from the above equations,
+using the values of $\chi$, $N_{s}$, $r_{d}^2$ and $n_g$ from the
+input file, the $A_{v}$ from the source file, and the $Y_{0}$ and $l$
+from the network file.
 
 \section{Using Astrochem}
 \label{sec:using-astrochem}
@@ -624,7 +683,8 @@ the parameters needed by the ODE solver. These parameters are:
 This section specifies the initial abundances in the computation. Each
 line should contain a specie name followed by a equal sign and the
 initial abundance with respect to H nuclei. Species abundances that
-are not specified here are assumed to be zero.
+are not specified here are assumed to be zero. Grains must be written
+as \verb=grain=, \verb=grain(-)= or \verb=grain(+)=.
 
 \subsection{Output}
 \label{sec:output}
@@ -799,7 +859,7 @@ Table~\label{tab:rate-const-meaning}.
       20    & (\ref{eq:freeze-out}) & $S$ & $m/m_\mathrm{H}$ & -\\
       21    & (\ref{eq:thermal-desorption}) & - & $m/m_\mathrm{H}$ & $E_{b}$\\
       22    & (\ref{eq:cosmic-ray-desorption}) & - & $m/m_\mathrm{H}$ & $E_{b}$\\
-      23    & (\ref{eq:photo-desorption}) & $Y$ & - & -\\
+      23    & (\ref{eq:photo-desorption}) & $Y_{0}$ & - & $l$\\
       \hline
     \end{tabular}
     \label{tab:rate-const-meaning}

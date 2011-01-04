@@ -38,7 +38,7 @@
 void 
 read_input (char *input_file, char *chem_file, char *source_file,
 	    double *chi, double *cosmic, double *grain_size,
-	    double *ti, double *tf, double *abs_err,
+	    double *grain_abundance, double *ti, double *tf, double *abs_err,
 	    double *rel_err, struct abund initial_abundances[],
 	    int *n_initial_abundances, char *output_species[],
 	    int *n_output_species, int *time_steps, int *trace_routes,
@@ -74,6 +74,7 @@ read_input (char *input_file, char *chem_file, char *source_file,
   *chi = CHI_DEFAULT;
   *cosmic = COSMIC_DEFAULT;
   *grain_size = GRAIN_SIZE_DEFAULT;
+  *grain_abundance = 0;
   *ti = TI_DEFAULT;
   *tf = TF_DEFAULT;
   *abs_err = ABS_ERR_DEFAULT;
@@ -144,6 +145,17 @@ read_input (char *input_file, char *chem_file, char *source_file,
 		strncpy (initial_abundances[i].specie, parameter,
 			 sizeof (initial_abundances[i].specie));
 		initial_abundances[i].abundance = atof (value);
+
+		/* Compute the total grain density */
+		
+		if ((strncmp (initial_abundances[i].specie, "grain",
+			      sizeof (initial_abundances[i].specie)) == 0) ||
+		    (strncmp (initial_abundances[i].specie, "grain(-)",
+			      sizeof (initial_abundances[i].specie)) == 0) ||
+		    (strncmp (initial_abundances[i].specie, "grain(+)",
+			      sizeof (initial_abundances[i].specie)) == 0))
+		  *grain_abundance += initial_abundances[i].abundance;
+		
 		i++;
 	      } 
 	    else 

@@ -36,6 +36,7 @@ main ()
   double chi;
   double cosmic;
   double grain_size;
+  double grain_abundance;
   double ti;
   double tf;
   double abs_err;
@@ -75,6 +76,7 @@ main ()
     "P(+)    = 3.00e-9\n"
     "Cl(+)   = 4.00e-9\n"
     "e(-)    = 7.32e-5\n"
+    "grain   = 1.32e-12\n"
     "# Output\n"
     "[output]\n"
     "time_steps = 64\n"
@@ -91,7 +93,7 @@ main ()
   /* Read it */
 
   read_input ("input.ini", chem_file, source_file, &chi, &cosmic,
-	      &grain_size, &ti, &tf, &abs_err, &rel_err,
+	      &grain_size, &grain_abundance, &ti, &tf, &abs_err, &rel_err,
 	      initial_abundances, &n_initial_abundances,
 	      output_species, &n_output_species, &time_steps,
 	      &trace_routes, suffix, verbose);
@@ -102,12 +104,13 @@ main ()
       (strcmp (chem_file, "../../networks/osu2008.chm") == 0) &&
       (chi == CHI_DEFAULT) &&
       (cosmic == 1.3e-17) && 
+      (grain_abundance == 1.32e-12) && 
       (ti == 1e-6 * CONST_MKSA_YEAR) &&
       (tf == 1e9 * CONST_MKSA_YEAR) && 
       (abs_err == ABS_ERR_DEFAULT) && 
       (rel_err == 1e-6) && 
       (time_steps == 64) &&
-      (n_initial_abundances == 13) &&
+      (n_initial_abundances == 14) &&
       (strcmp (initial_abundances[0].specie, "H2") == 0) &&
       (initial_abundances[0].abundance == 0.5) &&
       (strcmp (initial_abundances[1].specie, "He") == 0) &&

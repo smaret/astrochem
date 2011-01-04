@@ -42,6 +42,7 @@ main ()
   double chi;
   double cosmic;
   double grain_size;
+  double grain_abundance;
   double ti;
   double tf;
   double abs_err;
@@ -112,7 +113,7 @@ main ()
   /* Read them */
 
   read_input ("input.ini", chem_file, source_file, &chi, &cosmic,
-	      &grain_size, &ti, &tf, &abs_err, &rel_err,
+	      &grain_size, &grain_abundance, &ti, &tf, &abs_err, &rel_err,
 	      initial_abundances, &n_initial_abundances,
 	      output_species, &n_output_species, &time_steps,
 	      &trace_routes, suffix, verbose);
@@ -139,7 +140,7 @@ main ()
   }
 
   shell_index = 0.;
-  solve (chi, cosmic, grain_size,
+  solve (chi, cosmic, grain_size, grain_abundance, 
 	 abs_err, rel_err, initial_abundances,
 	 n_initial_abundances, output_species,
 	 n_output_species, av[shell_index],

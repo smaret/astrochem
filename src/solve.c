@@ -43,6 +43,14 @@ struct par {
   int n_reactions;
   int n_species;
   int spec_index_h;
+  double nh; 
+  double av;
+  double tgas;
+  double tdust;
+  double chi;
+  double cosmic;
+  double grain_size;
+  double grain_abundance;
 };
 
 static int f (realtype t, N_Vector y, N_Vector ydot, void *f_data);
@@ -68,6 +76,14 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
   int n_reactions = ((struct par *)f_data)->n_reactions;
   int n_species = ((struct par *)f_data)->n_species;
   int spec_index_h =  ((struct par *)f_data)->spec_index_h;
+  double nh = ((struct par *)f_data)->nh;
+  double av = ((struct par *)f_data)->av;
+  double tgas = ((struct par *)f_data)->tgas;
+  double tdust = ((struct par *)f_data)->tdust;
+  double chi = ((struct par *)f_data)->chi;
+  double cosmic = ((struct par *)f_data)->cosmic;
+  double grain_size = ((struct par *)f_data)->grain_size;
+  double grain_abundance = ((struct par *)f_data)->grain_abundance;
 
   /* Loop over the reactions and build the right hand ODE system
      equations. */
@@ -81,24 +97,50 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
     {
       double y_product;
 
-      /* Compute the product of the reactants multiplied by the
-	 rate of the reaction. */
+      /* Compute the production/destruction rate of the reaction. */
 
       y_product = 1;
 
-      if (reactions[i].reactant1 != -1)
-	y_product *= NV_Ith_S (y, reactions[i].reactant1);
-      if (reactions[i].reactant2 != -1)
-	y_product *= NV_Ith_S (y, reactions[i].reactant2);
-      if (reactions[i].reactant3 != -1)
-	y_product *= NV_Ith_S (y, reactions[i].reactant3);
-      y_product *= reac_rates[i];
-
-      /* The formation of H2 is a first order reaction, so the product
-	 of the reactants needs to be divided by the H abundance. */
       if (reactions[i].reaction_type == 0)
-	if (NV_Ith_S (y, spec_index_h) != 0)
-	  y_product = y_product / NV_Ith_S (y, spec_index_h);
+	{
+	  /* The formation of H2 is a first order reaction, so the
+	     product of the reactants needs to be divided by the H
+	     abundance. */
+	  
+	  y_product *= NV_Ith_S (y, spec_index_h);
+	  y_product *= reac_rates[i];
+	}
+      else if (reactions[i].reaction_type == 23)
+	{
+	  /* Photo-desorption is a zeroth-order process. However the
+	     reaction rate depends on the ice thickness, so it must be
+	     recomputed at each time step. */	
+
+	  reac_rates[i] = rate (reactions[i].alpha,
+				reactions[i].beta,
+				reactions[i].gamma,
+				reactions[i].reaction_type,
+				reactions[i].reaction_no,
+				nh, av, tgas, tdust,
+				chi, cosmic,
+				grain_size,
+				grain_abundance,
+				NV_Ith_S (y, reactions[i].reactant1) / nh);
+	  y_product = reac_rates[i];
+	}
+      else
+	{
+	  /* For other reactions, the production/destruction rate is
+	     the product of the reactants multiplied by the reaction rate. */
+
+	  if (reactions[i].reactant1 != -1)
+	    y_product *= NV_Ith_S (y, reactions[i].reactant1);
+	  if (reactions[i].reactant2 != -1)
+	    y_product *= NV_Ith_S (y, reactions[i].reactant2);
+	  if (reactions[i].reactant3 != -1)
+	    y_product *= NV_Ith_S (y, reactions[i].reactant3);
+	  y_product *= reac_rates[i];
+	}
 
       /* Add a production term for each product of the reaction. */
 
@@ -301,7 +343,7 @@ jacobian (int N __attribute__ ((unused)),
 */
  
 int
-solve (double chi, double cosmic, double grain_size,
+solve (double chi, double cosmic, double grain_size, double grain_abundance,
        double abs_err, double rel_err,
        struct abund initial_abundances[],
        int n_initial_abundances, char *output_species[],
@@ -368,9 +410,11 @@ solve (double chi, double cosmic, double grain_size,
 			       reactions[i].gamma,
 			       reactions[i].reaction_type,
 			       reactions[i].reaction_no,
-			       av, tgas, tdust,
+			       nh, av, tgas, tdust,
 			       chi, cosmic,
-			       grain_size);
+			       grain_size,
+			       grain_abundance, 
+			       0.);
        }
    }
 
@@ -392,6 +436,14 @@ solve (double chi, double cosmic, double grain_size,
    params.n_reactions = n_reactions;
    params.n_species = n_species;
    params.spec_index_h = spec_index_h;
+   params.nh = nh;
+   params.av = av;
+   params.tgas = tgas;
+   params.tdust = tdust;
+   params.chi = chi;
+   params.cosmic = cosmic;
+   params.grain_size = grain_size;
+   params.grain_abundance = grain_abundance;
 
    /* Define the ODE system and solve it using the Backward
       Differential Formulae method (BDF) with a Newton Iteration. The
@@ -495,13 +547,20 @@ solve (double chi, double cosmic, double grain_size,
 			     double min_rate;
 			     unsigned int min_rate_index;
 
-			     formation_route.rate = reac_rates[k];
-			     formation_route.rate *= NV_Ith_S (y, reactions[k].reactant1);
-			     if (reactions[k].reactant2 != -1)
-			       formation_route.rate *= NV_Ith_S (y, reactions[k].reactant2);  
-			     if (reactions[k].reactant3 != -1)
-			       formation_route.rate *= NV_Ith_S (y, reactions[k].reactant3);
-			     formation_route.reaction_no = reactions[k].reaction_no;
+			     if (reactions[k].reaction_type == 23)
+			       {
+				 formation_route.rate = reac_rates[k];
+			       }
+			     else
+			       {
+				 formation_route.rate = reac_rates[k];
+				 formation_route.rate *= NV_Ith_S (y, reactions[k].reactant1);
+				 if (reactions[k].reactant2 != -1)
+				   formation_route.rate *= NV_Ith_S (y, reactions[k].reactant2);  
+				 if (reactions[k].reactant3 != -1)
+				   formation_route.rate *= NV_Ith_S (y, reactions[k].reactant3);
+				 formation_route.reaction_no = reactions[k].reaction_no;
+			       }
 
 			     min_rate = routes[shell_index][i][j][0].formation.rate;
 			     min_rate_index = 0;
@@ -533,16 +592,22 @@ solve (double chi, double cosmic, double grain_size,
 			     double min_rate;
 			     unsigned int min_rate_index;
 
-			     destruction_route.rate = reac_rates[k];
-			     if (reactions[k].reactant1 != spec_index)
-			       destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant1);
-			     if ((reactions[k].reactant2 != -1) &&
-				 (reactions[k].reactant2 != spec_index))
-			       destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant2);
-			     if ((reactions[k].reactant3 != -1) &&
-				 (reactions[k].reactant3 != spec_index))
-			       destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant3);
-			     destruction_route.reaction_no = reactions[k].reaction_no;
+			     if (reactions[k].reaction_type == 23)
+			       {
+				 destruction_route.rate = reac_rates[k];
+			       }
+			     else
+			       {
+				 destruction_route.rate = reac_rates[k];
+				 if (reactions[k].reactant1 != spec_index)
+				   destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant1);
+				 if ((reactions[k].reactant2 != -1) &&
+				     (reactions[k].reactant2 != spec_index))
+				   destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant2);
+				 if ((reactions[k].reactant3 != -1) &&
+				     (reactions[k].reactant3 != spec_index))
+				   destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant3);
+			       }
 
 			     min_rate = routes[shell_index][i][j][0].destruction.rate;
 			     min_rate_index = 0;

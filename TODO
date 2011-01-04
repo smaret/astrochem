@@ -7,10 +7,6 @@ Items to be completed before the first release
 The following tasks need to be completed before the first
 release. They are ordered by descending order of priority.
 
-* Oberg et al. (2005) mention that desorption is zeroth order process,
-  while it is currently modeled as a second order process in
-  astrochem. Fix this.
-
 * Complete and proof-read the documentation manual.
 
 * Write a README file. The file should explain briefly what the code

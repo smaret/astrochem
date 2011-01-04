@@ -28,15 +28,16 @@
 #include <math.h>
 #include "astrochem.h"
 
-#define FRACTION_TIME_GRAIN_70K 3.16e-19
+#define FRACTION_TIME_GRAIN_70K 3.16e-19 
 #define GAS_DUST_NUMBER_RATIO 7.57e+11
-#define NUMBER_SITE_PER_GRAIN_SURFACE 3.00e+15
+#define GRAIN_SITES_PER_CM2 3.00e+15     /* cm-2 */
+#define AVERAGE_UV_IRSF 1e8              /* photons cm-2 */
 
 double 
 rate(double alpha, double beta, double gamm, int reaction_type,
-     int reaction_no __attribute__ ((unused)), double av,
+     int reaction_no __attribute__ ((unused)), double nh, double av,
      double tgas, double tdust, double chi, double cosmic,
-     double grain_size) 
+     double grain_size, double grain_abundance, double ice_abundance)
 {  
   double k; /* Reaction rate (cm^-3 s^-1) */
 
@@ -87,14 +88,14 @@ rate(double alpha, double beta, double gamm, int reaction_type,
 	double thermal_veloc = pow (8 * CONST_CGSM_BOLTZMANN * tgas
 				    / (M_PI * beta * CONST_CGSM_MASS_PROTON),
 				    0.5);
-	k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc;
+	k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc * grain_abundance * nh;
 	break;
       }
       
     case 21:
       /* Thermal desorption */
       {
-	double v0 = pow (2 * NUMBER_SITE_PER_GRAIN_SURFACE * gamm * CONST_CGSM_BOLTZMANN
+	double v0 = pow (2 * GRAIN_SITES_PER_CM2 * gamm * CONST_CGSM_BOLTZMANN
 			 / (M_PI * M_PI * beta * CONST_CGSM_MASS_PROTON),
 			 0.5);
 	k = v0 * exp (-gamm / tdust );
@@ -104,7 +105,7 @@ rate(double alpha, double beta, double gamm, int reaction_type,
     case 22:
       /* Cosmic ray desorption */
       {
-	double v0 = pow (2 * NUMBER_SITE_PER_GRAIN_SURFACE * gamm * CONST_CGSM_BOLTZMANN
+	double v0 = pow (2 * GRAIN_SITES_PER_CM2 * gamm * CONST_CGSM_BOLTZMANN
 			 / (M_PI * M_PI * beta * CONST_CGSM_MASS_PROTON),
 			 0.5);
 	k = v0 * FRACTION_TIME_GRAIN_70K * exp (-gamm / 70.);
@@ -114,7 +115,12 @@ rate(double alpha, double beta, double gamm, int reaction_type,
     case 23:
       /* Photo-desorption */
       {
-	k = chi * exp(-2 * av) * alpha * M_PI * pow (grain_size, 2);
+	double x = (ice_abundance * nh ) / (GRAIN_SITES_PER_CM2 * M_PI
+					    * pow (grain_size, 2) 
+					    * grain_abundance * nh); 
+	double Ypd = alpha * (1 - exp (-x / gamm));
+	k = chi * AVERAGE_UV_IRSF * exp(-2 * av) * M_PI * pow (grain_size, 2)
+	  * grain_abundance * nh * Ypd;
 	break;
       }
       
