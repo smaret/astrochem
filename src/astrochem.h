@@ -112,7 +112,7 @@ int specie_index (char specie[], char *species[], int n_species);
 double rate(double alpha, double beta, double gamm, int reaction_type,
 	    int reaction_no, double nh, double av, double tgas, double tdust,
 	    double chi, double cosmic, double grain_size,
-	    double grain_abundance);
+	    double grain_abundance, double ice_abundance);
   
 int solve (double chi, double cosmic, double grain_size, double grain_abundance,
 	   double abs_err, double rel_err,
