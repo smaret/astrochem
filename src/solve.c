@@ -531,12 +531,12 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 		   {
 		     for (k = 0; k < n_reactions; k++)
 		       {
-			 /* If the species is product of the reaction
-			    then compute the formation rate. If the
-			    rate is greater than the smallest rate in
-			    the formation route structure, we add the
-			    current reaction number and rate to that
-			    structure. */
+			 /* If the species is a product of the
+			    reaction then compute the formation
+			    rate. If the rate is greater than the
+			    smallest rate in the formation route
+			    structure, we add the current reaction
+			    number and rate to that structure. */
 
 			 if ((reactions[k].product1 == spec_index) ||
 			     (reactions[k].product2 == spec_index) ||
@@ -546,8 +546,13 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 			     struct r formation_route;
 			     double min_rate;
 			     unsigned int min_rate_index;
-
-			     if (reactions[k].reaction_type == 23)
+			     
+			     if (reactions[k].reaction_type == 0)
+			       {
+				 formation_route.rate = reac_rates[k];
+				 formation_route.rate *= NV_Ith_S (y, reactions[k].reactant1);
+			       }
+			     else if (reactions[k].reaction_type == 23)
 			       {
 				 formation_route.rate = reac_rates[k];
 			       }
@@ -559,8 +564,8 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 				   formation_route.rate *= NV_Ith_S (y, reactions[k].reactant2);  
 				 if (reactions[k].reactant3 != -1)
 				   formation_route.rate *= NV_Ith_S (y, reactions[k].reactant3);
-				 formation_route.reaction_no = reactions[k].reaction_no;
 			       }
+			     formation_route.reaction_no = reactions[k].reaction_no;
 
 			     min_rate = routes[shell_index][i][j][0].formation.rate;
 			     min_rate_index = 0;
@@ -592,7 +597,12 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 			     double min_rate;
 			     unsigned int min_rate_index;
 
-			     if (reactions[k].reaction_type == 23)
+			     if (reactions[k].reaction_type == 0)
+			       {
+				 destruction_route.rate = reac_rates[k];
+				 destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant1);
+			       }
+			     else if (reactions[k].reaction_type == 23)
 			       {
 				 destruction_route.rate = reac_rates[k];
 			       }
@@ -601,13 +611,12 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 				 destruction_route.rate = reac_rates[k];
 				 if (reactions[k].reactant1 != spec_index)
 				   destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant1);
-				 if ((reactions[k].reactant2 != -1) &&
-				     (reactions[k].reactant2 != spec_index))
+				 if (reactions[k].reactant2 != -1)
 				   destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant2);
-				 if ((reactions[k].reactant3 != -1) &&
-				     (reactions[k].reactant3 != spec_index))
+				 if (reactions[k].reactant3 != -1)
 				   destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant3);
 			       }
+			     destruction_route.reaction_no = reactions[k].reaction_no;
 
 			     min_rate = routes[shell_index][i][j][0].destruction.rate;
 			     min_rate_index = 0;
