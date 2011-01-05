@@ -82,7 +82,7 @@ main ()
   k = rate (alpha, beta, gamm, reaction_type, reaction_no, nh,
 	    av, tgas, tdust, chi, cosmic, grain_size, grain_abundance,
 	    ice_abundance);
-  if (equaltol (9.037422e-18, k, 1e-6) == 1)
+  if (equaltol (9.037422e-14, k, 1e-6) == 1)
     return EXIT_FAILURE;
 
   /* Cosmic-ray ionisation reaction:

@@ -56,7 +56,7 @@ rate(double alpha, double beta, double gamm, int reaction_type,
 
     case 0:
       /* H2 formation on grains */
-      k = alpha * pow (tgas / 300, beta);
+      k = alpha * pow (tgas / 300, beta) * nh;
       break;
       
     case 1:
