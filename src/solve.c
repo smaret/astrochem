@@ -187,6 +187,11 @@ jacobian (int N __attribute__ ((unused)),
   struct react *reactions = ((struct par *)jacobian_data)->reactions;
   int n_reactions = ((struct par *)jacobian_data)->n_reactions;
   int n_species = ((struct par *)jacobian_data)->n_species;
+  double nh = ((struct par *)jacobian_data)->nh;
+  double av = ((struct par *)jacobian_data)->av;
+  double chi = ((struct par *)jacobian_data)->chi;
+  double grain_size = ((struct par *)jacobian_data)->grain_size;
+  double grain_abundance = ((struct par *)jacobian_data)->grain_abundance;
     
   /* Compute the jacobian matrix. */
 
@@ -214,6 +219,23 @@ jacobian (int N __attribute__ ((unused)),
 	    2 * reac_rates[i];
 	  DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant1) +=
 	    reac_rates[i];
+	}
+      else if (reactions[i].reaction_type == 23)
+	{
+	  /* Photo-desorption */
+	  
+	  double jac_elem;
+
+	  jac_elem = (chi * AVERAGE_UV_IRSF * exp (-2 * av) * reactions[i].alpha)
+	    / (GRAIN_SITES_PER_CM2 * reactions[i].gamma)
+	    * exp (-NV_Ith_S (y, reactions[i].reactant1)
+		   / (GRAIN_SITES_PER_CM2 * M_PI * pow (grain_size, 2)
+		      * grain_abundance * nh * reactions[i].gamma));
+
+	  DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant1) -=
+	    jac_elem;	  
+	  DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant1) +=
+	    jac_elem;
 	}
       else
 	{
