@@ -112,7 +112,7 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
 	}
       else if (reactions[i].reaction_type == 23)
 	{
-	  /* Photo-desorption is a zeroth-order process. However the
+	  /* Photo-desorption is a zeroth order reaction. However the
 	     reaction rate depends on the ice thickness, so it must be
 	     recomputed at each time step. */	
 
@@ -206,132 +206,146 @@ jacobian (int N __attribute__ ((unused)),
 
       double y_product;
       
-      if ((reactions[i].reactant1 != -1) &&
-	  (reactions[i].reactant2 == -1) &&
-	  (reactions[i].reactant3 == -1))
+      if (reactions[i].reaction_type == 0)
 	{
+	  /* H2 formation on grains */
+	  
 	  DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant1) -=
-	    reac_rates[i];
+	    2 * reac_rates[i];
 	  DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant1) +=
 	    reac_rates[i];
-	  if (reactions[i].product2 != -1)
-	    DENSE_ELEM (J, reactions[i].product2, reactions[i].reactant1) +=
-	      reac_rates[i];
-	  if (reactions[i].product3 != -1)
-	    DENSE_ELEM (J, reactions[i].product3, reactions[i].reactant1) +=
-	      reac_rates[i];
-	  if (reactions[i].product4 != -1)
-	    DENSE_ELEM (J, reactions[i].product4, reactions[i].reactant1) +=
-	      reac_rates[i];
 	}
-
-      if ((reactions[i].reactant1 != -1) &&
-	  (reactions[i].reactant2 != -1) &&
-	  (reactions[i].reactant3 == -1))
+      else
 	{
-	  y_product = reac_rates[i] * NV_Ith_S (y, reactions[i].reactant2);
+	  /* Other reactions */
 
-	  DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant1) -=
-	    y_product;
-	  DENSE_ELEM (J, reactions[i].reactant2, reactions[i].reactant1) -=
-	    y_product;
-	  DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant1) +=
-	    y_product;
-	  if (reactions[i].product2 != -1)
-	    DENSE_ELEM (J, reactions[i].product2, reactions[i].reactant1) +=
-	      y_product;
-	  if (reactions[i].product3 != -1)
-	    DENSE_ELEM (J, reactions[i].product3, reactions[i].reactant1) +=
-	      y_product;
-	  if (reactions[i].product4 != -1)
-	    DENSE_ELEM (J, reactions[i].product4, reactions[i].reactant1) +=
-	      y_product;
-
-	  y_product = reac_rates[i] * NV_Ith_S (y, reactions[i].reactant1);
-
-	  DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant2) -=
-	    y_product;
-	  DENSE_ELEM (J, reactions[i].reactant2, reactions[i].reactant2) -=
-	    y_product;
-	  DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant2) +=
-	    y_product;
-	  if (reactions[i].product2 != -1)
-	    DENSE_ELEM (J, reactions[i].product2, reactions[i].reactant2) +=
-	      y_product;
-	  if (reactions[i].product3 != -1)
-	    DENSE_ELEM (J, reactions[i].product3, reactions[i].reactant2) +=
-	      y_product;
-	  if (reactions[i].product4 != -1)
-	    DENSE_ELEM (J, reactions[i].product4, reactions[i].reactant2) +=
-	      y_product;
-	}
-
-      if ((reactions[i].reactant1 != -1) &&
-	  (reactions[i].reactant2 != -1) &&
-	  (reactions[i].reactant3 != -1))
-	{
-	  y_product = reac_rates[i] * NV_Ith_S (y, reactions[i].reactant2)
-	    * NV_Ith_S (y, reactions[i].reactant3);
-
-	  DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant1) -=
-	    y_product;
-	  DENSE_ELEM (J, reactions[i].reactant2, reactions[i].reactant1) -=
-	    y_product;
-	  DENSE_ELEM (J, reactions[i].reactant3, reactions[i].reactant1) -=
-	    y_product;
-	  DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant1) +=
-	    y_product;
-	  if (reactions[i].product2 != -1)
-	    DENSE_ELEM (J, reactions[i].product2, reactions[i].reactant1) +=
-	      y_product;
-	  if (reactions[i].product3 != -1)
-	    DENSE_ELEM (J, reactions[i].product3, reactions[i].reactant1) +=
-	      y_product;
-	  if (reactions[i].product4 != -1)
-	    DENSE_ELEM (J, reactions[i].product4, reactions[i].reactant1) +=
-	      y_product;
-
-	  y_product = reac_rates[i] * NV_Ith_S (y, reactions[i].reactant1)
-	    * NV_Ith_S (y, reactions[i].reactant3);
-
-	  DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant2) -=
-	    y_product;
-	  DENSE_ELEM (J, reactions[i].reactant2, reactions[i].reactant2) -=
-	    y_product;
-	  DENSE_ELEM (J, reactions[i].reactant3, reactions[i].reactant2) -=
-	    y_product;
-	  DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant2) +=
-	    y_product;
-	  if (reactions[i].product2 != -1)
-	    DENSE_ELEM (J, reactions[i].product2, reactions[i].reactant2) +=
-	      y_product;
-	  if (reactions[i].product3 != -1)
-	    DENSE_ELEM (J, reactions[i].product3, reactions[i].reactant2) +=
-	      y_product;
-	  if (reactions[i].product4 != -1)
-	    DENSE_ELEM (J, reactions[i].product4, reactions[i].reactant2) +=
-	      y_product;
-
-	  y_product = reac_rates[i] * NV_Ith_S (y, reactions[i].reactant1)
-	    * NV_Ith_S (y, reactions[i].reactant2);
-
-	  DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant3) -=
-	    y_product;
-	  DENSE_ELEM (J, reactions[i].reactant2, reactions[i].reactant3) -=
-	    y_product;
-	  DENSE_ELEM (J, reactions[i].reactant3, reactions[i].reactant3) -=
-	    y_product;
-	  DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant3) +=
-	    y_product;
-	  if (reactions[i].product2 != -1)
-	    DENSE_ELEM (J, reactions[i].product2, reactions[i].reactant3) +=
-	      y_product;
-	  if (reactions[i].product3 != -1)
-	    DENSE_ELEM (J, reactions[i].product3, reactions[i].reactant3) +=
-	      y_product;
-	  if (reactions[i].product4 != -1)
-	    DENSE_ELEM (J, reactions[i].product4, reactions[i].reactant3) +=
-	      y_product;
+	  if ((reactions[i].reactant1 != -1) &&
+	      (reactions[i].reactant2 == -1) &&
+	      (reactions[i].reactant3 == -1))
+	    {
+	      DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant1) -=
+		reac_rates[i];
+	      DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant1) +=
+		reac_rates[i];
+	      if (reactions[i].product2 != -1)
+		DENSE_ELEM (J, reactions[i].product2, reactions[i].reactant1) +=
+		  reac_rates[i];
+	      if (reactions[i].product3 != -1)
+		DENSE_ELEM (J, reactions[i].product3, reactions[i].reactant1) +=
+		  reac_rates[i];
+	      if (reactions[i].product4 != -1)
+		DENSE_ELEM (J, reactions[i].product4, reactions[i].reactant1) +=
+		  reac_rates[i];
+	    }
+	  
+	  if ((reactions[i].reactant1 != -1) &&
+	      (reactions[i].reactant2 != -1) &&
+	      (reactions[i].reactant3 == -1))
+	    {
+	      y_product = reac_rates[i] * NV_Ith_S (y, reactions[i].reactant2);
+	      
+	      DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant1) -=
+		y_product;
+	      DENSE_ELEM (J, reactions[i].reactant2, reactions[i].reactant1) -=
+		y_product;
+	      DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant1) +=
+		y_product;
+	      if (reactions[i].product2 != -1)
+		DENSE_ELEM (J, reactions[i].product2, reactions[i].reactant1) +=
+		  y_product;
+	      if (reactions[i].product3 != -1)
+		DENSE_ELEM (J, reactions[i].product3, reactions[i].reactant1) +=
+		  y_product;
+	      if (reactions[i].product4 != -1)
+		DENSE_ELEM (J, reactions[i].product4, reactions[i].reactant1) +=
+		  y_product;
+	      
+	      y_product = reac_rates[i] * NV_Ith_S (y, reactions[i].reactant1);
+	      
+	      DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant2) -=
+		y_product;
+	      DENSE_ELEM (J, reactions[i].reactant2, reactions[i].reactant2) -=
+		y_product;
+	      DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant2) +=
+		y_product;
+	      if (reactions[i].product2 != -1)
+		DENSE_ELEM (J, reactions[i].product2, reactions[i].reactant2) +=
+		  y_product;
+	      if (reactions[i].product3 != -1)
+		DENSE_ELEM (J, reactions[i].product3, reactions[i].reactant2) +=
+		  y_product;
+	      if (reactions[i].product4 != -1)
+		DENSE_ELEM (J, reactions[i].product4, reactions[i].reactant2) +=
+		  y_product;
+	    }
+	  
+	  if ((reactions[i].reactant1 != -1) &&
+	      (reactions[i].reactant2 != -1) &&
+	      (reactions[i].reactant3 != -1))
+	    {
+	      y_product = reac_rates[i] * NV_Ith_S (y, reactions[i].reactant2)
+		* NV_Ith_S (y, reactions[i].reactant3);
+	      
+	      DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant1) -=
+		y_product;
+	      DENSE_ELEM (J, reactions[i].reactant2, reactions[i].reactant1) -=
+		y_product;
+	      DENSE_ELEM (J, reactions[i].reactant3, reactions[i].reactant1) -=
+		y_product;
+	      DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant1) +=
+		y_product;
+	      if (reactions[i].product2 != -1)
+		DENSE_ELEM (J, reactions[i].product2, reactions[i].reactant1) +=
+		  y_product;
+	      if (reactions[i].product3 != -1)
+		DENSE_ELEM (J, reactions[i].product3, reactions[i].reactant1) +=
+		  y_product;
+	      if (reactions[i].product4 != -1)
+		DENSE_ELEM (J, reactions[i].product4, reactions[i].reactant1) +=
+		  y_product;
+	      
+	      y_product = reac_rates[i] * NV_Ith_S (y, reactions[i].reactant1)
+		* NV_Ith_S (y, reactions[i].reactant3);
+	      
+	      DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant2) -=
+		y_product;
+	      DENSE_ELEM (J, reactions[i].reactant2, reactions[i].reactant2) -=
+		y_product;
+	      DENSE_ELEM (J, reactions[i].reactant3, reactions[i].reactant2) -=
+		y_product;
+	      DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant2) +=
+		y_product;
+	      if (reactions[i].product2 != -1)
+		DENSE_ELEM (J, reactions[i].product2, reactions[i].reactant2) +=
+		  y_product;
+	      if (reactions[i].product3 != -1)
+		DENSE_ELEM (J, reactions[i].product3, reactions[i].reactant2) +=
+		  y_product;
+	      if (reactions[i].product4 != -1)
+		DENSE_ELEM (J, reactions[i].product4, reactions[i].reactant2) +=
+		  y_product;
+	      
+	      y_product = reac_rates[i] * NV_Ith_S (y, reactions[i].reactant1)
+		* NV_Ith_S (y, reactions[i].reactant2);
+	      
+	      DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant3) -=
+		y_product;
+	      DENSE_ELEM (J, reactions[i].reactant2, reactions[i].reactant3) -=
+		y_product;
+	      DENSE_ELEM (J, reactions[i].reactant3, reactions[i].reactant3) -=
+		y_product;
+	      DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant3) +=
+		y_product;
+	      if (reactions[i].product2 != -1)
+		DENSE_ELEM (J, reactions[i].product2, reactions[i].reactant3) +=
+		  y_product;
+	      if (reactions[i].product3 != -1)
+		DENSE_ELEM (J, reactions[i].product3, reactions[i].reactant3) +=
+		  y_product;
+	      if (reactions[i].product4 != -1)
+		DENSE_ELEM (J, reactions[i].product4, reactions[i].reactant3) +=
+		  y_product;
+	    }
 	}
     }
 
