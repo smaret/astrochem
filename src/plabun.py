@@ -208,7 +208,7 @@ def main():
 	
     p = biggles.FramedPlot()
     p.title = "Abundances"
-    p.ytitle = "$n(x)/n(H_{2})$"
+    p.ytitle = "$n(x)/n_{H}$"
     p.ylog = 1
     if xrange:
 	p.xrange = xrange
