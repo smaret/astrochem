@@ -19,10 +19,14 @@
 
 CHMCONVERT = ../src/chmconvert
 
-nobase_dist_pkgdata_DATA = osu2008.osu osu2008.chm
+nobase_dist_pkgdata_DATA = osu2008.osu osu2008.chm osu2009.osu	\
+	osu2009.chm
 
 osu2008.chm: osu2008.osu
 	${CHMCONVERT} -o $@ $?
 
-CLEANFILES = osu2008.chm
+osu2009.chm: osu2009.osu
+	${CHMCONVERT} -o $@ $?
+
+CLEANFILES = osu2008.chm osu2009.chm
 
