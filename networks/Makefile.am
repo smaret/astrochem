@@ -19,16 +19,10 @@
 
 CHMCONVERT = ../src/chmconvert
 
-nobase_dist_pkgdata_DATA = osu2008.osu osu2008.chm udfa2006.udfa	\
-	udfa2006.chm udfa2006_dipole.udfa udfa2006_dipole.chm
+nobase_dist_pkgdata_DATA = osu2008.osu osu2008.chm
 
 osu2008.chm: osu2008.osu
 	${CHMCONVERT} -o $@ $?
 
-udfa2006.chm: udfa2006.udfa
-	${CHMCONVERT} -o $@ $?
+CLEANFILES = osu2008.chm
 
-udfa2006_dipole.chm: udfa2006_dipole.udfa
-	${CHMCONVERT} -o $@ $?
-
-CLEANFILES = osu2008.chm udfa2006.chm udfa2006_dipole.chm

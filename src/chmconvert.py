@@ -35,7 +35,7 @@ def usage():
 
 Common options:
    -h, --help         Display this help
-   -V, --version      Display chemutil version information
+   -V, --version      Display chmconvert version information
    -o, --output       Write the edited network in a file
 
 See chmconvert(1) man page for a complete list of commands and options.
@@ -51,47 +51,31 @@ This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent
 permitted by law."""
 
-def format_specie(specie, format):
+def format_specie(specie):
     """Format a specie name to astrochem format."""
 
     specie = specie.strip()
 
-    if format == "osu":
-
-        # In astrochem format, the charge of ions is in parenthesis.
-        specie = specie.replace("+", "(+)")
-        specie = specie.replace("-", "(-)")
-	
-        # For elements that have two letters in their names, the
-        # second one is in lower case.
-        specie = specie.replace("HE", "He")
-        specie = specie.replace("NA", "Na")
-        specie = specie.replace("MG", "Mg")
-        specie = specie.replace("CL", "Cl")
-        specie = specie.replace("SI", "Si")
-        specie = specie.replace("FE", "Fe")
-	
-        # Grains are in lowercase. Neutral grains are simply noted
-        # 'grain'
-        specie = specie.replace("GRAIN0", "grain")
-        specie = specie.replace("GRAIN", "grain")
-
-        # Electrons are noted as e(-)
-        if specie == "E": specie = "e(-)"
-
-    elif format == "udfa":
-
-        specie = specie.replace("+", "(+)")
-        specie = specie.replace("-", "(-)")
-
-        # Both cosmic-rays and cosmic-ray induced photons
-        # cosmic-ray-photons are noted 'cosmic-ray'
-        # FixMe: should we distinguish between the two?
-        specie = specie.replace("CRPHOT", "cosmic-ray")
-        specie = specie.replace("CRP", "cosmic-ray")
-
-        # Photons are noted 'photon'
-        specie = specie.replace("PHOTON", "photon") 
+    # In astrochem format, the charge of ions is in parenthesis.
+    specie = specie.replace("+", "(+)")
+    specie = specie.replace("-", "(-)")
+    
+    # For elements that have two letters in their names, the
+    # second one is in lower case.
+    specie = specie.replace("HE", "He")
+    specie = specie.replace("NA", "Na")
+    specie = specie.replace("MG", "Mg")
+    specie = specie.replace("CL", "Cl")
+    specie = specie.replace("SI", "Si")
+    specie = specie.replace("FE", "Fe")
+    
+    # Grains are in lowercase. Neutral grains are simply noted
+    # 'grain'
+    specie = specie.replace("GRAIN0", "grain")
+    specie = specie.replace("GRAIN", "grain")
+    
+    # Electrons are noted as e(-)
+    if specie == "E": specie = "e(-)"
 
     return specie
 
@@ -152,13 +136,13 @@ def convert(filein, format, fileout, ignore_unknown = True):
 	    if len(line) == 113 or len(line) == 119:
                 react = reaction()
                 try:
-                    react.reactant1 = format_specie(line[0:8], "osu")
-                    react.reactant2 = format_specie(line[8:16], "osu")
-                    react.reactant3 = format_specie(line[16:24], "osu")
-                    react.product1 = format_specie(line[24:32], "osu")
-                    react.product2 = format_specie(line[32:40], "osu")
-                    react.product3 = format_specie(line[40:48], "osu")
-                    react.product4 = format_specie(line[48:56], "osu")
+                    react.reactant1 = format_specie(line[0:8])
+                    react.reactant2 = format_specie(line[8:16])
+                    react.reactant3 = format_specie(line[16:24])
+                    react.product1 = format_specie(line[24:32])
+                    react.product2 = format_specie(line[32:40])
+                    react.product3 = format_specie(line[40:48])
+                    react.product4 = format_specie(line[48:56])
                     react.alpha = float(line[64:73])
                     react.beta = float(line[73:82])
                     react.gamma = float(line[82:91])
@@ -217,105 +201,8 @@ def convert(filein, format, fileout, ignore_unknown = True):
 
     elif format == "udfa":
 
-        # UDFA files are comma separated values files. Comments lines
-        # start with a pound sign.
-        
-        line_number = 0
-        for line in filein:
-            line_number = line_number + 1
-            if line[0] == '#':
-                continue
-            line = line.split(",")
-            react = reaction()
-            try:
-                react.number = int(line[0])
-                react.type = line[1]
-                react.reactant1 = format_specie(line[2], "udfa")
-                react.reactant2 = format_specie(line[3], "udfa")
-                react.reactant3 = format_specie(line[4], "udfa")
-                react.product1 = format_specie(line[5], "udfa")
-                react.product2 = format_specie(line[6], "udfa")
-                react.product3 = format_specie(line[7], "udfa")
-                react.product4 = format_specie(line[8], "udfa")
-                react.alpha = float(line[9])
-                react.beta = float(line[10])
-                react.gamma = float(line[11])
-                react.cleam = line[12]
-                react.tmin = float(line[13])
-                react.tmax = float(line[14])
-                react.accuracy = line[15]
-                react.source = line[16]
-            except:
-                sys.stderr.write("chmconvert: error while reading network file, line %s.\n"
-                                  % line_number)
-                print line
-                exit(1)
-            
-            # In the UDFA format, the reaction type is given by a
-            # string code (see Woodall et al. 2007 paper for the
-            # meaning of these codes). Map these to .chm reaction
-            # scheme. CD and CL have no equivalent in OU reaction
-            # scheme, so we label these as "other" (14)
-    
-            format_code = {"NN": 7, "IN": 2, "CE": 2, "II": 11, "DR": 9, 
-                           "RR": 10, "AD": 5, "RA": 4, "PH": 13, "CP": 1,
-                           "CR": 1, "CD": 14, "CI": 6,  "IM": 11, "CL": 14}
-            try:
-                react.type = format_code [react.type]
-            except KeyError:
-                sys.stderr.write("chmconvert: error: unknown reaction type in network file, line %s.\n"
-                                  % line_number)
-                exit(1)
-
-            # In astrochem reaction scheme, the rate of type 1
-            # reactions is k = \alpha * \chi, where \chi is the H2
-            # direct cosmic-ray ionization rate. In the OSU, it is
-            # simply k = \alpha. Therefore \alpha should be divided by
-            # the H2 cosmic-ray ionization value adopted in the UDFA
-            # network, i.e. 1.2e-17 s^-1, for type 1 reactions.
-
-            if react.type == 1:
-                react.alpha = react.alpha / 1.2e-17
-
-            # In the UDFA, some reactions are duplicated when their
-            # temperature dependence cannot be approximated by one
-            # Arrhenius-type formula. Choose the one that correspond
-            # to the lowest temperature range, and remove the others.
-
-            duplicate = [6, 93, 140, 171, 316, 660, 666, 667, 949, 1684, 1731, 
-                         2939, 2946, 3533, 3534, 3536, 3537, 3552, 3353, 3555,
-                         3556, 3558, 3559, 4007, 4008, 4013, 4014, 4016, 4079,
-                         4109, 4112, 4115, 4138, 4558, 4590]
-
-            # Some reaction have negative gamma. Extrapolating these
-            # outside their temperature range can give unrealistic
-            # high rates. In practice, these are neutral-neutral
-            # reactions, so it is safe to neglect them at low
-            # temperatures
-
-            negative_gamma = [266, 282, 288, 312, 351, 353, 377, 419, 431, 443,
-                              446, 448, 466, 488, 493, 501, 502, 520, 533, 540,
-                              3581, 3582, 3583, 3584, 3585, 3586, 4111, 4563, 4571,
-                              4573, 4574, 4575, 4579, 4582, 4583]
-
-            # Reactions that Woodall et al. recommand to ignore to low
-            # temperature. Some of them are valid only at high
-            # temperature, and can't probably interpolated at lower
-            # temperatures. For other, it is less clear: for example,
-            # reaction 384 is valid between 10 and 300 K, yet it is
-            # flagged.
-
-            woodall = [6, 93, 141, 174, 270, 288, 319, 323, 358, 360, 384, 426,
-                       438, 450, 453, 455, 495, 500, 508, 509, 527, 540, 547, 660,
-                       666, 667, 949, 1684, 1731, 2938, 2945, 3532, 3533, 3535, 3536,
-                       3551, 3552, 3554, 3555, 3557, 3558, 3581, 3582, 3583, 3584,
-                       3585, 4006, 4007, 4012, 4013, 4015, 4078, 4108, 4110, 4111,
-                       4114, 4139, 4557]
-
-            if ((react.number not in duplicate) and
-                (react.number not in negative_gamma) and
-                (react.number not in woodall)):
-                fileout.write(format_react(react))
+        sys.stderr.write("chmconvert: conversion of UDFA networks is not yet implemented.\n")
+        sys.exit(1)
 
 def main():
 
@@ -349,7 +236,7 @@ def main():
         else:
             sys.stderr.write("chmconvert: file has no extension.\n")
             sys.exit(1)  
-        if network_file_ext in ("udfa", "osu"):
+        if network_file_ext in ("osu", "udfa"):
             format = network_file_ext
         else:
             sys.stderr.write("chmconvert: unknown network format \"%s\".\n" 
