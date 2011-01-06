@@ -1,0 +1,62 @@
+Astrochem
+=========
+
+What is Astrochem?
+------------------
+
+Astrochem is a code to compute the abundances of chemical species in
+the interstellar medium, as function of time. It is designed to study
+the chemistry in a variety of astronomical objects, including diffuse
+clouds, dense clouds, photodissociation regions, prestellar cores,
+protostars, and protostellar disks. Astrochem reads a network of
+chemical reactions from a text file, builds up a system of kinetic
+rates equations, and solve it using a state-of-the-art stiff ordinary
+differential equation (ODE) solver. The Jacobian matrix of the system
+is computed implicitly, so the resolution of the system is extremely
+fast: large networks containing several thousands of reactions are
+usually solved in a few seconds. A variety of gas phase process are
+considered, as well as simple gas-grain interactions, such as the
+freeze-out and the desorption via several mechanisms (thermal
+desorption, cosmic-ray desorption and photo-desorption). The computed
+abundances are written in text files, and can be plotted in different
+ways with the tools provided with Astrochem. Chemical reactions and
+their rates are written in a format which is meant to be easy to read
+and to edit. A tool to convert the chemical networks from standard
+databases (OSU, UMIST) into this format is also provided. Astrochem is
+written in C, and its source code is distributed under the terms of
+the GNU General Public License (GPL).
+
+Installation
+------------
+
+Astrochem installation follows a standard procedure and is fairly
+straightforward. Instructions can be found in the INSTALL file.
+
+Documentation
+-------------
+
+Astrochem comes with a comprehensive documentation manual. The LaTeX
+source of the manual can be found in the doc/ directory. It is
+automatically compiled with Astrochem, provided that PDFLaTeX is
+installed on your computer. Each command also has a man page.
+
+Reporting bugs
+--------------
+
+A list of known bugs can be found in the BUGS file. If you find a bug
+which is not listed in this file please report it to
+<sebastien.maret@obs.ujf-grenoble.fr>
+
+How to contribute
+-----------------
+
+You can help the development of Astrochem in a number of ways: by
+testing the package and reporting any bugs that you find; by making
+improvements that you develop available to others; by working on the
+problems or items listed in the BUGS or TODO file.
+
+More information
+----------------
+
+For more information on Astrochem and its development, please contact
+<sebastien.maret@obs.ujf-grenoble.fr>

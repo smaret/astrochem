@@ -9,12 +9,6 @@ release. They are ordered by descending order of priority.
 
 * Complete and proof-read the documentation manual.
 
-* Write a README file. The file should explain briefly what the code
-  does, and give some succinct instructions on how to compile it. It
-  should also say what its dependency are, and where they can be
-  found. It should refer to the install file for more detailed
-  instructions.
-
 * Write a NEWS file.
 
 Items for future releases

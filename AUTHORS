@@ -1,8 +1,11 @@
-Sebastien Maret <smaret@umich.edu>:
+Authors
+=======
+
+Sebastien Maret <sebastien.maret@obs.ujf-grenoble.fr>:
     wrote astrochem.
 
 Ted Bergin <ebergin@umich.edu>:
-    wrote the original version of this code in Fortran. Although the
-    present version does not share any code with the Fortran version,
-    many ideas about its implementation were borrowed from it.
+    wrote an original version of this code in Fortran. Although the
+    present version has been written from scratch, many ideas about
+    its implementation were borrowed from it.
 
