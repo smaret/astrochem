@@ -25,10 +25,9 @@
 #include "../src/astrochem.h"
 
 int
-main ()
+main (void)
 {
   FILE *f;
-  char *input_ini;
 
   char chem_file[MAX_LINE]; 
   char source_file[MAX_LINE];
@@ -50,44 +49,42 @@ main ()
 
   int verbose = 0;
 
-  input_ini = "[files]\n"
-    "source = source.mdl\n"
-    "chem = ../../networks/osu2008.chm\n"
-    "# Physical paramaters\n"
-    "[phys]\n"
-    "cosmic = 1.3e-17\n"
-    "# Solver parameters\n"
-    "[solver]\n"
-    "ti = 1e-6\n"
-    "tf = 1e9\n"
-    "rel_err = 1e-6\n"
-    "# Initial abundances\n"
-    "[abundances]\n"
-    "H2      = 0.5\n"
-    "He      = 0.14\n"
-    "N       = 2.14e-5\n"
-    "O       = 1.76e-4\n"
-    "C(+)    = 7.30e-5\n"
-    "S(+)    = 8.00e-8\n"
-    "Si(+)   = 8.00e-8\n"
-    "Fe(+)   = 3.00e-9\n"
-    "Na(+)   = 2.00e-9\n"
-    "Mg(+)   = 7.00e-9\n"
-    "P(+)    = 3.00e-9\n"
-    "Cl(+)   = 4.00e-9\n"
-    "e(-)    = 7.32e-5\n"
-    "grain   = 1.32e-12\n"
-    "# Output\n"
-    "[output]\n"
-    "time_steps = 64\n"
-    "abundances = CO,C(+),C,e(-),OH,H3O(+),H,H2,HCO(+),CO(+),C4H,HCO(+),CH(+),CH\n"
-    "trace_routes = 1\n";
-
   /* Create the input.ini file */
 
   f = fopen ("input.ini", "w");
   fprintf (f, "# This input file was created by input_test\n");
-  fprintf (f, "%s", input_ini);
+  fprintf (f, "[files]\n");
+  fprintf (f, "source = source.mdl\n");
+  fprintf (f, "chem = ../../networks/osu2008.chm\n");
+  fprintf (f, "# Physical paramaters\n");
+  fprintf (f, "[phys]\n");
+  fprintf (f, "cosmic = 1.3e-17\n");
+  fprintf (f, "# Solver parameters\n");
+  fprintf (f, "[solver]\n");
+  fprintf (f, "ti = 1e-6\n");
+  fprintf (f, "tf = 1e9\n");
+  fprintf (f, "rel_err = 1e-6\n");
+  fprintf (f, "# Initial abundances\n");
+  fprintf (f, "[abundances]\n");
+  fprintf (f, "H2      = 0.5\n");
+  fprintf (f, "He      = 0.14\n");
+  fprintf (f, "N       = 2.14e-5\n");
+  fprintf (f, "O       = 1.76e-4\n");
+  fprintf (f, "C(+)    = 7.30e-5\n");
+  fprintf (f, "S(+)    = 8.00e-8\n");
+  fprintf (f, "Si(+)   = 8.00e-8\n");
+  fprintf (f, "Fe(+)   = 3.00e-9\n");
+  fprintf (f, "Na(+)   = 2.00e-9\n");
+  fprintf (f, "Mg(+)   = 7.00e-9\n");
+  fprintf (f, "P(+)    = 3.00e-9\n");
+  fprintf (f, "Cl(+)   = 4.00e-9\n");
+  fprintf (f, "e(-)    = 7.32e-5\n");
+  fprintf (f, "grain   = 1.32e-12\n");
+  fprintf (f, "# Output\n");
+  fprintf (f, "[output]\n");
+  fprintf (f, "time_steps = 64\n");
+  fprintf (f, "abundances = CO,C(+),C,e(-),OH,H3O(+),H,H2,HCO(+),CO(+),C4H,HCO(+),CH(+),CH\n");
+  fprintf (f, "trace_routes = 1\n");
   fclose (f);
 
   /* Read it */

@@ -36,7 +36,7 @@
 */ 
   
 void 
-read_input (char *input_file, char *chem_file, char *source_file,
+read_input (const char *input_file, char *chem_file, char *source_file,
 	    double *chi, double *cosmic, double *grain_size,
 	    double *grain_abundance, double *ti, double *tf, double *abs_err,
 	    double *rel_err, struct abund initial_abundances[],
@@ -266,7 +266,7 @@ read_input (char *input_file, char *chem_file, char *source_file,
 */
 
 void 
-input_error (char *input_file, int line_number)
+input_error (const char *input_file, int line_number)
 {
   fprintf (stderr, "astrochem: error: incorrect input in %s line %i.\n", 
 	  input_file, line_number);
@@ -278,7 +278,7 @@ input_error (char *input_file, int line_number)
 */
 
 void 
-read_source (char *source_file, int shell[], int *n_shells,
+read_source (const char *source_file, int shell[], int *n_shells,
 	     double av[], double nh[], double tgas[], double tdust[],
 	     int verbose)
 {

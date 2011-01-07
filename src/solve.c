@@ -42,7 +42,6 @@ struct par {
   struct react *reactions;
   int n_reactions;
   int n_species;
-  int spec_index_h;
   double nh; 
   double av;
   double tgas;
@@ -75,7 +74,6 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
   struct react *reactions = ((struct par *)f_data)->reactions;
   int n_reactions = ((struct par *)f_data)->n_reactions;
   int n_species = ((struct par *)f_data)->n_species;
-  int spec_index_h =  ((struct par *)f_data)->spec_index_h;
   double nh = ((struct par *)f_data)->nh;
   double av = ((struct par *)f_data)->av;
   double tgas = ((struct par *)f_data)->tgas;
@@ -107,7 +105,7 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
 	     product of the reactants needs to be divided by the H
 	     abundance. */
 	  
-	  y_product *= NV_Ith_S (y, spec_index_h);
+	  y_product *= NV_Ith_S (y, reactions[i].reactant1);
 	  y_product *= reac_rates[i];
 	}
       else if (reactions[i].reaction_type == 23)
@@ -398,8 +396,6 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
    void *cvode_mem;                    /* Memory space for the solver */
    double *reac_rates;                 /* Reaction rates */
 
-   int spec_index_h;                   /* Index for H */
-
    /* Allocate the work array and fill it with the initial
       concentrations. Ignore species that are not in the
       network. */
@@ -430,7 +426,7 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 
    /* Allocate an array for the reaction rates and compute them. */
    
-   if ((reac_rates = malloc (sizeof (double) * n_reactions)) == NULL)
+   if ((reac_rates = malloc (sizeof (double) * (unsigned int)n_reactions)) == NULL)
      {
        fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
 		__FILE__, __LINE__); 
@@ -453,10 +449,6 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 			       0.);
        }
    }
-
-   /* Find the index of H */
-   
-   spec_index_h = specie_index ("H", species, n_species);
    
    /* Allocate and fill out a structure containing the parameters of
       the function defining the ODE system and the jacobian. */
@@ -471,7 +463,6 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
    params.reactions = reactions;
    params.n_reactions = n_reactions;
    params.n_species = n_species;
-   params.spec_index_h = spec_index_h;
    params.nh = nh;
    params.av = av;
    params.tgas = tgas;
@@ -507,7 +498,6 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
    
    {
      int i, j;
-     void (*orig_interrupt_handler)(int);
      
      /* Solve the system for each time step. */
      
@@ -610,7 +600,7 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 				 if (routes[shell_index][i][j][l].formation.rate < min_rate)
 				   {
 				     min_rate = routes[shell_index][i][j][l].formation.rate;
-				     min_rate_index = l;
+				     min_rate_index = (unsigned int)l;
 				   }
 			       }
 			     if (formation_route.rate > min_rate)
@@ -661,7 +651,7 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 				 if (routes[shell_index][i][j][l].destruction.rate < min_rate)
 				   {
 				     min_rate = routes[shell_index][i][j][l].destruction.rate;
-				     min_rate_index = l;
+				     min_rate_index = (unsigned int)l;
 				   }
 			       }
 			     if (destruction_route.rate > min_rate)

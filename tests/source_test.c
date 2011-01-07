@@ -25,10 +25,9 @@
 #include "../src/astrochem.h"
 
 int
-main ()
+main (void)
 {
   FILE *f;
-  char *source_mdl;
 
   int n_shells;
   int shell[MAX_SHELLS];
@@ -39,16 +38,14 @@ main ()
 
   int verbose = 0;
 
-  source_mdl = "# shell number, Av [mag], n(H) [cm^-3], Tgas [K], Tdust [K]\n"
-    "0	 0.1	1e+02	15.0	12.0\n"
-    "1	 1.0	1e+03	11.0	10.0\n"
-    "2	10.0	1e+04	 8.0	 7.0\n";
-
   /* Create the input.ini file */
 
   f = fopen ("source.mdl", "w");
   fprintf (f, "# This source model file was created by source_test\n");
-  fprintf (f, "%s", source_mdl);
+  fprintf (f, "# shell number, Av [mag], n(H) [cm^-3], Tgas [K], Tdust [K]\n");
+  fprintf (f, "0	 0.1	1e+02	15.0	12.0\n");
+  fprintf (f, "1	 1.0	1e+03	11.0	10.0\n");
+  fprintf (f, "2	10.0	1e+04	 8.0	 7.0\n");
   fclose (f);
 
   /* Read it */

@@ -32,11 +32,11 @@ void add_specie (char *new_specie, char *species[],
 		 int *n_species);
 
 void 
-read_network (char *chem_file, struct react reactions[],
+read_network (const char *chem_file, struct react reactions[],
 	      int *n_reactions, char *species[],
 	      int *n_species, int verbose)
 {
-  FILE *f, *f1;
+  FILE *f;
   char line[MAX_LINE];
   int  line_number = 0;
   char reactant1[MAX_CHAR_SPECIES];
@@ -52,8 +52,6 @@ read_network (char *chem_file, struct react reactions[],
   int reaction_type;
   int reaction_no;
   
-  char s1[512], s2[512];
-
   *n_species = 0;
   *n_reactions = 0;
 
@@ -71,9 +69,9 @@ read_network (char *chem_file, struct react reactions[],
     {
       char chem_file1[MAX_LINE];
       
-      strncpy (chem_file1, PKGDATADIR, sizeof (chem_file1));
-      strncat (chem_file1, "/", sizeof (chem_file1));
-      strncat (chem_file1, chem_file, sizeof (chem_file1));
+      strncpy (chem_file1, PKGDATADIR, sizeof (chem_file1) - 1);
+      strncat (chem_file1, "/", sizeof (chem_file1) - strlen (chem_file1) - 1);
+      strncat (chem_file1, chem_file, sizeof (chem_file1) - strlen (chem_file1) - 1);
       f = fopen (chem_file1, "r");
       if ( !f )
 	{
@@ -299,7 +297,7 @@ add_specie (char *new_specie, char *species[],
 */
 
 int 
-specie_index (char *specie, char *species[], int n_species)
+specie_index (const char *specie, char *species[], int n_species)
 {
   int i;
   

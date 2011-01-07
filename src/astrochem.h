@@ -90,7 +90,7 @@ struct rout {
 #define MAX_REACTIONS 8192
 #define MAX_SPECIES 1024
 
-void read_input (char *input_file, char *chem_file, char *source_file,
+void read_input (const char *input_file, char *chem_file, char *source_file,
 		 double *chi, double *cosmic, double *grain_size,
 		 double *grain_abundance, double *ti, double *tf, double *abs_err,
 		 double *rel_err, struct abund initial_abundances[],
@@ -98,21 +98,21 @@ void read_input (char *input_file, char *chem_file, char *source_file,
 		 int *n_output_abundances, int *time_steps, 
 		 int *trace_routes, char *suffix, int verbose); 
 
-void read_source (char *source_f, int shell[], int *n_shells,
+void read_source (const char *source_f, int shell[], int *n_shells,
 		  double av[], double nh[], double tgas[],
 		  double tdust[], int verbose);
 
-void input_error (char *input_f, int line_number);
+void input_error (const char *input_f, int line_number);
 
 void check_species (struct abund initial_abundances[], int
 		    n_initial_abundances, char *output_species[], int
 		    n_output_species, char *species[], int n_species);
 
-void read_network (char *chem_file, struct react reactions[],
+void read_network (const char *chem_file, struct react reactions[],
 		   int *n_reactions, char *species[],
 		   int *n_species, int verbose);
 
-int specie_index (char specie[], char *species[], int n_species);
+int specie_index (const char specie[], char *species[], int n_species);
 
 double rate(double alpha, double beta, double gamm, int reaction_type,
 	    int reaction_no, double nh, double av, double tgas, double tdust,

@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "../src/astrochem.h"
 
 /* FixMe: Why do we need to define these here? (segfault otherwise) */
@@ -29,12 +30,9 @@ double abundances[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES];
 struct rout routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES];
 
 int
-main ()
+main (void)
 {
   FILE *f;
-  char *input_ini;
-  char *source_mdl;
-  char *network_chm;
 
   char chem_file[MAX_LINE]; 
   char source_file[MAX_LINE];
@@ -71,43 +69,37 @@ main ()
 
   int verbose = 0;
 
-  input_ini = "[files]\n"
-    "source = source.mdl\n"
-    "chem = network.chm\n"
-    "# Solver parameters\n"
-    "[solver]\n"
-    "ti = 1e-6\n"
-    "tf = 1e7\n"
-    "abs_err = 1e-15\n"
-    "rel_err = 1e-6\n"
-    "# Initial abundances\n"
-    "[abundances]\n"
-    "X = 1.0\n"
-    "Y = 0.0\n"
-    "# Output\n"
-    "[output]\n"
-    "time_steps = 128\n"
-    "abundances = X,Y\n";
-
-  source_mdl = "0   20.0    1e+04    10.0    10.0\n";
-
-  network_chm = "X -> Y    1e-9    0    0    2    1\n";
-
   /* Create the input.ini, source.mdl and network_chm files */
 
   f = fopen ("input.ini", "w");
   fprintf (f, "# This input file was created by solve_test\n");
-  fprintf (f, "%s", input_ini);
+  fprintf (f, "[files]\n");
+  fprintf (f, "source = source.mdl\n");
+  fprintf (f, "chem = network.chm\n");
+  fprintf (f, "# Solver parameters\n");
+  fprintf (f, "[solver]\n");
+  fprintf (f, "ti = 1e-6\n");
+  fprintf (f, "tf = 1e7\n");
+  fprintf (f, "abs_err = 1e-15\n");
+  fprintf (f, "rel_err = 1e-6\n");
+  fprintf (f, "# Initial abundances\n");
+  fprintf (f, "[abundances]\n");
+  fprintf (f, "X = 1.0\n");
+  fprintf (f, "Y = 0.0\n");
+  fprintf (f, "# Output\n");
+  fprintf (f, "[output]\n");
+  fprintf (f, "time_steps = 128\n");
+  fprintf (f, "abundances = X,Y\n");
   fclose (f);
 
   f = fopen ("source.mdl", "w");
   fprintf (f, "# This source model file was created by solve_test\n");
-  fprintf (f, "%s", source_mdl);
+  fprintf (f, "0   20.0    1e+04    10.0    10.0\n");
   fclose (f);
 
   f = fopen ("network.chm", "w");
   fprintf (f, "# This network file was created by solve_test\n");
-  fprintf (f, "%s", network_chm);
+  fprintf (f, "X -> Y    1e-9    0    0    2    1\n");
   fclose (f);
 
   /* Read them */

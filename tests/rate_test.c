@@ -24,7 +24,7 @@
 #include <math.h>
 #include "../src/astrochem.h"
 
-#include <stdio.h>
+int equaltol (double value1, double value2, double reltol);
 
 int
 equaltol (double value1, double value2, double reltol)
@@ -41,7 +41,7 @@ equaltol (double value1, double value2, double reltol)
 }
   
 int
-main ()
+main (void)
 {
   double alpha = 0;
   double beta = 0;

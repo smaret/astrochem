@@ -82,7 +82,7 @@ main (int argc, char *argv[])
      message if no (or more than one) argument is given. */
 
   {
-    char opt;
+    int opt;
   
     static struct option longopts[] = {
       {"help",    no_argument, NULL, 'h'},
