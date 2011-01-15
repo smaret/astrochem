@@ -145,7 +145,7 @@ output (int n_shells, double tim[], int time_steps,
   if (trace_routes == 1)
     {
       if (verbose == 1)
-	fprintf (stdout, "Writing formation/destruction in output files... ");
+	fprintf (stdout, "Writing formation/destruction routes in output files... ");
   
       for (i = 0; i < n_output_species; i++)
 	{
