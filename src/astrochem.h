@@ -26,9 +26,9 @@
 #define CHI_DEFAULT 1
 #define COSMIC_DEFAULT 1.3e-17
 #define GRAIN_SIZE_DEFAULT 1e-5     /* Grain radius, in cm */
-#define TI_DEFAULT 1e-7
+#define TI_DEFAULT 1e-6
 #define TF_DEFAULT 1e7
-#define ABS_ERR_DEFAULT 1e-15
+#define ABS_ERR_DEFAULT 1e-20
 #define REL_ERR_DEFAULT 1e-3
 #define TIME_STEPS_DEFAULT 32
 #define TRACE_ROUTES_DEFAULT 0
