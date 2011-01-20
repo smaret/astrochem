@@ -21,7 +21,7 @@ SUBDIRS = examples
 
 man_MANS = astrochem.1 plabun.1 plroute.1 chmconvert.1
 
-EXTRA_DIST = $(man_MANS), astrochem.tex
+EXTRA_DIST = $(man_MANS) astrochem.tex
 
 if HAVE_PDFLATEX
 if HAVE_BIBTEX
