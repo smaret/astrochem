@@ -55,20 +55,11 @@ fi
 AM_CONDITIONAL([HAVE_PYMOD_BIGGLES], [test $HAVE_PYMOD_BIGGLES = "yes"])
 AM_CONDITIONAL([HAVE_PYMOD_NUMPY], [test $HAVE_PYMOD_NUMPY = "yes"])
 
-# Checks for header files.
-AC_HEADER_STDC
-AC_CHECK_HEADERS([stdlib.h string.h])
-
 # Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
 if test x$enable_openmp = "xyes"; then
    AX_OPENMP
    AC_SUBST([OPENMP_CFLAGS])
 fi
-
-# Checks for library functions.
-AC_FUNC_MALLOC
-AC_CHECK_FUNCS([pow exp fabs])
 
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
