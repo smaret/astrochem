@@ -17,6 +17,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
-EXTRA_DIST = input.ini source.mdl abundances.pdf
+EXTRA_DIST = input.ini source.mdl abundances.pdf routes.pdf
 
 CLEANFILES = *.abun *.rout

@@ -30,9 +30,11 @@ all: pdf
 
 SUFFIXES = .pdf .tex
 
+vpath %.pdf examples
+
 pdf: astrochem.pdf
 
-astrochem.pdf: astrochem.tex examples/abundances.pdf
+astrochem.pdf: astrochem.tex abundances.pdf routes.pdf
 	$(PDFLATEX) astrochem.tex
 	$(BIBTEX) astrochem.aux
 	$(PDFLATEX) astrochem.tex
