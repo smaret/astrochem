@@ -148,10 +148,10 @@ def main():
     # Parse options and check commands and arguments
 
     try:
-	opts, args = getopt.getopt(sys.argv[1:], "ho:s:t:x:y:",
-				   ["help", "output=", "shell=", 
-                                    "time=", "xrange=", "yrange=",
-                                    "model="])
+	opts, args = getopt.getopt(sys.argv[1:], "hVo:s:t:x:y:",
+				   ["help", "version", "output=",
+                                    "shell=", "time=", "xrange=",
+                                    "yrange=", "model="])
     except getopt.GetoptError:
 	usage()
 	sys.exit(1)
@@ -166,6 +166,9 @@ def main():
     for opt, arg in opts:
 	if opt in ("-h", "--help") :
 	    usage()
+	    sys.exit()
+	if opt in ("-V", "--version") :
+	    version()
 	    sys.exit()
 	if opt in ("-o", "--output"):
 	    output = arg
