@@ -21,7 +21,7 @@ SUBDIRS = examples
 
 man_MANS = astrochem.1 plabun.1 plroute.1 chmconvert.1
 
-EXTRA_DIST = $(man_MANS) astrochem.tex
+EXTRA_DIST = $(man_MANS) astrochem.tex astrochem.bib fig1.pdf fig2.pdf
 
 if HAVE_PDFLATEX
 if HAVE_BIBTEX
@@ -30,11 +30,9 @@ all: pdf
 
 SUFFIXES = .pdf .tex
 
-vpath %.pdf examples
-
 pdf: astrochem.pdf
 
-astrochem.pdf: astrochem.tex abundances.pdf routes.pdf
+astrochem.pdf: astrochem.tex astrochem.bib fig1.pdf fig2.pdf
 	$(PDFLATEX) astrochem.tex
 	$(BIBTEX) astrochem.aux
 	$(PDFLATEX) astrochem.tex
@@ -44,4 +42,3 @@ CLEANFILES = astrochem.aux astrochem.log astrochem.bbl astrochem.blg astrochem.p
 
 endif
 endif
-

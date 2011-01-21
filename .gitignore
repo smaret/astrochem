@@ -32,6 +32,7 @@ doc/astrochem.out
 doc/astrochem.bbl
 doc/astrochem.blg
 doc/astrochem.pdf
+doc/fig*.pdf
 
 # Ignore object files and binaries
 *.o
@@ -40,10 +41,9 @@ src/chmconvert
 src/plabun
 src/plroute
 
-# Ignore example files and figures
+# Ignore example files
 doc/examples/*.abun
 doc/examples/*.rout
-doc/examples/*.pdf
 
 # Object files, binaries, input files, and result files tests/
 tests/*.o
