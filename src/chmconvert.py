@@ -22,7 +22,7 @@
 import sys
 import getopt
 
-VERSION = "0.1"
+VERSION = "0.2"
 
 class reaction:
     """A chemical reaction."""
@@ -269,6 +269,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-	
-	
-    
