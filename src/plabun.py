@@ -324,11 +324,8 @@ def main():
         sys.exit(1)
     
     if output:
-	p.write_eps(arg)
+	p.write_eps(output)
     else:
         p.show()
 
 main()			  
-	
-	
-    

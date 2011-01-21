@@ -461,10 +461,8 @@ def main():
     t[0,1] = p2
 
     if output:
-	t.write_eps(arg)
+	t.write_eps(output)
     else:
         t.show()
 
 main()  
-	
-    
