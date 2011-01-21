@@ -1,16 +1,5 @@
-Main to-do items
-================
-
-Items to be completed before the first release
-----------------------------------------------
-
-The following tasks need to be completed before the first
-release. They are ordered by descending order of priority.
-
-* Write a NEWS file.
-
-Items for future releases
--------------------------
+To-do list
+==========
 
 * Test different solver methods from CVODE. Some may take advantage of
   the sparsity of the Jacobian matrix.
@@ -21,18 +10,13 @@ Items for future releases
 * Pass structures to function that have a large number of arguments.
 
 * Intercept convergence errors from CVODE, and exit gracefully if they
-  occurs, maybe with a message that suggests how to avoid them, or
-  that refer to a section in the manual.
+  occur.
 
-* Implement grain surface chemistry 
+* Implement 2D geometry.
 
-Wish list or vague ideas
-========================
+* Implement grain surface chemistry.
 
-The following items are long-term goals, or just thoughts. They are in
-random order.
 
-* Merge the 1D and 2D versions of the code.
 
 
 
