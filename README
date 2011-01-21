@@ -36,9 +36,8 @@ Documentation
 -------------
 
 Astrochem comes with a comprehensive documentation manual. The LaTeX
-source of the manual can be found in the doc/ directory. It is
-automatically compiled with Astrochem, provided that PDFLaTeX is
-installed on your computer. Each command also has a man page.
+source of the manual can be found in the doc/ directory. Each command
+also has a man page.
 
 Reporting bugs
 --------------

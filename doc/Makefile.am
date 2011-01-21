@@ -26,8 +26,6 @@ EXTRA_DIST = $(man_MANS) astrochem.tex astrochem.bib fig1.pdf fig2.pdf
 if HAVE_PDFLATEX
 if HAVE_BIBTEX
 
-all: pdf
-
 SUFFIXES = .pdf .tex
 
 pdf: astrochem.pdf

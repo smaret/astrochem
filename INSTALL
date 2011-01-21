@@ -70,6 +70,9 @@ it can be invoked with "make check" at the top level. If you run the
 tests and get some failures, please report them to
 <sebastien.maret@obs.ujf-grenoble.fr>.
 
+The documentation manual can built by typing "make pdf" at the top
+level.
+
 Astrochem can be installed using the command:
 
   make install
