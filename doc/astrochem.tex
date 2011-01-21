@@ -144,9 +144,9 @@ destroyed principally through the following reaction:
 \end{equation}
 
 \noindent
-with a rate constant $k_{2}$. If we assume that other formation and
-destruction channels are neglectable, the derivative of the HCO$^{+}$
-density -- i.e. the number of HCO$^{+}$ per volume unit that we note
+with a rate constant $k_{2}$. If we neglect other formation and
+destruction channels, the derivative of the HCO$^{+}$ density --
+i.e. the number of HCO$^{+}$ per volume unit that we note
 $\conc{HCO^{+}}$ in the following -- writes as:
 
 \begin{equation}
@@ -183,7 +183,7 @@ of the system\footnote{The Jacobian matrix is a $n_\mathrm{s}^2$
  files), build-up the system of kinetic equation and solve them using
  the CVODE solver \citep{Cohen96} from the SUNDIALS library
  \citep{Hindmarsh05}. CVODES uses the Backward Differentiation
- formulae (BDF method) with a variable step-size, which is suitable
+ formula (BDF method) with a variable step-size, which is suitable
  for stiff systems. The resulting system of linear equations is solved
  using the Newton iteration. The Jacobian matrix of the system is
  computed explicitly to speed-up the computations. In addition,
@@ -225,7 +225,7 @@ each reactant is computed by multiplying the densities of the
 reactants by $k$. Reactions in Astrochem may have up to three
 reactants, and four products.
 
-\subsubsection{Cosmic-ray ionisation}
+\subsubsection{Cosmic-ray ionization}
 \label{sec:cosm-ray-ioniz}
 
 Cosmic-ray particles can ionize molecules and atoms. This may happen
@@ -236,8 +236,8 @@ H$_{2}$, forming H$_{2}^{+}$ and an electron. The electron then
 recombines with H$_{2}^{+}$ and emit a UV photon. This
 \emph{secondary} UV photon may then ionize other molecules or
 atoms. Astrochem assumes that the rate for these (either direct of
-indirect) cosmic-ray ionisation reactions scale with the H$_{2}$
-ionisation rate $\zeta$, such as:
+indirect) cosmic-ray ionization reactions scale with the H$_{2}$
+ionization rate $\zeta$, such as:
 
 \begin{equation}
   k = \alpha  \, \zeta
@@ -270,7 +270,7 @@ $\chi = 1$ corresponds to a ``standard'' interstellar radiation field
 (ISRF).
 
 This formulation implicitly assumes that the external radiation field
-has the same spectral shape than the the IRSF. In addition the
+has the same spectral shape than the the ISRF. In addition the
 \emph{self-shielding} of species that dissociate through a line
 process \citep[e.g. CO;][]{vanDishoeck86} is neglected.
 
@@ -454,7 +454,7 @@ with:
 \end{equation}
 
 \noindent
-Here $\nu_{0}$ is the characteristic vibrationnal frequency of the
+Here $\nu_{0}$ is the characteristic vibrational frequency of the
 desorbing species, $E_{B}$ is the binding energy of the desorbing
 species on the grain surface expressed in Kelvins, $T_{d}$ is the
 grain temperature and $N_{S}$ is the number of sites per unit surface
@@ -464,7 +464,7 @@ values of $E_{b}$ and $m$ are both read from the network file.
 \subsubsection{Cosmic-ray desorption}
 \label{sec:cosm-ray-desorpt}
 
-As mentionned above, ices may also evaporate by non-thermal
+As mentioned above, ices may also evaporate by non-thermal
 processes. For example, cosmic-rays heavy ions deposit energy and form
 ``hot spots'' on the grain surface, causing the evaporation of
 ices. This process is complex \citep[see e.g.][]{Bringa04}, and we
@@ -479,7 +479,7 @@ is then similar to that of thermal desorption:
 \end{equation}
 
 \noindent
-Here $f$ is the fraction of the time spent by a grain in the viscinity
+Here $f$ is the fraction of the time spent by a grain in the vicinity
 of 70~K between two cosmic-ray heating events, assumed to be $3.16
 \times 10^{-19}$ \citep{Hasegawa93}. Note that because of the
 uncertainties on this process, no scaling of $k$ with the cosmic ray
@@ -490,9 +490,9 @@ ionization rate is performed.
 
 Photo-desorption (i.e. desorption by UV photons) is another
 non-thermal desorption process. UV photons can originate in the ISRF,
-or in the ionisation of H$_{2}$ by cosmic-rays followed by
+or in the ionization of H$_{2}$ by cosmic-rays followed by
 recombination (secondary UV photons). At present only photo-desorption
-from IRSF UV photons is implemented in Astrochem.
+from ISRF UV photons is implemented in Astrochem.
 
 The photo-desorption rate of CO is for example
 \citep{Oberg09a,Oberg09b}:
@@ -510,7 +510,7 @@ with:
 \end{equation}
 
 \noindent
-Here $G_{0}$ is the average UV IRSF \citep[assumed to be
+Here $G_{0}$ is the average UV ISRF \citep[assumed to be
 10$^{8}$~photons~cm$^{-2}$~s$^{-1}$;][]{Habing68}, and $Y_\mathrm{PD}$
 is the photo-desorption yield, i.e. the number of molecules ejected
 per incident photon. The latter is given by:
@@ -522,7 +522,7 @@ per incident photon. The latter is given by:
 
 \noindent
 where $x$ is the ice thickness of the considered species expressed in
-monolayers (ML), $l$ is the diffusion lenght in ML, and $Y_{0}$ is the
+monolayers (ML), $l$ is the diffusion length in ML, and $Y_{0}$ is the
 photo-desorption yield for thick ices (i.e. $x \gg l$). Typical values
 for $Y_{0}$ and $l$ are $10^{-3}$ molecules~photon$^{-1}$ and 2~ML,
 respectively\footnote{For some species, $Y_{0}$ depends weakly on the
@@ -556,7 +556,7 @@ network file.
 In this section we present a simple example of Astrochem usage.  We
 propose to use Astrochem to study the formation of the HCO$^{+}$ ion
 in a dense interstellar cloud. We suppose that the cloud is isodense
-and isothermal, and that it is sheilded from the ISRF, so that
+and isothermal, and that it is shielded from the ISRF, so that
 photo-processes can be ignored. For a sake of simplicity, we also
 neglect the freeze-out of  molecules on dust grains. In the following,
 we describe the various steps needed to solve this problem.
@@ -740,7 +740,7 @@ yr and y-axis range from $10^{-12}$ to $10^{-4}$ with the
 \verb=time= commands tells Plabun to plot abundances as function of
 time in the first (and unique in our case) shell. Note that
 parenthesis in files names such as \verb=H3(+).abun= needs to be
-preceeded by an antislash (\verb=\=) because they have a special
+preceded by an anti-slash (\verb=\=) because they have a special
 meaning for Unix shells. The command above produces the plot shown on
 Fig.~\ref{fig:example-abundances}. Plabun has a number or other
 commands and options; see \verb=man plabun= for a complete list.
@@ -757,13 +757,13 @@ commands and options; see \verb=man plabun= for a complete list.
    a species}
 \label{sec:ident-main-form}
 
-It is often usefull to identify the main formation and destruction
+It is often useful to identify the main formation and destruction
 routes of a given species, for example to check that the rate of these
 main reactions have been determined accurately (e.g. from experiments)
 or are rather uncertain. This also allows to understand how the
 various species of a chemical network are linked together.
 
-As already mentionned, if one turns on the \verb=trace_route= option
+As already mentioned, if one turns on the \verb=trace_route= option
 in the input file, Astrochem creates some additional files containing
 the main formation and destruction routes of the species listed with
 \verb=output= option. Of course these routes may change with time;
@@ -771,7 +771,7 @@ therefore Astrochem saves the sixteen most important formation routes
 as well as the sixteen most important destruction routes at each time
 step and position.
 
-Althought the \verb=.rout= files are text files, they are -- unlike
+Although the \verb=.rout= files are text files, they are -- unlike
 the \verb=.abun= files -- not easy to read directly. However a command
 allows to plot the main formation and destruction rate of a given
 species as a function of time or position\footnote{Plotting the main
@@ -824,7 +824,7 @@ time range.
 \subsection{Input file}
 \label{sec:input-file}
 
-As mentionned already, the various parameters of Astrochem are read
+As mentioned already, the various parameters of Astrochem are read
 from an input file. Although this is not mandatory, the file usually
 has the \verb=.ini= file extension. The file has several sections that
 are delimited by a keyword within brackets (e.g. \verb=[files]=). Each
@@ -899,7 +899,7 @@ A note on tolerances: Astrochem adjusts the internal time step so that
 the relative error on any abundance is always lower that
 \verb=rel_err=, unless the given abundance is lower that
 \verb=abs_err=. Because errors on the abundances at each time step may
-add-up, we recommand to chose these errors quite conservatively. The
+add-up, we recommend to chose these errors quite conservatively. The
 default values should be suitable for most problems.
 
 \subsubsection{Initial abundances}
@@ -929,7 +929,7 @@ the computation. These parameters are:
 
 \item \verb=suffix=: A suffix to append to the name of the species
   before the file extension (\verb=.abun= or \verb=.reac=) in
-  abundance files. This is useful when you want to run astrochem for a
+  abundance files. This is useful when you want to run Astrochem for a
   number of different input files all located in the same directory;
   this way the results of a given simulation will not be overwritten
   by the results of others. A leading underscore is added to this
@@ -964,9 +964,9 @@ the computation. These parameters are:
 Astrochem reads the physical parameters (density, temperature) of the
 astronomical source in a source file. Although the source may have in
 principle any dimension, Astrochem is, for the moment, only designed
-to study 1D spherical sources in an external radiation field (such as a
-dense cloud or a prestellar core in the IRSF). Future versions will
-allow to study 2D sources with axi-symmetrical geometries, such as
+to study 1D spherical sources in an external radiation field (such as
+a dense cloud or a prestellar core in the ISRF). Future versions will
+allow to study 2D sources with axisymmetrical geometries, such as
 protoplanetary disks.
 
 In order to construct a source model file, one needs to sample the
@@ -1072,8 +1072,8 @@ type and reaction number.
 The chemical equation is composed of one, two or three reactants, and
 one, two, three or four products. Each reactants and products are
 separated by a white space, a \verb=+= sign, and another white
-space. To distangle the \verb=+= sign between reactants from the ones
-corresponding to ions, ion charge must be put in paranthesis: for
+space. To disentangle the \verb=+= sign between reactants from the ones
+corresponding to ions, ion charge must be put in parenthesis: for
 example, the HCO$^{+}$ ion must be written as \verb=HCO(+)= in the
 network file. Reactants and products are separated by a white space,
 an arrow (\verb=->=), and another white space.
@@ -1103,8 +1103,8 @@ while the formation rate of H is computed as:
 \end{equation}
 
 \noindent
-In other words, one body reactions (e.g. cosmic-ray ionisation, or UV
-ionisation) are assumed to have a first order kinetics, two body
+In other words, one body reactions (e.g. cosmic-ray ionization, or UV
+ionization) are assumed to have a first order kinetics, two body
 reactions are assumed to have a second order kinetics, etc. However,
 there are two exceptions to this rule. First the formation of H$_{2}$
 on the grains is assumed to be of the first order (see
@@ -1115,8 +1115,8 @@ large enough (see \S~ref{sec:photo-desorption}).
 Several reactants and products are not \emph{bona fide} chemical
 species, but are just meant to make the reading of the network
 easier. These \emph{pseudo-species} are \verb=cosmic-ray= (for
-cosmic-ray direct or indirect ionisation or desorption reactions),
-\verb=uv-photon= (for photo-ionisation, photo-dissociation and
+cosmic-ray direct or indirect ionization or desorption reactions),
+\verb=uv-photon= (for photo-ionization, photo-dissociation and
 photo-desorption reactions) and \verb=photon= (for radiative
 association reactions). All of these are ignored by Astrochem.
 
@@ -1220,7 +1220,7 @@ State University database files. Networks can be converted as follows
 
 \noindent
 The \verb=-o= option is used to select the name of the output file. If
-not specified, the network is copied to the standard output. Tahe two
+not specified, the network is copied to the standard output. Two
 networks provided with Astrochem (\verb=osu2008.chm= and
 \verb=osu2009.chm=; see section~\ref{sec:netw-prov-with}) are
 automatically generated from the OSU files using this tool.
@@ -1230,7 +1230,7 @@ automatically generated from the OSU files using this tool.
 
 Astrochem may be run in parallel for sources containing more than one
 shell. In this kind of source, if diffusion and advection are
-neglected, each shell is independant from others: abundances in a
+neglected, each shell is independent from others: abundances in a
 given shell are not affected by abundances in other shells. Therefore
 abundances may be computed in several shells simultaneously.
 
@@ -1239,7 +1239,7 @@ standard\footnote{For more information on OpenMP, see
   \url{http://openmp.org/}}. Basically, OpenMP is a set of compiler
 directives that allows a program to be run in parallel on a
 shared-memory parallel computer, such as a multi-core and/or multi-CPU
-machine. Astrochem forks in several threads that are run simulateously
+machine. Astrochem forks in several threads that are run simultaneously
 on several cores and/or CPUs. Each thread corresponds to a computation
 in a different shell. When run in parallel, Astrochem execution time
 scales almost linearly with the inverse of the number of cores or
@@ -1260,7 +1260,7 @@ for more information):
 The configure script will attempt to detect if your compiler supports
 the OpenMP standard\footnote{Most compilers (including GCC, starting
   from version 4.2) support OpenMP.}. Then one need to set the
-\verb=OMP_NUM_THREADS= environnement variable to the number of threads
+\verb=OMP_NUM_THREADS= environment variable to the number of threads
 to be run in parallel. It is recommended to set this variable to twice
 the number of cores on the machine (e.g. 16 for a eight core
 computer). With the bash shell, this is done as follows:
