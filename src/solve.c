@@ -32,8 +32,6 @@
 #include <cvode/cvode.h>
 #include <cvode/cvode_dense.h>
 #include <nvector/nvector_serial.h>
-#include <sundials/sundials_dense.h>
-#include <sundials/sundials_types.h>
  
 #include "astrochem.h"
 
