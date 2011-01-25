@@ -41,4 +41,11 @@ solve_test_SOURCES = solve_test.c
 
 solve_test_LDADD = ../src/input.o ../src/network.o ../src/solve.o ../src/rates.o
 
+benchmark: benchmark-bin
+	./benchmark
+
+benchmark-bin: benchmark.py
+	sed -e 's,\@PYTHON\@,${PYTHON},g' $? > benchmark
+	chmod a+x benchmark
+
 CLEANFILES = input.ini source.mdl network.chm *.abun

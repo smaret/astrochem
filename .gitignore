@@ -40,18 +40,18 @@ src/astrochem
 src/chmconvert
 src/plabun
 src/plroute
-
-# Ignore example files
-doc/examples/*.abun
-doc/examples/*.rout
-
-# Object files, binaries, input files, and result files tests/
-tests/*.o
+tests/benchmark
 tests/input_test
 tests/network_test
 tests/rate_test
 tests/solve_test
 tests/source_test
+
+# Ignore example files
+doc/examples/*.abun
+doc/examples/*.rout
+
+# Test input and result files
 tests/input.ini
 tests/network.chm
 tests/source.mdl
