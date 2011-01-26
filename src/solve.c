@@ -30,7 +30,11 @@
 #include <math.h>
 
 #include <cvode/cvode.h>
+#ifdef HAVE_LAPACK
+#include <cvode/cvode_lapack.h>
+#else
 #include <cvode/cvode_dense.h>
+#endif
 #include <nvector/nvector_serial.h>
  
 #include "astrochem.h"
@@ -485,7 +489,11 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
    abs_err = abs_err * nh;
    if ((CVodeInit (cvode_mem, f, 0.0, y) != CV_SUCCESS)
        || (CVodeSStolerances (cvode_mem, rel_err, abs_err) != CV_SUCCESS)
+#ifdef HAVE_LAPACK
+       || ((CVLapackDense (cvode_mem, n_species) != CV_SUCCESS))
+#else
        || ((CVDense (cvode_mem, n_species) != CV_SUCCESS))
+#endif
        || ((CVDlsSetDenseJacFn (cvode_mem, jacobian) != CV_SUCCESS))
        || (CVodeSetUserData (cvode_mem, &params) != CV_SUCCESS))
      {
