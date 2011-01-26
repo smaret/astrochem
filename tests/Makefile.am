@@ -49,3 +49,5 @@ benchmark-bin: benchmark.py
 	chmod a+x benchmark
 
 CLEANFILES = input.ini source.mdl network.chm *.abun
+
+EXTRA_DIST = benchmark.py
