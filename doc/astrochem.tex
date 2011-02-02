@@ -464,13 +464,23 @@ values of $E_{b}$ and $m$ are both read from the network file.
 \label{sec:cosm-ray-desorpt}
 
 As mentioned above, ices may also evaporate by non-thermal
-processes. For example, cosmic-rays heavy ions deposit energy and form
-``hot spots'' on the grain surface, causing the evaporation of
-ices. This process is complex \citep[see e.g.][]{Bringa04}, and we
-therefore adopt the simple treatment of \citet{Hasegawa93}, who assume
-that most cosmic-ray ions impulsively heat the grains to a peak
-temperature of 70~K, at which most of the desorption occurs. The rate
-is then similar to that of thermal desorption:
+processes. For example, cosmic-rays may desorb molecules from grains,
+either by creating hot-spots on the grain surfaces, or by heating the
+whole grains \citep{Leger85}. Because the energy deposited in a grain
+varies as $Z^{2}$, cosmic-ray desorption in mainly caused by heavy
+cosmic-ray ions, such as Fe. \cite{Leger85} suggested that desorption
+by spot-heating dominates over desorption by whole-grain heating for
+grains smaller than 2.5 $\mu$m. However, recent molecular dynamics
+simulations indicate that for 0.1 $\mu$m grains the whole grain
+heating contribution is small \citep{Bringa04}.
+
+Because of the uncertainties on this process, two different treatments
+are implemented in Astrochem. First, cosmic-ray desorption rates can
+be computed following \citet{Hasegawa93}, who assume that desorption
+occurs mostly through whole-grain heating; when impacting grains,
+heavy cosmic-ray ions are assumed to impulsively heat the grains to a
+peak temperature of 70~K, at which most of the desorption occurs. The
+rate is then similar to that of thermal desorption:
 
 \begin{equation}
   k = f \, \nu_{0} \, \mathrm{exp} \left( -\frac{E_{B}}{70} \right)
@@ -478,11 +488,17 @@ is then similar to that of thermal desorption:
 \end{equation}
 
 \noindent
-Here $f$ is the fraction of the time spent by a grain in the vicinity
+where $f$ is the fraction of the time spent by a grain in the vicinity
 of 70~K between two cosmic-ray heating events, assumed to be $3.16
-\times 10^{-19}$ \citep{Hasegawa93}. Note that because of the
-uncertainties on this process, no scaling of $k$ with the cosmic ray
-ionization rate is performed.
+\times 10^{-19}$ \citep{Hasegawa93}.
+
+Alternatively, the cosmic-ray desorption rate of any specie can be
+given explicitly in the network file. This allows for the use of the
+cosmic-ray desorption rates that have been computed and/or measured
+for some species \citep[e.g. H$_{2}$O and CO;][]{Bringa04}. The user
+can specify in the network file which treatment to use for each species
+(see Table.~\ref{tab:rate-const-meaning}).  Note that no scaling of
+$k$ with the cosmic ray ionization rate is performed.
 
 \subsubsection{Photo-desorption}
 \label{sec:photo-desorption}
@@ -1177,31 +1193,40 @@ reactions, that depends on the ice thickness; therefore the rate for
 these reactions is computed for each solver internal time step.
 
 \begin[h]{table}
-  \begin{center}
-    \caption{Physical meaning of the rate constants used chemical
-      networks and equation used in the code to compute the reaction
-      rate for each reaction type.}
-    \begin{tabular}{llccc}
-      \hline
-      \hline
-      Type number & Equation\footnotemark[1] & \multicolumn{3}{c}{Rate constants\footnotemark[2]}\\
-      \cline{3-5}
-      & & $a$ & $b$ & $c$\\
-      \hline
-      -1    & Eq.~(\ref{eq:grain-attach-neutralization}) & $\alpha$ & $\beta$\\
-      0     & Eq.~(\ref{eq:h2-formation-rate}) & $\alpha$ & $\beta$\\
-      1     & Eq.~(\ref{eq:cosmic-ray-ionization}) & $\alpha$ & - & -\\
-      2-12  & Eq.~(\ref{eq:arrhenius}) & $\alpha$ & $\beta$ & $\gamma$\\
-      13    & Eq.~(\ref{eq:photo-ionization}) & $\alpha$ & - & -\\
-      20    & Eq.~(\ref{eq:freeze-out}) & $S$ & $m/m_\mathrm{H}$ & -\\
-      21    & Eq.~(\ref{eq:thermal-desorption}) & - & $m/m_\mathrm{H}$ & $E_{b}$\\
-      22    & Eq.~(\ref{eq:cosmic-ray-desorption}) & - & $m/m_\mathrm{H}$ & $E_{b}$\\
-      23    & Eq.~(\ref{eq:photo-desorption}) & $Y_{0}$ & - & $l$\\
-      \hline
+%  \begin{minipage}{15cm}
+    \renewcommand{\footnoterule}{}  
+    \begin{center}
+      \caption{Physical meaning of the rate constants used chemical
+        networks and equation used in the code to compute the reaction
+        rate for each reaction type.}
+      \begin{tabular}{llccc}
+        \hline
+        \hline
+        Type number & Equation & \multicolumn{3}{c}{Rate constants}\\
+        \cline{3-5}
+        & & $a$ & $b$ & $c$\\
+        \hline
+        -1    & Eq.~(\ref{eq:grain-attach-neutralization}) & $\alpha$ & $\beta$\\
+        0     & Eq.~(\ref{eq:h2-formation-rate}) & $\alpha$ & $\beta$\\
+        1     & Eq.~(\ref{eq:cosmic-ray-ionization}) & $\alpha$ & - & -\\
+        2-12  & Eq.~(\ref{eq:arrhenius}) & $\alpha$ & $\beta$ & $\gamma$\\
+        13    & Eq.~(\ref{eq:photo-ionization}) & $\alpha$ & - & -\\
+        20    & Eq.~(\ref{eq:freeze-out}) & $S$ & $m/m_\mathrm{H}$ & -\\
+        21    & Eq.~(\ref{eq:thermal-desorption}) & - & $m/m_\mathrm{H}$ & $E_{b}$\\
+        22    & Eq.~(\ref{eq:cosmic-ray-desorption})$^\dagger$ & $k$ & $m/m_\mathrm{H}$ & $E_{b}$\\
+        23    & Eq.~(\ref{eq:photo-desorption}) & $Y_{0}$ & - & $l$\\
+        \hline
     \end{tabular}
+    \\ \parbox{12cm}{\footnotesize $^\dagger$The cosmic-ray desorption
+      rate may be computed in two different ways depending on the
+      value of $a$ (see Section~\ref{sec:cosm-ray-desorpt}). If $a =
+      0$ then $k$ is computed from
+      Eq.(\ref{eq:cosmic-ray-desorption}). If $a \ne 0$ then $k = a$.}
     \label{tab:rate-const-meaning}
   \end{center}
+%\end{minipage}
 \end{table}
+
 
 \subsection{Convert networks to Astrochem format}
 \label{sec:conv-netw-astr}

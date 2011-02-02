@@ -100,11 +100,19 @@ rate(double alpha, double beta, double gamm, int reaction_type,
     case 22:
       /* Cosmic ray desorption */
       {
-	double v0 = pow (2 * GRAIN_SITES_PER_CM2 * gamm * CONST_CGSM_BOLTZMANN
-			 / (M_PI * M_PI * beta * CONST_CGSM_MASS_PROTON),
-			 0.5);
-	k = v0 * FRACTION_TIME_GRAIN_70K * exp (-gamm / 70.);
-	break;
+	if (alpha == 0.0)
+	  {
+	    double v0 = pow (2 * GRAIN_SITES_PER_CM2 * gamm * CONST_CGSM_BOLTZMANN
+			     / (M_PI * M_PI * beta * CONST_CGSM_MASS_PROTON),
+			     0.5);
+	    k = v0 * FRACTION_TIME_GRAIN_70K * exp (-gamm / 70.);
+	    break;
+	  }
+	else
+	  {
+	    k = alpha;
+	    break;
+	  }
       }
       
     case 23:
