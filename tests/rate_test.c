@@ -167,7 +167,7 @@ main (void)
   if (equaltol (8.239140e-40, k, 1e-2) == 1)
     return EXIT_FAILURE;
 
-  /* Cosmic-ray desorption
+  /* Cosmic-ray desorption (from Hasegawa & Herbst 1993)
      CO(ice) + cosmic-ray -> CO */
 
   reaction_type = 22;
@@ -179,6 +179,20 @@ main (void)
 	    av, tgas, tdust, chi, cosmic, grain_size, grain_abundance,
 	    ice_abundance);
   if (equaltol (2.194592e-14, k, 1e-6) == 1)
+    return EXIT_FAILURE;
+
+  /* Cosmic-ray desorption (from Bring & Johnson 2004)
+     CO(ice) + cosmic-ray -> CO */
+
+  reaction_type = 22;
+  alpha = 4.3e-16;
+  beta = 0;
+  gamm = 0;
+
+  k = rate (alpha, beta, gamm, reaction_type, reaction_no, nh,
+	    av, tgas, tdust, chi, cosmic, grain_size, grain_abundance,
+	    ice_abundance);
+  if (equaltol (4.3e-16, k, 1e-6) == 1)
     return EXIT_FAILURE;
 
   return EXIT_SUCCESS;
