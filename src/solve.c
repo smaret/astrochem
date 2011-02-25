@@ -54,10 +54,10 @@ struct par {
   double grain_abundance;
 };
 
-static int f (realtype t, N_Vector y, N_Vector ydot, void *f_data);
+static int f (realtype t, N_Vector y, N_Vector ydot, void *params);
 
 static int jacobian (int N, realtype t, N_Vector y, N_Vector fy,
-		     DlsMat J, void *jacobian_data, N_Vector tmp1,
+		     DlsMat J, void *params, N_Vector tmp1,
 		     N_Vector tmp2, N_Vector tmp3);
 
 /*
@@ -66,24 +66,24 @@ static int jacobian (int N, realtype t, N_Vector y, N_Vector fy,
 
 static int 
 f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
-   void *f_data)
+   void *params)
 {
   int i;
   
-  /* Get the parameters passed with *f_data. */
+  /* Get the parameters passed with *params. */
 
-  double *reac_rates = ((struct par *)f_data)->reac_rates;
-  struct react *reactions = ((struct par *)f_data)->reactions;
-  int n_reactions = ((struct par *)f_data)->n_reactions;
-  int n_species = ((struct par *)f_data)->n_species;
-  double nh = ((struct par *)f_data)->nh;
-  double av = ((struct par *)f_data)->av;
-  double tgas = ((struct par *)f_data)->tgas;
-  double tdust = ((struct par *)f_data)->tdust;
-  double chi = ((struct par *)f_data)->chi;
-  double cosmic = ((struct par *)f_data)->cosmic;
-  double grain_size = ((struct par *)f_data)->grain_size;
-  double grain_abundance = ((struct par *)f_data)->grain_abundance;
+  double *reac_rates = ((struct par *)params)->reac_rates;
+  struct react *reactions = ((struct par *)params)->reactions;
+  int n_reactions = ((struct par *)params)->n_reactions;
+  int n_species = ((struct par *)params)->n_species;
+  double nh = ((struct par *)params)->nh;
+  double av = ((struct par *)params)->av;
+  double tgas = ((struct par *)params)->tgas;
+  double tdust = ((struct par *)params)->tdust;
+  double chi = ((struct par *)params)->chi;
+  double cosmic = ((struct par *)params)->cosmic;
+  double grain_size = ((struct par *)params)->grain_size;
+  double grain_abundance = ((struct par *)params)->grain_abundance;
 
   /* Loop over the reactions and build the right hand ODE system
      equations. */
@@ -174,24 +174,24 @@ static int
 jacobian (int N __attribute__ ((unused)), 
 	  realtype t __attribute__ ((unused)), N_Vector y,
 	  N_Vector fy __attribute__ ((unused)),
-	  DlsMat J, void *jacobian_data,
+	  DlsMat J, void *params,
 	  N_Vector tmp1 __attribute__ ((unused)), 
 	  N_Vector tmp2 __attribute__ ((unused)), 
 	  N_Vector tmp3 __attribute__ ((unused)))
 {
   int i, j;
   
-  /* Get the parameters passed with *jacobian_data. */
+  /* Get the parameters passed with *params. */
 
-  double *reac_rates = ((struct par *)jacobian_data)->reac_rates;
-  struct react *reactions = ((struct par *)jacobian_data)->reactions;
-  int n_reactions = ((struct par *)jacobian_data)->n_reactions;
-  int n_species = ((struct par *)jacobian_data)->n_species;
-  double nh = ((struct par *)jacobian_data)->nh;
-  double av = ((struct par *)jacobian_data)->av;
-  double chi = ((struct par *)jacobian_data)->chi;
-  double grain_size = ((struct par *)jacobian_data)->grain_size;
-  double grain_abundance = ((struct par *)jacobian_data)->grain_abundance;
+  double *reac_rates = ((struct par *)params)->reac_rates;
+  struct react *reactions = ((struct par *)params)->reactions;
+  int n_reactions = ((struct par *)params)->n_reactions;
+  int n_species = ((struct par *)params)->n_species;
+  double nh = ((struct par *)params)->nh;
+  double av = ((struct par *)params)->av;
+  double chi = ((struct par *)params)->chi;
+  double grain_size = ((struct par *)params)->grain_size;
+  double grain_abundance = ((struct par *)params)->grain_abundance;
     
   /* Compute the jacobian matrix. */
 
