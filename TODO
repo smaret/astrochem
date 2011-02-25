@@ -1,9 +1,6 @@
 To-do list
 ==========
 
-* Test different solver methods from CVODE. Some may take advantage of
-  the sparsity of the Jacobian matrix.
-
 * Allocate arrays dynamically instead of limiting their size
   arbitrarily.
 
