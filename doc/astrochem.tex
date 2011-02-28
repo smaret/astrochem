@@ -181,12 +181,12 @@ of the system\footnote{The Jacobian matrix is a $n_\mathrm{s}^2$
  \ref{sec:chemical-networks} for a description a chemical network
  files), build-up the system of kinetic equation and solve them using
  the CVODE solver \citep{Cohen96} from the SUNDIALS library
- \citep{Hindmarsh05}. CVODES uses the Backward Differentiation
- formula (BDF method) with a variable step-size, which is suitable
- for stiff systems. The resulting system of linear equations is solved
- using the Newton iteration. The Jacobian matrix of the system is
- computed explicitly to speed-up the computations. In addition,
- Astrochem may be run in parallel on multi core/CPU computers (see
+ \citep{Hindmarsh05}. CVODE uses the Backward Differentiation formula
+ (BDF method) with a variable step-size, which is suitable for stiff
+ systems. The resulting system of linear equations is solved using the
+ Newton iteration. The Jacobian matrix of the system is computed
+ explicitly to speed-up the computations. In addition, Astrochem may
+ be run in parallel on multi core/CPU computers (see
  \S~\ref{sec:runn-astr-parall}). Astrochem includes a number of
  gas-phase chemical processes as well as gas-grain interactions that
  we describe in the following.
@@ -1263,13 +1263,13 @@ standard\footnote{For more information on OpenMP, see
   \url{http://openmp.org/}}. Basically, OpenMP is a set of compiler
 directives that allows a program to be run in parallel on a
 shared-memory parallel computer, such as a multi-core and/or multi-CPU
-machine. Astrochem forks in several threads that are run simultaneously
-on several cores and/or CPUs. Each thread corresponds to a computation
-in a different shell. When run in parallel, Astrochem execution time
-scales almost linearly with the inverse of the number of cores or
-CPUs. For example, for a 64 shells source, Astrochem should run almost
-eight times faster on a quad-core dual-CPU (i.e. eight cores in total)
-than on single-core single-CPU computer.
+machine. Astrochem forks in several threads that are run
+simultaneously on several cores and/or CPUs. Each thread corresponds
+to a computation in a different shell. When run in parallel, Astrochem
+execution time scales almost linearly with the inverse of the number
+of cores or CPUs. For example, for a 64 shells source, Astrochem
+should run almost eight times faster on a quad-core dual-CPU
+(i.e. eight cores in total) than on single-core single-CPU computer.
 
 The compilation of the parallel version of Astrochem can be turned on
 by specifying the \verb=--enable-openmp= option to the configure
@@ -1285,17 +1285,17 @@ The configure script will attempt to detect if your compiler supports
 the OpenMP standard\footnote{Most compilers (including GCC, starting
   from version 4.2) support OpenMP.}. Then one need to set the
 \verb=OMP_NUM_THREADS= environment variable to the number of threads
-to be run in parallel. It is recommended to set this variable to twice
-the number of cores on the machine (e.g. 16 for a eight core
+to be run in parallel. It is recommended to set this variable
+the number of cores on the machine (e.g. 8 for a eight core
 computer). With the bash shell, this is done as follows:
 
 \begin{verbatim}
-export OMP_NUM_THREADS=16
+export OMP_NUM_THREADS=8
 \end{verbatim}
 
 \noindent
 It is also a good idea to sample the source in a number of shell that
-is a multiple of the number of threads (e.g. 64 shells for 16 threads)
+is a multiple of the number of threads (e.g. 64 shells for 8 threads)
 so that all cores 100\% of the time during the computation.
 
 \bibliography{astrochem.bib}
