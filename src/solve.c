@@ -452,15 +452,9 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
        }
    }
    
-   /* Allocate and fill out a structure containing the parameters of
-      the function defining the ODE system and the jacobian. */
-   
-   if ((params.reactions = malloc (sizeof (species))) == NULL)
-     {
-       fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
-		__FILE__, __LINE__); 
-       exit(1);
-     }
+   /* Fill out a structure containing the parameters of the function
+      defining the ODE system and the jacobian. */
+
    params.reac_rates = reac_rates;
    params.reactions = reactions;
    params.n_reactions = n_reactions;
@@ -675,6 +669,7 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
        }
    }
 
+   free (reac_rates);
    N_VDestroy_Serial (y);
    CVodeFree (&cvode_mem);
 
