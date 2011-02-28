@@ -19,7 +19,7 @@
 
 \documentclass[a4paper,12pt]{article}
 
-\usepackage{url,graphicx,fancyvrb,html}
+\usepackage{url,graphicx,fancyvrb}
 \usepackage[hmargin=2.5cm,vmargin=2.5cm]{geometry}
 \usepackage{verbatim} 
 \usepackage{natbib}
@@ -46,9 +46,7 @@
 \noindent
 {\huge \textbf{Astrochem}}
 
-\begin{latexonly}
-  \vskip4pt \hrule height 4pt width \hsize
-\end{latexonly}
+\vskip4pt \hrule height 4pt width \hsize
 
 \begin{flushright}
   \noindent
@@ -1149,7 +1147,7 @@ reaction must have a different number. Reaction numbers must start at
 to identify gas-phase reactions by numbers between 1 and 6046, and
 gas-grain reactions by numbers starting at 10000.
 
-\begin[h]{table}
+\begin{table}
   \begin{center}
     \caption{Reaction types and their corresponding type numbers.}
     \begin{tabular}{ll}
@@ -1192,8 +1190,7 @@ each shell. The only exception is the rate of UV photo-desorption
 reactions, that depends on the ice thickness; therefore the rate for
 these reactions is computed for each solver internal time step.
 
-\begin[h]{table}
-%  \begin{minipage}{15cm}
+\begin{table}
     \renewcommand{\footnoterule}{}  
     \begin{center}
       \caption{Physical meaning of the rate constants used chemical
@@ -1224,9 +1221,7 @@ these reactions is computed for each solver internal time step.
       Eq.(\ref{eq:cosmic-ray-desorption}). If $a \ne 0$ then $k = a$.}
     \label{tab:rate-const-meaning}
   \end{center}
-%\end{minipage}
 \end{table}
-
 
 \subsection{Convert networks to Astrochem format}
 \label{sec:conv-netw-astr}
