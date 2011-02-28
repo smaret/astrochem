@@ -1,6 +1,18 @@
 What's new in Astrochem ?
 =========================
 
+astrochem-0.3 (February 28, 2011)
+--------------------------------
+
+* The rate for cosmic-ray desorption is now either 1) computed
+  following Hasegawa & Herbst (1993) or 2) given explicitly in the
+  network file (e.g. using values from Bringa & Johnson 2004).
+
+* If the LAPACK library is installed, Astrochem can now use the
+  CVLapackDense solver from SUNDIALS instead of CVDense. This results
+  in a performance increase of 30% or more, depending on the LAPACK
+  version.
+
 astrochem-0.2 (January 21, 2011)
 --------------------------------
 
