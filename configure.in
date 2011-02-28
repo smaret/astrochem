@@ -41,7 +41,7 @@ AC_CHECK_LIB(sundials_nvecserial, main)
 if test $ac_cv_lib_sundials_cvode_main = "no"; then
    AC_MSG_ERROR(could not find SUNDIALS library.)
 fi
-if test x$with_lapack != "x" -a x$with_lapack != "xno"; then
+if test "x$with_lapack" != "x" -a "x$with_lapack" != "xno"; then
    AX_LAPACK(,AC_MSG_WARN(could not find BLAS and/or LAPACK libraries.))
    LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS"
 fi
