@@ -85,10 +85,18 @@ in this directory will require root privileges on most systems (use
 Optional features
 -----------------
 
-Astrochem can be run in parallel on multi CPU (or core) computers. For
-this it uses OpenMP compilation directives. If your compiler supports
-OpenMP, compilation of the parallel version of Astrochem can be turn
-on by specifying the `--enable-openmp' option to "configure", e.g.
+Astrochem can use the LAPACK library together with SUNDIALS, which
+results in better performance than when using SUNDIALS alone. The use
+of LAPACK in Astrochem can be turned on by specifying the
+`--with-lapack' option to "configure", e.g.
+
+  ./configure --with-lapack
+
+In addition, Astrochem can be run in parallel on multi CPU (or core)
+computers. For this it uses OpenMP compilation directives. If your
+compiler supports OpenMP, compilation of the parallel version of
+Astrochem can be turn on by specifying the `--enable-openmp' option to
+"configure", e.g.
   
   ./configure --enable-openmp
 
