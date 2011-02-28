@@ -22,7 +22,7 @@
 import sys
 import getopt
 
-VERSION = "0.2"
+VERSION = "0.3"
 
 class reaction:
     """A chemical reaction."""
