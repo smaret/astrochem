@@ -96,7 +96,9 @@ cosmic-ray desorption and photo-desorption). The computed abundances
 are written in text files, and can be plotted in different ways with
 the tools provided with Astrochem. Chemical reactions and their rates
 are written in a format which is meant to be easy to read and to
-edit. A tool to convert the chemical networks from the OSU database
+edit. A tool to convert chemical networks from the
+OSU\footnote{\url{http://www.physics.ohio-state.edu/~eric/research.html}}
+and KIDA\footnote{\url{http://kida.obs.u-bordeaux1.fr/}} databases
 into this format is provided. Astrochem is written in C, and its
 source code is distributed under the terms of the GNU General Public
 License (GPL).
@@ -1227,11 +1229,11 @@ these reactions is computed for each solver internal time step.
 \label{sec:conv-netw-astr}
 
 Astrochem comes with a tool called Chmconvert that converts network
-files to Astrochem native format (\verb=.chm=). For the moment,
-Chmconvert supports the OSU database format only. The type of file is
-determined from the file extension, which must be \verb=.osu= for Ohio
-State University database files. Networks can be converted as follows
-(see \verb=man chmconvert= for more information):
+files to Astrochem native format (\verb=.chm=). Chmconvert supports
+the OSU database and the KIDA formats. The file format is determined
+from the file extension, which must be \verb=.osu= for Ohio State
+University database files, and \verb=.kida= for KIDA. Networks can be
+converted as follows (see \verb=man chmconvert= for more information):
 
 \begin{verbatim}
 % chmconvert -o osu2009.chm osu2009.osu

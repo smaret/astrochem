@@ -115,9 +115,12 @@ class network:
             if convert.has_key(species):
                 return convert[species]
 
-            # The charge of ions is in parenthesis.
+            # The charge of ions is in parenthesis.  Be carefull with
+            # "-" because some species names may start with "c-",
+            # "l-", etc.
             species = species.replace("+", "(+)")
-            species = species.replace("-", "(-)")
+            if species[-1] == "-":
+                species = species[:-1] + "(-)"
     
             # For elements that have two letters in their names, the
             # second one is in lower case.
@@ -201,16 +204,103 @@ class network:
         return net
 
     @staticmethod
-    def _read_kida(self, filename):
+    def _read_kida(f):
         """
         Read a network in the kida format.
 
         Arguments:
-        filename -- Network file name        
+        f -- Network file handle
 
         """
 
-        pass
+        def _format_species_kida(species):
+            """
+            Format a species in kida format to chm format.
+            
+            """
+
+            # In chm format, electrons are noted e(-), cosmic-rays (or
+            # cosmic-ray secondary photons) are noted cosmic-ray and
+            # UV photons are noted "uv-photons"
+            convert = {"e-": "e(-)", "CR": "cosmic-ray", "CRP": "cosmic-ray",
+                       "Photon": "photon"}
+            if convert.has_key(species):
+                return convert[species]
+
+            # The charge of ions is in parenthesis.  Be carefull with
+            # "-" because some species names may start with "c-",
+            # "l-", etc.
+            species = species.replace("+", "(+)")
+            if species[-1] == "-":
+                species = species[:-1] + "(-)"
+            
+            return species
+
+        # KIDA uses a different convention for reaction types than OSU
+        # and Astrochem.
+
+        kida2chm_type = {1: 1,    # direct cosmic-ray processes
+                         2: 1,    # photo-processes induced by cosmic-rays
+                         3: 13,   # photo-reactions
+                         4: 2,    # bimolecular (ion-neutral or neutral-neutral)
+                         5: 2,    # charge exchange reactions
+                         6: 8,    # radiative association
+                         7: 5,    # associative detachment
+                         8: 9}    # electronic recombination
+
+	# KIDA files are fixed format text files, although it is also
+	# possible to download CSV files from the database. Here we
+	# assume that the file is in fixed format.
+        
+        net = []
+        linenumber = 0
+
+	for line in f:
+            linenumber += 1
+            try:
+                reactant1 = line[0:10].strip()
+                reactant2 = line[11:21].strip()
+                reactant3 = line[22:32].strip()
+                product1 = line[34:44].strip()
+                product2 = line[45:55].strip()
+                product3 = line[56:66].strip()
+                product4 = line[67:77].strip()
+                product5 = line[78:88].strip()
+                alpha = float(line[90:100])
+                beta = float(line[101:111])
+                gamma = float(line[112:122])
+                uncertainty_factor = float(line[123:131])
+                uncertainty_factor_temp_dep = float(line[132:140])
+                uncertainty_type = line[141:145]
+                rtype = int(line[146:148])
+                trange = float(line[149:155]), float(line[156:162])
+                rnumber = int(line[163:168])
+                rate_number = int(line[169:170])
+                recommendation = int(line[171:173])
+            except:
+                raise Exception, "incorrect input on line %i" % linenumber
+                    
+            reactants = []
+            for species in [reactant1, reactant2, reactant3]:
+                if species != "":
+                    reactants.append(_format_species_kida(species))
+                    
+            products = []
+            for species in [product1, product2, product3, product4]:
+                if species != "":
+                    products.append(_format_species_kida(species))
+
+            if rtype in kida2chm_type.keys():
+                rtype = kida2chm_type[rtype]
+            else:
+                raise Exception, "unknown reaction type on line %i" % linenumber
+                    
+            react = reaction(reactants, products, alpha, beta, gamma,
+                             rtype, rnumber)
+
+            net.append(react)
+
+        return net
 
     def write(self, f):
         """
@@ -353,7 +443,7 @@ def main():
     else:
         sys.stderr.write("chmconvert: file has no extension.\n")
         sys.exit(1)  
-    if network_file_ext in ("osu"):
+    if network_file_ext in ["osu", "kida"]:
         format = network_file_ext
     else:
         sys.stderr.write("chmconvert: unknown network format \"%s\".\n" 
