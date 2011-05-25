@@ -182,7 +182,7 @@ class network:
 		
 		if react.type == 1:
                     react.reactants.append("cosmic-ray")
-                elif react.type == 8 or react.type == 10:
+                elif react.type == 4 or react.type == 8 or react.type == 10:
                     react.products.append("photon")
 		elif react.type == 13:
                     react.reactants.append("uv-photon")
