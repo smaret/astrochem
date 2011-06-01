@@ -441,6 +441,18 @@ def main():
             for ci in c:
                 p2.add(ci)
 
+        # Plot the total formation and destruction rates
+
+        c = biggles.Curve(time, sum(f_rate, axis = 0), linetype = "dotted")
+        c.label = "Total"
+        curves_f.append(c)
+        p1.add(c)
+
+        c = biggles.Curve(time, sum(-d_rate, axis = 0), linetype = "dotted")
+        c.label = "Total"
+        curves_d.append(c)
+        p2.add(c)
+
     else:   
         print "Not implemented yet."
         sys.exit()
