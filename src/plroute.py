@@ -397,18 +397,22 @@ def main():
                 else:
                     d_rate[j, i] = 0.
 
-        # Find the most important formation/destruction routes
+        # Find the most important formation/destruction routes. For
+        # this we compute the integral of the formation/destruction
+        # rates for each formation/destruction over the time interval.
 
-        max_f_rate = zeros(len(f_reac), dtype=float)
-        max_d_rate = zeros(len(d_reac), dtype=float)
-        
+        int_f_rate = zeros(len(f_reac), dtype=float)
+        int_d_rate = zeros(len(d_reac), dtype=float)
+    
+        dtime = time[1:-1] - time[0:-2]
+
         for j in range(len(f_reac)):
-            max_f_rate[j] = max(f_rate[j, :])
+            int_f_rate[j] = sum(f_rate[j, 1:-1] * dtime)
         for j in range(len(d_reac)):
-            max_d_rate[j] = max(-d_rate[j, :])
+            int_d_rate[j] = sum(-d_rate[j, 1:-1] * dtime)
 
-        index_f = max_f_rate.argsort()[::-1]
-        index_d = max_d_rate.argsort()[::-1]
+        index_f = int_f_rate.argsort()[::-1]
+        index_d = int_d_rate.argsort()[::-1]
 
         # Find the reaction corresponding to the reaction numbers
         if chmfile:
