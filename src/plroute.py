@@ -49,7 +49,6 @@ Options:
 
    -s, --shell=index        Plot form./dest. rates in a given shell
    -t, --time=index         Plot form./dest. rates at a given time
-   -n, --nroutes=number     Plot the rates of the first n routes
    -x, --xrange=xmin,xmax   Set the x axis range
    -y, --yrange=ymin,ymax   Set the y axis range
    -c, --chmfile=file       Specify chemical network file
@@ -276,7 +275,6 @@ def main():
     output = None
     s =  0
     t = -1
-    n = 8
     xrange = None
     yrange = None
     chmfile = None
