@@ -53,6 +53,7 @@ Options:
    -x, --xrange=xmin,xmax   Set the x axis range
    -y, --yrange=ymin,ymax   Set the y axis range
    -c, --chmfile=file       Specify chemical network file
+   -p, --percent            Print the relative contribution of each route
    
 See the plroute(1) man page for more information
 Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>."""
@@ -263,10 +264,11 @@ def main():
 
     # Parse options and check commands and arguments
     try:
-	opts, args = getopt.getopt(sys.argv[1:], "hVo:s:t:x:y:c:",
+	opts, args = getopt.getopt(sys.argv[1:], "hVo:s:t:x:y:c:p",
 				   ["help", "version", "output=",
                                     "shell=", "time=", "xrange=",
-                                    "yrange=", "chmfile="])
+                                    "yrange=", "chmfile=",
+                                    "percent"])
     except getopt.GetoptError:
 	usage()
 	sys.exit(1)
@@ -278,6 +280,7 @@ def main():
     xrange = None
     yrange = None
     chmfile = None
+    percent = False
 
     for opt, arg in opts:
 	if opt in ("-h", "--help") :
@@ -320,6 +323,8 @@ def main():
                 sys.exit(1)
         if opt in ("-c", "--chmfile"):
             chmfile = arg
+        if opt in ("-p", "--percent"):
+            percent = True
 
     if len(args) != 2:
 	usage()
@@ -411,6 +416,10 @@ def main():
         for j in range(len(d_reac)):
             int_d_rate[j] = sum(-d_rate[j, 1:-1] * dtime)
 
+        if percent:
+            int_f_rate_percent = int_f_rate / sum(int_f_rate) * 100.
+            int_d_rate_percent = int_d_rate / sum(int_d_rate) * 100.
+
         index_f = int_f_rate.argsort()[::-1]
         index_d = int_d_rate.argsort()[::-1]
 
@@ -429,6 +438,8 @@ def main():
                 c[0].label = f_reaction[j]
             else:
                 c[0].label = "%i" % f_reac[j]
+            if percent:
+                c[0].label += " (%.0f" % int_f_rate_percent[j] + "%)"
             curves_f.append(c[0])
             for ci in c:
                 p1.add(ci)
@@ -441,6 +452,8 @@ def main():
                 c[0].label = d_reaction[j]
             else:
                 c[0].label = "%i" % d_reac[j]
+            if percent:
+                c[0].label += " (%.0f" % int_d_rate_percent[j] + "%)"
             curves_d.append(c[0])
             for ci in c:
                 p2.add(ci)
@@ -465,7 +478,7 @@ def main():
     if chmfile:
         xkey, ykey = .25, .4
     else:
-        xkey, ykey = .75, .4
+        xkey, ykey = .65, .4
     p1.add(biggles.PlotKey(xkey, ykey, curves_f))
     p2.add(biggles.PlotKey(xkey, ykey, curves_d))
     if command == "av":

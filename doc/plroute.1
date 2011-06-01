@@ -59,7 +59,7 @@ of time, in a given shell
 Display help text.
 .It Cm -V, --version
 Display astrochem version information.
-.It Cm -o Ar file , Cm --output=Ar file
+.It Cm -o Ar file , Cm --output= Ar file
 Create a PostScript file.
 .It Cm -s Ar shell-number , Cm --shell= Ar shell-number
 Set the shell number. Default is 0.
@@ -69,8 +69,10 @@ Set the time.
 Set the x axis range.
 .It Cm -y Ar ymin,ymax , Cm --yrange= Ar ymin,ymax
 Set the y axis range.
-.It Cm -c Ar file , Cm --chmfile=Ar file
+.It Cm -c Ar file , Cm --chmfile= Ar file
 Specify the chemical network file.
+.It Cm -p, --percent
+Print the relative contribution of each route.
 .\"
 .\" Authors, copyright, and see also
 .\"
@@ -80,7 +82,7 @@ Written by Sebastien Maret.
 Report bugs to
 .Aq sebastien.maret@obs.ujf-grenoble.fr .
 .Sh COPYRIGHT
-Copyright \(co 2006-2010 Sebastien Maret
+Copyright \(co 2006-2011 Sebastien Maret
 .Pp
 This is free software. You may redistribute copies of it under the
 terms of the GNU General Public License. There is NO WARRANTY, to the
