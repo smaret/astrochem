@@ -635,7 +635,7 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 			     else
 			       {
 				 destruction_route.rate = reac_rates[k];
-				 if (reactions[k].reactant1 != spec_index)
+				 if (reactions[k].reactant1 != -1)
 				   destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant1);
 				 if (reactions[k].reactant2 != -1)
 				   destruction_route.rate *= NV_Ith_S (y, reactions[k].reactant2);
