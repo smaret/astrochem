@@ -25,7 +25,7 @@ import string
 import biggles
 from numpy import *
 
-VERSION = "0.3"
+VERSION = "0.4"
 
 def usage():
 
