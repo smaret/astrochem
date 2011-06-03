@@ -1,8 +1,19 @@
 What's new in Astrochem ?
 =========================
 
+astrochem-0.4 (June 3, 2011)
+----------------------------
+
+* The main destruction/formation channels of a species plotted by
+  Plroute are now ordered by their total contribution to the
+  formation/destruction of that species over the time of the
+  computation. An aption has been added to print the relative
+  contribution of each channel.
+
+* Fixed a bug in the computation of the main destruction routes.
+
 astrochem-0.3 (February 28, 2011)
---------------------------------
+---------------------------------
 
 * The rate for cosmic-ray desorption is now either 1) computed
   following Hasegawa & Herbst (1993) or 2) given explicitly in the
