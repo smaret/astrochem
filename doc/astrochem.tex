@@ -812,16 +812,21 @@ which produces the plot shown on Fig.~\ref{fig:example-routes}.
 The left panel of the plot shows the formation rate of HCO$^{+}$ (in
 cm$^{-3}$~s$^{-1}$) through the six most important formation
 channels\footnote{The formation and destruction reactions are ordered
-  by their maximum formation/destruction rate at any time in the
-  computation.}. Conversely, the right panel shows the destruction
-rate of the same species through the six most important destruction
-channels. The \verb=--chmfile= option followed by the name of the
-network used in the computation makes Plabun to print the reactions
-explicitly instead of printing their numbers. On the left panel, we
-see that for $t > 10^{5}$~yr, the formation of HCO$^{+}$ is dominated
-by the reaction of CO with H$_{3}^{+}$. On the other hand, at any time
-in the simulation the destruction of HCO$^{+}$ is dominated by the
-dissociative recombination with electrons.
+  by the integral of their formation/destruction rate over
+  time. i.e. their total contribution to the formation/destruction of
+  the species. The \verb=--percent= option allows to display the
+  relative contribution, expressed in percent, to the
+  formation/destruction of the species.}, together with the total
+formation rate. Conversely, the right panel shows the destruction rate
+of the same species through the six most important destruction
+channels as well as the total destruction rate. The \verb=--chmfile=
+option followed by the name of the network used in the computation
+makes Plabun to print the reactions explicitly instead of printing
+their numbers. On the left panel, we see that for $t > 10^{5}$~yr, the
+formation of HCO$^{+}$ is dominated by the reaction of CO with
+H$_{3}^{+}$. On the other hand, at any time in the simulation the
+destruction of HCO$^{+}$ is dominated by the dissociative
+recombination with electrons.
 
 Note that because Astrochem only keeps tracks of the sixteen most
 important formation or destruction routes at any time, some gaps may
