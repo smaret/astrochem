@@ -17,17 +17,4 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
-CHMCONVERT = ../src/chmconvert
-
-EXTRA_DIST = osu2008.osu osu2009.osu
-
-nobase_dist_pkgdata_DATA = osu2008.chm osu2009.chm
-
-osu2008.chm: osu2008.osu
-	PYTHONPATH=../lib:${PYTHONPATH} ${CHMCONVERT} -o $@ $?
-
-osu2009.chm: osu2009.osu
-	PYTHONPATH=../lib:${PYTHONPATH} ${CHMCONVERT} -o $@ $?
-
-CLEANFILES = osu2008.chm osu2009.chm
-
+python_PYTHON = libastrochem.py

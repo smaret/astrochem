@@ -47,6 +47,9 @@ tests/rate_test
 tests/solve_test
 tests/source_test
 
+# Ignore Python compiled files
+*.pyc
+
 # Ignore example files
 doc/examples/*.abun
 doc/examples/*.rout

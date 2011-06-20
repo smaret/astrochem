@@ -67,6 +67,7 @@ fi
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
 		 doc/examples/Makefile
+		 lib/Makefile
                  src/Makefile
 		 networks/Makefile
 		 tests/Makefile])
