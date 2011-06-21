@@ -45,14 +45,31 @@ class reaction:
         self.gamma = gamma
         self.type = rtype
         self.number = rnumber
-        
+
 class network:
     """
     Chemical network class
 
     """
 
-    def __init__(self, f, format):
+    def __init__(self, l):
+        """
+        Creates a network object
+
+        Arguments:
+        l  -- A list of reactions
+
+        """
+        
+        for r in l:
+            if isinstance(r, reaction):
+                continue
+            raise ValueError, "Argument should be a list of network instances"
+    
+        self.data = l
+        
+    @staticmethod
+    def fromfile(f, fileformat):
         """
         Read a network from a file.
 
@@ -61,243 +78,242 @@ class network:
         kida.
 
         Arguments:
-        f      -- Network file handle
-        format -- Network file format ("chm", "osu" or "kida")
+        f          -- Network file handle
+        fileformat -- Network file format ("chm", "osu" or "kida")
 
         """
 
-        if format == "chm":
-            self.data = self._read_chm(f)
-        elif format == "osu":
-            self.data = self._read_osu(f)
-        elif format == "kida":
-            self.data = self._read_kida(f)
-        else:
-            raise ValueError, "Unknown format"
-        
-    @staticmethod
-    def _read_chm(f):
-        """
-        Read a network in the chm format.
-
-        Arguments:
-        f -- Network file handle
-
-        """
-
-        pass
-
-    @staticmethod
-    def _read_osu(f):
-        """
-        Read a network in the osu format.
-
-        Arguments:
-        f -- Network file handle
-
-        """
-
-        def _format_species_osu(species):
+        def _read_chm(f):
             """
-            Format a species in osu format to chm format.
-            
+            Read a network in the chm format.
+
+            Arguments:
+            f -- Network file handle
+
             """
 
-            # In chm format, electrons are noted e(-) and grains are
-            # simply noted 'grain'
-            convert = {"E": "e(-)", "GRAIN0": "grain", "GRAIN+": "grain(+)",
-                       "GRAIN-": "grain(-)"}
-            if convert.has_key(species):
-                return convert[species]
+            pass
 
-            # The charge of ions is in parenthesis.  Be carefull with
-            # "-" because some species names may start with "c-",
-            # "l-", etc.
-            species = species.replace("+", "(+)")
-            if species[-1] == "-":
-                species = species[:-1] + "(-)"
-    
-            # For elements that have two letters in their names, the
-            # second one is in lower case.
-            species = species.replace("HE", "He")
-            species = species.replace("NA", "Na")
-            species = species.replace("MG", "Mg")
-            species = species.replace("CL", "Cl")
-            species = species.replace("SI", "Si")
-            species = species.replace("FE", "Fe")
-        
-            return species
+        def _read_osu(f):
+            """
+            Read a network in the osu format.
 
-	# OSU file are fix format text files. The first part of the
-	# file lists the species, and the second part the reaction. We
-	# disantangle them by checking the line length. Networks older
-	# than 2007 have 113 characters for each reaction lines.
-	# Newer networks have 119 characters, with an additional
-	# column that lists the error on the rate.
+            Arguments:
+            f -- Network file handle
 
-        net = []
-        linenumber = 0
+            """
 
-	for line in f:
-            linenumber += 1
- 	    if len(line) == 113 or len(line) == 119:
+            def _format_species_osu(species):
+                """
+                Format a species in osu format to chm format.
+
+                """
+
+                # In chm format, electrons are noted e(-) and grains are
+                # simply noted 'grain'
+                convert = {"E": "e(-)", "GRAIN0": "grain", "GRAIN+": "grain(+)",
+                           "GRAIN-": "grain(-)"}
+                if convert.has_key(species):
+                    return convert[species]
+
+                # The charge of ions is in parenthesis.  Be carefull with
+                # "-" because some species names may start with "c-",
+                # "l-", etc.
+                species = species.replace("+", "(+)")
+                if species[-1] == "-":
+                    species = species[:-1] + "(-)"
+
+                # For elements that have two letters in their names, the
+                # second one is in lower case.
+                species = species.replace("HE", "He")
+                species = species.replace("NA", "Na")
+                species = species.replace("MG", "Mg")
+                species = species.replace("CL", "Cl")
+                species = species.replace("SI", "Si")
+                species = species.replace("FE", "Fe")
+
+                return species
+
+            # OSU file are fix format text files. The first part of the
+            # file lists the species, and the second part the reaction. We
+            # disantangle them by checking the line length. Networks older
+            # than 2007 have 113 characters for each reaction lines.
+            # Newer networks have 119 characters, with an additional
+            # column that lists the error on the rate.
+
+            net = []
+            linenumber = 0
+
+            for line in f:
+                linenumber += 1
+                if len(line) == 113 or len(line) == 119:
+                    try:
+                        reactant1 = line[0:8].strip()
+                        reactant2 = line[8:16].strip()
+                        reactant3 = line[16:24].strip()
+                        product1 = line[24:32].strip()
+                        product2 = line[32:40].strip()
+                        product3 = line[40:48].strip()
+                        product4 = line[48:56].strip()
+                        alpha = float(line[64:73])
+                        beta = float(line[73:82])
+                        gamma = float(line[82:91])
+                        rtype = int(line[91:93])
+                        rnumber = int(line[107:111])
+                    except:
+                        raise Exception, "incorrect input on line %i" % linenumber
+
+                    reactants = []
+                    for species in [reactant1, reactant2, reactant3]:
+                        if species != "":
+                            reactants.append(_format_species_osu(species))
+
+                    products = []
+                    for species in [product1, product2, product3, product4]:
+                        if species != "":
+                            products.append(_format_species_osu(species))
+
+                    react = reaction(reactants, products, alpha, beta, gamma,
+                                     rtype, rnumber)
+
+                    # In OSU format, cosmic rays and photons are implicit
+                    # reactants/products for cosmic-ray ionization,
+                    # photo-ionization, photo-dissociation, radiative
+                    # association and radiative recombination.
+
+                    if react.type == 1:
+                        react.reactants.append("cosmic-ray")
+                    elif react.type == 4 or react.type == 8 or react.type == 10:
+                        react.products.append("photon")
+                    elif react.type == 13:
+                        react.reactants.append("uv-photon")
+
+                    # H2 formation, electron attachement and ion
+                    # recombination on grains have the same type in
+                    # OSU. However, the rate are not computed in the same
+                    # fashion. In Astrochem format, only H2 formation has
+                    # type 0, other reactions have type -1.
+
+                    if react.type == 0:
+                        if react.reactants == ["H", "H"] and react.products == ["H2"]:
+                            pass
+                        else:
+                            react.type = -1
+
+                    net.append(react)
+
+            return net
+
+        def _read_kida(f):
+            """
+            Read a network in the kida format.
+
+            Arguments:
+            f -- Network file handle
+
+            """
+
+            def _format_species_kida(species):
+                """
+                Format a species in kida format to chm format.
+
+                """
+
+                # In chm format, electrons are noted e(-), cosmic-rays (or
+                # cosmic-ray secondary photons) are noted cosmic-ray and
+                # UV photons are noted "uv-photons"
+                convert = {"e-": "e(-)", "CR": "cosmic-ray", "CRP": "cosmic-ray",
+                           "Photon": "photon"}
+                if convert.has_key(species):
+                    return convert[species]
+
+                # The charge of ions is in parenthesis.  Be carefull with
+                # "-" because some species names may start with "c-",
+                # "l-", etc.
+                species = species.replace("+", "(+)")
+                if species[-1] == "-":
+                    species = species[:-1] + "(-)"
+
+                return species
+
+            # KIDA uses a different convention for reaction types than OSU
+            # and Astrochem.
+
+            kida2chm_type = {1: 1,    # direct cosmic-ray processes
+                             2: 1,    # photo-processes induced by cosmic-rays
+                             3: 13,   # photo-reactions
+                             4: 2,    # bimolecular (ion-neutral or neutral-neutral)
+                             5: 2,    # charge exchange reactions
+                             6: 8,    # radiative association
+                             7: 5,    # associative detachment
+                             8: 9}    # electronic recombination
+
+            # KIDA files are fixed format text files, although it is also
+            # possible to download CSV files from the database. Here we
+            # assume that the file is in fixed format.
+
+            net = []
+            linenumber = 0
+
+            for line in f:
+                linenumber += 1
                 try:
-                    reactant1 = line[0:8].strip()
-                    reactant2 = line[8:16].strip()
-                    reactant3 = line[16:24].strip()
-                    product1 = line[24:32].strip()
-                    product2 = line[32:40].strip()
-                    product3 = line[40:48].strip()
-                    product4 = line[48:56].strip()
-                    alpha = float(line[64:73])
-                    beta = float(line[73:82])
-                    gamma = float(line[82:91])
-                    rtype = int(line[91:93])
-                    rnumber = int(line[107:111])
+                    reactant1 = line[0:10].strip()
+                    reactant2 = line[11:21].strip()
+                    reactant3 = line[22:32].strip()
+                    product1 = line[34:44].strip()
+                    product2 = line[45:55].strip()
+                    product3 = line[56:66].strip()
+                    product4 = line[67:77].strip()
+                    product5 = line[78:88].strip()
+                    alpha = float(line[90:100])
+                    beta = float(line[101:111])
+                    gamma = float(line[112:122])
+                    uncertainty_factor = float(line[123:131])
+                    uncertainty_factor_temp_dep = float(line[132:140])
+                    uncertainty_type = line[141:145]
+                    rtype = int(line[146:148])
+                    trange = float(line[149:155]), float(line[156:162])
+                    rnumber = int(line[163:168])
+                    rate_number = int(line[169:170])
+                    recommendation = int(line[171:173])
                 except:
                     raise Exception, "incorrect input on line %i" % linenumber
-                    
+
                 reactants = []
                 for species in [reactant1, reactant2, reactant3]:
                     if species != "":
-                        reactants.append(_format_species_osu(species))
+                        reactants.append(_format_species_kida(species))
 
                 products = []
                 for species in [product1, product2, product3, product4]:
                     if species != "":
-                        products.append(_format_species_osu(species))
+                        products.append(_format_species_kida(species))
+
+                if rtype in kida2chm_type.keys():
+                    rtype = kida2chm_type[rtype]
+                else:
+                    raise Exception, "unknown reaction type on line %i" % linenumber
 
                 react = reaction(reactants, products, alpha, beta, gamma,
                                  rtype, rnumber)
-                
-                # In OSU format, cosmic rays and photons are implicit
-                # reactants/products for cosmic-ray ionization,
-                # photo-ionization, photo-dissociation, radiative
-                # association and radiative recombination.
-		
-		if react.type == 1:
-                    react.reactants.append("cosmic-ray")
-                elif react.type == 4 or react.type == 8 or react.type == 10:
-                    react.products.append("photon")
-		elif react.type == 13:
-                    react.reactants.append("uv-photon")
-
-                # H2 formation, electron attachement and ion
-                # recombination on grains have the same type in
-                # OSU. However, the rate are not computed in the same
-                # fashion. In Astrochem format, only H2 formation has
-                # type 0, other reactions have type -1.
-
-                if react.type == 0:
-                    if react.reactants == ["H", "H"] and react.products == ["H2"]:
-                        pass
-                    else:
-                        react.type = -1
 
                 net.append(react)
 
-        return net
+            return net
 
-    @staticmethod
-    def _read_kida(f):
-        """
-        Read a network in the kida format.
+        if fileformat == "chm":
+            l = _read_chm(f)
+        elif fileformat == "osu":
+            l = _read_osu(f)
+        elif fileformat == "kida":
+            l = _read_kida(f)
+        else:
+            raise ValueError, "Unknown format"
 
-        Arguments:
-        f -- Network file handle
+        return network(l)
 
-        """
-
-        def _format_species_kida(species):
-            """
-            Format a species in kida format to chm format.
-            
-            """
-
-            # In chm format, electrons are noted e(-), cosmic-rays (or
-            # cosmic-ray secondary photons) are noted cosmic-ray and
-            # UV photons are noted "uv-photons"
-            convert = {"e-": "e(-)", "CR": "cosmic-ray", "CRP": "cosmic-ray",
-                       "Photon": "photon"}
-            if convert.has_key(species):
-                return convert[species]
-
-            # The charge of ions is in parenthesis.  Be carefull with
-            # "-" because some species names may start with "c-",
-            # "l-", etc.
-            species = species.replace("+", "(+)")
-            if species[-1] == "-":
-                species = species[:-1] + "(-)"
-            
-            return species
-
-        # KIDA uses a different convention for reaction types than OSU
-        # and Astrochem.
-
-        kida2chm_type = {1: 1,    # direct cosmic-ray processes
-                         2: 1,    # photo-processes induced by cosmic-rays
-                         3: 13,   # photo-reactions
-                         4: 2,    # bimolecular (ion-neutral or neutral-neutral)
-                         5: 2,    # charge exchange reactions
-                         6: 8,    # radiative association
-                         7: 5,    # associative detachment
-                         8: 9}    # electronic recombination
-
-	# KIDA files are fixed format text files, although it is also
-	# possible to download CSV files from the database. Here we
-	# assume that the file is in fixed format.
-        
-        net = []
-        linenumber = 0
-
-	for line in f:
-            linenumber += 1
-            try:
-                reactant1 = line[0:10].strip()
-                reactant2 = line[11:21].strip()
-                reactant3 = line[22:32].strip()
-                product1 = line[34:44].strip()
-                product2 = line[45:55].strip()
-                product3 = line[56:66].strip()
-                product4 = line[67:77].strip()
-                product5 = line[78:88].strip()
-                alpha = float(line[90:100])
-                beta = float(line[101:111])
-                gamma = float(line[112:122])
-                uncertainty_factor = float(line[123:131])
-                uncertainty_factor_temp_dep = float(line[132:140])
-                uncertainty_type = line[141:145]
-                rtype = int(line[146:148])
-                trange = float(line[149:155]), float(line[156:162])
-                rnumber = int(line[163:168])
-                rate_number = int(line[169:170])
-                recommendation = int(line[171:173])
-            except:
-                raise Exception, "incorrect input on line %i" % linenumber
-                    
-            reactants = []
-            for species in [reactant1, reactant2, reactant3]:
-                if species != "":
-                    reactants.append(_format_species_kida(species))
-                    
-            products = []
-            for species in [product1, product2, product3, product4]:
-                if species != "":
-                    products.append(_format_species_kida(species))
-
-            if rtype in kida2chm_type.keys():
-                rtype = kida2chm_type[rtype]
-            else:
-                raise Exception, "unknown reaction type on line %i" % linenumber
-                    
-            react = reaction(reactants, products, alpha, beta, gamma,
-                             rtype, rnumber)
-
-            net.append(react)
-
-        return net
-
-    def write(self, f):
+    def tofile(self, f):
         """
         Write network in a file.
         

@@ -93,7 +93,7 @@ def main():
         sys.stderr.write("chmconvert: file has no extension.\n")
         sys.exit(1)  
     if network_file_ext in ["osu", "kida"]:
-        format = network_file_ext
+        fileformat = network_file_ext
     else:
         sys.stderr.write("chmconvert: unknown network format \"%s\".\n" 
                          % network_file_ext)
@@ -117,14 +117,14 @@ def main():
 	    
     # Read the network file and convert it
     try:
-        net = network(filein, format = format)
+        net = network.fromfile(filein, fileformat = fileformat)
     except Exception, err:
         sys.stderr.write("chmconvert: %s.\n" % err)
         sys.exit(1)        
     filein.close()
 
     # Write the converted file:
-    net.write(fileout)
+    net.tofile(fileout)
     fileout.close()
     
 if __name__ == "__main__":
