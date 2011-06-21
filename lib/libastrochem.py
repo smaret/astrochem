@@ -46,6 +46,21 @@ class reaction:
         self.type = rtype
         self.number = rnumber
     
+    def __repr__(self):
+        """
+        Returns the string representation of a reaction
+
+        """
+
+        return  "reaction(" \
+            + self.reactants.__repr__() + ", " \
+            + self.products.__repr__() + ", " \
+            + self.alpha.__repr__() + ", " \
+            + self.beta.__repr__() + ", " \
+            + self.gamma.__repr__() + ", " \
+            + self.type.__repr__() + ", " \
+            + self.number.__repr__() + ")"
+
     def __eq__(self, other):
         """
         Compares the reaction with another
@@ -96,7 +111,20 @@ class network:
             raise ValueError, "Argument should be a list of network instances"
     
         self.data = l
-        
+
+    def __repr__(self):
+        """
+        Returns the string representation of a network
+
+        """
+
+        string = "network([ "
+        for r in self.data:
+            string += "          " + r.__repr__() + ",\n"
+        string = string[:-3] + "])"
+
+        return string
+
     @staticmethod
     def fromfile(f, fileformat):
         """
