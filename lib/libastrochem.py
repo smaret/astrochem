@@ -92,7 +92,35 @@ class network:
 
             """
 
-            pass
+            net = []
+            linenumber = 0
+            for line in f:
+
+                linenumber += 1
+
+                if line[0] == "#":
+                    continue
+
+                try:
+                    react = line.rsplit(None, 5)[0]
+                    rconsts = line.rsplit(None, 5)[1:]
+                    
+                    reactants = map(lambda x: x.strip(), react.split("->")[0].split(" + "))
+                    products = map(lambda x: x.strip(), react.split("->")[1].split(" + "))
+                    
+                    alpha = float(rconsts[0])
+                    beta = float(rconsts[1])
+                    gamma = float(rconsts[2])
+                    rtype = int(rconsts[3])
+                    rnumber = int(rconsts[4])
+                except:
+                    raise Exception, "incorrect input on line %i" % linenumber                    
+
+                react = reaction(reactants, products, alpha, beta, gamma,
+                                 rtype, rnumber)
+                net.append(react)
+
+            return net
 
         def _read_osu(f):
             """
@@ -139,7 +167,7 @@ class network:
             # disantangle them by checking the line length. Networks older
             # than 2007 have 113 characters for each reaction lines.
             # Newer networks have 119 characters, with an additional
-            # column that lists the error on the rate.
+            # column that gives the error on the rate.
 
             net = []
             linenumber = 0
