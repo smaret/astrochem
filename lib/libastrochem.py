@@ -45,6 +45,35 @@ class reaction:
         self.gamma = gamma
         self.type = rtype
         self.number = rnumber
+    
+    def __eq__(self, other):
+        """
+        Compares the reaction with another
+
+        This method compares two reactions. The reactions are supposed
+        to be equal if both the reactants and products are equal,
+        regardless of the reaction rates.
+
+        Arguments:
+        other -- Another reaction instance
+
+        """
+
+        if not(isinstance(other, reaction)):
+            raise ValueError, "Argument should be a network instance"
+        
+        if len(self.reactants) != len(other.reactants) or len(self.products) != len(other.products):
+            return False
+
+        for r in self.reactants:
+            if not r in other.reactants:
+                return False
+
+        for p in self.products:
+            if not p in other.products:
+                return False
+
+        return True
 
 class network:
     """
