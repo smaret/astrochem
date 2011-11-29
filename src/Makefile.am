@@ -28,8 +28,8 @@ astrochem_SOURCES = astrochem.c astrochem.h input.c network.c rates.c solve.c ou
 chmconvert_SOURCES = chmconvert.py
 
 chmconvert: chmconvert.py
-	sed -e 's,\@PYTHON\@,${PYTHON},g' $? > $@
-	chmod a+x chmconvert
+	cp $? $@
+	chmod a+x $@
 
 if HAVE_PYMOD_BIGGLES 
 if HAVE_PYMOD_NUMPY
@@ -41,12 +41,12 @@ plabun_SOURCES = plabun.py
 plroute_SOURCES = plroute.py
 
 plabun:	plabun.py
-	sed -e 's,\@PYTHON\@,${PYTHON},g' $? > $@
-	chmod a+x plabun
+	cp $? $@
+	chmod a+x $@
 
 plroute: plroute.py
-	sed -e 's,\@PYTHON\@,${PYTHON},g' $? > $@
-	chmod a+x plroute
+	cp $? $@
+	chmod a+x $@
 
 endif
 endif
