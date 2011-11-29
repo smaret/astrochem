@@ -50,3 +50,13 @@ plroute: plroute.py
 
 endif
 endif
+
+install-exec-hook:
+	cd $(DESTDIR)$(bindir)
+	sed -i -e 's,$${prefix},${prefix},g' chmconvert
+if HAVE_PYMOD_BIGGLES
+if HAVE_PYMOD_NUMPY
+	sed -i -e 's,$${prefix},${prefix},g' plabun
+	sed -i -e 's,$${prefix},${prefix},g' plroute
+endif
+endif
