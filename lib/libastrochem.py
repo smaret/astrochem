@@ -398,14 +398,23 @@ class network:
 
         return network(l)
 
-    def tofile(self, f):
+    def tofile(self, f, renumber = False):
         """
         Write network in a file.
         
         Arguments:
-        f -- Network file handle
+        f        -- Network file handle
+        renumber -- Renumber reactions (default False)
 
         """
+
+        # Renumber the reactions, if requested
+
+        if renumber:
+            react_number = 1
+            for react in self.data:
+                react.number = react_number
+                react_number += 1
 
         # In order to format the file, we first to find out the
         # maximum number of reactants and products in the network, the
