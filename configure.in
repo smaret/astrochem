@@ -42,8 +42,14 @@ if test $ac_cv_lib_sundials_cvode_main = "no"; then
    AC_MSG_ERROR(could not find SUNDIALS library.)
 fi
 if test "x$with_lapack" != "x" -a "x$with_lapack" != "xno"; then
-   AX_LAPACK(,AC_MSG_WARN(could not find BLAS and/or LAPACK libraries.))
-   LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS"
+   AX_LAPACK(HAVE_LAPACK="yes",
+      HAVE_LAPACK = "no" && AC_MSG_WARN(could not find BLAS and/or LAPACK libraries.))
+   if test $HAVE_LAPACK = "yes"; then
+      AC_CHECK_HEADER("cvode/cvode_lapack.h",,
+         HAVE_LAPACK="no" && AC_MSG_WARN(SUNDIALS was compiled without LAPACK.))
+      LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS"
+   fi
+   AM_CONDITIONAL(HAVE_LAPACK, test $HAVE_LAPACK = "no")
 fi
 
 # Check for Python modules
