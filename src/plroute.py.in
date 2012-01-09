@@ -21,6 +21,7 @@
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+sys.path.append("@pythondir@")
 import os
 import getopt
 import string

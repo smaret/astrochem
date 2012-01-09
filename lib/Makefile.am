@@ -17,46 +17,4 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
-AM_CFLAGS = -DPKGDATADIR=\"$(pkgdatadir)\"
-
-AM_CFLAGS += ${OPENMP_CFLAGS}
-
-bin_PROGRAMS = astrochem chmconvert
-
-astrochem_SOURCES = astrochem.c astrochem.h input.c network.c rates.c solve.c output.c
-
-chmconvert_SOURCES = chmconvert.py
-
-chmconvert: chmconvert.py
-	cp $? $@
-	chmod a+x $@
-
-if HAVE_PYMOD_BIGGLES 
-if HAVE_PYMOD_NUMPY
-
-bin_PROGRAMS += plabun plroute
-
-plabun_SOURCES = plabun.py
-
-plroute_SOURCES = plroute.py
-
-plabun:	plabun.py
-	cp $? $@
-	chmod a+x $@
-
-plroute: plroute.py
-	cp $? $@
-	chmod a+x $@
-
-endif
-endif
-
-install-exec-hook:
-	cd $(DESTDIR)$(bindir)
-	sed -i -e 's,$${prefix},${prefix},g' chmconvert
-if HAVE_PYMOD_BIGGLES
-if HAVE_PYMOD_NUMPY
-	sed -i -e 's,$${prefix},${prefix},g' plabun
-	sed -i -e 's,$${prefix},${prefix},g' plroute
-endif
-endif
+python_PYTHON = libastrochem.py

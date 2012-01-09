@@ -73,7 +73,11 @@ fi
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
 		 doc/examples/Makefile
+		 lib/Makefile
                  src/Makefile
+		 src/chmconvert.py
+		 src/plabun.py
+		 src/plroute.py
 		 networks/Makefile
 		 tests/Makefile])
 AC_OUTPUT

@@ -24,10 +24,10 @@ EXTRA_DIST = osu2008.osu osu2009.osu
 nobase_dist_pkgdata_DATA = osu2008.chm osu2009.chm
 
 osu2008.chm: osu2008.osu
-	${CHMCONVERT} -o $@ $?
+	PYTHONPATH=../lib:${PYTHONPATH} ${CHMCONVERT} -o $@ $?
 
 osu2009.chm: osu2009.osu
-	${CHMCONVERT} -o $@ $?
+	PYTHONPATH=../lib:${PYTHONPATH} ${CHMCONVERT} -o $@ $?
 
 CLEANFILES = osu2008.chm osu2009.chm
 
