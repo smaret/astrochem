@@ -1,6 +1,6 @@
 #  libastrochem.py - Python utility library for astrochem
 #
-#  Copyright (c) 2006-2011 Sebastien Maret
+#  Copyright (c) 2006-2012 Sebastien Maret
 # 
 #  This file is part of Astrochem.
 #

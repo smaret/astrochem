@@ -1,7 +1,7 @@
 /* 
    rate_test.c - Test the rate() function
    
-   Copyright (c) 2006-2011 Sebastien Maret
+   Copyright (c) 2006-2012 Sebastien Maret
    
    This file is part of Astrochem.
 
