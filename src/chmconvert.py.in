@@ -32,7 +32,7 @@ def usage():
 
     print """Usage: chmconvert [option] [file]
 
-Common options:
+Options:
    -h, --help         Display this help
    -V, --version      Display chmconvert version information
    -o, --output       Write the edited network in a file
@@ -83,7 +83,7 @@ def main():
     if len(args) == 1:
         network_file = args[0]
     else:
-        sys.stderr.write("chmconvert: no file to convert.\n")
+        sys.stderr.write("chmconvert: error: no file to convert.\n")
         sys.stderr.write("Type \'chmconvert --help\' for more information.\n")
         sys.exit(1)
         
@@ -91,12 +91,12 @@ def main():
     if len(network_file.rsplit('.', 1)) == 2:
         network_file_base, network_file_ext = network_file.rsplit('.', 1)
     else:
-        sys.stderr.write("chmconvert: file has no extension.\n")
+        sys.stderr.write("chmconvert: error: file has no extension.\n")
         sys.exit(1)  
     if network_file_ext in ["osu", "kida"]:
         fileformat = network_file_ext
     else:
-        sys.stderr.write("chmconvert: unknown network format \"%s\".\n" 
+        sys.stderr.write("chmconvert: error: unknown network format \"%s\".\n" 
                          % network_file_ext)
         sys.exit(1)
 		
@@ -105,7 +105,7 @@ def main():
     try:
         filein = open(network_file)
     except:
-        sys.stderr.write("chmconvert: can't open %s.\n" % network_file)
+        sys.stderr.write("chmconvert: error: can't open %s.\n" % network_file)
         sys.exit(1)
     if not output:
         fileout = sys.stdout
@@ -113,7 +113,7 @@ def main():
         try:
             fileout = open(output, 'w')
         except:
-            sys.stderr.write("chmconvert: can't open %s.\n" % output)
+            sys.stderr.write("chmconvert: error: can't open %s.\n" % output)
             sys.exit(1)
 	    
     # Read the network file and convert it
@@ -124,7 +124,14 @@ def main():
         sys.exit(1)        
     filein.close()
 
-    # Write the converted file:
+    # If the network originates from KIDA, make sure that reaction
+    # numbers are unique
+    if fileformat == "kida":
+        if net.duplicate_react_numbers():
+            sys.stderr.write("chmconvert: error: reaction numbers are not unique.\n")
+            sys.exit(1)
+
+    # Write the converted network to a file:
     net.tofile(fileout)
     fileout.close()
     

@@ -471,10 +471,48 @@ class network:
                    react.number)
             f.write(string)
 
-    def check(self):
+    def duplicate_react_numbers(self):
         """
-        Check network.
+        Find reactions with the same reaction number
 
-        """        
+        """
+
+        react_numbers = []
+        count = []
+        dups = []
+        for react in self.data:
+            if not react.number in react_numbers:
+                react_numbers.append(react.number)
+                count.append(1)
+            else:
+                index = react_numbers.index(react.number)
+                count[index] += 1
+        for i in range(len(react_numbers)):
+            if count[i] > 1:
+                dups.append(react_numbers[i])
+
+        return dups
+
+    def duplicate_reactions(self, verbose = False):
+        """
+        Find duplicate reactions
+
+        """
+
+        import copy
         
-        pass
+        dups = []
+        reacts = copy.copy(self.data)
+        while reacts:
+            react = reacts.pop()
+            dup = [react.number]
+            while True:
+                try:
+                    index = reacts.index(react)
+                except ValueError:
+                    break
+                dup.append(reacts.pop(index).number)
+            if len(dup) > 1:
+                dups.append(dup)
+
+        return dups
