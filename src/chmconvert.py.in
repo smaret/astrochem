@@ -24,6 +24,8 @@ sys.path.append("@pythondir@")
 import getopt
 from libastrochem import network
 
+VERSION = "@VERSION@"
+
 def usage():
     """
     Display usage.

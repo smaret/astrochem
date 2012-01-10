@@ -72,8 +72,10 @@ fi
 
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
+		 doc/astrochem.tex
 		 doc/examples/Makefile
 		 lib/Makefile
+		 lib/libastrochem.py
                  src/Makefile
 		 src/chmconvert.py
 		 src/plabun.py
