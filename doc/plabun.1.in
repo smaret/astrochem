@@ -1,6 +1,6 @@
 .\" -*- nroff -*-
 .\"
-.\"  astrochem.1 - Man page for Astrochem
+.\"  plabun.1 - Manual page for plabun
 .\"
 .\"  Copyright (c) 2006-2012 Sebastien Maret
 .\" 
@@ -19,24 +19,41 @@
 .\"  You should have received a copy of the GNU General Public License
 .\"  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 .\"
-.Dd June 3, 2011
+.Dd @RELEASE_DATE@
 .Os
-.Dt ASTROCHEM 1
+.Dt PLABUN 1
 .Sh NAME
-.Nm astrochem
-.Nd compute interstellar medium abundances
+.Nm plabun
+.Nd plot abundances computed by astrochem
 .Sh SYNOPSIS
 .Nm
 .Op Ar option
-.Op Ar file
+.Ar command
+.Ar file1
+.Op Ar file2 ...
 .\"
 .\" Description
 .\"
 .Sh DESCRIPTION
 .Nm
-is a code to compute the abundances of chemical species in the
-interstellar medium. It reads a chemical network file, create a system
-of ordinary differential equations (ODE), and solve it.
+is a 
+.Xr python 1
+script to plot the abundances computed by
+.Xr astrochem 1
+.\"
+.\" Commands
+.\"
+.Sh COMMANDS
+.Bl -tag -width flag
+.It Cm av Ar file1 Op Ar file2 ...
+Plot abundances as a function of the visual extinction at a given
+time. For this the model file (.mdl) must be specified with the
+--model option).
+.It Cm radius Ar file1 Op Ar file2 ...
+Plot abundances as a function of the radius at a given time. In this
+case the the model file (.mdl) must also be specified.
+.It Cm time Ar file1 Op Ar file2 ...
+Plot abundance as a function of time in a given shell
 .\"
 .\" Options
 .\"
@@ -46,15 +63,20 @@ of ordinary differential equations (ODE), and solve it.
 Display help text.
 .It Cm -V, --version
 Display astrochem version information.
-.It Cm -v, --verbose
-Causes astrochem to be more verbose. This option display detailled
-information about the computations that are being done.
-.It Cm -q, --quiet
-Causes astrochem to be completely silent. Only error messages are
-displayed.
-.El
+.It Cm -o Ar file , Cm --output=Ar file
+Create a PostScript file.
+.It Cm -s Ar shell-number , Cm --shell= Ar shell-number
+Set the shell number. Default is 0.
+.It Cm -s Ar time , Cm --time= Ar time
+Set the time index. Default is -1 (latest).
+.It Cm -x Ar xmin,xmax , Cm --xrange= Ar xmin,xmax
+Set the x axis range
+.It Cm -y Ar ymin,ymax , Cm --yrange= Ar ymin,ymax
+Set the y axis range
+.It Cm -m Ar file , Cm --model=Ar file
+Specify the model filename
 .\"
-.\" Authors, bug reports, copyright, and other information
+.\" Authors, copyright, and see also
 .\"
 .Sh AUTHOR
 Written by Sebastien Maret.
@@ -68,6 +90,6 @@ This is free software. You may redistribute copies of it under the
 terms of the GNU General Public License. There is NO WARRANTY, to the
 extent permitted by law.
 .Sh "SEE ALSO"
-.Xr plabun 1 ","
+.Xr astrochem 1 ","
 .Xr plroute 1 ","
 .Xr chmconvert 1

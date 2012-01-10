@@ -1,6 +1,6 @@
 .\" -*- nroff -*-
 .\"
-.\"  plroute.1 - Manual page for plroute
+.\"  chmconvert.1 - Manual page for chmconvert
 .\"
 .\"  Copyright (c) 2006-2012 Sebastien Maret
 .\" 
@@ -19,37 +19,31 @@
 .\"  You should have received a copy of the GNU General Public License
 .\"  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 .\"
-.Dd June 3, 2011
+.Dd @RELEASE_DATE@
 .Os
-.Dt PLROUTE 1
+.Dt CHMCONVERT 1
 .Sh NAME
-.Nm plroute
-.Nd plot the destruction/formation routes computed by astrochem for a given specie
+.Nm chmconvert
+.Nd convert chemical networks into .chm format
 .Sh SYNOPSIS
 .Nm
 .Op Ar option
-.Ar command
-.Ar file
+.Op Ar file
 .\"
 .\" Description
 .\"
 .Sh DESCRIPTION
 .Nm
-is a
-.Xr python 1
-script to plot the main destruction/formation routes computed by
-.Xr astrochem 1
-.\"
-.\" Commands
-.\"
-.Sh COMMANDS
-.Bl -tag -width flag
-.It Cm av Ar file
-Plot the formation/destruction rates of a given molecule as a function
-of the shell number at a given time
-.It Cm time Ar file
-Plot the formation/destruction rates of a given molecule as a function
-of time, in a given shell
+is a tool to convert chemical network files from different formats to
+.Xr astrochem 1 
+native format
+.Em .chm .
+The format of the input file is determined
+from the extension of the input file. Supported formats are
+.Em .osu
+(Ohio State University astrochemistry database) and
+.Em .kida
+(KInetic Database for Astrochemistry).
 .\"
 .\" Options
 .\"
@@ -59,20 +53,11 @@ of time, in a given shell
 Display help text.
 .It Cm -V, --version
 Display astrochem version information.
-.It Cm -o Ar file , Cm --output= Ar file
-Create a PostScript file.
-.It Cm -s Ar shell-number , Cm --shell= Ar shell-number
-Set the shell number. Default is 0.
-.It Cm -s Ar time , Cm --time= Ar time
-Set the time.
-.It Cm -x Ar xmin,xmax , Cm --xrange= Ar xmin,xmax
-Set the x axis range.
-.It Cm -y Ar ymin,ymax , Cm --yrange= Ar ymin,ymax
-Set the y axis range.
-.It Cm -c Ar file , Cm --chmfile= Ar file
-Specify the chemical network file.
-.It Cm -p, --percent
-Print the relative contribution of each route.
+.It Cm -o Ar file , Cm --output Ar file
+Write the converted network in
+.Ar file "."
+Default is the standard output.
+.El
 .\"
 .\" Authors, copyright, and see also
 .\"
@@ -90,4 +75,4 @@ extent permitted by law.
 .Sh "SEE ALSO"
 .Xr astrochem 1 ","
 .Xr plabun 1 ","
-.Xr chmconvert 1
+.Xr plroute 1

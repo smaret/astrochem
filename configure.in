@@ -19,6 +19,8 @@
 
 AC_PREREQ(2.59)
 AC_INIT(astrochem, 0.4, sebastien.maret@obs.ujf-grenoble.fr)
+RELEASE_DATE="June 3, 2011"
+AC_SUBST([RELEASE_DATE])
 AM_INIT_AUTOMAKE(astrochem, 0.4)
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
@@ -73,6 +75,10 @@ fi
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
 		 doc/astrochem.tex
+		 doc/astrochem.1
+		 doc/plabun.1
+		 doc/plroute.1
+		 doc/chmconvert.1
 		 doc/examples/Makefile
 		 lib/Makefile
 		 lib/libastrochem.py

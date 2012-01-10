@@ -31,7 +31,7 @@
 \newcommand{\bain}{Bull.~Astron.~Inst.~Netherlands}
 
 \newcommand{\version}{@VERSION@}
-\newcommand{\updated}{June 3, 2011}
+\newcommand{\updated}{@RELEASE_DATE@}
 \newcommand{\bugreport}{\url{sebastien.maret@obs.ujf-grenoble.fr}}
 
 \newcommand{\conc}[1]{n(\mathrm{#1})}
