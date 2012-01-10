@@ -31,6 +31,8 @@ chmconvert: chmconvert.py
 	cp $? $@
 	chmod a+x $@
 
+CLEANFILES = chmconvert.py
+
 if HAVE_PYMOD_BIGGLES 
 if HAVE_PYMOD_NUMPY
 
@@ -47,6 +49,8 @@ plabun:	plabun.py
 plroute: plroute.py
 	cp $? $@
 	chmod a+x $@
+
+CLEANFILES += plabun.py plroute.py
 
 endif
 endif

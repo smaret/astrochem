@@ -36,7 +36,9 @@ astrochem.pdf: astrochem.tex astrochem.bib fig1.pdf fig2.pdf
 	$(PDFLATEX) astrochem.tex
 	$(PDFLATEX) astrochem.tex
 
-CLEANFILES = astrochem.aux astrochem.log astrochem.bbl astrochem.blg astrochem.pdf
+CLEANFILES = astrochem.tex astrochem.aux astrochem.log astrochem.bbl	\
+	astrochem.blg astrochem.pdf astrochem.1 plabun.1 plroute.1	\
+	chmconvert.1
 
 endif
 endif
