@@ -1,6 +1,16 @@
 To-do list
 ==========
 
+For release 0.5:
+----------------
+
+* Fix the bug with configure --lapack
+
+* Remove the time keyword from plabun and plroute commands
+
+Longer-term to-dos:
+-------------------
+
 * Allocate arrays dynamically instead of limiting their size
   arbitrarily.
 
