@@ -4,9 +4,12 @@ To-do list
 For release 0.5:
 ----------------
 
-* Fix the bug with configure --lapack
+* Fix the bug with configure --with-lapack
 
 * Remove the time keyword from plabun and plroute commands
+
+* Clean-up plabun and plroute code, and factorize code into
+  libastrochem.py
 
 Longer-term to-dos:
 -------------------
