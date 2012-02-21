@@ -19,16 +19,11 @@ Longer-term to-dos:
 
 * Pass structures to function that have a large number of arguments.
 
-* Intercept convergence errors from CVODE, and exit gracefully if they
-  occur.
+* Use MPI instead of OpenMP.
 
 * Implement 2D geometry.
 
 * Implement grain surface chemistry.
 
-
-
-
-
-
-
+* Intercept convergence errors from CVODE, and exit gracefully if they
+  occur.
