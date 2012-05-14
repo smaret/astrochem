@@ -236,6 +236,16 @@ void
 version (void)
 {
   fprintf (stdout, "This is astrochem, version %s\n", VERSION);
+#ifdef HAVE_OPENMP
+  fprintf (stdout, "OpenMP support enabled, ");
+#else
+  fprintf (stdout, "OpenMP support disabled, ");
+#endif
+#ifdef HAVE_LAPACK
+  fprintf (stdout, "LAPACK support enabled.\n");
+#else
+  fprintf (stdout, "LAPACK support disabled.\n");
+#endif
   fprintf (stdout, "Copyright (c) 2006-2012 Sebastien Maret\n");
   fprintf (stdout, "\n");
   fprintf (stdout, "This is free software. You may redistribute copies of it under the terms\n");
