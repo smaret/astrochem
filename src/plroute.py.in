@@ -28,7 +28,7 @@ import string
 import biggles
 from numpy import *
 
-VERSION = "@VERSION@"
+PACKAGE_VERSION = "@PACKAGE_VERSION@"
 
 def usage():
     """
@@ -64,7 +64,7 @@ def version():
 
     """
 
-    print "This is plroute, version %s" % VERSION
+    print "This is plroute, version %s" % PACKAGE_VERSION
     print """Copyright (c) 2006-2012 Sebastien Maret
 
 This is free software. You may redistribute copies of it under the terms

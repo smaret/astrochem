@@ -30,7 +30,7 @@
 \newcommand{\mnras}{MNRAS}
 \newcommand{\bain}{Bull.~Astron.~Inst.~Netherlands}
 
-\newcommand{\version}{@VERSION@}
+\newcommand{\version}{@PACKAGE_VERSION@}
 \newcommand{\updated}{@RELEASE_DATE@}
 \newcommand{\bugreport}{\url{sebastien.maret@obs.ujf-grenoble.fr}}
 

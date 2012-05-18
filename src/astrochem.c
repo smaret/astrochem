@@ -235,7 +235,7 @@ usage (void)
 void
 version (void)
 {
-  fprintf (stdout, "This is astrochem, version %s\n", VERSION);
+  fprintf (stdout, "This is astrochem, version %s\n", PACKAGE_VERSION);
 #ifdef HAVE_OPENMP
   fprintf (stdout, "OpenMP support enabled, ");
 #else

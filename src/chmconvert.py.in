@@ -24,7 +24,7 @@ sys.path.append("@pythondir@")
 import getopt
 from libastrochem import network
 
-VERSION = "@VERSION@"
+PACKAGE_VERSION = "@PACKAGE_VERSION@"
 
 def usage():
     """
@@ -48,7 +48,7 @@ def version():
 
     """
 
-    print "This is chmconvert, version %s" % VERSION
+    print "This is chmconvert, version %s" % PACKAGE_VERSION
     print """Copyright (c) 2006-2012 Sebastien Maret
 
 This is free software. You may redistribute copies of it under the terms
