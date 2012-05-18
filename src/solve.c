@@ -30,7 +30,7 @@
 #include <math.h>
 
 #include <cvode/cvode.h>
-#ifdef HAVE_LAPACK
+#ifdef USE_LAPACK
 #include <cvode/cvode_lapack.h>
 #else
 #include <cvode/cvode_dense.h>
@@ -483,7 +483,7 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
    abs_err = abs_err * nh;
    if ((CVodeInit (cvode_mem, f, 0.0, y) != CV_SUCCESS)
        || (CVodeSStolerances (cvode_mem, rel_err, abs_err) != CV_SUCCESS)
-#ifdef HAVE_LAPACK
+#ifdef USE_LAPACK
        || ((CVLapackDense (cvode_mem, n_species) != CV_SUCCESS))
 #else
        || ((CVDense (cvode_mem, n_species) != CV_SUCCESS))
