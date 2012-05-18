@@ -18,10 +18,10 @@
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
 AC_PREREQ(2.59)
-AC_INIT(astrochem, 0.4, sebastien.maret@obs.ujf-grenoble.fr)
-RELEASE_DATE="June 3, 2011"
+AC_INIT(astrochem, 0.5-dev, sebastien.maret@obs.ujf-grenoble.fr)
+RELEASE_DATE="Not released yet"
 AC_SUBST([RELEASE_DATE])
-AM_INIT_AUTOMAKE(astrochem, 0.4)
+AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADER([config.h])
 
