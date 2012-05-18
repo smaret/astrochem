@@ -1,6 +1,12 @@
 What's new in Astrochem ?
 =========================
 
+astrochem-0.5 (not released yet)
+--------------------------------
+
+* Fixed a bug in the detection of the LAPACK library. Astrochem now
+  uses LAPACK by default.
+
 astrochem-0.4 (June 3, 2011)
 ----------------------------
 
