@@ -241,7 +241,7 @@ version (void)
 #else
   fprintf (stdout, "OpenMP support disabled, ");
 #endif
-#ifdef HAVE_LAPACK
+#ifdef USE_LAPACK
   fprintf (stdout, "LAPACK support enabled.\n");
 #else
   fprintf (stdout, "LAPACK support disabled.\n");
