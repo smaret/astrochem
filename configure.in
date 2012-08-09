@@ -69,6 +69,7 @@ AM_CONDITIONAL([HAVE_PYMOD_NUMPY], [test $HAVE_PYMOD_NUMPY = "yes"])
 # Checks for typedefs, structures, and compiler characteristics.
 if test x$enable_openmp = "xyes"; then
    AX_OPENMP(have_openmp="yes", have_openmp="no")
+   AC_DEFINE(HAVE_OPENMP,1,[Define if OpenMP is enabled])
    AC_SUBST([OPENMP_CFLAGS])
 else
    have_openmp="no"
