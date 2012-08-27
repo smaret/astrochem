@@ -87,8 +87,8 @@ struct rout {
   struct r formation;
 };
 
-#define MAX_REACTIONS 8192
-#define MAX_SPECIES 1024
+#define MAX_REACTIONS 32768
+#define MAX_SPECIES 4096
 
 void read_input (const char *input_file, char *chem_file, char *source_file,
 		 double *chi, double *cosmic, double *grain_size,
