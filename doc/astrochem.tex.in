@@ -793,7 +793,7 @@ destruction routes of HCO$^{+}$ with the following command (see
 \verb=man plroute= for a complete list of commands and options):
 
 \begin{verbatim}
-% plroute --chmfile=osu2009.chm time HCO\(+\).rout
+% plroute --chmfile=osu2009.chm HCO\(+\).rout
 \end{verbatim}
 
 \begin{figure}

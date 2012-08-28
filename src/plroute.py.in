@@ -36,20 +36,16 @@ def usage():
 
     """
 
-    print """Usage: plroute [options] command file
+    print """Usage: plroute [options] file
 
-Commands:
-   time   Plot formation/destruction rates vs. time in a given shell
-   av     Plot formation/destruction rates vs. visual extinction
-          at a given time
+Plot formation/destruction rates vs. time
 
 Options:
    -h, --help               Display this help
    -V, --version            Display plroute version information
    -o, --output             Create a postscript file
 
-   -s, --shell=index        Plot form./dest. rates in a given shell
-   -t, --time=index         Plot form./dest. rates at a given time
+   -s, --shell=index        Set the shell index. Default is 0.
    -x, --xrange=xmin,xmax   Set the x axis range
    -y, --yrange=ymin,ymax   Set the y axis range
    -c, --chmfile=file       Specify chemical network file
@@ -262,20 +258,18 @@ def main():
 
     """
 
-    # Parse options and check commands and arguments
+    # Parse options and arguments
     try:
-	opts, args = getopt.getopt(sys.argv[1:], "hVo:s:t:x:y:c:p",
+	opts, args = getopt.getopt(sys.argv[1:], "hVo:s:x:y:c:p",
 				   ["help", "version", "output=",
-                                    "shell=", "time=", "xrange=",
-                                    "yrange=", "chmfile=",
-                                    "percent"])
+                                    "shell=", "xrange=", "yrange=",
+                                    "chmfile=", "percent"])
     except getopt.GetoptError:
 	usage()
 	sys.exit(1)
 
     output = None
     s =  0
-    t = -1
     xrange = None
     yrange = None
     chmfile = None
@@ -296,18 +290,6 @@ def main():
             except:
                 sys.stderr.write("plroute: error: invalid shell index.\n")
                 sys.exit(1)
-	if opt in ("-t", "--time"):
-            try:
-                t = int(arg)
-            except:
-                sys.stderr.write("plroute: error: invalid time index.\n")
-                sys.exit(1)
-	if opt in ("-n", "--nroutes"):
-            try:
-                r = int(arg)
-            except:
-                sys.stderr.write("plroute: error: number of routes.\n")
-                sys.exit(1)
         if opt in ("-x", "--xrange"):
             try:
                 xrange = [float(arg.split(",")[0]), float(arg.split(",")[1])]
@@ -325,15 +307,19 @@ def main():
         if opt in ("-p", "--percent"):
             percent = True
 
-    if len(args) != 2:
+    if len(args) == 0:
 	usage()
 	sys.exit(1)
-    command = args[0]
-    filename = args[1]
 
-    if not command in ["time", "av"]:
-	sys.stderr.write("plroute: error: invalid command.\n")
-	sys.exit(1)
+    # Ignore commands, for backward compatibility
+    if args[0] == "time":
+        sys.stderr.write("plabun: warning: time command is deprecated, ignoring it.\n")
+        args = args[1:]
+        if len(args) != 1:
+            usage()
+            sys.exit(1)            
+
+    filename = args[0]
 
     biggles.configure( 'screen', 'width', 1200 )
     biggles.configure( 'screen', 'height', 600 )
@@ -363,115 +349,110 @@ def main():
 
     time, shell, formation_reac, formation_rate, destruction_reac, \
         destruction_rate = readrout(filename)
-    if command == "time":
 
-        p1.xtitle = p2.xtitle = "Time (yr)"
-        p1.xlog = p2.xlog = 1
+    p1.xtitle = p2.xtitle = "Time (yr)"
+    p1.xlog = p2.xlog = 1
 
-        # Check that the shell index is valid
-        try:
-            temp = formation_reac[s, 0, 0]
-        except IndexError:
-            sys.stderr.write("plroute: error: shell index is out of bounds.\n")
-            sys.exit(1)
+    # Check that the shell index is valid
+    try:
+        temp = formation_reac[s, 0, 0]
+    except IndexError:
+        sys.stderr.write("plroute: error: shell index is out of bounds.\n")
+        sys.exit(1)
 
-        # Create arrays containing the destruction/formation routes at
-        # each time step and in each shell
+    # Create arrays containing the destruction/formation routes at
+    # each time step and in each shell
 
-        f_reac = unique(formation_reac[s, :, :])
-        d_reac = unique(destruction_reac[s, :, :])
-        f_reac = f_reac[f_reac.nonzero()]
-        d_reac = d_reac[d_reac.nonzero()]
-        f_rate = zeros(len(f_reac) * len(time), dtype=float)
-        d_rate = zeros(len(d_reac) * len(time), dtype=float)
-        f_rate = f_rate.reshape(len(f_reac), len(time))
-        d_rate = d_rate.reshape(len(d_reac), len(time))
+    f_reac = unique(formation_reac[s, :, :])
+    d_reac = unique(destruction_reac[s, :, :])
+    f_reac = f_reac[f_reac.nonzero()]
+    d_reac = d_reac[d_reac.nonzero()]
+    f_rate = zeros(len(f_reac) * len(time), dtype=float)
+    d_rate = zeros(len(d_reac) * len(time), dtype=float)
+    f_rate = f_rate.reshape(len(f_reac), len(time))
+    d_rate = d_rate.reshape(len(d_reac), len(time))
 
-        for i in range(len(time)):
-            for j in range(len(f_reac)):
-                index = where(formation_reac[s, i, :] == f_reac[j])[0]
-                if len(index) > 0:
-                    f_rate[j, i] = formation_rate[s, i, index[0]]
-                else:
-                    f_rate[j, i] = 0.
-            for j in range(len(d_reac)):
-                index = where(destruction_reac[s, i, :] == d_reac[j])[0]
-                if len(index) > 0:
-                    d_rate[j, i] = destruction_rate[s, i, index[0]]
-                else:
-                    d_rate[j, i] = 0.
-
-        # Find the most important formation/destruction routes. For
-        # this we compute the integral of the formation/destruction
-        # rates for each formation/destruction over the time interval.
-
-        int_f_rate = zeros(len(f_reac), dtype=float)
-        int_d_rate = zeros(len(d_reac), dtype=float)
-    
-        dtime = time[1:-1] - time[0:-2]
-
+    for i in range(len(time)):
         for j in range(len(f_reac)):
-            int_f_rate[j] = sum(f_rate[j, 1:-1] * dtime)
+            index = where(formation_reac[s, i, :] == f_reac[j])[0]
+            if len(index) > 0:
+                f_rate[j, i] = formation_rate[s, i, index[0]]
+            else:
+                f_rate[j, i] = 0.
         for j in range(len(d_reac)):
-            int_d_rate[j] = sum(-d_rate[j, 1:-1] * dtime)
+            index = where(destruction_reac[s, i, :] == d_reac[j])[0]
+            if len(index) > 0:
+                d_rate[j, i] = destruction_rate[s, i, index[0]]
+            else:
+                d_rate[j, i] = 0.
 
-        if percent:
-            int_f_rate_percent = int_f_rate / sum(int_f_rate) * 100.
-            int_d_rate_percent = int_d_rate / sum(int_d_rate) * 100.
+    # Find the most important formation/destruction routes. For
+    # this we compute the integral of the formation/destruction
+    # rates for each formation/destruction over the time interval.
 
-        index_f = int_f_rate.argsort()[::-1]
-        index_d = int_d_rate.argsort()[::-1]
+    int_f_rate = zeros(len(f_reac), dtype=float)
+    int_d_rate = zeros(len(d_reac), dtype=float)
 
-        # Find the reaction corresponding to the reaction numbers
+    dtime = time[1:-1] - time[0:-2]
+
+    for j in range(len(f_reac)):
+        int_f_rate[j] = sum(f_rate[j, 1:-1] * dtime)
+    for j in range(len(d_reac)):
+        int_d_rate[j] = sum(-d_rate[j, 1:-1] * dtime)
+
+    if percent:
+        int_f_rate_percent = int_f_rate / sum(int_f_rate) * 100.
+        int_d_rate_percent = int_d_rate / sum(int_d_rate) * 100.
+
+    index_f = int_f_rate.argsort()[::-1]
+    index_d = int_d_rate.argsort()[::-1]
+
+    # Find the reaction corresponding to the reaction numbers
+    if chmfile:
+        f_reaction = getreact(f_reac, chmfile)
+        d_reaction = getreact(d_reac, chmfile)
+
+    # Plot them, ignoring blanked values
+
+    for j in index_f[0:6]:
+        linecolor = linecolor_stack.pop(0)
+        linecolor_stack.append(linecolor)
+        c = curveblank(time, f_rate[j, :], linecolor = linecolor)
         if chmfile:
-            f_reaction = getreact(f_reac, chmfile)
-            d_reaction = getreact(d_reac, chmfile)
+            c[0].label = f_reaction[j]
+        else:
+            c[0].label = "%i" % f_reac[j]
+        if percent:
+            c[0].label += " (%.0f" % int_f_rate_percent[j] + "%)"
+        curves_f.append(c[0])
+        for ci in c:
+            p1.add(ci)
 
-        # Plot them, ignoring blanked values
-            
-        for j in index_f[0:6]:
-            linecolor = linecolor_stack.pop(0)
-            linecolor_stack.append(linecolor)
-            c = curveblank(time, f_rate[j, :], linecolor = linecolor)
-            if chmfile:
-                c[0].label = f_reaction[j]
-            else:
-                c[0].label = "%i" % f_reac[j]
-            if percent:
-                c[0].label += " (%.0f" % int_f_rate_percent[j] + "%)"
-            curves_f.append(c[0])
-            for ci in c:
-                p1.add(ci)
+    for j in index_d[0:6]:
+        linecolor = linecolor_stack.pop(0)
+        linecolor_stack.append(linecolor)
+        c = curveblank(time, -d_rate[j, :], linecolor = linecolor)
+        if chmfile:
+            c[0].label = d_reaction[j]
+        else:
+            c[0].label = "%i" % d_reac[j]
+        if percent:
+            c[0].label += " (%.0f" % int_d_rate_percent[j] + "%)"
+        curves_d.append(c[0])
+        for ci in c:
+            p2.add(ci)
 
-        for j in index_d[0:6]:
-            linecolor = linecolor_stack.pop(0)
-            linecolor_stack.append(linecolor)
-            c = curveblank(time, -d_rate[j, :], linecolor = linecolor)
-            if chmfile:
-                c[0].label = d_reaction[j]
-            else:
-                c[0].label = "%i" % d_reac[j]
-            if percent:
-                c[0].label += " (%.0f" % int_d_rate_percent[j] + "%)"
-            curves_d.append(c[0])
-            for ci in c:
-                p2.add(ci)
+    # Plot the total formation and destruction rates
 
-        # Plot the total formation and destruction rates
+    c = biggles.Curve(time, sum(f_rate, axis = 0), linetype = "dotted")
+    c.label = "Total"
+    curves_f.append(c)
+    p1.add(c)
 
-        c = biggles.Curve(time, sum(f_rate, axis = 0), linetype = "dotted")
-        c.label = "Total"
-        curves_f.append(c)
-        p1.add(c)
-
-        c = biggles.Curve(time, sum(-d_rate, axis = 0), linetype = "dotted")
-        c.label = "Total"
-        curves_d.append(c)
-        p2.add(c)
-
-    else:   
-        print "Not implemented yet."
-        sys.exit()
+    c = biggles.Curve(time, sum(-d_rate, axis = 0), linetype = "dotted")
+    c.label = "Total"
+    curves_d.append(c)
+    p2.add(c)
     
     # Draw the plot key
     if chmfile:
@@ -480,10 +461,6 @@ def main():
         xkey, ykey = .65, .4
     p1.add(biggles.PlotKey(xkey, ykey, curves_f))
     p2.add(biggles.PlotKey(xkey, ykey, curves_d))
-    if command == "av":
-        p.add(biggles.PlotLabel(.8,.9, "t=%3.1fx10$^{%i} yr" % 
-                                 (time[t]/10**log10(time[t]),
-                                  floor(log10(time[t])))))
     
     t[0,0] = p1
     t[0,1] = p2
