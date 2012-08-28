@@ -4,7 +4,7 @@ To-do list
 For release 0.5:
 ----------------
 
-* Remove the time keyword from plabun and plroute commands
+* Remove the time keyword from plroute commands
 
 * Clean-up plabun and plroute code, and factorize code into
   libastrochem.py

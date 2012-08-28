@@ -32,11 +32,9 @@ def usage():
 
     # Display usage.
 
-    print """Usage: plabun [options] command file1 [file2...]
+    print """Usage: plabun [options] file1 [file2...]
 
-Commands:
-   time   Plot abundances vs. time in a given shell
-   av     Plot abundance vs. av at a given time
+Plot abundances vs. time
 
 Options:
    -h, --help               Display this help
@@ -44,11 +42,8 @@ Options:
    -o, --output=file        Create a postscript file
 
    -s, --shell=index        Set the shell number (default 0)
-   -t, --time=time          Set the time index (default -1)
    -x, --xrange=xmin,xmax   Set the x axis range
    -y, --yrange=ymin,ymax   Set the y axis range
-
-   -m, --model=file         Specify the model filename
    
 See the plabun(1) man page for more information
 Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>."""
@@ -100,29 +95,6 @@ def readabun(filename):
 
     return time, abund
 
-def readmodel(filename):
-    
-    # Read a model file (.mdl) and returns the visual extinction and
-    # radius (if present in the model file).
-
-    av, radius = [], []
-    try:
-        f = open(filename)
-    except:
-        sys.stderr.write("plabun: error: can't open %s.\n" % filename)
-        sys.exit(1)
-
-    for line in f.readlines():
-        if line[0] == "#":
-            continue
-        av.append(float(line.split()[1]))
-        if len(line.split()) >= 6:
-            radius.append(float(line.split()[5]))
-
-    av, radius = array(av), array(radius)
-                          
-    return av, radius
-
 def speciename(filename):
     
     # Guess the specie name from the filename
@@ -146,20 +118,18 @@ def speciename(filename):
 
 def main():
 
-    # Parse options and check commands and arguments
+    # Parse options and arguments
 
     try:
-	opts, args = getopt.getopt(sys.argv[1:], "hVo:s:t:x:y:",
+	opts, args = getopt.getopt(sys.argv[1:], "hVo:s:x:y:",
 				   ["help", "version", "output=",
-                                    "shell=", "time=", "xrange=",
-                                    "yrange=", "model="])
+                                    "shell=", "xrange=", "yrange="])
     except getopt.GetoptError:
 	usage()
 	sys.exit(1)
 
     output = None
     s =  0
-    t = -1
     xrange = None
     yrange = None
     model = None
@@ -179,12 +149,6 @@ def main():
             except:
                 sys.stderr.write("plabun: error: invalid shell index.\n")
                 sys.exit(1)
-	if opt in ("-t", "--time"):
-            try:
-                t = int(arg)
-            except:
-                sys.stderr.write("plabun: error: invalid time index.\n")
-                sys.exit(1)
         if opt in ("-x", "--xrange"):
             try:
                 xrange = [float(arg.split(",")[0]), float(arg.split(",")[1])]
@@ -200,18 +164,27 @@ def main():
         if opt in ("-m", "--model"):
             model = arg
 
-    if len(args) < 2:
+    if len(args) == 0:
 	usage()
 	sys.exit(1)
-    command = args[0]
-    filenames = args[1:]
 
-    if not command in ["time", "av", "radius"]:
-	sys.stderr.write("plabun: error: invalid command.\n")
-	sys.exit(1)
+    # Ignore commands, for backward compatibility
+    if args[0] == "time":
+        sys.stderr.write("plabun: warning: time command is deprecated, ignoring it.\n")
+        args = args[1:]
+        if len(args) == 0:
+            usage()
+            sys.exit(1)            
+    elif args[0] == "av":
+        sys.stderr.write("plabun: error: av command is deprecated.\n")
+        sys.exit()
+
+    filenames = args[0:]
 	
     p = biggles.FramedPlot()
     p.title = "Abundances"
+    p.xtitle = "Time (yr)"
+    p.xlog = 1
     p.ytitle = "$n(x)/n_{H}$"
     p.ylog = 1
     if xrange:
@@ -224,100 +197,39 @@ def main():
     # FixMe: use different symbols once we used
     # all colors. Set a maximum number of plots?
     linecolor_stack = ["red", "blue", "green", "yellow", "orange", "cyan"]
-
-    # Read the model file, if given
-    if model:
-        av, radius = readmodel(model)
     
     # Plot the abundances in each file
+
     for filename in filenames:
+
 	time, abund = readabun(filename)
-	shell = arange(len(time))
 
-	if command == "time":
+        # Pick-up values that correspond to the given time index
+        try:
+            abund = abund[:, s]
+        except IndexError:
+            sys.stderr.write("plabun: error: shell index is out of bounds.\n")
+            sys.exit(1)            
 
-	    p.xtitle = "Time (yr)"
-	    p.xlog = 1
+        # Drop zeros and negative values
+        index = abund > 0
+        time = time[index]
+        abund = abund[index]
 
-            # Pick-up values that correspond to the given time index
-            try:
-                abund = abund[:, s]
-	    except IndexError:
-		sys.stderr.write("plabun: error: shell index is out of bounds.\n")
-		sys.exit(1)            
+        # Check that time and abund contain at least two points
+        if len(time) < 2:
+            sys.stderr.write("plabun: warning: %s contains less than two non-zero abundances.\n" % filename)
+            continue
 
-	    # Drop zeros and negative values
-            index = abund > 0
-	    time = time[index]
-	    abund = abund[index]
-
-	    # Check that time and abund contain at least two points
-	    if len(time) < 2:
-		sys.stderr.write("plabun: warning: %s contains less than two non-zero abundances.\n" % filename)
-		continue
-        
-	    linecolor = linecolor_stack.pop(0)
-	    linecolor_stack.append(linecolor)
-            c = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
-	    c.label = speciename(filename)
-	    curves.append(c)
-	    p.add(c)
-
-	else:
-
-            # Make sure that the model file was given
-            if not(model):
-		sys.stderr.write("plabun: error: no model file given.\n")
-                sys.exit(1)
-
-            if command == "av":
-                p.xtitle = "$A_{v}$ (mag)"
-                p.xlog = 0
-                xvalues = av
-            else:
-                # Make sure the radius values are in the model fiel
-                if radius.size == 0:
-                    sys.stderr.write("plabun: error: no radius in the model file.\n")
-                    sys.exit(1)
-                p.xtitle = "Radius (AU)"
-                p.xlog = 1
-                xvalues = radius
-
-            # Pick-up values that correspond to the given time index
-            try:
-                abund = abund[t, :]
-	    except IndexError:
-		sys.stderr.write("plabun: error: time index is out of bounds.\n")
-		sys.exit(1)            
-
-	    # Drop zeros and negative values
-            index = abund > 0
-	    xvalues = xvalues[index]
-	    abund = abund[index]
-
-	    # Drop zeros and negative values
-            index = where(abund > 0)
-	    xvalues = xvalues[index]
-	    abund = abund[index]
-
-	    # Check that xvalues and abund contain at least two points
-	    if len(xvalues) < 2:
-		sys.stderr.write("plabun: warning: %s contains less than two non-zero abundances.\n" % filename)
-		continue
-        
-	    linecolor = linecolor_stack.pop(0)
-	    linecolor_stack.append(linecolor)
-            c = biggles.Curve(xvalues, abund, linecolor = linecolor)
-	    c.label = speciename(filename)
-	    curves.append(c)
-	    p.add(c)
+        linecolor = linecolor_stack.pop(0)
+        linecolor_stack.append(linecolor)
+        c = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
+        c.label = speciename(filename)
+        curves.append(c)
+        p.add(c)
     
     # Draw the plot key
     p.add(biggles.PlotKey(.1, .90, curves))
-    if command == "av" or command == "radius":
-        p.add(biggles.PlotLabel(.8,.9, "t=%3.1f x 10$^{%i} yr" % 
-                                 (time[t]/10**floor(log10(time[t])),
-                                  floor(log10(time[t])))))
 
     # Check that we have at least one abundance to plot
     if len(curves) == 0:

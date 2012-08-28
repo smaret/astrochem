@@ -740,25 +740,22 @@ only two columns, one for the time, and one for the shell number.
 Astrochem comes with a program that make plots of the abundances
 computed by Astrochem. The program, named Plabun, allows to plot the
 abundances of one or several species as of function of time in a given
-shell, or as a function of position at a given time. For example, the
-following command plots the CO, H$_{3}^{+}$, e$^{-}$ and HCO$^{+}$
-abundances as a function of time:
+shell. For example, the following command plots the CO, H$_{3}^{+}$,
+e$^{-}$ and HCO$^{+}$ abundances:
 
 \begin{verbatim}
-% plabun --xrange=1,1e7 --yrange=1e-12,1e-4 time CO.abun H3\(+\).abun
+% plabun --xrange=1,1e7 --yrange=1e-12,1e-4 CO.abun H3\(+\).abun
 e.abun HCO\(+\).abun
 \end{verbatim}
 
 In the example above, we have set the x-axis range from 1 to 10$^{7}$
 yr and y-axis range from $10^{-12}$ to $10^{-4}$ with the
-\verb=--xrange= and \verb=--yrange= options, respectively. The
-\verb=time= commands tells Plabun to plot abundances as function of
-time in the first (and unique in our case) shell. Note that
+\verb=--xrange= and \verb=--yrange= options, respectively. Note that
 parenthesis in files names such as \verb=H3(+).abun= needs to be
 preceded by an anti-slash (\verb=\=) because they have a special
 meaning for Unix shells. The command above produces the plot shown on
 Fig.~\ref{fig:example-abundances}. Plabun has a number or other
-commands and options; see \verb=man plabun= for a complete list.
+options; see \verb=man plabun= for a complete list.
 
 \begin{figure}
   \begin{center}
@@ -1019,9 +1016,8 @@ from the leftmost to the rightmost columns:
 \item The dust temperature in the shell, expressed in K.
 
 \item The radius corresponding to the shell, expressed in astronomical
-  units (AU). This optional parameter is used by Plabun only when
-  plotting abundances as a function of the source radius (see
-  \verb=man plabun= for more information); Astrochem ignores it.
+  units (AU). This optional parameter is used for bookkeeping only;
+  Astrochem ignores it.
 
 \end{enumerate}
 
