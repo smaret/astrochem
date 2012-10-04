@@ -15,6 +15,9 @@ Longer-term to-dos:
 
 * Pass structures to function that have a large number of arguments.
 
+* Move solve() to a library that can be called from other codes
+  (e.g. hydrodynamics or MHD codes).
+
 * Use MPI instead of OpenMP.
 
 * Implement 2D geometry.
