@@ -167,6 +167,8 @@ read_input (const char *input_file, char *chem_file, char *source_file,
 	  }
 
 	/* Output */
+	/* FixMe: check that the number of output species is lower
+	   than MAX_OUTPUT_SPECIES. */
 	
 	else if (strcmp (keyword, "output") == 0)
 	  {
