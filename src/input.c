@@ -167,8 +167,6 @@ read_input (const char *input_file, char *chem_file, char *source_file,
 	  }
 
 	/* Output */
-	/* FixMe: check that the number of output species is lower
-	   than MAX_OUTPUT_SPECIES. */
 	
 	else if (strcmp (keyword, "output") == 0)
 	  {
@@ -182,6 +180,12 @@ read_input (const char *input_file, char *chem_file, char *source_file,
 		const char delimiter[] = ",";
 		char *output_specie;
 		
+		if (j >= MAX_OUTPUT_ABUNDANCES)
+		  {
+		    fprintf (stderr, "astrochem: error: the number of species in output exceeds %i.\n",
+			     MAX_OUTPUT_ABUNDANCES);
+		    exit(1);
+		    }
 		if ((output_species[j] = malloc (sizeof (char) * MAX_CHAR_SPECIES)) == NULL)
 		  {
 		    fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
@@ -194,6 +198,12 @@ read_input (const char *input_file, char *chem_file, char *source_file,
 		j++;
 		while ((output_specie = strtok (NULL, delimiter)) != NULL)
 		  {
+		    if (j >= MAX_OUTPUT_ABUNDANCES)
+		      {
+			fprintf (stderr, "astrochem: error: the number of species in output exceeds %i.\n", 
+				 MAX_OUTPUT_ABUNDANCES);
+			exit(1);
+		      }
 		    if ((output_species[j] = malloc (sizeof (char) * MAX_CHAR_SPECIES)) == NULL)
 		      {
 			fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",

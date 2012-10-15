@@ -4,9 +4,6 @@ To-do list
 For release 0.5:
 ----------------
 
-* Fix segfault that occur if the number of species is greater than
-  MAX_OUTPUT_SPECIES.
-
 Longer-term to-dos:
 -------------------
 

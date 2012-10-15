@@ -1,9 +1,6 @@
 Known bugs
 ==========
 
-* astrochem segfaults if the number of species is greater than
-  MAX_OUTPUT_SPECIES.
-
 * plroute returns an error if some of the formation/destruction routes
   are equal to zero.
 
