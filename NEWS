@@ -1,7 +1,10 @@
 What's new in Astrochem ?
 =========================
 
-astrochem-0.5 (not released yet)
+astrochem-0.6 (Not released yet)
+--------------------------------
+
+astrochem-0.5 (October 15, 2012)
 --------------------------------
 
 * Fixed a bug in plroute that occured when some of the formation or
