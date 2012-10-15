@@ -1,16 +1,16 @@
 To-do list
 ==========
 
-For release 0.5:
+For release 0.6:
 ----------------
 
-Longer-term to-dos:
--------------------
+* Pass structures to function that have a large number of arguments.
+
+Long-term to-dos:
+-----------------
 
 * Allocate arrays dynamically instead of limiting their size
   arbitrarily.
-
-* Pass structures to function that have a large number of arguments.
 
 * Move solve() to a library that can be called from other codes
   (e.g. hydrodynamics or MHD codes).
