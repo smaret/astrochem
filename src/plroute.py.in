@@ -22,13 +22,14 @@
 
 import sys
 sys.path.append("@pythondir@")
-import os
+import os.path
 import getopt
-import string
 import biggles
 from numpy import *
+from libastrochem import network, readrout, _totex_species
 
 PACKAGE_VERSION = "@PACKAGE_VERSION@"
+PACKAGE_BUGREPORT = "@PACKAGE_BUGREPORT@"
 
 def usage():
     """
@@ -51,8 +52,8 @@ Options:
    -c, --chmfile=file       Specify chemical network file
    -p, --percent            Print the relative contribution of each route
    
-See the plroute(1) man page for more information
-Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>."""
+See the plroute(1) man page for more information"""
+    print "Report bugs to <%s>." % PACKAGE_BUGREPORT
 
 def version():
     """
@@ -66,71 +67,6 @@ def version():
 This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent
 permitted by law."""
-
-def readrout(filename):
-    """
-    Read a rout file and return arrays of time, shell number,
-    formation/destruction rates
-
-    """
-
-    a = []
-    try:
-        f = open(filename)
-    except:
-        sys.stderr.write("plroute: error: can't open %s.\n" % filename)
-        sys.exit(1)
-
-    # Skip comments
-    f.readline()
-    f.readline()
-    f.readline()
-
-    # Read all lines
-    lines = map(string.strip, f.readlines())
-
-    # Construct a list of the elements of the array
-    for line in lines:
-        newline = []        
-        for elem in string.split(line):
-	    elem = string.atof(elem)
-            newline.append(elem)
-        a.append(newline)
-
-    # Create an array from the list
-    a = array(a)
-
-    # Extract shell number, time, formation/destruction reactions and
-    # rates.
-    shell = array(a[::2,0], dtype = int)
-    time = a[::2,1]
-    formation_reac = array(a[0::2,2::2], dtype = int)
-    formation_rate = a[0::2,3::2]
-    destruction_reac = array(a[1::2,2::2], dtype = int)
-    destruction_rate = a[1::2,3::2]
-
-    shell = unique(shell)
-    nshell = len(unique(shell))
-    time = unique(time)
-    ntime = len(unique(time))
-
-    # Reshape formation/destruction reactions and rates arrays 
-    formation_reac = reshape(formation_reac, (nshell, ntime, -1))
-    formation_rate = reshape(formation_rate, (nshell, ntime, -1))
-    destruction_reac = reshape(destruction_reac, (nshell, ntime, -1))
-    destruction_rate = reshape(destruction_rate, (nshell, ntime, -1))
-
-    return time, shell, formation_reac, formation_rate, destruction_reac, destruction_rate
-
-def speciename(filename):
-    """
-    Guess the specie name from the .abun or .rout file name
-
-    """
-    
-    filename = os.path.basename(filename)[:-5]
-
-    return "$" + formatspecies(filename) + "$"
 
 def curveblank(xvalues, yvalues, blanking = 0, linecolor = "black"):
     """
@@ -168,89 +104,6 @@ def curveblank(xvalues, yvalues, blanking = 0, linecolor = "black"):
         c.append(biggles.Curve(x, y, linecolor = linecolor, linewidth = 2))
 
     return c
-
-def getreact(react_number, chmfile):
-    """
-    Get the reactions corresponding to reaction numbers
-
-    Arguments:
-    react_number:   a list of reaction number
-    chmfile:        chemical network file
-
-    """
-
-    # Read the chemical network file
-    react_dict = {}
-    try:
-        f = open(chmfile, 'r')
-        for line in f:
-            if line[0] == "#":
-                continue
-            react = line.rsplit(None, 5)[0]
-            react_n = int(line.rsplit(None, 5)[5])
-            react_dict[react_n] = react
-    except:
-	sys.stderr.write("plroute: error: can't read %s.\n" % chmfile)
-	sys.exit(1)
-
-    react = []
-    for react_n in react_number:
-        try:
-            react.append(formatreact(react_dict[react_n]))
-        except KeyError:
-            sys.stderr.write("plroute: warning: can't find reaction %i in %s.\n" \
-                                 % (react_n, chmfile))
-            react.append(react_n)
-        
-    return react
-
-def formatreact(react):
-    """
-    Format a reaction in Biggles' TeX-like format
-
-    Arguments:
-    react:   reaction string
-
-    """
-
-    reaction = "$"
-
-    reactants = react.split("->")[0].split(" + ")
-    products = react.split("->")[1].split(" + ")
-
-    for i in range(len(reactants) - 1):
-        reaction = reaction + formatspecies(reactants[i].strip()) + " + "
-    reaction = reaction + formatspecies(reactants[-1].strip()) + " \\rightarrow  "
-    for i in range(len(products) - 1):
-        reaction = reaction + formatspecies(products[i].strip()) + " + "
-    reaction = reaction + formatspecies(products[-1].strip()) + "$"
-
-    return reaction
-
-def formatspecies(spec):
-    """
-    Format a species in Biggles' TeX-like format
-
-    Arguments:
-    species:   species string
-
-    """
-
-    if spec in ["cosmic-ray", "uv-photon"]:
-        return spec
-
-    species = ""
-    for char in spec:
-	if char == '(' or char == ')':
-	    continue
-	elif (char == '+' or char == '-'):
-	    species = species + "^{" + char + "}"
-	elif char.isdigit():
-	    species = species + "_{" + char + "}"
-	else:
-	    species = species + char
-
-    return species
 
 def main():
     """
@@ -326,11 +179,14 @@ def main():
     biggles.configure('postscript', 'width', '15.0in')
     biggles.configure('postscript', 'height', '7.5in')
 
+    # Get species name from the filename
+    spec = os.path.splitext(os.path.basename(filename))[0]
+
     t = biggles.Table(1,2)
     p1 = biggles.FramedPlot()
     p2 = biggles.FramedPlot()
-    p1.title = "Main " + speciename(filename) + " formation routes"
-    p2.title = "Main " + speciename(filename) + " destruction routes"
+    p1.title = "$Main " + _totex_species(spec) + " formation routes$"
+    p2.title = "$Main " + _totex_species(spec) + " destruction routes$"
     p1.ytitle = "$Formation rate (cm^{-3} s^{-1})$"
     p2.ytitle = "$Destruction rate (cm^{-3} s^{-1})$"
     p1.ylog = p2.ylog = 1
@@ -347,8 +203,15 @@ def main():
     # Plot formation/destruction rates as a function of time or shell
     # number for the main formation/destruction routes
 
-    time, shell, formation_reac, formation_rate, destruction_reac, \
-        destruction_rate = readrout(filename)
+    try:
+        time, shell, formation_reac, formation_rate, destruction_reac, \
+            destruction_rate = readrout(filename)
+    except IOError:
+        sys.stderr.write("plroute: error: can't open %s.\n" % filename)
+        sys.exit(1)
+    except ValueError:
+        sys.stderr.write("plroute: error: can't read %s.\n" % filename)
+        sys.exit(1)            
 
     p1.xtitle = p2.xtitle = "Time (yr)"
     p1.xlog = p2.xlog = 1
@@ -408,9 +271,25 @@ def main():
     index_d = int_d_rate.argsort()[::-1]
 
     # Find the reaction corresponding to the reaction numbers
+
     if chmfile:
-        f_reaction = getreact(f_reac, chmfile)
-        d_reaction = getreact(d_reac, chmfile)
+        try:
+            f = open(chmfile)
+            net = network.fromfile(f, fileformat = "chm")
+            f.close()
+        except:
+            sys.stderr.write("plroute: error: can't read %s.\n" % chmfile)
+            sys.exit(1)
+        try:
+            f_reaction, d_reaction = [], []
+            for r in f_reac:
+                f_reaction.append(net.getreact(r).totex())
+            for r in d_reac:
+                d_reaction.append(net.getreact(r).totex())
+        except ValueError:
+            sys.stderr.write("plroute: error: can't find reaction %i in %s.\n" \
+                                 % (r, chmfile))
+            sys.exit(1)
 
     # Plot them, ignoring blanked values
 

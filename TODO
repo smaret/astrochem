@@ -4,9 +4,6 @@ To-do list
 For release 0.5:
 ----------------
 
-* Clean-up plabun and plroute code, and factorize code into
-  libastrochem.py
-
 Longer-term to-dos:
 -------------------
 

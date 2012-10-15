@@ -21,16 +21,20 @@
 
 import sys
 sys.path.append("@pythondir@")
+import os.path
 import getopt
-import string
 import biggles
 from numpy import *
+from libastrochem import readabun, _totex_species
 
 PACKAGE_VERSION = "@PACKAGE_VERSION@"
+PACKAGE_BUGREPORT = "@PACKAGE_BUGREPORT@"
 
 def usage():
+    """
+    Display usage
 
-    # Display usage.
+    """
 
     print """Usage: plabun [options] file1 [file2...]
 
@@ -45,12 +49,14 @@ Options:
    -x, --xrange=xmin,xmax   Set the x axis range
    -y, --yrange=ymin,ymax   Set the y axis range
    
-See the plabun(1) man page for more information
-Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>."""
+See the plabun(1) man page for more information"""
+    print "Report bugs to <%s>." % PACKAGE_BUGREPORT
 
 def version():
-
-    # Display version number.
+    """
+    Display version number
+    
+    """
 
     print "This is plabun, version %s" % PACKAGE_VERSION
     print """Copyright (c) 2006-2012 Sebastien Maret
@@ -59,67 +65,13 @@ This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent
 permitted by law."""
 
-def readabun(filename):
-
-    # Read an abund file and return arrays of time and abundances
-    
-    a = []
-    try:
-        f = open(filename)
-    except:
-        sys.stderr.write("plabun: error: can't open %s.\n" % filename)
-        sys.exit(1)
-
-    # Skip comments and shell number
-    f.readline()
-    f.readline()
-    f.readline()
-    f.readline()
-
-    # Read all lines
-    lines = map(string.strip, f.readlines())
-
-    # Construct a list of the elements of the array
-    for line in lines:
-        newline = []        
-        for elem in string.split(line):
-	    elem = string.atof(elem)
-            newline.append(elem)
-        a.append(newline)
-
-    # Create an array from the list
-    a = array(a)
-
-    time = a[:,0]
-    abund = a[:,1:]
-
-    return time, abund
-
-def speciename(filename):
-    
-    # Guess the specie name from the filename
-    
-    specie = "$"
-    for char in filename[:-5]:
-	if char == '(' or char == ')':
-	    continue
-        if char == '_':
-            break
-	elif (char == '+' or char == '-') and char == filename[-7]:
-	    specie = specie + "^{" + char + "}"
-	elif char.isdigit():
-	    specie = specie + "_{" + char + "}"
-	else:
-	    specie = specie + char
-    specie = specie + "$"
-    specie = specie.replace("ice", " ice")
-
-    return specie
-
 def main():
+    """
+    Plot the abundances computed by Astrochem
+
+    """
 
     # Parse options and arguments
-
     try:
 	opts, args = getopt.getopt(sys.argv[1:], "hVo:s:x:y:",
 				   ["help", "version", "output=",
@@ -180,6 +132,9 @@ def main():
         sys.exit()
 
     filenames = args[0:]
+    if len(filenames) > 6:
+        sys.stderr.write("plabun: warning: at most 6 species can be plotted, ignoring others.\n")
+        filenames = filenames[0:5]
 	
     p = biggles.FramedPlot()
     p.title = "Abundances"
@@ -194,15 +149,24 @@ def main():
     curves = []
 
     # Stack for line colors
-    # FixMe: use different symbols once we used
-    # all colors. Set a maximum number of plots?
     linecolor_stack = ["red", "blue", "green", "yellow", "orange", "cyan"]
     
     # Plot the abundances in each file
 
     for filename in filenames:
+        
+        # Read the abundance file
+        try:
+            time, abund = readabun(filename)
+        except IOError:
+            sys.stderr.write("plabun: error: can't open %s.\n" % filename)
+            sys.exit(1)
+        except ValueError:
+            sys.stderr.write("plabun: error: can't read %s.\n" % filename)
+            sys.exit(1)
 
-	time, abund = readabun(filename)
+        # Get species name from the filename
+        spec = os.path.splitext(os.path.basename(filename))[0]
 
         # Pick-up values that correspond to the given time index
         try:
@@ -224,7 +188,7 @@ def main():
         linecolor = linecolor_stack.pop(0)
         linecolor_stack.append(linecolor)
         c = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
-        c.label = speciename(filename)
+        c.label = "$" + _totex_species(spec) + "$"
         curves.append(c)
         p.add(c)
     

@@ -17,6 +17,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
+import string
+import numpy
+
 PACKAGE_VERSION = "@PACKAGE_VERSION@"
 
 class reaction:
@@ -89,6 +92,22 @@ class reaction:
                 return False
 
         return True
+
+    def totex(self):
+        """
+        Returns a reaction in TeX format
+
+        """
+
+        tex_r = "$"
+        for s in self.reactants:
+            tex_r += _totex_species(s) + " + "
+        tex_r = tex_r[0:-3] + " \\rightarrow  "
+        for s in self.products:
+            tex_r += _totex_species(s) + " + "
+        tex_r = tex_r[0:-3] + "$"
+        
+        return tex_r
 
 class network:
     """
@@ -516,3 +535,133 @@ class network:
                 dups.append(dup)
 
         return dups
+
+    def getreact(self, number):
+        """
+        Returns the reaction with a given number
+
+        Arguments:
+        number -- the reaction number
+
+        """
+
+        for react in self.data:
+            if react.number == number:
+                return react
+        raise ValueError("no reaction with number %i." % number)
+
+def readabun(filename):
+    """
+    Read an abund file and return arrays of time and abundances
+
+    Arguments:
+    filename    -- name of the abundance file
+
+    Returns:
+    time, abund -- array of time values and abundances
+
+    """
+ 
+    f = open(filename)
+
+    # Skip comments and shell number
+    f.readline()
+    f.readline()
+    f.readline()
+    f.readline()
+
+    # Read all lines
+    lines = map(string.strip, f.readlines())
+
+    # Construct a list of the elements of the array
+    a = []
+    for line in lines:
+        newline = []        
+        for elem in string.split(line):
+	    elem = string.atof(elem)
+            newline.append(elem)
+        a.append(newline)
+
+    # Create an array from the list
+    a = numpy.array(a)
+
+    time = a[:,0]
+    abund = a[:,1:]
+
+    return time, abund
+
+def readrout(filename):
+    """
+    Read a rout file and return arrays of time, shell number,
+    formation/destruction rates
+
+    """
+
+    f = open(filename)
+
+    # Skip comments
+    f.readline()
+    f.readline()
+    f.readline()
+
+    # Read all lines
+    lines = map(string.strip, f.readlines())
+
+    # Construct a list of the elements of the array
+    a = []
+    for line in lines:
+        newline = []        
+        for elem in string.split(line):
+	    elem = string.atof(elem)
+            newline.append(elem)
+        a.append(newline)
+
+    # Create an array from the list
+    a = numpy.array(a)
+
+    # Extract shell number, time, formation/destruction reactions and
+    # rates.
+    shell = numpy.array(a[::2,0], dtype = int)
+    time = a[::2,1]
+    formation_reac = numpy.array(a[0::2,2::2], dtype = int)
+    formation_rate = a[0::2,3::2]
+    destruction_reac = numpy.array(a[1::2,2::2], dtype = int)
+    destruction_rate = a[1::2,3::2]
+
+    shell = numpy.unique(shell)
+    nshell = len(numpy.unique(shell))
+    time = numpy.unique(time)
+    ntime = len(numpy.unique(time))
+
+    # Reshape formation/destruction reactions and rates arrays 
+    formation_reac = numpy.reshape(formation_reac, (nshell, ntime, -1))
+    formation_rate = numpy.reshape(formation_rate, (nshell, ntime, -1))
+    destruction_reac = numpy.reshape(destruction_reac, (nshell, ntime, -1))
+    destruction_rate = numpy.reshape(destruction_rate, (nshell, ntime, -1))
+
+    return time, shell, formation_reac, formation_rate, destruction_reac, destruction_rate
+
+def _totex_species(spec):
+    """
+    Returns a species in TeX format
+    
+    Arguments:
+    spec --- species string
+    
+    """
+    
+    if spec in ["cosmic-ray", "uv-photon"]:
+        return spec
+    
+    tex_s = ""
+    for char in spec:
+        if char == '(' or char == ')':
+            continue
+        elif (char == '+' or char == '-'):
+            tex_s = tex_s + "^{" + char + "}"
+        elif char.isdigit():
+            tex_s = tex_s + "_{" + char + "}"
+        else:
+            tex_s = tex_s + char
+            
+    return tex_s
