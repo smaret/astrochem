@@ -4,9 +4,6 @@ To-do list
 For release 0.5:
 ----------------
 
-* Fix bug in plroute that occurs returns an error if some of the
-  formation/destruction routes are equal to zero.
-
 Longer-term to-dos:
 -------------------
 

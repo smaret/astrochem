@@ -68,7 +68,8 @@ This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent
 permitted by law."""
 
-def curveblank(xvalues, yvalues, blanking = 0, linecolor = "black"):
+def curveblank(xvalues, yvalues, blanking = 0, linecolor = "black",
+               linetype = "solid"):
     """
     Return a list of curves of yvalues vs. xvalues with blank values
 
@@ -85,6 +86,7 @@ def curveblank(xvalues, yvalues, blanking = 0, linecolor = "black"):
        yvalues:     sequence of y values
        blanking:    blanking value for y (default 0)
        linecolor:   curve color (default "black")
+       linetype:    curve type (default "solid")
        
     """
 
@@ -97,11 +99,13 @@ def curveblank(xvalues, yvalues, blanking = 0, linecolor = "black"):
             y.append(yi)
         else:
             if len(x) >= 2:
-                c.append(biggles.Curve(x, y, linecolor = linecolor, linewidth = 2))
+                c.append(biggles.Curve(x, y, linecolor = linecolor,
+                                       linetype = linetype, linewidth = 2))
             x = []
             y = []
     if len(x) >= 2:
-        c.append(biggles.Curve(x, y, linecolor = linecolor, linewidth = 2))
+        c.append(biggles.Curve(x, y, linecolor = linecolor, 
+                               linetype = linetype, linewidth = 2))
 
     return c
 
@@ -259,8 +263,10 @@ def main():
     dtime = time[1:-1] - time[0:-2]
 
     for j in range(len(f_reac)):
+        if (f_rate[j] == 0).all(): continue
         int_f_rate[j] = sum(f_rate[j, 1:-1] * dtime)
     for j in range(len(d_reac)):
+#        if (d_rate[j] == 0).all(): continue
         int_d_rate[j] = sum(-d_rate[j, 1:-1] * dtime)
 
     if percent:
@@ -269,6 +275,8 @@ def main():
 
     index_f = int_f_rate.argsort()[::-1]
     index_d = int_d_rate.argsort()[::-1]
+
+    # FixMe: drop values containing only zeros
 
     # Find the reaction corresponding to the reaction numbers
 
@@ -296,6 +304,7 @@ def main():
     for j in index_f[0:6]:
         linecolor = linecolor_stack.pop(0)
         linecolor_stack.append(linecolor)
+
         c = curveblank(time, f_rate[j, :], linecolor = linecolor)
         if chmfile:
             c[0].label = f_reaction[j]
@@ -309,7 +318,6 @@ def main():
 
     for j in index_d[0:6]:
         linecolor = linecolor_stack.pop(0)
-        linecolor_stack.append(linecolor)
         c = curveblank(time, -d_rate[j, :], linecolor = linecolor)
         if chmfile:
             c[0].label = d_reaction[j]
@@ -323,15 +331,17 @@ def main():
 
     # Plot the total formation and destruction rates
 
-    c = biggles.Curve(time, sum(f_rate, axis = 0), linetype = "dotted")
-    c.label = "Total"
-    curves_f.append(c)
-    p1.add(c)
+    c = curveblank(time, sum(f_rate, axis = 0), linetype = "dotted")
+    c[0].label = "Total"
+    curves_f.append(c[0])
+    for ci in c:
+        p1.add(ci)
 
-    c = biggles.Curve(time, sum(-d_rate, axis = 0), linetype = "dotted")
-    c.label = "Total"
-    curves_d.append(c)
-    p2.add(c)
+    c = curveblank(time, sum(-d_rate, axis = 0), linetype = "dotted")
+    c[0].label = "Total"
+    curves_d.append(c[0])
+    for ci in c:
+        p2.add(ci)
     
     # Draw the plot key
     if chmfile:
