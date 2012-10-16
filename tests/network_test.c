@@ -37,7 +37,7 @@ main (void)
 
   int verbose = 0;
 
-  /* Create the input.ini file */
+  /* Create the network.chm file */
 
   f = fopen ("network.chm", "w");
   fprintf (f, "# This network file was created by network_test\n");
