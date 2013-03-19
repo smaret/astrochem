@@ -1,6 +1,5 @@
 Known bugs
 ==========
 
-* Some compilers (e.g. Sun Studio) rejects the __attribute__
-  ((unused)) argument, so maybe we should check this with the
-  configure script.
+A list of known bugs can be found here:
+https://github.com/smaret/astrochem/issues
