@@ -27,10 +27,10 @@ To compile Astrochem you will need:
     http://numpy.scipy.org/
     http://biggles.sourceforge.net/
 
-    Although they are optional, these modules are needed in order to
-    use the plotting tools provided with Astrochem. Both are present
-    in major Linux distributions (Debian, Ubuntu, etc.) and in Fink or
-    MacPorts on Mac OSX.
+    Numpy is mandatory, but Biggles is optional. However, the later is
+    required to use the plotting tools provided with Astrochem. Both
+    modules are present in major Linux distributions (Debian, Ubuntu,
+    etc.)  and in Fink or MacPorts on Mac OSX.
 
  5. To compile the documentation, you will also need PDFLaTeX and
     BibTeX.

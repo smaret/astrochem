@@ -4,6 +4,8 @@ What's new in Astrochem ?
 astrochem-0.6 (Not released yet)
 --------------------------------
 
+* Numpy module is now mandatory (fixes issue #3)
+
 astrochem-0.5 (October 15, 2012)
 --------------------------------
 
