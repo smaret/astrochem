@@ -104,7 +104,7 @@ if test ${have_openmp} = "yes"; then
 fi
 echo "LAPACK support:     ${use_lapack}"
 if test ${use_lapack} = "yes"; then
-   echo "LAPACK version:     ${LAPACK_LIBS} ${BLAS_LIBS}"
+   echo "LAPACK libraries:  ${LAPACK_LIBS} ${BLAS_LIBS}"
 fi
 echo "Python interpreter: ${PYTHON}
 Python version:     ${PYTHON_VERSION}
