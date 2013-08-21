@@ -33,6 +33,10 @@
 
 #include "astrochem.h"
 
+
+struct inp input_params;
+struct mdl source_mdl;
+
 char chem_file[MAX_LINE];
 char source_file[MAX_LINE];
 char suffix[MAX_LINE];
@@ -127,16 +131,10 @@ main (int argc, char *argv[])
     
   /* Read the input file */
 
-  read_input (input_file, chem_file, source_file, &chi, &cosmic,
-	      &grain_size, &grain_abundance, &ti, &tf, &abs_err, &rel_err,
-	      initial_abundances, &n_initial_abundances,
-	      output_species, &n_output_species, &time_steps,
-	      &trace_routes, suffix, verbose);
-  
+  read_input(input_file,&input_params,verbose);
   /* Read the source model file */
 
-  read_source (source_file, shell, &n_shells, av, nh,
-	       tgas, tdust, verbose);
+  read_source (source_file, &source_mdl, verbose);
 
   /* Read the chemical network file */
 

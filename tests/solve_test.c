@@ -34,6 +34,7 @@ main (void)
 {
   FILE *f;
 
+  struct inp input_params;
   char chem_file[MAX_LINE]; 
   char source_file[MAX_LINE];
   char suffix[MAX_LINE];
@@ -52,6 +53,7 @@ main (void)
   int time_steps; 
   int trace_routes;
 
+  struct mdl source_mdl;
   int n_shells;
   int shell[MAX_SHELLS];
   double av[MAX_SHELLS];
@@ -104,14 +106,9 @@ main (void)
 
   /* Read them */
 
-  read_input ("input.ini", chem_file, source_file, &chi, &cosmic,
-	      &grain_size, &grain_abundance, &ti, &tf, &abs_err, &rel_err,
-	      initial_abundances, &n_initial_abundances,
-	      output_species, &n_output_species, &time_steps,
-	      &trace_routes, suffix, verbose);
+  read_input ("input.ini", &input_params,verbose);
 
-  read_source ("source.mdl", shell, &n_shells, av, nh,
-	       tgas, tdust, verbose);
+  read_source ("source.mdl", &source_mdl, verbose);
 
   read_network ("network.chm", reactions, &n_reactions, 
 		species, &n_species, verbose);

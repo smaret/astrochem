@@ -147,21 +147,9 @@ struct res {
    that uses the new "input_params", "source_mdl", "network" and
    "results" data structures. */
 
-void read_input (const char *input_file, char *chem_file, char *source_file,
-		 double *chi, double *cosmic, double *grain_size,
-		 double *grain_abundance, double *ti, double *tf, double *abs_err,
-		 double *rel_err, struct abund initial_abundances[],
-		 int *n_initial_abundances, char *output_species[],
-		 int *n_output_abundances, int *time_steps, 
-		 int *trace_routes, char *suffix, int verbose); 
+void read_input (const char *input_file, struct inp *input_params, int verbose);
 
-void read_input_new (const char *input_file, struct inp *input_params, int verbose);
-
-void read_source (const char *source_file, int shell[], int *n_shells,
-		  double av[], double nh[], double tgas[],
-		  double tdust[], int verbose);
-
-void read_source_new (const char *source_file, struct mdl *source_mdl,
+void read_source (const char *source_file, struct mdl *source_mdl,
 		      const int verbose);
 
 void input_error (const char *input_f, int line_number);
@@ -170,11 +158,7 @@ void check_species (struct abund initial_abundances[], int
 		    n_initial_abundances, char *output_species[], int
 		    n_output_species, char *species[], int n_species);
 
-void read_network (const char *chem_file, struct react reactions[],
-		   int *n_reactions, char *species[],
-		   int *n_species, int verbose);
-
-void read_network_new (const char *chem_file, struct net *network, const int verbose);
+void read_network (const char *chem_file, struct net *network, const int verbose);
 
 int specie_index (const char specie[],const char * const species[], int n_species);
 
