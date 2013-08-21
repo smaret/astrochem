@@ -36,6 +36,7 @@
 
 struct inp input_params;
 struct mdl source_mdl;
+struct net network;
 
 char chem_file[MAX_LINE];
 char source_file[MAX_LINE];
@@ -138,8 +139,7 @@ main (int argc, char *argv[])
 
   /* Read the chemical network file */
 
-  read_network (chem_file, reactions, &n_reactions, 
-		species, &n_species, verbose);
+  read_network (chem_file, &network, verbose);
 
   /* Check that the initial_abundance and output_species structure do
      not contain any specie that is not in the network. */

@@ -62,6 +62,7 @@ main (void)
   double tdust[MAX_SHELLS];
   int shell_index;
 
+  struct net network;
   struct react reactions[MAX_REACTIONS];
   char *species[MAX_SPECIES];
   int n_reactions;
@@ -110,8 +111,7 @@ main (void)
 
   read_source ("source.mdl", &source_mdl, verbose);
 
-  read_network ("network.chm", reactions, &n_reactions, 
-		species, &n_species, verbose);
+  read_network ("network.chm", &network, verbose);
 
   /* Solve the ODE system */
 
