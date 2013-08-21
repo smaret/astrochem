@@ -685,7 +685,7 @@ check_species (struct abund initial_abundances[],
   
   for (i=0; i < n_initial_abundances; i++)
     {
-      if (specie_index (initial_abundances[i].specie, species, n_species) == -2)
+      if (specie_index (initial_abundances[i].specie, (const char* const*) species, n_species) == -2)
 	  fprintf (stderr, "astrochem: warning: %s initial abundance given, "
 		   "but is not in the network.\n", initial_abundances[i].specie);
     }
@@ -694,7 +694,7 @@ check_species (struct abund initial_abundances[],
   
   for (i=0; i < n_output_species; i++)
     {
-      if (specie_index (output_species [i], species, n_species) == -2)
+      if (specie_index (output_species [i], (const char *const *) species, n_species) == -2)
 	fprintf (stderr, "astrochem: warning: %s abundance requested, "
 		 "but is not in the network.\n", output_species [i]);
     }

@@ -75,10 +75,10 @@ main (void)
       (n_species == 25) &&
 
       /* Reaction #1 */
-      (reactions[0].reactant1 == specie_index ("H", species, n_species)) &&
-      (reactions[0].reactant2 == specie_index ("H", species, n_species)) &&
+      (reactions[0].reactant1 == specie_index ("H", (const char * const *) species, n_species)) &&
+      (reactions[0].reactant2 == specie_index ("H", (const char * const *) species, n_species)) &&
       (reactions[0].reactant3 == -1) &&
-      (reactions[0].product1 == specie_index ("H2", species, n_species)) &&
+      (reactions[0].product1 == specie_index ("H2", (const char * const *) species, n_species)) &&
       (reactions[0].product2 == -1) &&
       (reactions[0].product3 == -1) &&
       (reactions[0].product4 == -1) &&
@@ -89,13 +89,13 @@ main (void)
       (reactions[0].reaction_no == 1) &&
 
       /* Reaction #176 */
-      (reactions[4].reactant1 == specie_index ("CH5N", species, n_species)) &&
+      (reactions[4].reactant1 == specie_index ("CH5N", (const char * const *) species, n_species)) &&
       (reactions[4].reactant2 == -1) &&
       (reactions[4].reactant3 == -1) &&
-      (reactions[4].product1 == specie_index ("HCN", species, n_species)) &&
-      (reactions[4].product2 == specie_index ("H2", species, n_species)) &&
-      (reactions[4].product3 == specie_index ("H", species, n_species)) &&
-      (reactions[4].product4 == specie_index ("H", species, n_species)) &&
+      (reactions[4].product1 == specie_index ("HCN", (const char * const *) species, n_species)) &&
+      (reactions[4].product2 == specie_index ("H2", (const char * const *) species, n_species)) &&
+      (reactions[4].product3 == specie_index ("H", (const char * const *) species, n_species)) &&
+      (reactions[4].product4 == specie_index ("H", (const char * const *) species, n_species)) &&
       (reactions[4].alpha == 1.41e3) &&
       (reactions[4].beta == 0) &&
       (reactions[4].gamma == 0) &&
@@ -103,10 +103,10 @@ main (void)
       (reactions[4].reaction_no == 176) &&
 
       /* Reaction #4227 */
-      (reactions[14].reactant1 == specie_index ("C(+)", species, n_species)) &&
-      (reactions[14].reactant2 == specie_index ("e(-)", species, n_species)) &&
+      (reactions[14].reactant1 == specie_index ("C(+)", (const char * const *) species, n_species)) &&
+      (reactions[14].reactant2 == specie_index ("e(-)", (const char * const *) species, n_species)) &&
       (reactions[14].reactant3 == -1) &&
-      (reactions[14].product1 == specie_index ("C", species, n_species)) &&
+      (reactions[14].product1 == specie_index ("C", (const char * const *) species, n_species)) &&
       (reactions[14].product2 == -1) &&
       (reactions[14].product3 == -1) &&
       (reactions[14].product4 == -1) &&

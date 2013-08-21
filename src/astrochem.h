@@ -176,7 +176,7 @@ void read_network (const char *chem_file, struct react reactions[],
 
 void read_network_new (const char *chem_file, struct net *network, const int verbose);
 
-int specie_index (const char specie[], char * species[], int n_species);
+int specie_index (const char specie[],const char * const species[], int n_species);
 
 double rate(double alpha, double beta, double gamm, int reaction_type,
 	    int reaction_no, double nh, double av, double tgas, double tdust,
@@ -197,7 +197,7 @@ int solve (double chi, double cosmic, double grain_size, double grain_abundance,
 	   struct rout routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES],
 	   int verbose);
 
-int solve_new (int shell_index, struct inp *input_params, struct sh *shell, struct net *network, struct res *results, int verbose);
+int solve_new (int shell_index, struct inp *input_params, const struct sh *shell, const struct net *network, struct res *results, int verbose);
 
 void output (int n_shells, double tim[], int time_steps,
 	     char *output_species[], int n_output_species,
@@ -206,4 +206,4 @@ void output (int n_shells, double tim[], int time_steps,
 	     struct rout routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES],
 	     char *suffix, int verbose);
 
-void output_new (int n_shells, struct inp *input_params, struct net *network, struct res *results, int verbose);
+void output_new (int n_shells, const struct inp *input_params, const struct net *network, const struct res *results, int verbose);

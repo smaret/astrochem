@@ -41,7 +41,7 @@
 
 struct par {
   double *reac_rates;
-  struct react *reactions;
+  const struct react *reactions;
   int n_reactions;
   int n_species;
   double nh; 
@@ -73,7 +73,7 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
   /* Get the parameters passed with *params. */
 
   double *reac_rates = ((struct par *)params)->reac_rates;
-  struct react *reactions = ((struct par *)params)->reactions;
+  const struct react *reactions = ((struct par *)params)->reactions;
   int n_reactions = ((struct par *)params)->n_reactions;
   int n_species = ((struct par *)params)->n_species;
   double nh = ((struct par *)params)->nh;
@@ -184,7 +184,7 @@ jacobian (int N __attribute__ ((unused)),
   /* Get the parameters passed with *params. */
 
   double *reac_rates = ((struct par *)params)->reac_rates;
-  struct react *reactions = ((struct par *)params)->reactions;
+  const struct react *reactions = ((struct par *)params)->reactions;
   int n_reactions = ((struct par *)params)->n_reactions;
   int n_species = ((struct par *)params)->n_species;
   double nh = ((struct par *)params)->nh;
@@ -420,7 +420,7 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 	 int spec_index;
 
 	 spec_index = specie_index ((initial_abundances[i].specie),
-				    species, n_species);
+				    (const char * const *) species, n_species);
 	 if (spec_index != -2)
 	   NV_Ith_S (y, spec_index) = initial_abundances[i].abundance * nh;
        }
@@ -526,7 +526,7 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 	   {
 	     int spec_index;
 	     
-	     spec_index = specie_index (output_species [j], species, n_species);
+	     spec_index = specie_index (output_species [j],   (const char *const *) species, n_species);
 	     if (spec_index != -2)
 	       {
 		 abundances[shell_index][i][j] = (double) NV_Ith_S (y, spec_index) / nh;
@@ -552,7 +552,7 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 		     routes[shell_index][i][j][l].destruction.rate = 0.;
 		   }
 		 
-		 spec_index = specie_index (output_species [j], species, n_species);
+		 spec_index = specie_index (output_species [j],  (const char *const *) species, n_species);
 		 if (spec_index != -2)
 		   {
 		     for (k = 0; k < n_reactions; k++)
@@ -681,7 +681,7 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
   Solve the ODE system.
 */
  
-int solve_new (int shell_index, struct inp *input_params, struct sh *shell, struct net *network, struct res *results,int verbose)
+int solve_new (int shell_index,struct inp *input_params, const struct sh *shell,const struct net *network, struct res *results,int verbose)
 {
    realtype t = 0.0;
    struct par params;                  /* Parameters for f() and jacobian() */
@@ -711,7 +711,7 @@ int solve_new (int shell_index, struct inp *input_params, struct sh *shell, stru
 	 int spec_index;
 
 	 spec_index = specie_index ((input_params->abundances.initial_abundances[i].specie),
-				    network->species, network->n_species);
+				    (const char * const *) network->species, network->n_species);
 	 if (spec_index != -2)
 	   NV_Ith_S (y, spec_index) = input_params->abundances.initial_abundances[i].abundance * shell->nh;
        }
@@ -817,7 +817,7 @@ int solve_new (int shell_index, struct inp *input_params, struct sh *shell, stru
 	   {
 	     int spec_index;
 	     
-	     spec_index = specie_index (input_params->output.output_species [j],  network->species, network->n_species);
+	     spec_index = specie_index (input_params->output.output_species [j],   (const char *const *) network->species, network->n_species);
 	     if (spec_index != -2)
 	       {
 		 results->abundances[shell_index][i][j] = (double) NV_Ith_S (y, spec_index) / shell->nh;
@@ -843,7 +843,7 @@ int solve_new (int shell_index, struct inp *input_params, struct sh *shell, stru
 		     results->routes[shell_index][i][j][l].destruction.rate = 0.;
 		   }
 		 
-		 spec_index = specie_index (input_params->output.output_species [j], network->species, network->n_species);
+		 spec_index = specie_index (input_params->output.output_species [j],  (const char * const *) network->species, network->n_species);
 		 if (spec_index != -2)
 		   {
 		     for (k = 0; k < network->n_reactions; k++)

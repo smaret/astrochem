@@ -51,7 +51,7 @@ output (int n_shells, double tim[], int time_steps,
     {
       /* Ignore species that are not in the network. */
       
-      if (specie_index (output_species [i], species, n_species) != - 2)
+      if (specie_index (output_species [i], (const char * const *) species, n_species) != - 2)
 	{
 
 	  /* Open the file or exit if an error occurs. */
@@ -150,7 +150,7 @@ output (int n_shells, double tim[], int time_steps,
 	{
 	  /* Ignore species that are not in the network. */
       
-	  if (specie_index (output_species [i], species, n_species) != - 2)
+	  if (specie_index (output_species [i], (const char * const *) species, n_species) != - 2)
 	    {
 
 	      /* Open the file or exit if an error occurs. */
@@ -213,7 +213,7 @@ output (int n_shells, double tim[], int time_steps,
     }
 }
 
-void output_new (int n_shells, struct inp *input_params,  struct net *network, struct res *results, int verbose )
+void output_new (int n_shells,const struct inp *input_params,  const struct net *network, const struct res *results, int verbose )
 {
   FILE *f;
   char filename[MAX_CHAR_FILENAME];
@@ -228,7 +228,7 @@ void output_new (int n_shells, struct inp *input_params,  struct net *network, s
     {
       /* Ignore species that are not in the network. */
       
-      if (specie_index (input_params->output.output_species [i], network->species, network->n_species) != - 2)
+      if (specie_index (input_params->output.output_species [i],  (const char * const *) network->species, network->n_species) != - 2)
 	{
 
 	  /* Open the file or exit if an error occurs. */
@@ -327,7 +327,7 @@ void output_new (int n_shells, struct inp *input_params,  struct net *network, s
 	{
 	  /* Ignore species that are not in the network. */
       
-	  if (specie_index (input_params->output.output_species [i], network->species, network->n_species) != - 2)
+	  if (specie_index (input_params->output.output_species [i],  (char const * const *) network->species, network->n_species) != - 2)
 	    {
 
 	      /* Open the file or exit if an error occurs. */

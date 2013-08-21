@@ -198,19 +198,19 @@ read_network (const char *chem_file, struct react reactions[],
       if (*n_reactions < MAX_REACTIONS) 
 	{
 	  if (((reactions[*n_reactions].reactant1 = 
-		specie_index (reactant1, species, *n_species)) == -2) ||
+		specie_index (reactant1, (const char * const *) species, *n_species)) == -2) ||
 	      ((reactions[*n_reactions].reactant2 = 
-		specie_index (reactant2, species, *n_species)) == -2) ||
+		specie_index (reactant2,  (const char *const *) species, *n_species)) == -2) ||
 	      ((reactions[*n_reactions].reactant3 = 
-		specie_index (reactant3, species, *n_species)) == -2) ||
+		specie_index (reactant3,  (const char *const *) species, *n_species)) == -2) ||
 	      ((reactions[*n_reactions].product1 = 
-		specie_index (product1,  species, *n_species)) == -2)  ||
+		specie_index (product1,   (const char *const *) species, *n_species)) == -2)  ||
 	      ((reactions[*n_reactions].product2 = 
-		specie_index (product2,  species, *n_species)) == -2)  ||
+		specie_index (product2,   (const char *const *) species, *n_species)) == -2)  ||
 	      ((reactions[*n_reactions].product3 = 
-		specie_index (product3,  species, *n_species)) == -2)  ||
+		specie_index (product3,   (const char *const *) species, *n_species)) == -2)  ||
 	      ((reactions[*n_reactions].product4 = 
-		specie_index (product4,  species, *n_species)) == -2))
+		specie_index (product4,  (const char *const *) species, *n_species)) == -2))
 	    {
 	      fprintf (stderr, "astrochem: %s:%d: can't find specie index.\n",
 		       __FILE__, __LINE__); 
@@ -412,19 +412,19 @@ void read_network_new (const char *chem_file, struct net *network, const int ver
       if (network->n_reactions < MAX_REACTIONS) 
 	{
 	  if (((network->reactions[network->n_reactions].reactant1 = 
-		specie_index (reactant1, network->species, network->n_species)) == -2) ||
+		specie_index (reactant1,  (const char * const *) network->species, network->n_species)) == -2) ||
 	      ((network->reactions[network->n_reactions].reactant2 = 
-		specie_index (reactant2, network->species, network->n_species)) == -2) ||
+		specie_index (reactant2,  (const char *const *) network->species, network->n_species)) == -2) ||
 	      ((network->reactions[network->n_reactions].reactant3 = 
-		specie_index (reactant3, network->species, network->n_species)) == -2) ||
+		specie_index (reactant3,  (const char *const *) network->species, network->n_species)) == -2) ||
 	      ((network->reactions[network->n_reactions].product1 = 
-		specie_index (product1, network->species, network->n_species)) == -2)  ||
+		specie_index (product1,  (const char *const *) network->species, network->n_species)) == -2)  ||
 	      ((network->reactions[network->n_reactions].product2 = 
-		specie_index (product2, network->species, network->n_species)) == -2)  ||
+		specie_index (product2,  (const char *const *) network->species, network->n_species)) == -2)  ||
 	      ((network->reactions[network->n_reactions].product3 = 
-		specie_index (product3, network->species, network->n_species)) == -2)  ||
+		specie_index (product3,  (const char *const *) network->species, network->n_species)) == -2)  ||
 	      ((network->reactions[network->n_reactions].product4 = 
-		specie_index (product4, network->species, network->n_species)) == -2))
+		specie_index (product4,  (const char *const *) network->species, network->n_species)) == -2))
 	    {
 	      fprintf (stderr, "astrochem: %s:%d: can't find specie index.\n",
 		       __FILE__, __LINE__); 
@@ -511,7 +511,7 @@ add_specie (char *new_specie, char *species[],
 */
 
 int 
-specie_index (const char *specie, char *species[], int n_species)
+specie_index (const char *specie, const char * const species[], int n_species)
 {
   int i;
   
