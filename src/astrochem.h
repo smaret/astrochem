@@ -57,9 +57,13 @@
 
 /* Data structures */
 
+struct abund {
+  char specie[MAX_CHAR_SPECIES];
+  double abundance;
+};
+
 struct inp {
   struct {
-    char input_file[MAX_LINE];
     char chem_file[MAX_LINE];
     char source_file[MAX_LINE];
   } files;
@@ -76,27 +80,16 @@ struct inp {
     double rel_err;
   } solver;
   struct {
-    struct abund *initial_abundances;
+    struct abund initial_abundances[MAX_INITIAL_ABUNDANCES];
     int n_initial_abundances;
   } abundances;
   struct {
-    char *output_species;
-    int n_output_abundances;
+    char *output_species[MAX_OUTPUT_ABUNDANCES];
+    int n_output_species;
     int time_steps;
     int trace_routes;
     char suffix;
-    int verbose;
   } output;
-};
-
-struct abund {
-  char specie[MAX_CHAR_SPECIES];
-  double abundance;
-};
-
-struct spec {
-  char specie[MAX_CHAR_SPECIES];
-  int index;
 };
 
 struct mdl {
@@ -127,7 +120,7 @@ struct react {
 
 struct net {
   int n_species;
-  struct spec species[MAX_SPECIES];
+  char* species[MAX_SPECIES];
   int n_reactions;
   struct react reactions[MAX_REACTIONS];
 };
@@ -162,7 +155,7 @@ void read_input (const char *input_file, char *chem_file, char *source_file,
 		 int *n_output_abundances, int *time_steps, 
 		 int *trace_routes, char *suffix, int verbose); 
 
-void read_input_new (const char *input_file, struct inp *input_params);
+void read_input_new (const char *input_file, struct inp *input_params, int verbose);
 
 void read_source (const char *source_file, int shell[], int *n_shells,
 		  double av[], double nh[], double tgas[],
@@ -183,7 +176,7 @@ void read_network (const char *chem_file, struct react reactions[],
 
 void read_network_new (const char *chem_file, struct net *network, const int verbose);
 
-int specie_index (const char specie[], char *species[], int n_species);
+int specie_index (const char specie[], char * species[], int n_species);
 
 double rate(double alpha, double beta, double gamm, int reaction_type,
 	    int reaction_no, double nh, double av, double tgas, double tdust,
@@ -204,7 +197,7 @@ int solve (double chi, double cosmic, double grain_size, double grain_abundance,
 	   struct rout routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES],
 	   int verbose);
 
-int solve_new (struct inp *input_params, struct sh *shell, struct net *network, struct res *results);
+int solve_new (int shell_index, struct inp *input_params, struct sh *shell, struct net *network, struct res *results, int verbose);
 
 void output (int n_shells, double tim[], int time_steps,
 	     char *output_species[], int n_output_species,
@@ -213,4 +206,4 @@ void output (int n_shells, double tim[], int time_steps,
 	     struct rout routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES],
 	     char *suffix, int verbose);
 
-void output_new (struct inp *input_params, struct res *results);
+void output_new (int n_shells, struct inp *input_params, struct net *network, struct res *results, int verbose);

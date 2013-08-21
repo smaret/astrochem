@@ -375,9 +375,9 @@ jacobian (int N __attribute__ ((unused)),
 }
 
 /*
-  Solve the ODE system.
-*/
- 
+   Solve the system
+
+   */
 int
 solve (double chi, double cosmic, double grain_size, double grain_abundance,
        double abs_err, double rel_err,
@@ -659,6 +659,297 @@ solve (double chi, double cosmic, double grain_size, double grain_abundance,
 				 routes[shell_index][i][j][min_rate_index].destruction.rate = 
 				   destruction_route.rate;
 				 routes[shell_index][i][j][min_rate_index].destruction.reaction_no = 
+				   destruction_route.reaction_no;
+			       }
+			   }
+		       }
+		   }
+	       }
+	   }
+       }
+   }
+
+   free (reac_rates);
+   N_VDestroy_Serial (y);
+   CVodeFree (&cvode_mem);
+
+   return (0);
+ 
+ }
+
+/*
+  Solve the ODE system.
+*/
+ 
+int solve_new (int shell_index, struct inp *input_params, struct sh *shell, struct net *network, struct res *results,int verbose)
+{
+   realtype t = 0.0;
+   struct par params;                  /* Parameters for f() and jacobian() */
+   N_Vector y;                         /* Work array for the solver */
+   void *cvode_mem;                    /* Memory space for the solver */
+   double *reac_rates;                 /* Reaction rates */
+
+   /* Allocate the work array and fill it with the initial
+      concentrations. Ignore species that are not in the
+      network. */
+   
+   if ((y = N_VNew_Serial (network->n_species)) == NULL)
+     {
+       fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__, 
+		"array allocation failed.\n");
+       exit(1);
+     }
+   {
+     int i;
+
+     for (i = 0; i < network->n_species; i++)
+       {
+	 NV_Ith_S (y, i) = 0;
+       }
+     for (i = 0; i < input_params->abundances.n_initial_abundances; i++)
+       {
+	 int spec_index;
+
+	 spec_index = specie_index ((input_params->abundances.initial_abundances[i].specie),
+				    network->species, network->n_species);
+	 if (spec_index != -2)
+	   NV_Ith_S (y, spec_index) = input_params->abundances.initial_abundances[i].abundance * shell->nh;
+       }
+   }
+
+   /* Allocate an array for the reaction rates and compute them. */
+   
+   if ((reac_rates = malloc (sizeof (double) * (unsigned int)network->n_reactions)) == NULL)
+     {
+       fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+		__FILE__, __LINE__); 
+       exit(1);
+     }
+   {
+     int i;
+
+     for (i = 0; i < network->n_reactions; i++)
+       {
+	 reac_rates[i] = rate (network->reactions[i].alpha,
+			       network->reactions[i].beta,
+			       network->reactions[i].gamma,
+			       network->reactions[i].reaction_type,
+			       network->reactions[i].reaction_no,
+			       shell->nh, shell->av, shell->tgas, shell->tdust,
+			       input_params->phys.chi, input_params->phys.cosmic,
+			       input_params->phys.grain_size,
+			       input_params->phys.grain_abundance, 
+			       0.);
+       }
+   }
+   
+   /* Fill out a structure containing the parameters of the function
+      defining the ODE system and the jacobian. */
+
+   params.reac_rates = reac_rates;
+   params.reactions = network->reactions;
+   params.n_reactions = network->n_reactions;
+   params.n_species = network->n_species;
+   params.nh = shell->nh;
+   params.av = shell->av;
+   params.tgas = shell->tgas;
+   params.tdust = shell->tdust;
+   params.chi = input_params->phys.chi;
+   params.cosmic = input_params->phys.cosmic;
+   params.grain_size = input_params->phys.grain_size;
+   params.grain_abundance = input_params->phys.grain_abundance;
+
+   /* Define the ODE system and solve it using the Backward
+      Differential Formulae method (BDF) with a Newton Iteration. The
+      absolute error is multiplied by the density, because we compute
+      concentrations and not abundances. */
+      
+   if ((cvode_mem = CVodeCreate(CV_BDF, CV_NEWTON)) == NULL)
+     {
+       fprintf (stderr, "astrochem: %s:%d: solver memory allocation failed.\n",
+		__FILE__, __LINE__); 
+       exit(1);
+     }
+
+   input_params->solver.abs_err = input_params->solver.abs_err * shell->nh;
+   if ((CVodeInit (cvode_mem, f, 0.0, y) != CV_SUCCESS)
+       || (CVodeSStolerances (cvode_mem, input_params->solver.rel_err, input_params->solver.abs_err) != CV_SUCCESS)
+#ifdef USE_LAPACK
+       || ((CVLapackDense (cvode_mem, network->n_species) != CV_SUCCESS))
+#else
+       || ((CVDense (cvode_mem, network->n_species) != CV_SUCCESS))
+#endif
+       || ((CVDlsSetDenseJacFn (cvode_mem, jacobian) != CV_SUCCESS))
+       || (CVodeSetUserData (cvode_mem, &params) != CV_SUCCESS))
+     {
+       fprintf (stderr, "astrochem: %s:%d: solver initialization failed.\n",
+		__FILE__, __LINE__); 
+       exit(1);
+     }
+   
+   {
+     int i, j;
+     
+     /* Solve the system for each time step. */
+     
+     for (i = 0; i < input_params->output.time_steps; i++)
+       {
+	 CVode (cvode_mem, (realtype) results->tim[i], y, &t, CV_NORMAL);
+	 
+	 /* Print the shell number, time and time step after each call. */
+	 
+	 if (verbose >= 2)
+	   {
+	     realtype h;
+
+	     CVodeGetLastStep (cvode_mem, &h);
+	     fprintf (stdout, "shell = %3i  t = %8.2e  delta_t = %8.2e\n",
+		      shell_index, (double) t / CONST_MKSA_YEAR, 
+		      (double) h / CONST_MKSA_YEAR);
+	   }
+	 
+	 /* Fill the array of abundances with the output species
+	    abundances. Ignore species that are not in the
+	    network. Abundance that are lower than MIN_ABUNDANCES are
+	    set to 0. */
+	 
+	 for (j = 0; j < input_params->output.n_output_species; j++)
+	   {
+	     int spec_index;
+	     
+	     spec_index = specie_index (input_params->output.output_species [j],  network->species, network->n_species);
+	     if (spec_index != -2)
+	       {
+		 results->abundances[shell_index][i][j] = (double) NV_Ith_S (y, spec_index) / shell->nh;
+		 if (results->abundances[shell_index][i][j] < MIN_ABUNDANCE)
+		   results->abundances[shell_index][i][j] = 0.;
+	       }
+	   }
+
+	 /* Compute the rate of each formation/destruction route for
+	    each output specie. */
+
+	 if (input_params->output.trace_routes)
+	   {
+	     for (j = 0; j < input_params->output.n_output_species; j++)
+	       {
+		 int spec_index;
+		 int k;
+		 int l;
+
+		 for (l = 0; l < N_OUTPUT_ROUTES; l++)
+		   {
+		     results->routes[shell_index][i][j][l].formation.rate = 0.;
+		     results->routes[shell_index][i][j][l].destruction.rate = 0.;
+		   }
+		 
+		 spec_index = specie_index (input_params->output.output_species [j], network->species, network->n_species);
+		 if (spec_index != -2)
+		   {
+		     for (k = 0; k < network->n_reactions; k++)
+		       {
+			 /* If the species is a product of the
+			    reaction then compute the formation
+			    rate. If the rate is greater than the
+			    smallest rate in the formation route
+			    structure, we add the current reaction
+			    number and rate to that structure. */
+
+			 if ((network->reactions[k].product1 == spec_index) ||
+			     (network->reactions[k].product2 == spec_index) ||
+			     (network->reactions[k].product3 == spec_index) ||
+			     (network->reactions[k].product4 == spec_index))
+			   {
+			     struct r formation_route;
+			     double min_rate;
+			     unsigned int min_rate_index;
+			     
+			     if (network->reactions[k].reaction_type == 0)
+			       {
+				 formation_route.rate = reac_rates[k];
+				 formation_route.rate *= NV_Ith_S (y, network->reactions[k].reactant1);
+			       }
+			     else if (network->reactions[k].reaction_type == 23)
+			       {
+				 formation_route.rate = reac_rates[k];
+			       }
+			     else
+			       {
+				 formation_route.rate = reac_rates[k];
+				 formation_route.rate *= NV_Ith_S (y, network->reactions[k].reactant1);
+				 if (network->reactions[k].reactant2 != -1)
+				   formation_route.rate *= NV_Ith_S (y, network->reactions[k].reactant2);  
+				 if (network->reactions[k].reactant3 != -1)
+				   formation_route.rate *= NV_Ith_S (y, network->reactions[k].reactant3);
+			       }
+			     formation_route.reaction_no = network->reactions[k].reaction_no;
+
+			     min_rate =  results->routes[shell_index][i][j][0].formation.rate;
+			     min_rate_index = 0;
+			     for (l = 1; l < N_OUTPUT_ROUTES; l++)
+			       {
+				 if ( results->routes[shell_index][i][j][l].formation.rate < min_rate)
+				   {
+				     min_rate =  results->routes[shell_index][i][j][l].formation.rate;
+				     min_rate_index = (unsigned int)l;
+				   }
+			       }
+			     if (formation_route.rate > min_rate)
+			       {
+				  results->routes[shell_index][i][j][min_rate_index].formation.rate = 
+				   formation_route.rate;
+				  results->routes[shell_index][i][j][min_rate_index].formation.reaction_no = 
+				   formation_route.reaction_no;
+			       }
+			   }
+
+			 /* If the species is reactant of the reaction
+			    then compute the destruction rate. */
+
+			 if ((network->reactions[k].reactant1 == spec_index) ||
+			     (network->reactions[k].reactant2 == spec_index) ||
+			     (network->reactions[k].reactant3 == spec_index))
+			   {
+			     struct r destruction_route;
+			     double min_rate;
+			     unsigned int min_rate_index;
+
+			     if (network->reactions[k].reaction_type == 0)
+			       {
+				 destruction_route.rate = reac_rates[k];
+				 destruction_route.rate *= NV_Ith_S (y, network->reactions[k].reactant1);
+			       }
+			     else if (network->reactions[k].reaction_type == 23)
+			       {
+				 destruction_route.rate = reac_rates[k];
+			       }
+			     else
+			       {
+				 destruction_route.rate = reac_rates[k];
+				 if (network->reactions[k].reactant1 != -1)
+				   destruction_route.rate *= NV_Ith_S (y, network->reactions[k].reactant1);
+				 if (network->reactions[k].reactant2 != -1)
+				   destruction_route.rate *= NV_Ith_S (y, network->reactions[k].reactant2);
+				 if (network->reactions[k].reactant3 != -1)
+				   destruction_route.rate *= NV_Ith_S (y, network->reactions[k].reactant3);
+			       }
+			     destruction_route.reaction_no = network->reactions[k].reaction_no;
+
+			     min_rate =  results->routes[shell_index][i][j][0].destruction.rate;
+			     min_rate_index = 0;
+			     for (l = 1; l < N_OUTPUT_ROUTES; l++)
+			       {
+				 if ( results->routes[shell_index][i][j][l].destruction.rate < min_rate)
+				   {
+				     min_rate =  results->routes[shell_index][i][j][l].destruction.rate;
+				     min_rate_index = (unsigned int)l;
+				   }
+			       }
+			     if (destruction_route.rate > min_rate)
+			       {
+				  results->routes[shell_index][i][j][min_rate_index].destruction.rate = 
+				   destruction_route.rate;
+				  results->routes[shell_index][i][j][min_rate_index].destruction.reaction_no = 
 				   destruction_route.reaction_no;
 			       }
 			   }
