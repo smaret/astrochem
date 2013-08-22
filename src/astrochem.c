@@ -37,7 +37,7 @@
 struct inp input_params;
 struct mdl source_mdl;
 struct net network;
-
+struct res results;
 char chem_file[MAX_LINE];
 char source_file[MAX_LINE];
 char suffix[MAX_LINE];
@@ -184,15 +184,7 @@ main (int argc, char *argv[])
 	if (verbose >= 1)
 	  fprintf (stdout, "Computing abundances in shell %d...\n", shell_index);
 
-	  solve (chi, cosmic, grain_size, grain_abundance,
-	       abs_err, rel_err, initial_abundances,
-	       n_initial_abundances, output_species,
-	       n_output_species, av[shell_index],
-	       nh[shell_index], tgas[shell_index],
-	       tdust[shell_index], reactions, n_reactions,
-	       species, n_species, shell_index, tim,
-	       time_steps, abundances, trace_routes,
-	       routes, verbose);
+	  solve (shell_index,&input_params,&source_mdl.shell[shell_index],&network,&results,verbose);
 
 	if (verbose >= 1)
 	  fprintf (stdout, "Done with shell %d.\n", shell_index);

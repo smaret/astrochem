@@ -167,21 +167,7 @@ double rate(double alpha, double beta, double gamm, int reaction_type,
 	    double chi, double cosmic, double grain_size,
 	    double grain_abundance, double ice_abundance);
 
-int solve (double chi, double cosmic, double grain_size, double grain_abundance,
-	   double abs_err, double rel_err,
-	   struct abund initial_abundances[],
-	   int n_initial_abundances, char *output_species[],
-	   int n_output_species, double av, double nh,
-	   double tgas, double tdust,
-	   struct react reactions[], int n_reactions, 
-	   char *species[], int n_species,
-	   int shell_index, double tim[], int time_steps,
-	   double abundances[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES],
-	   int trace_routes, 
-	   struct rout routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES],
-	   int verbose);
-
-int solve_new (int shell_index, struct inp *input_params, const struct sh *shell, const struct net *network, struct res *results, int verbose);
+int solve (int shell_index, struct inp *input_params, const struct sh *shell, const struct net *network, struct res *results, int verbose);
 
 void output (int n_shells, double tim[], int time_steps,
 	     char *output_species[], int n_output_species,

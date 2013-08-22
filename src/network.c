@@ -320,3 +320,13 @@ specie_index (const char *specie, const char * const species[], int n_species)
   /* Return -2 if we can not find the specie */
   return -2;
 }
+
+void
+free_network_struct ( struct net * network )
+{
+    int i;
+    for(i=0;i<network->n_species;i++)
+    {
+        free(network->species[i]);
+    }
+}

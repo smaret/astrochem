@@ -34,42 +34,11 @@ main (void)
 {
   FILE *f;
 
-  struct inp input_params;
-  char chem_file[MAX_LINE]; 
-  char source_file[MAX_LINE];
-  char suffix[MAX_LINE];
-  double chi;
-  double cosmic;
-  double grain_size;
-  double grain_abundance;
-  double ti;
-  double tf;
-  double abs_err;
-  double rel_err;
-  struct abund initial_abundances[MAX_INITIAL_ABUNDANCES];
-  int n_initial_abundances;
-  char *output_species[MAX_OUTPUT_ABUNDANCES];
-  int n_output_species;
-  int time_steps; 
-  int trace_routes;
-
-  struct mdl source_mdl;
-  int n_shells;
-  int shell[MAX_SHELLS];
-  double av[MAX_SHELLS];
-  double nh[MAX_SHELLS];
-  double tgas[MAX_SHELLS];
-  double tdust[MAX_SHELLS];
   int shell_index;
-
-  struct net network;
-  struct react reactions[MAX_REACTIONS];
-  char *species[MAX_SPECIES];
-  int n_reactions;
-  int n_species;
-
-  double tim[MAX_TIME_STEPS];
-
+  struct inp input_params;
+  struct mdl source_mdl;
+  struct net * network = malloc(sizeof(struct net));
+  struct res * results = malloc(sizeof(struct res));
   int verbose = 0;
 
   /* Create the input.ini, source.mdl and network_chm files */
@@ -111,34 +80,26 @@ main (void)
 
   read_source ("source.mdl", &source_mdl, verbose);
 
-  read_network ("network.chm", &network, verbose);
+  read_network ("network.chm", network, verbose);
 
   /* Solve the ODE system */
 
   {
     int i;
 
-    for (i = 0; i < time_steps; i++)
+    for (i = 0; i < input_params.output.time_steps; i++)
       {   
 	if (i < MAX_TIME_STEPS)
-	  tim[i] = pow (10., log10 (ti) + i * (log10 (tf) - log10(ti)) 
-			/ (time_steps - 1));
+	  results->tim[i] = pow (10., log10 (input_params.solver.ti) + i * (log10 (input_params.solver.tf) - log10(input_params.solver.ti)) 
+			/ (input_params.output.time_steps - 1));
 	else
 	  return EXIT_FAILURE;
       }
   }
 
   shell_index = 0.;
-  solve (chi, cosmic, grain_size, grain_abundance, 
-	 abs_err, rel_err, initial_abundances,
-	 n_initial_abundances, output_species,
-	 n_output_species, av[shell_index],
-	 nh[shell_index], tgas[shell_index],
-	 tdust[shell_index], reactions, n_reactions,
-	 species, n_species, shell_index, tim,
-	 time_steps, abundances, trace_routes,
-	 routes, verbose);
-
+  
+  solve (shell_index,&input_params,&source_mdl.shell[shell_index],network,results,verbose);
 
   /* Check the abundances */
 
@@ -151,13 +112,13 @@ main (void)
     double y_abs_err;
     double y_rel_err;
 
-    for (i = 0; i < time_steps; i++)
+    for (i = 0; i < input_params.output.time_steps; i++)
       {
-	x_abundance = 1.0 * exp (-1e-9 * tim[i]);
+	x_abundance = 1.0 * exp (-1e-9 *  results->tim[i]);
 	y_abundance = 1.0 - x_abundance;
 
-	x_abs_err = fabs(abundances[0][i][0] - x_abundance);
-	y_abs_err = fabs(abundances[0][i][1] - y_abundance);
+	x_abs_err = fabs( results->abundances[0][i][0] - x_abundance);
+	y_abs_err = fabs( results->abundances[0][i][1] - y_abundance);
 	x_rel_err = x_abs_err / x_abundance;
 	y_rel_err = y_abs_err / y_abundance;
 
@@ -165,22 +126,32 @@ main (void)
 	   on the abundance is somewhat larger than the solver
 	   relative tolerance. */
 	
-	if ((x_abs_err > abs_err) && (x_rel_err > rel_err * 5e2))
+	if ((x_abs_err >input_params.solver.abs_err) && (x_rel_err > input_params.solver.rel_err * 5e2))
 	  {
 	    fprintf (stderr, "solve_test: %s:%d: incorrect abundance at t=%12.6e: expected %12.6e, got %12.6e.\n",
-		     __FILE__, __LINE__, tim[i], x_abundance, abundances[0][i][0]); 
+		     __FILE__, __LINE__, results->tim[i], x_abundance, results->abundances[0][i][0]); 
+        free_input_struct( &input_params );
+        free_network_struct(network);
+        free(network);
 	    return EXIT_FAILURE;
 	    }
 
-	if ((y_abs_err > abs_err) && (y_rel_err > rel_err * 5e2))
+	if ((y_abs_err > input_params.solver.abs_err) && (y_rel_err > input_params.solver.rel_err * 5e2))
 	  {
 	    fprintf (stderr, "solve_test: %s:%d: incorrect abundance at t=%12.6e: expected %12.6e, got %12.6e.\n",
-		     __FILE__, __LINE__, tim[i], y_abundance, abundances[0][i][1]); 
+		     __FILE__, __LINE__, results->tim[i], y_abundance, results->abundances[0][i][1]); 
+        free_input_struct( &input_params );
+        free_network_struct(network);
+        free(network);
 	    return EXIT_FAILURE;
 	  }
       }
   }
-    
+  
+  free_input_struct( &input_params );
+  free_network_struct(network);
+  free(network);
+  free(results);
   return EXIT_SUCCESS;
 }
 

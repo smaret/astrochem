@@ -172,7 +172,14 @@ void read_input (const char *input_file, struct inp *input_params, int verbose )
 	      {
 		const char delimiter[] = ",";
 		char *output_specie;
-		
+
+        /* Struct initialization */
+        int temp_i;
+        for(temp_i=0; temp_i < MAX_OUTPUT_ABUNDANCES; temp_i++)
+        {
+            input_params->output.output_species[temp_i]=NULL;
+        }
+
 		if (j >= MAX_OUTPUT_ABUNDANCES)
 		  {
 		    fprintf (stderr, "astrochem: error: the number of species in output exceeds %i.\n",
@@ -378,5 +385,18 @@ check_species (struct abund initial_abundances[],
       if (specie_index (output_species [i], (const char *const *) species, n_species) == -2)
 	fprintf (stderr, "astrochem: warning: %s abundance requested, "
 		 "but is not in the network.\n", output_species [i]);
+    }
+}
+
+void
+free_input_struct ( struct inp * input_params )
+{
+    int i;
+    for (i=0;i<MAX_OUTPUT_ABUNDANCES;i++)
+    {
+        if(input_params->output.output_species[i] != NULL)
+        {
+            free(input_params->output.output_species[i]);
+        }
     }
 }

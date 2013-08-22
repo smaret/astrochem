@@ -1,5 +1,5 @@
 /* 
-   network_test.c - Test the read_network() function
+   network->test.c - Test the read_network->) function
    
    Copyright (c) 2006-2013 Sebastien Maret
    
@@ -29,14 +29,15 @@ main (void)
 {
   FILE *f;
   char chem_file[MAX_LINE];
+  
+  struct net * network = malloc(sizeof(struct net) );
 
-  struct net network;
   int verbose = 0;
 
-  /* Create the network.chm file */
+  /* Create the network->chm file */
 
   f = fopen ("network.chm", "w");
-  fprintf (f, "# This network file was created by network_test\n");
+  fprintf (f, "# This network file was created by network test\n");
   fprintf (f, "# The reaction were extracted form the OSU 2008 network\n");
   fprintf (f, "H            + H                           -> H2                                                           4.95e-17  5.00e-01  0.00e+00  0    1\n");
   fprintf (f, "C(+)         + grain(-)                    -> C            + grain                                         4.90e-17  5.00e-01  0.00e+00  0    3\n");
@@ -62,57 +63,65 @@ main (void)
 
   /* Read it */
 
-  read_network (chem_file, &network, verbose);
+  read_network(chem_file, network, verbose);
   
   /* Check that the values are correct */
 
-  if ((network.n_reactions == 18) &&
-      (network.n_species == 25) &&
+  if ((network->n_reactions == 18) &&
+      (network->n_species == 25) &&
 
       /* Reaction #1 */
-      (network.reactions[0].reactant1 == specie_index ("H", (const char * const *) network.species, network.n_species)) &&
-      (network.reactions[0].reactant2 == specie_index ("H", (const char * const *) network.species, network.n_species)) &&
-      (network.reactions[0].reactant3 == -1) &&
-      (network.reactions[0].product1 == specie_index ("H2", (const char * const *) network.species, network.n_species)) &&
-      (network.reactions[0].product2 == -1) &&
-      (network.reactions[0].product3 == -1) &&
-      (network.reactions[0].product4 == -1) &&
-      (network.reactions[0].alpha == 4.95e-17) &&
-      (network.reactions[0].beta == .5) &&
-      (network.reactions[0].gamma == 0) &&
-      (network.reactions[0].reaction_type == 0) &&
-      (network.reactions[0].reaction_no == 1) &&
+      (network->reactions[0].reactant1 == specie_index ("H", (const char * const *) network->species, network->n_species)) &&
+      (network->reactions[0].reactant2 == specie_index ("H", (const char * const *) network->species, network->n_species)) &&
+      (network->reactions[0].reactant3 == -1) &&
+      (network->reactions[0].product1 == specie_index ("H2", (const char * const *) network->species, network->n_species)) &&
+      (network->reactions[0].product2 == -1) &&
+      (network->reactions[0].product3 == -1) &&
+      (network->reactions[0].product4 == -1) &&
+      (network->reactions[0].alpha == 4.95e-17) &&
+      (network->reactions[0].beta == .5) &&
+      (network->reactions[0].gamma == 0) &&
+      (network->reactions[0].reaction_type == 0) &&
+      (network->reactions[0].reaction_no == 1) &&
 
       /* Reaction #176 */
-      (network.reactions[4].reactant1 == specie_index ("CH5N", (const char * const *) network.species, network.n_species)) &&
-      (network.reactions[4].reactant2 == -1) &&
-      (network.reactions[4].reactant3 == -1) &&
-      (network.reactions[4].product1 == specie_index ("HCN", (const char * const *) network.species, network.n_species)) &&
-      (network.reactions[4].product2 == specie_index ("H2", (const char * const *) network.species, network.n_species)) &&
-      (network.reactions[4].product3 == specie_index ("H", (const char * const *) network.species, network.n_species)) &&
-      (network.reactions[4].product4 == specie_index ("H", (const char * const *) network.species, network.n_species)) &&
-      (network.reactions[4].alpha == 1.41e3) &&
-      (network.reactions[4].beta == 0) &&
-      (network.reactions[4].gamma == 0) &&
-      (network.reactions[4].reaction_type == 1) &&
-      (network.reactions[4].reaction_no == 176) &&
+      (network->reactions[4].reactant1 == specie_index ("CH5N", (const char * const *) network->species, network->n_species)) &&
+      (network->reactions[4].reactant2 == -1) &&
+      (network->reactions[4].reactant3 == -1) &&
+      (network->reactions[4].product1 == specie_index ("HCN", (const char * const *) network->species, network->n_species)) &&
+      (network->reactions[4].product2 == specie_index ("H2", (const char * const *) network->species, network->n_species)) &&
+      (network->reactions[4].product3 == specie_index ("H", (const char * const *) network->species, network->n_species)) &&
+      (network->reactions[4].product4 == specie_index ("H", (const char * const *) network->species, network->n_species)) &&
+      (network->reactions[4].alpha == 1.41e3) &&
+      (network->reactions[4].beta == 0) &&
+      (network->reactions[4].gamma == 0) &&
+      (network->reactions[4].reaction_type == 1) &&
+      (network->reactions[4].reaction_no == 176) &&
 
       /* Reaction #4227 */
-      (network.reactions[14].reactant1 == specie_index ("C(+)", (const char * const *) network.species, network.n_species)) &&
-      (network.reactions[14].reactant2 == specie_index ("e(-)", (const char * const *) network.species, network.n_species)) &&
-      (network.reactions[14].reactant3 == -1) &&
-      (network.reactions[14].product1 == specie_index ("C", (const char * const *) network.species, network.n_species)) &&
-      (network.reactions[14].product2 == -1) &&
-      (network.reactions[14].product3 == -1) &&
-      (network.reactions[14].product4 == -1) &&
-      (network.reactions[14].alpha == 4.40e-12) &&
-      (network.reactions[14].beta == -.61) &&
-      (network.reactions[14].gamma == 0) &&
-      (network.reactions[14].reaction_type == 10) &&
-      (network.reactions[14].reaction_no == 4227))
+      (network->reactions[14].reactant1 == specie_index ("C(+)", (const char * const *) network->species, network->n_species)) &&
+      (network->reactions[14].reactant2 == specie_index ("e(-)", (const char * const *) network->species, network->n_species)) &&
+      (network->reactions[14].reactant3 == -1) &&
+      (network->reactions[14].product1 == specie_index ("C", (const char * const *) network->species, network->n_species)) &&
+      (network->reactions[14].product2 == -1) &&
+      (network->reactions[14].product3 == -1) &&
+      (network->reactions[14].product4 == -1) &&
+      (network->reactions[14].alpha == 4.40e-12) &&
+      (network->reactions[14].beta == -.61) &&
+      (network->reactions[14].gamma == 0) &&
+      (network->reactions[14].reaction_type == 10) &&
+      (network->reactions[14].reaction_no == 4227))
 
-    return EXIT_SUCCESS;
+    {
+        free_network_struct(network);
+        free(network);
+        return EXIT_SUCCESS;
+    }
   else
-    return EXIT_FAILURE;
+    {
+        free_network_struct(network);
+        free(network);
+        return EXIT_FAILURE;
+    }
 }
 
