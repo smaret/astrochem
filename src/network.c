@@ -35,9 +35,9 @@ void add_specie (char *new_specie, char *species[],
   Add a specie in the species array, if not already present.
 */
 
-void read_network (const char *chem_file, struct net *network, const int verbose)
+void
+read_network (const char *chem_file, struct net *network, const int verbose)
 {
-
   FILE *f;
   char line[MAX_LINE];
   int  line_number = 0;
@@ -321,12 +321,17 @@ specie_index (const char *specie, const char * const species[], int n_species)
   return -2;
 }
 
+/*
+  Free the network structure.
+*/
+
 void
-free_network_struct ( struct net * network )
+free_network_struct (struct net * network )
 {
-    int i;
-    for(i=0;i<network->n_species;i++)
+  int i;
+
+  for (i=0; i<network->n_species; i++)
     {
-        free(network->species[i]);
+      free (network->species[i]);
     }
 }

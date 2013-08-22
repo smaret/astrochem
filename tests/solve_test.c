@@ -33,12 +33,11 @@ int
 main (void)
 {
   FILE *f;
-
   int shell_index;
   struct inp input_params;
   struct mdl source_mdl;
-  struct net * network = malloc(sizeof(struct net));
-  struct res * results = malloc(sizeof(struct res));
+  struct net * network = malloc (sizeof (struct net));
+  struct res * results = malloc (sizeof (struct res));
   int verbose = 0;
 
   /* Create the input.ini, source.mdl and network_chm files */
@@ -76,7 +75,7 @@ main (void)
 
   /* Read them */
 
-  read_input ("input.ini", &input_params,verbose);
+  read_input ("input.ini", &input_params, verbose);
 
   read_source ("source.mdl", &source_mdl, verbose);
 
@@ -98,8 +97,7 @@ main (void)
   }
 
   shell_index = 0.;
-  
-  solve (shell_index,&input_params,&source_mdl.shell[shell_index],network,results,verbose);
+  solve (shell_index, &input_params, &source_mdl.shell[shell_index], network, results, verbose);
 
   /* Check the abundances */
 
@@ -130,28 +128,28 @@ main (void)
 	  {
 	    fprintf (stderr, "solve_test: %s:%d: incorrect abundance at t=%12.6e: expected %12.6e, got %12.6e.\n",
 		     __FILE__, __LINE__, results->tim[i], x_abundance, results->abundances[0][i][0]); 
-        free_input_struct( &input_params );
-        free_network_struct(network);
-        free(network);
+	    free_input_struct (&input_params);
+	    free_network_struct (network);
+	    free (network);
 	    return EXIT_FAILURE;
-	    }
+	  }
 
 	if ((y_abs_err > input_params.solver.abs_err) && (y_rel_err > input_params.solver.rel_err * 5e2))
 	  {
 	    fprintf (stderr, "solve_test: %s:%d: incorrect abundance at t=%12.6e: expected %12.6e, got %12.6e.\n",
 		     __FILE__, __LINE__, results->tim[i], y_abundance, results->abundances[0][i][1]); 
-        free_input_struct( &input_params );
-        free_network_struct(network);
-        free(network);
+	    free_input_struct (&input_params);
+	    free_network_struct (network);
+	    free (network);
 	    return EXIT_FAILURE;
 	  }
       }
   }
   
-  free_input_struct( &input_params );
-  free_network_struct(network);
-  free(network);
-  free(results);
+  free_input_struct (&input_params );
+  free_network_struct (network);
+  free (network);
+  free (results);
   return EXIT_SUCCESS;
 }
 

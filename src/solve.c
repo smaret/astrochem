@@ -1,4 +1,4 @@
- /*
+/*
    solve.c - Build the ODE system and the jacobian matrix, and solve
    the system with CVODE.
 
@@ -377,8 +377,9 @@ jacobian (int N __attribute__ ((unused)),
 /*
   Solve the ODE system.
 */
- 
-int solve (int shell_index,struct inp *input_params, const struct sh *shell,const struct net *network, struct res *results,int verbose)
+
+int solve (int shell_index,struct inp *input_params, const struct sh *shell,
+	   const struct net *network, struct res *results, int verbose)
 {
    realtype t = 0.0;
    struct par params;                  /* Parameters for f() and jacobian() */
@@ -455,7 +456,7 @@ int solve (int shell_index,struct inp *input_params, const struct sh *shell,cons
    params.cosmic = input_params->phys.cosmic;
    params.grain_size = input_params->phys.grain_size;
    params.grain_abundance = input_params->phys.grain_abundance;
-
+   
    /* Define the ODE system and solve it using the Backward
       Differential Formulae method (BDF) with a Newton Iteration. The
       absolute error is multiplied by the density, because we compute
@@ -514,7 +515,9 @@ int solve (int shell_index,struct inp *input_params, const struct sh *shell,cons
 	   {
 	     int spec_index;
 	     
-	     spec_index = specie_index (input_params->output.output_species [j],   (const char *const *) network->species, network->n_species);
+	     spec_index = specie_index (input_params->output.output_species [j], 
+					(const char *const *) network->species,
+					network->n_species);
 	     if (spec_index != -2)
 	       {
 		 results->abundances[shell_index][i][j] = (double) NV_Ith_S (y, spec_index) / shell->nh;

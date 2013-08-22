@@ -1,7 +1,7 @@
 /* 
    Astrochem - compute the abundances of chemical species in the
    interstellar medium as as function of time.
-
+   
    Copyright (c) 2006-2013 Sebastien Maret
 
    This program is free software: you can redistribute it and/or modify
@@ -40,14 +40,12 @@ void version (void);
 int
 main (int argc, char *argv[])
 {
-
-    struct inp input_params;
-    struct mdl source_mdl;
-    struct net * network = malloc(sizeof(struct net));
-    struct res * results = malloc(sizeof(struct res));
-    int shell_index;
-
-
+  struct inp input_params;
+  struct mdl source_mdl;
+  struct net *network = malloc (sizeof (struct net));
+  struct res *results = malloc (sizeof (struct res));
+  int shell_index;
+  
   int verbose = 1;
   char *input_file;
 
@@ -56,7 +54,7 @@ main (int argc, char *argv[])
 
   {
     int opt;
-  
+    
     static struct option longopts[] = {
       {"help",    no_argument, NULL, 'h'},
       {"version", no_argument, NULL, 'V'},
@@ -100,7 +98,8 @@ main (int argc, char *argv[])
     
   /* Read the input file */
 
-  read_input(input_file,&input_params,verbose);
+  read_input (input_file, &input_params, verbose);
+  
   /* Read the source model file */
 
   read_source (input_params.files.source_file, &source_mdl, verbose);
@@ -124,8 +123,9 @@ main (int argc, char *argv[])
     for (i = 0; i <  input_params.output.time_steps; i++)
       {
 	if (i < MAX_TIME_STEPS)
-	    results->tim[i] = pow (10., log10 ( input_params.solver.ti) + i * (log10 (input_params.solver.tf) - log10(input_params.solver.ti)) 
-			   / (input_params.output.time_steps - 1));
+	    results->tim[i] = pow (10., log10 ( input_params.solver.ti) + i 
+				   * (log10 (input_params.solver.tf) - log10 (input_params.solver.ti)) 
+				   / (input_params.output.time_steps - 1));
 	else
 	  {
 	    fprintf (stderr, "astrochem: error: the number of time" 
@@ -151,20 +151,19 @@ main (int argc, char *argv[])
       {
 	if (verbose >= 1)
 	  fprintf (stdout, "Computing abundances in shell %d...\n", shell_index);
-
-	  solve (shell_index,&input_params,&source_mdl.shell[shell_index],network,results,verbose);
-
+	solve (shell_index, &input_params, &source_mdl.shell[shell_index], network, results, verbose);
 	if (verbose >= 1)
 	  fprintf (stdout, "Done with shell %d.\n", shell_index);
       }
   }
 
   /* Write the abundances in output files */
-  output(source_mdl.n_shells,&input_params,network,results,verbose);
-  free_input_struct( &input_params );
-  free_network_struct(network);
-  free(network);
-  free(results);
+
+  output (source_mdl.n_shells, &input_params, network, results, verbose);
+  free_input_struct (&input_params);
+  free_network_struct (network);
+  free (network);
+  free (results);
   exit (0);
 }
 

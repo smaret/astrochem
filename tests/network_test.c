@@ -29,9 +29,7 @@ main (void)
 {
   FILE *f;
   char chem_file[MAX_LINE];
-  
-  struct net * network = malloc(sizeof(struct net) );
-
+  struct net * network = malloc (sizeof (struct net));
   int verbose = 0;
 
   /* Create the network->chm file */
@@ -111,17 +109,16 @@ main (void)
       (network->reactions[14].gamma == 0) &&
       (network->reactions[14].reaction_type == 10) &&
       (network->reactions[14].reaction_no == 4227))
-
     {
-        free_network_struct(network);
-        free(network);
-        return EXIT_SUCCESS;
+      free_network_struct (network);
+      free (network);
+      return EXIT_SUCCESS;
     }
   else
     {
-        free_network_struct(network);
-        free(network);
-        return EXIT_FAILURE;
+      free_network_struct (network);
+      free (network);
+      return EXIT_FAILURE;
     }
 }
 
