@@ -31,11 +31,13 @@
 void add_specie (char *new_specie, char *species[], 
 		 int *n_species);
 
-void 
-read_network (const char *chem_file, struct react reactions[],
-	      int *n_reactions, char *species[],
-	      int *n_species, int verbose)
+/*
+  Add a specie in the species array, if not already present.
+*/
+
+void read_network (const char *chem_file, struct net *network, const int verbose)
 {
+
   FILE *f;
   char line[MAX_LINE];
   int  line_number = 0;
@@ -52,8 +54,8 @@ read_network (const char *chem_file, struct react reactions[],
   int reaction_type;
   int reaction_no;
   
-  *n_species = 0;
-  *n_reactions = 0;
+  network->n_species = 0;
+  network->n_reactions = 0;
 
   if (verbose >= 1)
     {
@@ -184,44 +186,44 @@ read_network (const char *chem_file, struct react reactions[],
 
       /* Fill the array of species. */
     
-      add_specie (reactant1, species, n_species);
-      add_specie (reactant2, species, n_species);
-      add_specie (reactant3, species, n_species);
-      add_specie (product1, species, n_species);
-      add_specie (product2, species, n_species);
-      add_specie (product3, species, n_species);
-      add_specie (product4, species, n_species);
+      add_specie (reactant1, network->species, &network->n_species);
+      add_specie (reactant2, network->species, &network->n_species);
+      add_specie (reactant3, network->species, &network->n_species);
+      add_specie (product1, network->species, &network->n_species);
+      add_specie (product2, network->species, &network->n_species);
+      add_specie (product3, network->species, &network->n_species);
+      add_specie (product4, network->species, &network->n_species);
 
       /* Fill the array of reactions. Exit if of the reactant and
 	 product is not in the specie array. */
       
-      if (*n_reactions < MAX_REACTIONS) 
+      if (network->n_reactions < MAX_REACTIONS) 
 	{
-	  if (((reactions[*n_reactions].reactant1 = 
-		specie_index (reactant1, species, *n_species)) == -2) ||
-	      ((reactions[*n_reactions].reactant2 = 
-		specie_index (reactant2, species, *n_species)) == -2) ||
-	      ((reactions[*n_reactions].reactant3 = 
-		specie_index (reactant3, species, *n_species)) == -2) ||
-	      ((reactions[*n_reactions].product1 = 
-		specie_index (product1, species, *n_species)) == -2)  ||
-	      ((reactions[*n_reactions].product2 = 
-		specie_index (product2, species, *n_species)) == -2)  ||
-	      ((reactions[*n_reactions].product3 = 
-		specie_index (product3, species, *n_species)) == -2)  ||
-	      ((reactions[*n_reactions].product4 = 
-		specie_index (product4, species, *n_species)) == -2))
+	  if (((network->reactions[network->n_reactions].reactant1 = 
+		specie_index (reactant1,  (const char * const *) network->species, network->n_species)) == -2) ||
+	      ((network->reactions[network->n_reactions].reactant2 = 
+		specie_index (reactant2,  (const char *const *) network->species, network->n_species)) == -2) ||
+	      ((network->reactions[network->n_reactions].reactant3 = 
+		specie_index (reactant3,  (const char *const *) network->species, network->n_species)) == -2) ||
+	      ((network->reactions[network->n_reactions].product1 = 
+		specie_index (product1,  (const char *const *) network->species, network->n_species)) == -2)  ||
+	      ((network->reactions[network->n_reactions].product2 = 
+		specie_index (product2,  (const char *const *) network->species, network->n_species)) == -2)  ||
+	      ((network->reactions[network->n_reactions].product3 = 
+		specie_index (product3,  (const char *const *) network->species, network->n_species)) == -2)  ||
+	      ((network->reactions[network->n_reactions].product4 = 
+		specie_index (product4,  (const char *const *) network->species, network->n_species)) == -2))
 	    {
 	      fprintf (stderr, "astrochem: %s:%d: can't find specie index.\n",
 		       __FILE__, __LINE__); 
 	      exit(1);
 	    }
-	  reactions[*n_reactions].alpha = alpha;
-	  reactions[*n_reactions].beta = beta;
-	  reactions[*n_reactions].gamma = gamma;
-	  reactions[*n_reactions].reaction_type = reaction_type;
-	  reactions[*n_reactions].reaction_no = reaction_no;
-	  (*n_reactions)++;
+	  network->reactions[network->n_reactions].alpha = alpha;
+	  network->reactions[network->n_reactions].beta = beta;
+	  network->reactions[network->n_reactions].gamma = gamma;
+	  network->reactions[network->n_reactions].reaction_type = reaction_type;
+	  network->reactions[network->n_reactions].reaction_no = reaction_no;
+	  (network->n_reactions)++;
 	}
       else
 	{
@@ -235,7 +237,7 @@ read_network (const char *chem_file, struct react reactions[],
     {
       fprintf (stdout, "done.\n");  
       fprintf (stdout, "Found %d reactions involving %d species.\n", 
-	       *n_reactions, *n_species);
+	       network->n_reactions, network->n_species);
     }
  
   /* Close the file. */
@@ -297,7 +299,7 @@ add_specie (char *new_specie, char *species[],
 */
 
 int 
-specie_index (const char *specie, char *species[], int n_species)
+specie_index (const char *specie, const char * const species[], int n_species)
 {
   int i;
   
@@ -317,4 +319,14 @@ specie_index (const char *specie, char *species[], int n_species)
 
   /* Return -2 if we can not find the specie */
   return -2;
+}
+
+void
+free_network_struct ( struct net * network )
+{
+    int i;
+    for(i=0;i<network->n_species;i++)
+    {
+        free(network->species[i]);
+    }
 }

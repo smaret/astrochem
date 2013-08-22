@@ -35,14 +35,7 @@
   parameters, solver parameters, and initial abundances.
 */ 
   
-void 
-read_input (const char *input_file, char *chem_file, char *source_file,
-	    double *chi, double *cosmic, double *grain_size,
-	    double *grain_abundance, double *ti, double *tf, double *abs_err,
-	    double *rel_err, struct abund initial_abundances[],
-	    int *n_initial_abundances, char *output_species[],
-	    int *n_output_species, int *time_steps, int *trace_routes,
-	    char *suffix, int verbose)
+void read_input (const char *input_file, struct inp *input_params, int verbose )
 {
   FILE *f;
   char line[MAX_LINE];
@@ -68,19 +61,19 @@ read_input (const char *input_file, char *chem_file, char *source_file,
   /* Set the default values for parameters in the input file, in case
      the user didn't specify them. */
   
-  strcpy(source_file, "");
-  strcpy(chem_file, "");
-  strcpy(suffix, "");
-  *chi = CHI_DEFAULT;
-  *cosmic = COSMIC_DEFAULT;
-  *grain_size = GRAIN_SIZE_DEFAULT;
-  *grain_abundance = 0;
-  *ti = TI_DEFAULT;
-  *tf = TF_DEFAULT;
-  *abs_err = ABS_ERR_DEFAULT;
-  *rel_err = REL_ERR_DEFAULT;
-  *time_steps = TIME_STEPS_DEFAULT;
-  *trace_routes = TRACE_ROUTES_DEFAULT;
+  strcpy(input_params->files.source_file, "");
+  strcpy(input_params->files.chem_file, "");
+  strcpy(&input_params->output.suffix, "");
+  input_params->phys.chi = CHI_DEFAULT;
+  input_params->phys.cosmic = COSMIC_DEFAULT;
+  input_params->phys.grain_size = GRAIN_SIZE_DEFAULT;
+  input_params->phys.grain_abundance = 0;
+  input_params->solver.ti = TI_DEFAULT;
+  input_params->solver.tf = TF_DEFAULT;
+  input_params->solver.abs_err = ABS_ERR_DEFAULT;
+  input_params->solver.rel_err = REL_ERR_DEFAULT;
+  input_params->output.time_steps = TIME_STEPS_DEFAULT;
+  input_params->output.trace_routes = TRACE_ROUTES_DEFAULT;
 
   /* Loop over the lines, and look for keywords (between brackets) and
      parameters/values (separated by "="). */
@@ -98,9 +91,9 @@ read_input (const char *input_file, char *chem_file, char *source_file,
 	if (strcmp (keyword, "files") == 0)
 	  {
 	    if (strcmp (parameter, "source") == 0)
-	      strncpy (source_file, value, MAX_LINE);
+	      strncpy (input_params->files.source_file, value, MAX_LINE);
 	    else if (strcmp (parameter, "chem") == 0)
-	      strncpy (chem_file, value, MAX_LINE);
+	      strncpy (input_params->files.chem_file, value, MAX_LINE);
 	    else
 	      input_error (input_file, line_number); /* Unknown parameter */
 	  }
@@ -110,11 +103,11 @@ read_input (const char *input_file, char *chem_file, char *source_file,
 	else if (strcmp (keyword, "phys") == 0)
 	  {
 	    if (strcmp (parameter, "chi") == 0)
-	      *chi = atof (value);
+	      input_params->phys.chi = atof (value);
 	    else if (strcmp (parameter, "cosmic") == 0)
-	      *cosmic = atof (value);
+	      input_params->phys.cosmic = atof (value);
 	    else if (strcmp (parameter, "grain_size") == 0)
-	      *grain_size = atof (value) * 1e-4;   /* microns -> cm */
+	      input_params->phys.grain_size = atof (value) * 1e-4;   /* microns -> cm */
 	    else
 	      input_error (input_file, line_number);
 	  }
@@ -125,13 +118,13 @@ read_input (const char *input_file, char *chem_file, char *source_file,
 	else if (strcmp (keyword, "solver") == 0)
 	  {
 	    if (strcmp (parameter, "ti") == 0)
-	      *ti = atof (value) * CONST_MKSA_YEAR;
+	      input_params->solver.ti = atof (value) * CONST_MKSA_YEAR;
 	    else if (strcmp (parameter, "tf") == 0)
-	      *tf = atof (value) * CONST_MKSA_YEAR;
+	      input_params->solver.tf = atof (value) * CONST_MKSA_YEAR;
 	    else if (strcmp (parameter, "abs_err") == 0)
-	      *abs_err = atof (value);
+	      input_params->solver.abs_err = atof (value);
 	    else if (strcmp (parameter, "rel_err") == 0)
-	      *rel_err = atof (value);
+	      input_params->solver.rel_err = atof (value);
 	    else
 	      input_error (input_file, line_number);
 	  }
@@ -142,19 +135,19 @@ read_input (const char *input_file, char *chem_file, char *source_file,
 	  {
 	    if (i < MAX_INITIAL_ABUNDANCES)
 	      {
-		strncpy (initial_abundances[i].specie, parameter,
-			 sizeof (initial_abundances[i].specie));
-		initial_abundances[i].abundance = atof (value);
+		strncpy (input_params->abundances.initial_abundances[i].specie, parameter,
+			 sizeof (input_params->abundances.initial_abundances[i].specie));
+		input_params->abundances.initial_abundances[i].abundance = atof (value);
 
 		/* Compute the total grain density */
 		
-		if ((strncmp (initial_abundances[i].specie, "grain",
-			      sizeof (initial_abundances[i].specie)) == 0) ||
-		    (strncmp (initial_abundances[i].specie, "grain(-)",
-			      sizeof (initial_abundances[i].specie)) == 0) ||
-		    (strncmp (initial_abundances[i].specie, "grain(+)",
-			      sizeof (initial_abundances[i].specie)) == 0))
-		  *grain_abundance += initial_abundances[i].abundance;
+		if ((strncmp (input_params->abundances.initial_abundances[i].specie, "grain",
+			      sizeof (input_params->abundances.initial_abundances[i].specie)) == 0) ||
+		    (strncmp (input_params->abundances.initial_abundances[i].specie, "grain(-)",
+			      sizeof (input_params->abundances.initial_abundances[i].specie)) == 0) ||
+		    (strncmp (input_params->abundances.initial_abundances[i].specie, "grain(+)",
+			      sizeof (input_params->abundances.initial_abundances[i].specie)) == 0))
+		  input_params->phys.grain_abundance += input_params->abundances.initial_abundances[i].abundance;
 		
 		i++;
 	      } 
@@ -171,7 +164,7 @@ read_input (const char *input_file, char *chem_file, char *source_file,
 	else if (strcmp (keyword, "output") == 0)
 	  {
 	    if (strcmp (parameter, "time_steps") == 0)
-		*time_steps = atoi (value);
+		input_params->output.time_steps = atoi (value);
 	    else if (strcmp (parameter, "abundances") == 0)
 	      
 	      /* Loop over the species (separated by a comma), and
@@ -179,21 +172,28 @@ read_input (const char *input_file, char *chem_file, char *source_file,
 	      {
 		const char delimiter[] = ",";
 		char *output_specie;
-		
+
+        /* Struct initialization */
+        int temp_i;
+        for(temp_i=0; temp_i < MAX_OUTPUT_ABUNDANCES; temp_i++)
+        {
+            input_params->output.output_species[temp_i]=NULL;
+        }
+
 		if (j >= MAX_OUTPUT_ABUNDANCES)
 		  {
 		    fprintf (stderr, "astrochem: error: the number of species in output exceeds %i.\n",
 			     MAX_OUTPUT_ABUNDANCES);
 		    exit(1);
 		    }
-		if ((output_species[j] = malloc (sizeof (char) * MAX_CHAR_SPECIES)) == NULL)
+		if ((input_params->output.output_species[j] = malloc (sizeof (char) * MAX_CHAR_SPECIES)) == NULL)
 		  {
 		    fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
 			     __FILE__, __LINE__); 
 		    exit(1);
 		  }
 		output_specie = strtok (value, delimiter);
-		strncpy (output_species[j], output_specie,
+		strncpy (input_params->output.output_species[j], output_specie,
 			 sizeof (char) * MAX_CHAR_SPECIES); 
 		j++;
 		while ((output_specie = strtok (NULL, delimiter)) != NULL)
@@ -204,21 +204,21 @@ read_input (const char *input_file, char *chem_file, char *source_file,
 				 MAX_OUTPUT_ABUNDANCES);
 			exit(1);
 		      }
-		    if ((output_species[j] = malloc (sizeof (char) * MAX_CHAR_SPECIES)) == NULL)
+		    if ((input_params->output.output_species[j] = malloc (sizeof (char) * MAX_CHAR_SPECIES)) == NULL)
 		      {
 			fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
 				 __FILE__, __LINE__); 
 			exit(1);
 		      }
-		    strncpy (output_species[j], output_specie,
+		    strncpy (input_params->output.output_species[j], output_specie,
 			     sizeof (char) * MAX_CHAR_SPECIES);
 		    j++;
 		  }
 	      }
 	    else if (strcmp (parameter, "trace_routes") == 0)
-	      *trace_routes = atoi (value);
+	      input_params->output.trace_routes = atoi (value);
 	    else if (strcmp (parameter, "suffix") == 0)
-	      strncpy (suffix, value, MAX_LINE);
+	      strncpy (&input_params->output.suffix, value, MAX_LINE);
 	    else
 	      input_error (input_file, line_number);
 	  }
@@ -239,36 +239,36 @@ read_input (const char *input_file, char *chem_file, char *source_file,
   
   fclose (f);
   
-  *n_initial_abundances = i;
-  *n_output_species = j;
+  input_params->abundances.n_initial_abundances = i;
+  input_params->output.n_output_species = j;
   
   /* Check that the source file name and the chemical file name were specified
      in the input file. Also check that other parameters have acceptable 
      values. */
 
-  if (strcmp (chem_file, "") == 0)
+  if (strcmp (input_params->files.chem_file, "") == 0)
     {
       fprintf (stderr, "astrochem: error: no chemical network file specified in %s.\n",
 	       input_file);
       exit (1);
     }
-  if (strcmp (source_file, "") == 0)
+  if (strcmp (input_params->files.source_file, "") == 0)
     {
       fprintf (stderr, "astrochem: error: no source model file specified in %s.\n",
 	       input_file);
       exit (1);
     }
-  if (*ti <= 0.)
+  if (input_params->solver.ti <= 0.)
     {
       fprintf (stderr, "astrochem: warning: incorrect ti value specified in %s."
 	       "Assuming default value.\n", input_file);
-      *ti = TI_DEFAULT;
+      input_params->solver.ti = TI_DEFAULT;
     }
-  if (*tf < *ti)
+  if (input_params->solver.tf < input_params->solver.ti)
     {
       fprintf (stderr, "astrochem: warning: incorrect tf value specified in %s."
 	       "Assuming default value.\n", input_file);
-      *tf = TF_DEFAULT;
+      input_params->solver.tf = TF_DEFAULT;
     }
 }
 
@@ -284,15 +284,12 @@ input_error (const char *input_file, int line_number)
 	  input_file, line_number);
   exit (1);
 }
-  
+ 
 /*
   Read the file containing the source model.
 */
 
-void 
-read_source (const char *source_file, int shell[], int *n_shells,
-	     double av[], double nh[], double tgas[], double tdust[],
-	     int verbose)
+void read_source (const char *source_file, struct mdl *source_mdl,const int verbose)
 {
   FILE *f;
   char line[MAX_LINE];
@@ -324,11 +321,10 @@ read_source (const char *source_file, int shell[], int *n_shells,
 	{
 	  if (i <= MAX_SHELLS - 1)
 	    {
-	      shell[i] = col1;
-	      av[i] = col2;
-	      nh[i] = col3;
-	      tgas[i] = col4;
-	      tdust[i] = col5;
+	      source_mdl->shell[i].av = col2;
+	      source_mdl->shell[i].nh = col3;
+	      source_mdl->shell[i].tgas = col4;
+	      source_mdl->shell[i].tdust = col5;
 	      i++;
 	    }
 	  else
@@ -350,8 +346,8 @@ read_source (const char *source_file, int shell[], int *n_shells,
 
   /* Check the model has at least one shell */
 
-  *n_shells = i;
-  if ( *n_shells == 0 )
+  source_mdl->n_shells = i;
+  if ( source_mdl->n_shells == 0 )
     {
       fprintf (stderr, "astrochem: error: no valid lines found in %s.\n",
 	       source_file);
@@ -377,7 +373,7 @@ check_species (struct abund initial_abundances[],
   
   for (i=0; i < n_initial_abundances; i++)
     {
-      if (specie_index (initial_abundances[i].specie, species, n_species) == -2)
+      if (specie_index (initial_abundances[i].specie, (const char* const*) species, n_species) == -2)
 	  fprintf (stderr, "astrochem: warning: %s initial abundance given, "
 		   "but is not in the network.\n", initial_abundances[i].specie);
     }
@@ -386,8 +382,21 @@ check_species (struct abund initial_abundances[],
   
   for (i=0; i < n_output_species; i++)
     {
-      if (specie_index (output_species [i], species, n_species) == -2)
+      if (specie_index (output_species [i], (const char *const *) species, n_species) == -2)
 	fprintf (stderr, "astrochem: warning: %s abundance requested, "
 		 "but is not in the network.\n", output_species [i]);
+    }
+}
+
+void
+free_input_struct ( struct inp * input_params )
+{
+    int i;
+    for (i=0;i<MAX_OUTPUT_ABUNDANCES;i++)
+    {
+        if(input_params->output.output_species[i] != NULL)
+        {
+            free(input_params->output.output_species[i]);
+        }
     }
 }

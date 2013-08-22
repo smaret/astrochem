@@ -29,13 +29,7 @@ main (void)
 {
   FILE *f;
 
-  int n_shells;
-  int shell[MAX_SHELLS];
-  double av[MAX_SHELLS];
-  double nh[MAX_SHELLS];
-  double tgas[MAX_SHELLS];
-  double tdust[MAX_SHELLS];
-
+  struct mdl source_mdl;
   int verbose = 0;
 
   /* Create the input.ini file */
@@ -50,24 +44,22 @@ main (void)
 
   /* Read it */
 
-  read_source ("source.mdl", shell, &n_shells, av, nh,
-	       tgas, tdust, verbose);
+  read_source ("source.mdl", &source_mdl, verbose);
   
   /* Check that the values are correct */
-
-  if ((n_shells == 3) &&
-      (av[0] == 0.1) &&
-      (nh[0] == 1e2) &&
-      (tgas[0] == 15) &&
-      (tdust[0] == 12) &&
-      (av[1] == 1.0) &&
-      (nh[1] == 1e3) &&
-      (tgas[1] == 11) &&
-      (tdust[1] == 10) &&
-      (av[2] == 10.0) &&
-      (nh[2] == 1e4) &&
-      (tgas[2] == 8) &&
-      (tdust[2] == 7))
+  if ((source_mdl.n_shells == 3) &&
+      (source_mdl.shell[0].av == 0.1) &&
+      (source_mdl.shell[0].nh == 1e2) &&
+      (source_mdl.shell[0].tgas == 15) &&
+      (source_mdl.shell[0].tdust == 12) &&
+      (source_mdl.shell[1].av == 1.0) &&
+      (source_mdl.shell[1].nh == 1e3) &&
+      (source_mdl.shell[1].tgas == 11) &&
+      (source_mdl.shell[1].tdust == 10) &&
+      (source_mdl.shell[2].av == 10.0) &&
+      (source_mdl.shell[2].nh == 1e4) &&
+      (source_mdl.shell[2].tgas == 8) &&
+      (source_mdl.shell[2].tdust == 7))
     return EXIT_SUCCESS;
   else
     return EXIT_FAILURE;
