@@ -28,7 +28,7 @@ int
 main (void)
 {
   FILE *f;
-  struct inp input_params;
+  inp_t input_params;
   int verbose = 0;
 
   /* Create the input.ini file */

@@ -57,53 +57,65 @@
 
 /* Data structures */
 
-struct abund {
+typedef struct {
   char specie[MAX_CHAR_SPECIES];
   double abundance;
-};
+} abund_t;
 
-struct inp {
-  struct {
-    char chem_file[MAX_LINE];
-    char source_file[MAX_LINE];
-  } files;
-  struct {
-    double chi;
-    double cosmic;
-    double grain_size;
-    double grain_abundance;
-  } phys;
-  struct {
-    double ti;
-    double tf;
-    double abs_err;
-    double rel_err;
-  } solver;
-  struct {
-    struct abund initial_abundances[MAX_INITIAL_ABUNDANCES];
-    int n_initial_abundances;
-  } abundances;
-  struct {
-    char *output_species[MAX_OUTPUT_ABUNDANCES];
-    int n_output_species;
-    int time_steps;
-    int trace_routes;
-    char suffix;
-  } output;
-};
+typedef struct {
+  char chem_file[MAX_LINE];
+  char source_file[MAX_LINE];
+} files_t;
 
-struct mdl {
-  int n_shells;
-  struct sh {
+typedef struct {
+  double chi;
+  double cosmic;
+  double grain_size;
+  double grain_abundance;
+} phys_t;
+
+typedef struct {
+  double ti;
+  double tf;
+  double abs_err;
+  double rel_err;
+} solver_t;
+
+typedef struct {
+  abund_t initial_abundances[MAX_INITIAL_ABUNDANCES];
+  int n_initial_abundances;
+} abundances_t;
+
+typedef struct {
+  char *output_species[MAX_OUTPUT_ABUNDANCES];
+  int n_output_species;
+  int time_steps;
+  int trace_routes;
+  char suffix;
+} output_t;
+
+typedef struct {
+  files_t files;
+  phys_t phys;  
+  solver_t solver;
+  abundances_t abundances;
+  output_t output;
+} inp_t;
+
+typedef struct {
     double av;
     double nh;
     double tgas;
     double tdust;
-  } shell[MAX_SHELLS];
-};
+  } shell_t;
+
+typedef struct {
+  shell_t shell[MAX_SHELLS];
+  int n_shells;
+} mdl_t;
 
 
-struct react {
+typedef struct {
   int reactant1;
   int reactant2;
   int reactant3;
@@ -116,30 +128,30 @@ struct react {
   double gamma;
   int reaction_type;
   int reaction_no;
-};
+} react_t;
 
-struct net {
+typedef struct {
   int n_species;
   char* species[MAX_SPECIES];
   int n_reactions;
-  struct react reactions[MAX_REACTIONS];
-};
+  react_t reactions[MAX_REACTIONS];
+} net_t;
 
-struct r {
+typedef struct {
   int reaction_no;
   double rate;
-};
+} r_t;
 
-struct rout {
-  struct r destruction;
-  struct r formation;
-};
+typedef struct {
+  r_t destruction;
+  r_t formation;
+} rout_t;
 
-struct res {
+typedef struct {
   double abundances[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES];
-  struct rout routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES];
+  rout_t routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES];
   double tim[MAX_TIME_STEPS];
-};
+} res_t;
 
 /* Fonction prototypes
 
@@ -147,20 +159,20 @@ struct res {
    that uses the new "input_params", "source_mdl", "network" and
    "results" data structures. */
 
-void read_input (const char *input_file, struct inp *input_params, int verbose);
+void read_input (const char *input_file, inp_t *input_params, int verbose);
 
-void free_input_struct ( struct inp * input_params );
+void free_input_struct ( inp_t * input_params );
 
-void read_source (const char *source_file, struct mdl *source_mdl,
+void read_source (const char *source_file, mdl_t *source_mdl,
 		      const int verbose);
 
 void input_error (const char *input_f, int line_number);
 
-void check_species (struct abund initial_abundances[], int
+void check_species ( abund_t initial_abundances[], int
 		    n_initial_abundances, char *output_species[], int
 		    n_output_species, char *species[], int n_species);
 
-void read_network (const char *chem_file, struct net *network, const int verbose);
+void read_network (const char *chem_file, net_t *network, const int verbose);
 
 int specie_index (const char specie[],const char * const species[], int n_species);
 
@@ -169,8 +181,8 @@ double rate(double alpha, double beta, double gamm, int reaction_type,
 	    double chi, double cosmic, double grain_size,
 	    double grain_abundance, double ice_abundance);
 
-int solve (int shell_index, const struct inp *input_params, const struct sh *shell,
-	   const struct net *network, struct res *results, int verbose);
+int solve (int shell_index, const inp_t *input_params, const shell_t *shell,
+	   const net_t *network, res_t *results, int verbose);
 
-void output (int n_shells, const struct inp *input_params, const struct net *network,
-	     const struct res *results, int verbose);
+void output (int n_shells, const inp_t *input_params, const net_t *network,
+	     const res_t *results, int verbose);

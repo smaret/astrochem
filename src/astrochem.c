@@ -40,10 +40,10 @@ void version (void);
 int
 main (int argc, char *argv[])
 {
-  struct inp input_params;
-  struct mdl source_mdl;
-  struct net *network = malloc (sizeof (struct net));
-  struct res *results = malloc (sizeof (struct res));
+  inp_t input_params;
+  mdl_t source_mdl;
+  net_t *network = malloc (sizeof (net_t));
+  res_t *results = malloc (sizeof (res_t));
   int shell_index;
   
   int verbose = 1;

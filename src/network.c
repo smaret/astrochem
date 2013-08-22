@@ -36,7 +36,7 @@ void add_specie (char *new_specie, char *species[],
 */
 
 void
-read_network (const char *chem_file, struct net *network, const int verbose)
+read_network (const char *chem_file, net_t *network, const int verbose)
 {
   FILE *f;
   char line[MAX_LINE];
@@ -326,7 +326,7 @@ specie_index (const char *specie, const char * const species[], int n_species)
 */
 
 void
-free_network_struct (struct net * network )
+free_network_struct (net_t * network )
 {
   int i;
 

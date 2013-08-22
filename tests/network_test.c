@@ -29,7 +29,7 @@ main (void)
 {
   FILE *f;
   char chem_file[MAX_LINE];
-  struct net * network = malloc (sizeof (struct net));
+  net_t * network = malloc (sizeof (net_t));
   int verbose = 0;
 
   /* Create the network->chm file */
