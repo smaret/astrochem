@@ -35,7 +35,8 @@
   parameters, solver parameters, and initial abundances.
 */ 
   
-void read_input (const char *input_file, struct inp *input_params, int verbose )
+void
+read_input (const char *input_file, struct inp *input_params, int verbose)
 {
   FILE *f;
   char line[MAX_LINE];
@@ -61,9 +62,9 @@ void read_input (const char *input_file, struct inp *input_params, int verbose )
   /* Set the default values for parameters in the input file, in case
      the user didn't specify them. */
   
-  strcpy(input_params->files.source_file, "");
-  strcpy(input_params->files.chem_file, "");
-  strcpy(&input_params->output.suffix, "");
+  strcpy (input_params->files.source_file, "");
+  strcpy (input_params->files.chem_file, "");
+  strcpy (&input_params->output.suffix, "");
   input_params->phys.chi = CHI_DEFAULT;
   input_params->phys.cosmic = COSMIC_DEFAULT;
   input_params->phys.grain_size = GRAIN_SIZE_DEFAULT;
@@ -82,10 +83,10 @@ void read_input (const char *input_file, struct inp *input_params, int verbose )
     {
       line_number++;
       if (line[0] == '#') continue; /* Skip comments */
-      if (sscanf( line, "[ %512[a-zA-Z] ]", keyword ) == 1)
+      if (sscanf (line, "[ %512[a-zA-Z] ]", keyword ) == 1)
 	;
       else if (sscanf (line, "%s = %s", parameter, value ) == 2) {
-
+	
 	/* Source and chemical network files */
 	
 	if (strcmp (keyword, "files") == 0)
@@ -173,19 +174,20 @@ void read_input (const char *input_file, struct inp *input_params, int verbose )
 		const char delimiter[] = ",";
 		char *output_specie;
 
-        /* Struct initialization */
-        int temp_i;
-        for(temp_i=0; temp_i < MAX_OUTPUT_ABUNDANCES; temp_i++)
-        {
-            input_params->output.output_species[temp_i]=NULL;
-        }
+		/* Structure initialization */
+
+		int temp_i;
+		for (temp_i = 0; temp_i < MAX_OUTPUT_ABUNDANCES; temp_i++)
+		  {
+		    input_params->output.output_species[temp_i]=NULL;
+		  }
 
 		if (j >= MAX_OUTPUT_ABUNDANCES)
 		  {
 		    fprintf (stderr, "astrochem: error: the number of species in output exceeds %i.\n",
 			     MAX_OUTPUT_ABUNDANCES);
 		    exit(1);
-		    }
+		  }
 		if ((input_params->output.output_species[j] = malloc (sizeof (char) * MAX_CHAR_SPECIES)) == NULL)
 		  {
 		    fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
@@ -281,15 +283,16 @@ void
 input_error (const char *input_file, int line_number)
 {
   fprintf (stderr, "astrochem: error: incorrect input in %s line %i.\n", 
-	  input_file, line_number);
+	   input_file, line_number);
   exit (1);
 }
- 
+
 /*
   Read the file containing the source model.
 */
 
-void read_source (const char *source_file, struct mdl *source_mdl,const int verbose)
+void 
+read_source (const char *source_file, struct mdl *source_mdl,const int verbose)
 {
   FILE *f;
   char line[MAX_LINE];
@@ -388,15 +391,20 @@ check_species (struct abund initial_abundances[],
     }
 }
 
+/* 
+   Free the input structure.
+*/
+
 void
-free_input_struct ( struct inp * input_params )
+free_input_struct (struct inp * input_params)
 {
-    int i;
-    for (i=0;i<MAX_OUTPUT_ABUNDANCES;i++)
+  int i;
+
+  for (i=0; i < MAX_OUTPUT_ABUNDANCES; i++)
     {
-        if(input_params->output.output_species[i] != NULL)
+      if (input_params->output.output_species[i] != NULL)
         {
-            free(input_params->output.output_species[i]);
+	  free (input_params->output.output_species[i]);
         }
     }
 }

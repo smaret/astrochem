@@ -169,6 +169,8 @@ double rate(double alpha, double beta, double gamm, int reaction_type,
 	    double chi, double cosmic, double grain_size,
 	    double grain_abundance, double ice_abundance);
 
-int solve (int shell_index, struct inp *input_params, const struct sh *shell, const struct net *network, struct res *results, int verbose);
+int solve (int shell_index, const struct inp *input_params, const struct sh *shell,
+	   const struct net *network, struct res *results, int verbose);
 
-void output (int n_shells, const struct inp *input_params, const struct net *network, const struct res *results, int verbose);
+void output (int n_shells, const struct inp *input_params, const struct net *network,
+	     const struct res *results, int verbose);

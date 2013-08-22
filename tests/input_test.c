@@ -28,7 +28,6 @@ int
 main (void)
 {
   FILE *f;
-
   struct inp input_params;
   int verbose = 0;
 
@@ -72,7 +71,7 @@ main (void)
 
   /* Read it */
 
-  read_input ("input.ini",&input_params,verbose);
+  read_input ("input.ini", &input_params, verbose);
   
   /* Check that the values are correct */
   
@@ -104,13 +103,13 @@ main (void)
       (strcmp (input_params.output.output_species[3], "e(-)") == 0) &&
       (strcmp (input_params.output.output_species[4], "OH") == 0))
     {
-        free_input_struct( &input_params );
-        return EXIT_SUCCESS;
+      free_input_struct (&input_params);
+      return EXIT_SUCCESS;
     }
   else
     {
-        free_input_struct( &input_params );
-        return EXIT_FAILURE;
+      free_input_struct (&input_params);
+      return EXIT_FAILURE;
     }
 }
 
