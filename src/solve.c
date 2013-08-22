@@ -378,8 +378,9 @@ jacobian (int N __attribute__ ((unused)),
   Solve the ODE system.
 */
 
-int solve (int shell_index,struct inp *input_params, const struct sh *shell,
-	   const struct net *network, struct res *results, int verbose)
+int
+solve (int shell_index, const struct inp *input_params, const struct sh *shell,
+       const struct net *network, struct res *results, int verbose)
 {
    realtype t = 0.0;
    struct par params;                  /* Parameters for f() and jacobian() */
@@ -469,9 +470,8 @@ int solve (int shell_index,struct inp *input_params, const struct sh *shell,
        exit(1);
      }
 
-   input_params->solver.abs_err = input_params->solver.abs_err * shell->nh;
    if ((CVodeInit (cvode_mem, f, 0.0, y) != CV_SUCCESS)
-       || (CVodeSStolerances (cvode_mem, input_params->solver.rel_err, input_params->solver.abs_err) != CV_SUCCESS)
+       || (CVodeSStolerances (cvode_mem, input_params->solver.rel_err, input_params->solver.abs_err * shell->nh) != CV_SUCCESS)
 #ifdef USE_LAPACK
        || ((CVLapackDense (cvode_mem, network->n_species) != CV_SUCCESS))
 #else
