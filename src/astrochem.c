@@ -34,52 +34,20 @@
 #include "astrochem.h"
 
 
-struct inp input_params;
-struct mdl source_mdl;
-struct net network;
-struct res results;
-char chem_file[MAX_LINE];
-char source_file[MAX_LINE];
-char suffix[MAX_LINE];
-
-double chi;
-double cosmic;
-double grain_size;
-double grain_abundance;
-double ti;
-double tf;
-double abs_err;
-double rel_err;
-struct abund initial_abundances[MAX_INITIAL_ABUNDANCES];
-int n_initial_abundances;
-char *output_species[MAX_OUTPUT_ABUNDANCES];
-int n_output_species;
-int time_steps;
-int trace_routes;
-
-int n_shells;
-int shell[MAX_SHELLS];
-double av[MAX_SHELLS];
-double nh[MAX_SHELLS];
-double tgas[MAX_SHELLS];
-double tdust[MAX_SHELLS];
-int shell_index;
-
-struct react reactions[MAX_REACTIONS];
-char *species[MAX_SPECIES];
-int n_reactions;
-int n_species;
-
-double abundances[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES];
-struct rout routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES];
-double tim[MAX_TIME_STEPS];
-
 void usage (void);
 void version (void);
 
 int
 main (int argc, char *argv[])
-{  
+{
+
+    struct inp input_params;
+    struct mdl source_mdl;
+    struct net * network = malloc(sizeof(struct net));
+    struct res * results = malloc(sizeof(struct res));
+    int shell_index;
+
+
   int verbose = 1;
   char *input_file;
 
@@ -135,29 +103,29 @@ main (int argc, char *argv[])
   read_input(input_file,&input_params,verbose);
   /* Read the source model file */
 
-  read_source (source_file, &source_mdl, verbose);
+  read_source (input_params.files.source_file, &source_mdl, verbose);
 
   /* Read the chemical network file */
 
-  read_network (chem_file, &network, verbose);
+  read_network (input_params.files.chem_file, network, verbose);
 
   /* Check that the initial_abundance and output_species structure do
      not contain any specie that is not in the network. */
 
-  check_species (initial_abundances, n_initial_abundances,
-		 output_species, n_output_species, species, 
-		 n_species);
+  check_species (input_params.abundances.initial_abundances, input_params.abundances.n_initial_abundances,
+		 input_params.output.output_species, input_params.output.n_output_species, network->species, 
+		 network->n_species);
 
   /* Build the vector of time */
 
   {
     int i;
     
-    for (i = 0; i < time_steps; i++)
+    for (i = 0; i <  input_params.output.time_steps; i++)
       {
 	if (i < MAX_TIME_STEPS)
-	    tim[i] = pow (10., log10 (ti) + i * (log10 (tf) - log10(ti)) 
-			   / (time_steps - 1));
+	    results->tim[i] = pow (10., log10 ( input_params.solver.ti) + i * (log10 (input_params.solver.tf) - log10(input_params.solver.ti)) 
+			   / (input_params.output.time_steps - 1));
 	else
 	  {
 	    fprintf (stderr, "astrochem: error: the number of time" 
@@ -179,12 +147,12 @@ main (int argc, char *argv[])
 #pragma omp for schedule (dynamic, 1) nowait
 #endif
 
-    for (shell_index = 0; shell_index < n_shells; shell_index++)
+    for (shell_index = 0; shell_index < source_mdl.n_shells; shell_index++)
       {
 	if (verbose >= 1)
 	  fprintf (stdout, "Computing abundances in shell %d...\n", shell_index);
 
-	  solve (shell_index,&input_params,&source_mdl.shell[shell_index],&network,&results,verbose);
+	  solve (shell_index,&input_params,&source_mdl.shell[shell_index],network,results,verbose);
 
 	if (verbose >= 1)
 	  fprintf (stdout, "Done with shell %d.\n", shell_index);
@@ -192,11 +160,11 @@ main (int argc, char *argv[])
   }
 
   /* Write the abundances in output files */
-
-  output (n_shells, tim, time_steps, output_species, n_output_species,
-	  abundances, species, n_species, trace_routes, routes, suffix,
-	  verbose);
-
+  output(source_mdl.n_shells,&input_params,network,results,verbose);
+  free_input_struct( &input_params );
+  free_network_struct(network);
+  free(network);
+  free(results);
   exit (0);
 }
 

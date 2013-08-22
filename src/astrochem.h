@@ -149,6 +149,8 @@ struct res {
 
 void read_input (const char *input_file, struct inp *input_params, int verbose);
 
+void free_input_struct ( struct inp * input_params );
+
 void read_source (const char *source_file, struct mdl *source_mdl,
 		      const int verbose);
 
@@ -169,11 +171,4 @@ double rate(double alpha, double beta, double gamm, int reaction_type,
 
 int solve (int shell_index, struct inp *input_params, const struct sh *shell, const struct net *network, struct res *results, int verbose);
 
-void output (int n_shells, double tim[], int time_steps,
-	     char *output_species[], int n_output_species,
-	     double abundances[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES],
-	     char *species[], int n_species, int trace_routes, 
-	     struct rout routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES],
-	     char *suffix, int verbose);
-
-void output_new (int n_shells, const struct inp *input_params, const struct net *network, const struct res *results, int verbose);
+void output (int n_shells, const struct inp *input_params, const struct net *network, const struct res *results, int verbose);
