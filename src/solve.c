@@ -39,9 +39,9 @@
  
 #include "astrochem.h"
 
-struct par {
+typedef struct {
   double *reac_rates;
-  const struct react *reactions;
+  const react_t *reactions;
   int n_reactions;
   int n_species;
   double nh; 
@@ -52,7 +52,7 @@ struct par {
   double cosmic;
   double grain_size;
   double grain_abundance;
-};
+} params_t;
 
 static int f (realtype t, N_Vector y, N_Vector ydot, void *params);
 
@@ -72,18 +72,18 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
   
   /* Get the parameters passed with *params. */
 
-  double *reac_rates = ((struct par *)params)->reac_rates;
-  const struct react *reactions = ((struct par *)params)->reactions;
-  int n_reactions = ((struct par *)params)->n_reactions;
-  int n_species = ((struct par *)params)->n_species;
-  double nh = ((struct par *)params)->nh;
-  double av = ((struct par *)params)->av;
-  double tgas = ((struct par *)params)->tgas;
-  double tdust = ((struct par *)params)->tdust;
-  double chi = ((struct par *)params)->chi;
-  double cosmic = ((struct par *)params)->cosmic;
-  double grain_size = ((struct par *)params)->grain_size;
-  double grain_abundance = ((struct par *)params)->grain_abundance;
+  double *reac_rates = ((params_t *)params)->reac_rates;
+  const react_t *reactions = ((params_t *)params)->reactions;
+  int n_reactions = ((params_t *)params)->n_reactions;
+  int n_species = ((params_t *)params)->n_species;
+  double nh = ((params_t *)params)->nh;
+  double av = ((params_t *)params)->av;
+  double tgas = ((params_t *)params)->tgas;
+  double tdust = ((params_t *)params)->tdust;
+  double chi = ((params_t *)params)->chi;
+  double cosmic = ((params_t *)params)->cosmic;
+  double grain_size = ((params_t *)params)->grain_size;
+  double grain_abundance = ((params_t *)params)->grain_abundance;
 
   /* Loop over the reactions and build the right hand ODE system
      equations. */
@@ -183,15 +183,15 @@ jacobian (int N __attribute__ ((unused)),
   
   /* Get the parameters passed with *params. */
 
-  double *reac_rates = ((struct par *)params)->reac_rates;
-  const struct react *reactions = ((struct par *)params)->reactions;
-  int n_reactions = ((struct par *)params)->n_reactions;
-  int n_species = ((struct par *)params)->n_species;
-  double nh = ((struct par *)params)->nh;
-  double av = ((struct par *)params)->av;
-  double chi = ((struct par *)params)->chi;
-  double grain_size = ((struct par *)params)->grain_size;
-  double grain_abundance = ((struct par *)params)->grain_abundance;
+  double *reac_rates = ((params_t *)params)->reac_rates;
+  const react_t *reactions = ((params_t *)params)->reactions;
+  int n_reactions = ((params_t *)params)->n_reactions;
+  int n_species = ((params_t *)params)->n_species;
+  double nh = ((params_t *)params)->nh;
+  double av = ((params_t *)params)->av;
+  double chi = ((params_t *)params)->chi;
+  double grain_size = ((params_t *)params)->grain_size;
+  double grain_abundance = ((params_t *)params)->grain_abundance;
     
   /* Compute the jacobian matrix. */
 
@@ -379,11 +379,11 @@ jacobian (int N __attribute__ ((unused)),
 */
 
 int
-solve (int shell_index, const struct inp *input_params, const struct sh *shell,
-       const struct net *network, struct res *results, int verbose)
+solve (int shell_index, const inp_t *input_params, const shell_t *shell,
+       const net_t *network, res_t *results, int verbose)
 {
    realtype t = 0.0;
-   struct par params;                  /* Parameters for f() and jacobian() */
+   params_t params;                  /* Parameters for f() and jacobian() */
    N_Vector y;                         /* Work array for the solver */
    void *cvode_mem;                    /* Memory space for the solver */
    double *reac_rates;                 /* Reaction rates */
@@ -560,7 +560,7 @@ solve (int shell_index, const struct inp *input_params, const struct sh *shell,
 			     (network->reactions[k].product3 == spec_index) ||
 			     (network->reactions[k].product4 == spec_index))
 			   {
-			     struct r formation_route;
+			     r_t formation_route;
 			     double min_rate;
 			     unsigned int min_rate_index;
 			     
@@ -610,7 +610,7 @@ solve (int shell_index, const struct inp *input_params, const struct sh *shell,
 			     (network->reactions[k].reactant2 == spec_index) ||
 			     (network->reactions[k].reactant3 == spec_index))
 			   {
-			     struct r destruction_route;
+			     r_t destruction_route;
 			     double min_rate;
 			     unsigned int min_rate_index;
 

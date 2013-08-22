@@ -27,17 +27,17 @@
 
 /* FixMe: Why do we need to define these here? (segfault otherwise) */
 double abundances[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES];
-struct rout routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES];
+rout_t routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES];
 
 int
 main (void)
 {
   FILE *f;
   int shell_index;
-  struct inp input_params;
-  struct mdl source_mdl;
-  struct net * network = malloc (sizeof (struct net));
-  struct res * results = malloc (sizeof (struct res));
+  inp_t input_params;
+  mdl_t source_mdl;
+  net_t * network = malloc (sizeof (net_t));
+  res_t * results = malloc (sizeof (res_t));
   int verbose = 0;
 
   /* Create the input.ini, source.mdl and network_chm files */

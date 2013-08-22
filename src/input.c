@@ -36,7 +36,7 @@
 */ 
   
 void
-read_input (const char *input_file, struct inp *input_params, int verbose)
+read_input (const char *input_file, inp_t *input_params, int verbose)
 {
   FILE *f;
   char line[MAX_LINE];
@@ -292,7 +292,7 @@ input_error (const char *input_file, int line_number)
 */
 
 void 
-read_source (const char *source_file, struct mdl *source_mdl,const int verbose)
+read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
 {
   FILE *f;
   char line[MAX_LINE];
@@ -366,7 +366,7 @@ read_source (const char *source_file, struct mdl *source_mdl,const int verbose)
 */
 
 void
-check_species (struct abund initial_abundances[],
+check_species (abund_t initial_abundances[],
 	       int n_initial_abundances, char *output_species[],
 	       int n_output_species, char *species[], int n_species)
 {
@@ -396,7 +396,7 @@ check_species (struct abund initial_abundances[],
 */
 
 void
-free_input_struct (struct inp * input_params)
+free_input_struct (inp_t * input_params)
 {
   int i;
 
