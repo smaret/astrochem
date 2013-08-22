@@ -4,18 +4,16 @@ To-do list
 For release 0.6:
 ----------------
 
-* Pass structures to function that have a large number of arguments.
+* Allocate arrays dynamically instead of limiting their size
+  arbitrarily.
 
 Long-term to-dos:
 -----------------
 
-* Allocate arrays dynamically instead of limiting their size
-  arbitrarily.
+* Use MPI instead of OpenMP.
 
 * Move solve() to a library that can be called from other codes
   (e.g. hydrodynamics or MHD codes).
-
-* Use MPI instead of OpenMP.
 
 * Implement 2D geometry.
 
