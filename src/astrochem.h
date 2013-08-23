@@ -91,7 +91,7 @@ typedef struct {
   int n_output_species;
   int time_steps;
   int trace_routes;
-  char suffix;
+  char suffix[MAX_LINE];
 } output_t;
 
 typedef struct {

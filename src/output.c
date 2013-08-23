@@ -53,13 +53,13 @@ output (int n_shells,const inp_t *input_params,  const net_t *network, const res
 	  /* Open the file or exit if an error occurs. */
 
 	  strncpy (filename, input_params->output.output_species[i], MAX_CHAR_FILENAME);
-	  if (strlen (&input_params->output.suffix) != 0)
+	  if (strlen (input_params->output.suffix) != 0)
 	    {
 	      strncat (filename, "_", MAX_CHAR_FILENAME - strlen (filename) - 1);
-	      strncat (filename, &input_params->output.suffix, MAX_CHAR_FILENAME - strlen (filename) - 1);
+	      strncat (filename, input_params->output.suffix, MAX_CHAR_FILENAME - strlen (filename) - 1);
 	    }
 	  strncat (filename, ".abun", MAX_CHAR_FILENAME - strlen (filename) -1
-		   - strlen (&input_params->output.suffix));
+		   - strlen (input_params->output.suffix));
 	  if ((f = fopen (filename, "w")) == NULL)
 	    {
 	      fprintf (stderr, "astrochem: error: can't open %s\n", filename);
@@ -152,13 +152,13 @@ output (int n_shells,const inp_t *input_params,  const net_t *network, const res
 	      /* Open the file or exit if an error occurs. */
 
 	      strncpy (filename, input_params->output.output_species[i], MAX_CHAR_FILENAME);
-	      if (strlen (&input_params->output.suffix) != 0)
+	      if (strlen (input_params->output.suffix) != 0)
 		{
 		  strncat (filename, "_", MAX_CHAR_FILENAME - strlen (filename) - 1);
-		  strncat (filename, &input_params->output.suffix, MAX_CHAR_FILENAME - strlen (filename) - 1);
+		  strncat (filename, input_params->output.suffix, MAX_CHAR_FILENAME - strlen (filename) - 1);
 		}
 	      strncat (filename, ".rout", MAX_CHAR_FILENAME - strlen (filename) -1
-		       - strlen (&input_params->output.suffix));
+		       - strlen (input_params->output.suffix));
 	      if ((f = fopen (filename, "w")) == NULL)
 		{
 		  fprintf (stderr, "astrochem: error: can't open %s\n", filename);

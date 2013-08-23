@@ -67,7 +67,7 @@ read_input (const char *input_file, inp_t *input_params, int verbose)
   alloc_input (input_params, MAX_INITIAL_ABUNDANCES, MAX_OUTPUT_ABUNDANCES);  
   strcpy (input_params->files.source_file, "");
   strcpy (input_params->files.chem_file, "");
-  strcpy (&input_params->output.suffix, "");
+  strcpy (input_params->output.suffix, "");
   input_params->phys.chi = CHI_DEFAULT;
   input_params->phys.cosmic = COSMIC_DEFAULT;
   input_params->phys.grain_size = GRAIN_SIZE_DEFAULT;
@@ -223,7 +223,7 @@ read_input (const char *input_file, inp_t *input_params, int verbose)
 	    else if (strcmp (parameter, "trace_routes") == 0)
 	      input_params->output.trace_routes = atoi (value);
 	    else if (strcmp (parameter, "suffix") == 0)
-	      strncpy (&input_params->output.suffix, value, MAX_LINE);
+	      strncpy (input_params->output.suffix, value, MAX_LINE);
 	    else
 	      input_error (input_file, line_number);
 	  }
