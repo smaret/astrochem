@@ -29,7 +29,7 @@ main (void)
 {
   FILE *f;
 
-  struct mdl source_mdl;
+  mdl_t source_mdl;
   int verbose = 0;
 
   /* Create the input.ini file */

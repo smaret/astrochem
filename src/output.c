@@ -32,7 +32,7 @@
 #define MAX_CHAR_FILENAME 64
 
 void
-output (int n_shells,const struct inp *input_params,  const struct net *network, const struct res *results, int verbose )
+output (int n_shells,const inp_t *input_params,  const net_t *network, const res_t *results, int verbose )
 {
   FILE *f;
   char filename[MAX_CHAR_FILENAME];
