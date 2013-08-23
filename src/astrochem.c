@@ -42,8 +42,8 @@ main (int argc, char *argv[])
 {
   inp_t input_params;
   mdl_t source_mdl;
-  net_t *network = malloc (sizeof (net_t));
-  res_t *results = malloc (sizeof (res_t));
+  net_t network;
+  res_t results;
   int shell_index;
   
   int verbose = 1;
@@ -106,14 +106,19 @@ main (int argc, char *argv[])
 
   /* Read the chemical network file */
 
-  read_network (input_params.files.chem_file, network, verbose);
+  read_network (input_params.files.chem_file, &network, verbose);
 
   /* Check that the initial_abundance and output_species structure do
      not contain any specie that is not in the network. */
 
   check_species (input_params.abundances.initial_abundances, input_params.abundances.n_initial_abundances,
-		 input_params.output.output_species, input_params.output.n_output_species, network->species, 
-		 network->n_species);
+		 input_params.output.output_species, input_params.output.n_output_species, network.species, 
+		 network.n_species);
+
+  /* Allocate results */
+   int n_shells = MAX_SHELLS;
+   alloc_results( &results, input_params.output.time_steps, n_shells, input_params.output.n_output_species,N_OUTPUT_ROUTES);
+
 
   /* Build the vector of time */
 
@@ -123,14 +128,18 @@ main (int argc, char *argv[])
     for (i = 0; i <  input_params.output.time_steps; i++)
       {
 	if (i < MAX_TIME_STEPS)
-	    results->tim[i] = pow (10., log10 ( input_params.solver.ti) + i 
+	    results.tim[i] = pow (10., log10 ( input_params.solver.ti) + i 
 				   * (log10 (input_params.solver.tf) - log10 (input_params.solver.ti)) 
 				   / (input_params.output.time_steps - 1));
 	else
 	  {
 	    fprintf (stderr, "astrochem: error: the number of time" 
 		     "steps in %s exceed %i.\n", input_file, MAX_TIME_STEPS);
-	    exit (1);
+        free_input (&input_params);
+        free_mdl (&source_mdl);
+        free_network (&network);
+        free_results (&results);
+	    return(EXIT_FAILURE);
 	  }
       }
   }
@@ -151,7 +160,7 @@ main (int argc, char *argv[])
       {
 	if (verbose >= 1)
 	  fprintf (stdout, "Computing abundances in shell %d...\n", shell_index);
-	solve (shell_index, &input_params, &source_mdl.shell[shell_index], network, results, verbose);
+	solve (shell_index, &input_params, &source_mdl.shell[shell_index], &network, &results, verbose);
 	if (verbose >= 1)
 	  fprintf (stdout, "Done with shell %d.\n", shell_index);
       }
@@ -159,12 +168,12 @@ main (int argc, char *argv[])
 
   /* Write the abundances in output files */
 
-  output (source_mdl.n_shells, &input_params, network, results, verbose);
-  free_input_struct (&input_params);
-  free_network_struct (network);
-  free (network);
-  free (results);
-  exit (0);
+  output (source_mdl.n_shells, &input_params, &network, &results, verbose);
+  free_input (&input_params);
+  free_mdl (&source_mdl);
+  free_network (&network);
+  free_results (&results);
+  return (EXIT_SUCCESS);
 }
 
 /*

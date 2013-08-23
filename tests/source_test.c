@@ -60,8 +60,15 @@ main (void)
       (source_mdl.shell[2].nh == 1e4) &&
       (source_mdl.shell[2].tgas == 8) &&
       (source_mdl.shell[2].tdust == 7))
-    return EXIT_SUCCESS;
+    {
+      free_mdl(&source_mdl);
+      return EXIT_SUCCESS;
+    }
+
   else
+  {
+    free_mdl(&source_mdl);
     return EXIT_FAILURE;
+  }
 }
 

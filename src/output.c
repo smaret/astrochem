@@ -122,7 +122,7 @@ output (int n_shells,const inp_t *input_params,  const net_t *network, const res
 	    {
 	      fprintf (f, "%8.2e", results->tim[j] / CONST_MKSA_YEAR);
 	      for (k = 0; k < n_shells; k++)
-		fprintf (f, "  %8.2e", results->abundances[k][j][i]);
+		fprintf (f, "  %8.2e", results->abundances[get_abundance_idx(results,k,j,i)]);
 	      fprintf (f, "\n");
 	    } 
 	  
@@ -187,16 +187,16 @@ output (int n_shells,const inp_t *input_params,  const net_t *network, const res
 		      fprintf (f, "  %9.2e", results->tim[j] / CONST_MKSA_YEAR);
 		      for (l = 0; l < N_OUTPUT_ROUTES; l++)
 			{
-			  fprintf (f, "  %4i", results->routes[k][j][i][l].formation.reaction_no);
-			  fprintf (f, " %9.2e", results->routes[k][j][i][l].formation.rate);
+			  fprintf (f, "  %4i", results->routes[get_route_idx(results,k,j,i,l)].formation.reaction_no);
+			  fprintf (f, " %9.2e", results->routes[get_route_idx(results,k,j,i,l)].formation.rate);
 			}
 		      fprintf (f, "\n");
 		      fprintf (f, "%4i", k);
 		      fprintf (f, "  %9.2e",  results->tim[j] / CONST_MKSA_YEAR);
 		      for (l = 0; l < N_OUTPUT_ROUTES; l++)
 			{
-			  fprintf (f, "  %4i",  results->routes[k][j][i][l].destruction.reaction_no);
-			  fprintf (f, " %9.2e", - results->routes[k][j][i][l].destruction.rate);
+			  fprintf (f, "  %4i",  results->routes[get_route_idx(results,k,j,i,l)].destruction.reaction_no);
+			  fprintf (f, " %9.2e", - results->routes[get_route_idx(results,k,j,i,l)].destruction.rate);
 			}
 		      fprintf (f, "\n");
 		    }

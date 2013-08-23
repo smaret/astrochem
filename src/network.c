@@ -30,6 +30,7 @@
 
 void add_specie (char *new_specie, char *species[], 
 		 int *n_species);
+void alloc_network ( net_t * network, int n_species, int n_reactions );
 
 /*
   Add a specie in the species array, if not already present.
@@ -53,7 +54,9 @@ read_network (const char *chem_file, net_t *network, const int verbose)
   double gamma;
   int reaction_type;
   int reaction_no;
-  
+ 
+  alloc_network(network,MAX_SPECIES,MAX_REACTIONS);
+
   network->n_species = 0;
   network->n_reactions = 0;
 
@@ -322,16 +325,33 @@ specie_index (const char *specie, const char * const species[], int n_species)
 }
 
 /*
+  Alloc the network structure.
+*/
+void
+alloc_network ( net_t * network, int n_species, int n_reactions )
+{
+  network->species = malloc (sizeof(char*) * n_species );
+  network->reactions = malloc (sizeof( react_t) * n_reactions );
+  int i;
+  for (i=0; i<n_species; i++)
+  {
+    network->species[i] = NULL;
+  }
+}
+/*
   Free the network structure.
 */
-
 void
-free_network_struct (net_t * network )
+free_network (net_t * network)
 {
   int i;
-
   for (i=0; i<network->n_species; i++)
+  {
+    if(network->species[i] != NULL )
     {
       free (network->species[i]);
     }
+  }
+  free(network->reactions);
+  free(network->species);
 }

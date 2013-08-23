@@ -387,6 +387,7 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
    N_Vector y;                         /* Work array for the solver */
    void *cvode_mem;                    /* Memory space for the solver */
    double *reac_rates;                 /* Reaction rates */
+    
 
    /* Allocate the work array and fill it with the initial
       concentrations. Ignore species that are not in the
@@ -520,9 +521,10 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
 					network->n_species);
 	     if (spec_index != -2)
 	       {
-		 results->abundances[shell_index][i][j] = (double) NV_Ith_S (y, spec_index) / shell->nh;
-		 if (results->abundances[shell_index][i][j] < MIN_ABUNDANCE)
-		   results->abundances[shell_index][i][j] = 0.;
+         int idx = get_abundance_idx (results,shell_index,i,j);
+		 results->abundances[idx] = (double) NV_Ith_S (y, spec_index) / shell->nh;
+		 if (results->abundances[idx] < MIN_ABUNDANCE)
+		   results->abundances[idx] = 0.;
 	       }
 	   }
 
@@ -539,8 +541,9 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
 
 		 for (l = 0; l < N_OUTPUT_ROUTES; l++)
 		   {
-		     results->routes[shell_index][i][j][l].formation.rate = 0.;
-		     results->routes[shell_index][i][j][l].destruction.rate = 0.;
+             int idx = get_route_idx (results,shell_index,i,j,l);
+		     results->routes[idx].formation.rate = 0.;
+		     results->routes[idx].destruction.rate = 0.;
 		   }
 		 
 		 spec_index = specie_index (input_params->output.output_species [j],  (const char * const *) network->species, network->n_species);
@@ -584,21 +587,23 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
 			       }
 			     formation_route.reaction_no = network->reactions[k].reaction_no;
 
-			     min_rate =  results->routes[shell_index][i][j][0].formation.rate;
+			     min_rate =  results->routes[get_route_idx (results,shell_index,i,j,0)].formation.rate;
 			     min_rate_index = 0;
 			     for (l = 1; l < N_OUTPUT_ROUTES; l++)
 			       {
-				 if ( results->routes[shell_index][i][j][l].formation.rate < min_rate)
+                 int idx = get_route_idx (results,shell_index,i,j,l);
+				 if ( results->routes[idx].formation.rate < min_rate)
 				   {
-				     min_rate =  results->routes[shell_index][i][j][l].formation.rate;
+				     min_rate =  results->routes[idx].formation.rate;
 				     min_rate_index = (unsigned int)l;
 				   }
 			       }
 			     if (formation_route.rate > min_rate)
 			       {
-				  results->routes[shell_index][i][j][min_rate_index].formation.rate = 
+                  int idx = get_route_idx (results,shell_index,i,j,min_rate_index);
+				  results->routes[idx].formation.rate = 
 				   formation_route.rate;
-				  results->routes[shell_index][i][j][min_rate_index].formation.reaction_no = 
+				  results->routes[idx].formation.reaction_no = 
 				   formation_route.reaction_no;
 			       }
 			   }
@@ -635,21 +640,23 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
 			       }
 			     destruction_route.reaction_no = network->reactions[k].reaction_no;
 
-			     min_rate =  results->routes[shell_index][i][j][0].destruction.rate;
+			     min_rate =  results->routes[ get_route_idx (results,shell_index,i,j,0)].destruction.rate;
 			     min_rate_index = 0;
 			     for (l = 1; l < N_OUTPUT_ROUTES; l++)
 			       {
-				 if ( results->routes[shell_index][i][j][l].destruction.rate < min_rate)
+                 int idx = get_route_idx (results,shell_index,i,j,l);
+				 if ( results->routes[idx].destruction.rate < min_rate)
 				   {
-				     min_rate =  results->routes[shell_index][i][j][l].destruction.rate;
+				     min_rate =  results->routes[idx].destruction.rate;
 				     min_rate_index = (unsigned int)l;
 				   }
 			       }
 			     if (destruction_route.rate > min_rate)
 			       {
-				  results->routes[shell_index][i][j][min_rate_index].destruction.rate = 
+                  int idx = get_route_idx (results,shell_index,i,j,min_rate_index);
+				  results->routes[idx].destruction.rate = 
 				   destruction_route.rate;
-				  results->routes[shell_index][i][j][min_rate_index].destruction.reaction_no = 
+				  results->routes[idx].destruction.reaction_no = 
 				   destruction_route.reaction_no;
 			       }
 			   }
@@ -668,3 +675,41 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
  
  }
 
+void 
+alloc_results( res_t * results, int n_time_steps, int n_shells, int n_output_abundances, int n_output_routes)
+{
+    results->abundances = malloc (sizeof(double) * n_shells * n_time_steps * n_output_abundances);
+    results->routes = malloc (sizeof(rout_t) * n_shells * n_time_steps * n_output_abundances * n_output_routes);
+    results->tim = malloc (sizeof(double) * n_time_steps);
+    results->n_time_steps = n_time_steps;
+    results->n_shells = n_shells;
+    results->n_output_abundances = n_output_abundances;
+    results->n_output_routes = n_output_routes;
+}
+void
+free_results ( res_t * results )
+{
+    free(results->tim);
+    free(results->routes);
+    free(results->abundances);
+}
+
+/* 
+   Get index in array from all idx
+*/
+int 
+get_abundance_idx( const res_t * results,int shell_idx, int ts_idx, int abund_idx)
+{
+  return ( shell_idx * ( results->n_output_abundances * results->n_time_steps ) + ts_idx * results->n_output_abundances + abund_idx );
+}
+
+/* 
+   Get index in array from all idx
+*/
+int 
+get_route_idx( const res_t * results, int shell_idx, int ts_idx, int abund_idx, int route_idx)
+{
+  return ( shell_idx * ( results->n_output_routes * results->n_output_abundances * results->n_time_steps) 
+           + ts_idx * ( results->n_output_routes * results->n_output_abundances ) 
+           + abund_idx * results->n_output_routes +  route_idx );
+}

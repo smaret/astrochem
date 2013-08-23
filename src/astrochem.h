@@ -82,12 +82,12 @@ typedef struct {
 } solver_t;
 
 typedef struct {
-  abund_t initial_abundances[MAX_INITIAL_ABUNDANCES];
+  abund_t * initial_abundances;
   int n_initial_abundances;
 } abundances_t;
 
 typedef struct {
-  char *output_species[MAX_OUTPUT_ABUNDANCES];
+  char ** output_species;
   int n_output_species;
   int time_steps;
   int trace_routes;
@@ -110,7 +110,7 @@ typedef struct {
   } shell_t;
 
 typedef struct {
-  shell_t shell[MAX_SHELLS];
+  shell_t * shell;
   int n_shells;
 } mdl_t;
 
@@ -132,9 +132,9 @@ typedef struct {
 
 typedef struct {
   int n_species;
-  char* species[MAX_SPECIES];
+  char ** species;
   int n_reactions;
-  react_t reactions[MAX_REACTIONS];
+  react_t * reactions;
 } net_t;
 
 typedef struct {
@@ -148,9 +148,13 @@ typedef struct {
 } rout_t;
 
 typedef struct {
-  double abundances[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES];
-  rout_t routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES];
-  double tim[MAX_TIME_STEPS];
+  double * abundances;
+  rout_t * routes;
+  double * tim;
+  int n_shells;
+  int n_time_steps;
+  int n_output_abundances;
+  int n_output_routes;
 } res_t;
 
 /* Fonction prototypes
@@ -160,11 +164,12 @@ typedef struct {
    "results" data structures. */
 
 void read_input (const char *input_file, inp_t *input_params, int verbose);
-
-void free_input_struct ( inp_t * input_params );
+void free_input ( inp_t * input_params );
 
 void read_source (const char *source_file, mdl_t *source_mdl,
 		      const int verbose);
+void free_mdl( mdl_t * source_mdl );
+
 
 void input_error (const char *input_f, int line_number);
 
@@ -173,6 +178,11 @@ void check_species ( abund_t initial_abundances[], int
 		    n_output_species, char *species[], int n_species);
 
 void read_network (const char *chem_file, net_t *network, const int verbose);
+void free_network ( net_t *network );
+void alloc_results( res_t * results, int n_time_steps, int n_shells, int n_output_abundances, int n_output_routes);
+
+void alloc_results( res_t * results, int n_time_steps, int n_shells, int n_output_abundances, int n_output_routes);
+void free_results ( res_t * results );
 
 int specie_index (const char specie[],const char * const species[], int n_species);
 
@@ -183,6 +193,7 @@ double rate(double alpha, double beta, double gamm, int reaction_type,
 
 int solve (int shell_index, const inp_t *input_params, const shell_t *shell,
 	   const net_t *network, res_t *results, int verbose);
-
+int get_abundance_idx( const res_t * results,int shell_idx, int ts_idx, int abund_idx);
+int get_route_idx( const res_t * results, int shell_idx, int ts_idx, int abund_idx, int route_idx);
 void output (int n_shells, const inp_t *input_params, const net_t *network,
 	     const res_t *results, int verbose);

@@ -103,12 +103,12 @@ main (void)
       (strcmp (input_params.output.output_species[3], "e(-)") == 0) &&
       (strcmp (input_params.output.output_species[4], "OH") == 0))
     {
-      free_input_struct (&input_params);
+      free_input (&input_params);
       return EXIT_SUCCESS;
     }
   else
     {
-      free_input_struct (&input_params);
+      free_input (&input_params);
       return EXIT_FAILURE;
     }
 }

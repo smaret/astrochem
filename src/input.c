@@ -35,6 +35,9 @@
   parameters, solver parameters, and initial abundances.
 */ 
   
+void alloc_input (inp_t * input_params, int n_initial_abundances, int n_output_abundances);
+void alloc_mdl( mdl_t * source_mdl , int n_shells );
+
 void
 read_input (const char *input_file, inp_t *input_params, int verbose)
 {
@@ -61,7 +64,7 @@ read_input (const char *input_file, inp_t *input_params, int verbose)
 
   /* Set the default values for parameters in the input file, in case
      the user didn't specify them. */
-  
+  alloc_input (input_params, MAX_INITIAL_ABUNDANCES, MAX_OUTPUT_ABUNDANCES);  
   strcpy (input_params->files.source_file, "");
   strcpy (input_params->files.chem_file, "");
   strcpy (&input_params->output.suffix, "");
@@ -300,7 +303,8 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
   int i = 0;
   int col1;
   double col2, col3, col4, col5;
-
+  
+  alloc_mdl(source_mdl, MAX_SHELLS);
   /* Open the input file or exit if we can't open it */
 
   if (verbose == 1)
@@ -392,19 +396,54 @@ check_species (abund_t initial_abundances[],
 }
 
 /* 
-   Free the input structure.
+   Alloc the input structure.
 */
-
 void
-free_input_struct (inp_t * input_params)
+alloc_input (inp_t * input_params, int n_initial_abundances, int n_output_abundances)
 {
+  input_params->abundances.initial_abundances = malloc (sizeof(abund_t)*n_initial_abundances);
+  input_params->output.output_species = malloc (sizeof(char*)*n_output_abundances);
   int i;
-
-  for (i=0; i < MAX_OUTPUT_ABUNDANCES; i++)
+  for (i=0; i < n_output_abundances; i++)
     {
-      if (input_params->output.output_species[i] != NULL)
-        {
-	  free (input_params->output.output_species[i]);
-        }
+        input_params->output.output_species[i]=NULL;
     }
 }
+/* 
+   Free the input structure.
+*/
+void
+free_input (inp_t * input_params)
+{
+  int i;
+  for (i=0; i < input_params->output.n_output_species; i++)
+  {
+    if (input_params->output.output_species[i] != NULL)
+    {
+      free (input_params->output.output_species[i]);
+    }
+  }
+  free(input_params->output.output_species);
+  free(input_params->abundances.initial_abundances);
+
+}
+
+/*
+   Alloc the model structure
+*/
+void 
+alloc_mdl( mdl_t * source_mdl , int n_shells )
+{
+    source_mdl->shell = malloc ( sizeof(shell_t) * n_shells );
+}
+
+/*
+   Fre the model structure
+*/
+void 
+free_mdl( mdl_t * source_mdl )
+{
+    free(source_mdl->shell);
+}
+
+
