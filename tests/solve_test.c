@@ -29,7 +29,7 @@ int
 main (void)
 {
   FILE *f;
-  int shell_index;
+  int cell_index;
   inp_t input_params;
   mdl_t source_mdl;
   net_t network;
@@ -81,8 +81,7 @@ main (void)
   /* Solve the ODE system */
 
   /* Allocate results */
-   int n_shells = MAX_SHELLS;
-   alloc_results( &results, input_params.output.time_steps, n_shells, input_params.output.n_output_species);
+   alloc_results( &results, input_params.output.time_steps, source_mdl.n_cells, input_params.output.n_output_species);
 
 
   {
@@ -98,8 +97,8 @@ main (void)
       }
   }
 
-  shell_index = 0.;
-  solve (shell_index, &input_params, &source_mdl.shell[shell_index], &network, &results, verbose);
+  cell_index = 0.;
+  solve (cell_index, &input_params, &source_mdl.cell[cell_index], &network, &results, verbose);
 
   {
     int i;

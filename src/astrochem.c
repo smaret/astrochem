@@ -44,7 +44,7 @@ main (int argc, char *argv[])
   mdl_t source_mdl;
   net_t network;
   res_t results;
-  int shell_index;
+  int cell_index;
   
   int verbose = 1;
   char *input_file;
@@ -116,8 +116,7 @@ main (int argc, char *argv[])
 		 network.n_species);*/
 
   /* Allocate results */
-   int n_shells = MAX_SHELLS;
-   alloc_results( &results, input_params.output.time_steps, n_shells, input_params.output.n_output_species);
+   alloc_results( &results, input_params.output.time_steps, source_mdl.n_cells, input_params.output.n_output_species);
 
 
   /* Build the vector of time */
@@ -144,10 +143,10 @@ main (int argc, char *argv[])
       }
   }
 
-  /* Solve the ODE system for each shell. */
+  /* Solve the ODE system for each cell. */
 
 #ifdef HAVE_OPENMP  
-#pragma omp parallel shared (abundances) private (shell_index)
+#pragma omp parallel shared (abundances) private (cell_index)
 #endif
 
   {
@@ -156,19 +155,19 @@ main (int argc, char *argv[])
 #pragma omp for schedule (dynamic, 1) nowait
 #endif
 
-    for (shell_index = 0; shell_index < source_mdl.n_shells; shell_index++)
+    for (cell_index = 0; cell_index < source_mdl.n_cells; cell_index++)
       {
 	if (verbose >= 1)
-	  fprintf (stdout, "Computing abundances in shell %d...\n", shell_index);
-	solve (shell_index, &input_params, &source_mdl.shell[shell_index], &network, &results, verbose);
+	  fprintf (stdout, "Computing abundances in cell %d...\n", cell_index);
+	solve (cell_index, &input_params, &source_mdl.cell[cell_index], &network, &results, verbose);
 	if (verbose >= 1)
-	  fprintf (stdout, "Done with shell %d.\n", shell_index);
+	  fprintf (stdout, "Done with cell %d.\n", cell_index);
       }
   }
 
   /* Write the abundances in output files */
 
-  output (source_mdl.n_shells, &input_params, &network, &results, verbose);
+  output (source_mdl.n_cells, &input_params, &network, &results, verbose);
   free_input (&input_params);
   free_mdl (&source_mdl);
   free_network (&network);

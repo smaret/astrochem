@@ -379,7 +379,7 @@ jacobian (int N __attribute__ ((unused)),
  */
 
   int
-solve (int shell_index, const inp_t *input_params, const shell_t *shell,
+solve (int cell_index, const inp_t *input_params, const cell_t *cell,
     const net_t *network, res_t *results, int verbose)
 {
   realtype t = 0.0;
@@ -409,7 +409,7 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
     for (i = 0; i < input_params->abundances.n_initial_abundances; i++)
     {
       NV_Ith_S (y, input_params->abundances.initial_abundances[i].specie_idx) = 
-        input_params->abundances.initial_abundances[i].abundance * shell->nh;
+        input_params->abundances.initial_abundances[i].abundance * cell->nh[0];
     }
   }
 
@@ -431,7 +431,7 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
           network->reactions[i].gamma,
           network->reactions[i].reaction_type,
           network->reactions[i].reaction_no,
-          shell->nh, shell->av, shell->tgas, shell->tdust,
+          cell->nh[0], cell->av[0], cell->tgas[0], cell->tdust[0],
           input_params->phys.chi, input_params->phys.cosmic,
           input_params->phys.grain_size,
           input_params->phys.grain_abundance, 
@@ -446,10 +446,10 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
   params.reactions = network->reactions;
   params.n_reactions = network->n_reactions;
   params.n_species = network->n_species;
-  params.nh = shell->nh;
-  params.av = shell->av;
-  params.tgas = shell->tgas;
-  params.tdust = shell->tdust;
+  params.nh = cell->nh[0];
+  params.av = cell->av[0];
+  params.tgas = cell->tgas[0];
+  params.tdust = cell->tdust[0];
   params.chi = input_params->phys.chi;
   params.cosmic = input_params->phys.cosmic;
   params.grain_size = input_params->phys.grain_size;
@@ -468,7 +468,7 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
   }
 
   if ((CVodeInit (cvode_mem, f, 0.0, y) != CV_SUCCESS)
-      || (CVodeSStolerances (cvode_mem, input_params->solver.rel_err, input_params->solver.abs_err * shell->nh) != CV_SUCCESS)
+      || (CVodeSStolerances (cvode_mem, input_params->solver.rel_err, input_params->solver.abs_err * cell->nh[0]) != CV_SUCCESS)
 #ifdef USE_LAPACK
       || ((CVLapackDense (cvode_mem, network->n_species) != CV_SUCCESS))
 #else
@@ -491,15 +491,15 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
     {
       CVode (cvode_mem, (realtype) results->tim[i], y, &t, CV_NORMAL);
 
-      /* Print the shell number, time and time step after each call. */
+      /* Print the cell number, time and time step after each call. */
 
       if (verbose >= 2)
       {
         realtype h;
 
         CVodeGetLastStep (cvode_mem, &h);
-        fprintf (stdout, "shell = %3i  t = %8.2e  delta_t = %8.2e\n",
-            shell_index, (double) t / CONST_MKSA_YEAR, 
+        fprintf (stdout, "cell = %3i  t = %8.2e  delta_t = %8.2e\n",
+            cell_index, (double) t / CONST_MKSA_YEAR, 
             (double) h / CONST_MKSA_YEAR);
       }
 
@@ -510,9 +510,9 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
 
       for (j = 0; j < input_params->output.n_output_species; j++)
       {
-        int idx = get_abundance_idx (results,shell_index,i,j);
+        int idx = get_abundance_idx (results,cell_index,i,j);
         results->abundances[idx] 
-          = (double) NV_Ith_S (y, input_params->output.output_species_idx[j]) / shell->nh;
+          = (double) NV_Ith_S (y, input_params->output.output_species_idx[j]) / cell->nh[0];
         if (results->abundances[idx] < MIN_ABUNDANCE)
           results->abundances[idx] = 0.;
       }
@@ -528,7 +528,7 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
           int l;
           for (l = 0; l < N_OUTPUT_ROUTES; l++)
           {
-            int idx = get_route_idx (results,shell_index,i,j,l);
+            int idx = get_route_idx (results,cell_index,i,j,l);
             results->routes[idx].formation.rate = 0.;
             results->routes[idx].destruction.rate = 0.;
           }
@@ -568,11 +568,11 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
                   formation_route.rate *= NV_Ith_S (y, network->reactions[k].reactant3);
               }
               formation_route.reaction_no = network->reactions[k].reaction_no;
-              min_rate =  results->routes[get_route_idx (results,shell_index,i,j,0)].formation.rate;
+              min_rate =  results->routes[get_route_idx (results,cell_index,i,j,0)].formation.rate;
               min_rate_index = 0;
               for (l = 1; l < N_OUTPUT_ROUTES; l++)
               {
-                int idx = get_route_idx (results,shell_index,i,j,l);
+                int idx = get_route_idx (results,cell_index,i,j,l);
                 if ( results->routes[idx].formation.rate < min_rate)
                 {
                   min_rate =  results->routes[idx].formation.rate;
@@ -581,7 +581,7 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
               }
               if (formation_route.rate > min_rate)
               {
-                int idx = get_route_idx (results,shell_index,i,j,min_rate_index);
+                int idx = get_route_idx (results,cell_index,i,j,min_rate_index);
                 results->routes[idx].formation.rate = 
                   formation_route.rate;
                 results->routes[idx].formation.reaction_no = 
@@ -621,11 +621,11 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
               }
               destruction_route.reaction_no = network->reactions[k].reaction_no;
 
-              min_rate =  results->routes[ get_route_idx (results,shell_index,i,j,0)].destruction.rate;
+              min_rate =  results->routes[ get_route_idx (results,cell_index,i,j,0)].destruction.rate;
               min_rate_index = 0;
               for (l = 1; l < N_OUTPUT_ROUTES; l++)
               {
-                int idx = get_route_idx (results,shell_index,i,j,l);
+                int idx = get_route_idx (results,cell_index,i,j,l);
                 if ( results->routes[idx].destruction.rate < min_rate)
                 {
                   min_rate =  results->routes[idx].destruction.rate;
@@ -634,7 +634,7 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
               }
               if (destruction_route.rate > min_rate)
               {
-                int idx = get_route_idx (results,shell_index,i,j,min_rate_index);
+                int idx = get_route_idx (results,cell_index,i,j,min_rate_index);
                 results->routes[idx].destruction.rate = 
                   destruction_route.rate;
                 results->routes[idx].destruction.reaction_no = 
@@ -654,15 +654,15 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
 }
 
   void 
-alloc_results( res_t * results, int n_time_steps, int n_shells, int n_output_abundances)
+alloc_results( res_t * results, int n_time_steps, int n_cells, int n_output_abundances)
 {
-  if (( results->abundances = malloc (sizeof(double) * n_shells * n_time_steps * n_output_abundances)) == NULL )
+  if (( results->abundances = malloc (sizeof(double) * n_cells * n_time_steps * n_output_abundances)) == NULL )
   {
     fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
         __FILE__, __LINE__); 
     exit(1);
   }
-  if (( results->routes = malloc (sizeof(rout_t) * n_shells * n_time_steps * n_output_abundances * N_OUTPUT_ROUTES)) == NULL )
+  if (( results->routes = malloc (sizeof(rout_t) * n_cells * n_time_steps * n_output_abundances * N_OUTPUT_ROUTES)) == NULL )
   {
     fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
         __FILE__, __LINE__); 
@@ -675,7 +675,7 @@ alloc_results( res_t * results, int n_time_steps, int n_shells, int n_output_abu
     exit(1);
   }
   results->n_time_steps = n_time_steps;
-  results->n_shells = n_shells;
+  results->n_cells = n_cells;
   results->n_output_abundances = n_output_abundances;
 }
   void
@@ -690,18 +690,18 @@ free_results ( res_t * results )
    Get index in array from all idx
  */
   int 
-get_abundance_idx( const res_t * results,int shell_idx, int ts_idx, int abund_idx)
+get_abundance_idx( const res_t * results,int cell_idx, int ts_idx, int abund_idx)
 {
-  return ( shell_idx * ( results->n_output_abundances * results->n_time_steps ) + ts_idx * results->n_output_abundances + abund_idx );
+  return ( cell_idx * ( results->n_output_abundances * results->n_time_steps ) + ts_idx * results->n_output_abundances + abund_idx );
 }
 
 /* 
    Get index in array from all idx
  */
   int 
-get_route_idx( const res_t * results, int shell_idx, int ts_idx, int abund_idx, int route_idx)
+get_route_idx( const res_t * results, int cell_idx, int ts_idx, int abund_idx, int route_idx)
 {
-  return ( shell_idx * ( N_OUTPUT_ROUTES * results->n_output_abundances * results->n_time_steps) 
+  return ( cell_idx * ( N_OUTPUT_ROUTES * results->n_output_abundances * results->n_time_steps) 
       + ts_idx * ( N_OUTPUT_ROUTES * results->n_output_abundances ) 
       + abund_idx * N_OUTPUT_ROUTES +  route_idx );
 }

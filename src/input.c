@@ -36,7 +36,7 @@
  */ 
 
 void alloc_input (inp_t * input_params, int n_initial_abundances, int n_output_abundances);
-void alloc_mdl( mdl_t * source_mdl , int n_shells );
+void alloc_mdl( mdl_t * source_mdl , int n_cells , int n_time_steps);
 
   void
 read_input (const char *input_file, inp_t *input_params, const net_t * network, int verbose)
@@ -247,7 +247,7 @@ read_input (const char *input_file, inp_t *input_params, const net_t * network, 
           if(specie_idx<0)
           {
             fprintf (stderr, "astrochem: warning: %s abundance requested, "
-            "but is not in the network.\n", output_specie);
+                "but is not in the network.\n", output_specie);
           }
           input_params->output.output_species_idx[j] = specie_idx;
           j++;
@@ -263,7 +263,7 @@ read_input (const char *input_file, inp_t *input_params, const net_t * network, 
             if(specie_idx<0)
             {
               fprintf (stderr, "astrochem: warning: %s abundance requested, "
-              "but is not in the network.\n", output_specie);
+                  "but is not in the network.\n", output_specie);
             }
             input_params->output.output_species_idx[j] = specie_idx;
             j++;
@@ -346,22 +346,22 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
   FILE *f;
   char line[MAX_LINE];
   int line_number = 0;
-  int i = 0;
-  int col1;
-  double col2, col3, col4, col5;
-  int n_shells = 0;
-
-  n_shells = get_nb_active_line(source_file);
-  /* Check the model has at least one shell */
-  if ( n_shells == 0 )
+  int n_cell = 0;
+  int ts = 0;
+  int allocated = 0;
+  int n_line = get_nb_active_line(source_file);
+  int mode = 0; //0 static, 1 dynamic
+  double av,nh,tgas,tdust;
+  /* Check the model has at least one cell */
+  if ( n_line == 0 )
   {
     fprintf (stderr, "astrochem: error: no valid lines found in %s.\n",
         source_file);
     exit (1);
   }
-  alloc_mdl(source_mdl, n_shells);
-  /* Open the input file or exit if we can't open it */
 
+
+  /* Open the input file or exit if we can't open it */
   if (verbose == 1)
     fprintf (stdout, "Reading source model from %s.\n", source_file);
   f = fopen (source_file, "r" );
@@ -371,76 +371,114 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
     exit (1);
   }
 
-  /* Loop over the lines, and read the shell number, visual
+  /* Loop over the lines, and read the cell number, visual
      extinction, density, gas and dust temperature. */
-
   while (fgets (line, MAX_LINE, f) != NULL)
   {
     line_number++;
     if (line[0] == '#') continue; /* Skip comments */
-    if (sscanf (line, "%d %lf %lf %lf %lf", 
-          &col1, &col2, &col3, &col4, &col5) == 5)
+    if(line[0] == 'D') //Header
     {
-      if (i < source_mdl->n_shells )
+      int nts;
+      sscanf(line,"D %d",nts);
+      alloc_mdl(source_mdl, n_line/nts,nts);
+      mode=1;
+      allocated=1;
+      continue;
+    }
+    else if(allocated==0)
+    {
+      alloc_mdl(source_mdl, n_line,1);
+      allocated=1;
+    }
+
+    //Dynamic mode
+    if(mode==1)
+    {
+      if (ts < source_mdl->n_time_steps )
       {
-        source_mdl->shell[i].av = col2;
-        source_mdl->shell[i].nh = col3;
-        source_mdl->shell[i].tgas = col4;
-        source_mdl->shell[i].tdust = col5;
-        i++;
+        int tmp_cell,ts_val;
+        if (sscanf (line, "%d %d %lf %lf %lf %lf", 
+              &tmp_cell,&ts_val, &av, &nh, &tgas, &tdust) != 6)
+        {
+          fprintf (stderr, "astrochem: error: incorrect format in source file %s.\n", 
+              source_file);
+          exit (1);
+        }
+        if(tmp_cell==0)
+        {
+          source_mdl->time_steps[ts] = ts_val;
+        }
+        else if(tmp_cell==n_cell+1)
+        {
+          ts=0;
+          n_cell=tmp_cell;
+        }
+        else if(tmp_cell != n_cell)
+        {
+          fprintf (stderr, "astrochem: error: incorrect format in source file %s. next cell %i is not past cell %i +1 \n", 
+              source_file, tmp_cell, n_cell );
+          exit (1);
+        }
+        if(n_cell < source_mdl->n_cells)
+        {
+          if(ts_val != source_mdl->time_steps[ts])
+          {
+            fprintf (stderr, "astrochem: error: incorrect format in source file %s. with cell %i , time_steps n°%i == %i, should be %i  \n", 
+                source_file, n_cell, ts, ts_val, source_mdl->time_steps[ts] );
+            exit (1);
+          }
+          source_mdl->cell[n_cell].av[ts] = av;
+          source_mdl->cell[n_cell].nh[ts] = nh;
+          source_mdl->cell[n_cell].tgas[ts] = tgas;
+          source_mdl->cell[n_cell].tdust[ts] = tdust;
+          ts++;
+        }
+        else
+        {
+          fprintf (stderr, "astrochem: error: the number of cells in %s exceed %i\n", 
+              source_file, source_mdl->n_cells);
+          exit (1);
+        }
       }
       else
       {
-        fprintf (stderr, "astrochem: error: the number of shells in %s exceed %i.\n", 
-            source_file, source_mdl->n_shells);
+        fprintf (stderr, "astrochem: error: the number of time steps in %s exceed %i.\n", 
+            source_file, source_mdl->n_time_steps);
         exit (1);
+
       }
-    } 
+    }
+    //Static mode
     else
     {
-      input_error (source_file, line_number);
+      if (n_cell < source_mdl->n_cells )
+      {
+        int tmp;
+        if (sscanf (line, "%d %lf %lf %lf %lf", 
+              &tmp, &av, &nh, &tgas, &tdust) != 5)
+        {
+          fprintf (stderr, "astrochem: error: incorrect format in source file %s.\n", 
+              source_file);
+          exit (1);
+        }
+        source_mdl->cell[n_cell].av[0] = av;
+        source_mdl->cell[n_cell].nh[0] = nh;
+        source_mdl->cell[n_cell].tgas[0] = tgas;
+        source_mdl->cell[n_cell].tdust[0] = tdust;
+        n_cell++;
+      }
+      else
+      {
+        fprintf (stderr, "astrochem: error: the number of cells in %s exceed %i.\n", 
+            source_file, source_mdl->n_cells);
+        exit (1);
+      }
     }
   }
-
   /* Close the file */
-
   fclose (f);
-
 }
-
-/* 
-   Check that the initial_abundance and output species structure do
-   not contain any specie that is not in the network. If they do, we
-   simply display a warning message, since those will be ignored in
-   solve() and output(). 
- */
-
-/*  void
-check_species (abund_t initial_abundances[],
-    int n_initial_abundances, char *output_species[],
-    int n_output_species, char *species[], int n_species)
-{
-  int i;
-*/
-  /* Check initial abundances */
-
-  /*for (i=0; i < n_initial_abundances; i++)
-  {
-    if (specie_index (initial_abundances[i].specie_idx, (const char* const*) species, n_species) == -2)
-      fprintf (stderr, "astrochem: warning: %s initial abundance given, "
-          "but is not in the network.\n", initial_abundances[i].specie_idx);
-  }
-*/
-  /* Check output species */
-
-  /*for (i=0; i < n_output_species; i++)
-  {
-    if (specie_index (output_species [i], (const char *const *) species, n_species) == -2)
-      fprintf (stderr, "astrochem: warning: %s abundance requested, "
-          "but is not in the network.\n", output_species [i]);
-  }
-}
-*/
 
 /* 
    Alloc the input structure.
@@ -477,14 +515,49 @@ free_input (inp_t * input_params)
    Alloc the model structure
  */
   void 
-alloc_mdl( mdl_t * source_mdl , int n_shells )
+alloc_mdl( mdl_t * source_mdl , int n_cells , int n_time_steps)
 {
-  source_mdl->n_shells = n_shells;
-  if ( (source_mdl->shell = malloc ( sizeof(shell_t) * n_shells ) ) == NULL )
+  source_mdl->n_cells = n_cells;
+  source_mdl->n_time_steps = n_time_steps;
+  if ( (source_mdl->cell = malloc ( sizeof(cell_t) * n_cells ) ) == NULL )
   {
     fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
         __FILE__, __LINE__); 
     exit(1);
+  }
+  if ( (source_mdl->time_steps = malloc ( sizeof(cell_t) * n_time_steps ) ) == NULL )
+  {
+    fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+        __FILE__, __LINE__); 
+    exit(1);
+  }
+  int i;
+  for(i=0;i<n_cells;i++)
+  {
+    if( ( source_mdl->cell[i].nh = malloc(sizeof(double) * n_time_steps) ) == NULL )
+    {
+      fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+          __FILE__, __LINE__); 
+      exit(1);
+    }
+    if( ( source_mdl->cell[i].av = malloc(sizeof(double) * n_time_steps) ) == NULL )
+    {
+      fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+          __FILE__, __LINE__); 
+      exit(1);
+    }
+    if( ( source_mdl->cell[i].tgas = malloc(sizeof(double) * n_time_steps) ) == NULL )
+    {
+      fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+          __FILE__, __LINE__); 
+      exit(1);
+    }
+    if( ( source_mdl->cell[i].tdust = malloc(sizeof(double) * n_time_steps) ) == NULL )
+    {
+      fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+          __FILE__, __LINE__); 
+      exit(1);
+    }
   }
 }
 
@@ -494,7 +567,16 @@ alloc_mdl( mdl_t * source_mdl , int n_shells )
   void 
 free_mdl( mdl_t * source_mdl )
 {
-  free(source_mdl->shell);
+  int i;
+  for(i=0;i<source_mdl->n_cells;i++)
+  {
+    free(source_mdl->cell[i].av);
+    free(source_mdl->cell[i].nh);
+    free(source_mdl->cell[i].tgas);
+    free(source_mdl->cell[i].tdust);
+  }
+  free(source_mdl->cell);
+  free(source_mdl->time_steps);
 }
 
   int
@@ -510,7 +592,7 @@ get_nb_active_line(const char * file)
     exit (1);
   }
 
-  /* Loop over the lines, and read the shell number, visual
+  /* Loop over the lines, and read the cell number, visual
      extinction, density, gas and dust temperature. */
 
   while (fgets (line, MAX_LINE, f) != NULL)
@@ -524,7 +606,7 @@ get_nb_active_line(const char * file)
   return line_number;
 }
 
- void
+  void
 read_input_file_names (const char *input_file, files_t *files, int verbose)
 {
   FILE *f;
