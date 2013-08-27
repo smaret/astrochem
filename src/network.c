@@ -364,9 +364,20 @@ alloc_network ( net_t * network, int n_species, int n_reactions )
 {
   network->n_alloc_species = n_species;
   network->n_species = 0;
-  network->species = malloc (sizeof(char*) * n_species );
+  if ((network->species = malloc (sizeof(char*) * n_species )) == NULL )
+  {
+      fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__, 
+		   "array allocation failed.\n");
+	  exit (1);
+  }
+
   network->n_reactions = n_reactions;
-  network->reactions = malloc (sizeof( react_t) * n_reactions );
+  if ((network->reactions = malloc (sizeof( react_t) * n_reactions )) == NULL )
+  {
+     fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__, 
+		   "array allocation failed.\n");
+	 exit (1);
+  }
   int i;
   for (i=0; i<n_species; i++)
   {
@@ -384,7 +395,12 @@ realloc_network_species ( net_t * network, int n_species )
 	  exit (1);
   }
   network->n_alloc_species = n_species;
-  network->species = realloc (network->species,sizeof(char*) * n_species );
+  if(( network->species = realloc (network->species,sizeof(char*) * n_species )) == NULL )
+  {
+      fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__, 
+		   "array allocation failed.\n");
+	  exit (1);
+  }
   int i;
   for (i=network->n_species; i<n_species; i++)
   {

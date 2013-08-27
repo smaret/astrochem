@@ -444,8 +444,18 @@ alloc_input (inp_t * input_params, int n_initial_abundances, int n_output_abunda
 {
   input_params->abundances.n_initial_abundances = n_initial_abundances;
   input_params->output.n_output_species = n_output_abundances;
-  input_params->abundances.initial_abundances = malloc (sizeof(abund_t)*n_initial_abundances);
-  input_params->output.output_species = malloc (sizeof(char*)*n_output_abundances);
+  if ( ( input_params->abundances.initial_abundances = malloc (sizeof(abund_t)*n_initial_abundances) ) == NULL )
+  {
+    fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+		 __FILE__, __LINE__); 
+    exit(1);
+  }
+  if ( ( input_params->output.output_species = malloc (sizeof(char*)*n_output_abundances) ) == NULL )
+  {
+    fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+		 __FILE__, __LINE__); 
+    exit(1);
+  }
   int i;
   for (i=0; i < n_output_abundances; i++)
     {
@@ -478,7 +488,12 @@ void
 alloc_mdl( mdl_t * source_mdl , int n_shells )
 {
     source_mdl->n_shells = n_shells;
-    source_mdl->shell = malloc ( sizeof(shell_t) * n_shells );
+    if ( (source_mdl->shell = malloc ( sizeof(shell_t) * n_shells ) ) == NULL )
+    {
+      fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+  		 __FILE__, __LINE__); 
+      exit(1);
+    }
 }
 
 /*

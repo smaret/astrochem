@@ -678,9 +678,24 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
 void 
 alloc_results( res_t * results, int n_time_steps, int n_shells, int n_output_abundances)
 {
-    results->abundances = malloc (sizeof(double) * n_shells * n_time_steps * n_output_abundances);
-    results->routes = malloc (sizeof(rout_t) * n_shells * n_time_steps * n_output_abundances * N_OUTPUT_ROUTES);
-    results->tim = malloc (sizeof(double) * n_time_steps);
+    if (( results->abundances = malloc (sizeof(double) * n_shells * n_time_steps * n_output_abundances)) == NULL )
+    {
+       fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+		__FILE__, __LINE__); 
+       exit(1);
+     }
+    if (( results->routes = malloc (sizeof(rout_t) * n_shells * n_time_steps * n_output_abundances * N_OUTPUT_ROUTES)) == NULL )
+    {
+       fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+		__FILE__, __LINE__); 
+       exit(1);
+    }
+    if (( results->tim = malloc (sizeof(double) * n_time_steps)) == NULL )
+    { 
+       fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+		__FILE__, __LINE__); 
+       exit(1);
+    }
     results->n_time_steps = n_time_steps;
     results->n_shells = n_shells;
     results->n_output_abundances = n_output_abundances;
