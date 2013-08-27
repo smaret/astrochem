@@ -62,9 +62,59 @@ read_input (const char *input_file, inp_t *input_params, int verbose)
       exit (EXIT_FAILURE);
     }
 
+  int n_initial_abundances=0;
+  int n_output_species=0;
+  while (fgets (line, MAX_LINE, f) != NULL)
+  {
+      if(strcmp(line,"[abundances]\n") == 0 )
+      {
+        while (fgets (line, MAX_LINE, f) != NULL)
+        {
+          if (sscanf (line, "%s = %s", parameter, value ) == 2)
+          { 
+            n_initial_abundances++;
+          }
+          else
+          {
+            break;
+          }
+        }
+      }
+      else if(strncmp(line,"abundances",10)==0)
+      {
+          char * localStr = &line[9];
+          while(localStr!=NULL)
+          {
+              localStr++;
+              localStr=strchr(localStr,',');
+              n_output_species++;
+          }
+      }
+    
+  }
+  if(n_initial_abundances > MAX_INITIAL_ABUNDANCES)
+  {
+    fprintf (stderr, "astrochem: error: the number of species "
+			 "in %s exceed %i.\n", input_file, MAX_INITIAL_ABUNDANCES);
+	exit (1);
+  }
+  if(n_output_species > MAX_OUTPUT_ABUNDANCES)
+  {
+    fprintf (stderr, "astrochem: error: the number of species in output exceeds %i.\n",
+			     MAX_OUTPUT_ABUNDANCES);
+	exit(1);
+  }
+  //Reset stream to beginning of file
+  if( fseek(f,0,SEEK_SET) != 0)
+  {
+    fprintf (stderr, "astrochem: error seeking begining of input file "
+			 "%s .\n", input_file);
+	exit (1);
+  }
+
   /* Set the default values for parameters in the input file, in case
      the user didn't specify them. */
-  alloc_input (input_params, MAX_INITIAL_ABUNDANCES, MAX_OUTPUT_ABUNDANCES);  
+  alloc_input (input_params, n_initial_abundances, n_output_species);  
   strcpy (input_params->files.source_file, "");
   strcpy (input_params->files.chem_file, "");
   strcpy (input_params->output.suffix, "");
@@ -137,7 +187,7 @@ read_input (const char *input_file, inp_t *input_params, int verbose)
 	
 	else if (strcmp (keyword, "abundances") == 0)
 	  {
-	    if (i < MAX_INITIAL_ABUNDANCES)
+	    if (i < input_params->abundances.n_initial_abundances)
 	      {
 		strncpy (input_params->abundances.initial_abundances[i].specie, parameter,
 			 sizeof (input_params->abundances.initial_abundances[i].specie));
@@ -157,8 +207,8 @@ read_input (const char *input_file, inp_t *input_params, int verbose)
 	      } 
 	    else 
 	      {
-		fprintf (stderr, "astrochem: error: the number of species "
-			 "in %s exceed %i.\n", input_file, MAX_INITIAL_ABUNDANCES);
+		fprintf (stderr, "astrochem: error: the number of species is incorrect, != %i, file "
+			 "%s may be corrupt .\n", input_file, MAX_INITIAL_ABUNDANCES);
 		exit (1);
 	      }
 	  }
@@ -179,13 +229,7 @@ read_input (const char *input_file, inp_t *input_params, int verbose)
 
 		/* Structure initialization */
 
-		int temp_i;
-		for (temp_i = 0; temp_i < MAX_OUTPUT_ABUNDANCES; temp_i++)
-		  {
-		    input_params->output.output_species[temp_i]=NULL;
-		  }
-
-		if (j >= MAX_OUTPUT_ABUNDANCES)
+		if (j >= input_params->output.n_output_species)
 		  {
 		    fprintf (stderr, "astrochem: error: the number of species in output exceeds %i.\n",
 			     MAX_OUTPUT_ABUNDANCES);
@@ -244,9 +288,6 @@ read_input (const char *input_file, inp_t *input_params, int verbose)
   
   fclose (f);
   
-  input_params->abundances.n_initial_abundances = i;
-  input_params->output.n_output_species = j;
-  
   /* Check that the source file name and the chemical file name were specified
      in the input file. Also check that other parameters have acceptable 
      values. */
@@ -303,8 +344,17 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
   int i = 0;
   int col1;
   double col2, col3, col4, col5;
+  int n_shells = 0;
   
-  alloc_mdl(source_mdl, MAX_SHELLS);
+  n_shells = get_nb_active_line(source_file);
+  /* Check the model has at least one shell */
+  if ( n_shells == 0 )
+    {
+      fprintf (stderr, "astrochem: error: no valid lines found in %s.\n",
+	       source_file);
+      exit (1);
+    }
+   alloc_mdl(source_mdl, n_shells);
   /* Open the input file or exit if we can't open it */
 
   if (verbose == 1)
@@ -326,7 +376,7 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
       if (sscanf (line, "%d %lf %lf %lf %lf", 
 		  &col1, &col2, &col3, &col4, &col5) == 5)
 	{
-	  if (i <= MAX_SHELLS - 1)
+	  if (i < source_mdl->n_shells )
 	    {
 	      source_mdl->shell[i].av = col2;
 	      source_mdl->shell[i].nh = col3;
@@ -337,7 +387,7 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
 	  else
 	    {
 	      fprintf (stderr, "astrochem: error: the number of shells in %s exceed %i.\n", 
-		      source_file, MAX_SHELLS);
+		      source_file, source_mdl->n_shells);
 	      exit (1);
 	    }
 	} 
@@ -351,15 +401,6 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
   
   fclose (f);
 
-  /* Check the model has at least one shell */
-
-  source_mdl->n_shells = i;
-  if ( source_mdl->n_shells == 0 )
-    {
-      fprintf (stderr, "astrochem: error: no valid lines found in %s.\n",
-	       source_file);
-      exit (1);
-    }
 }
 
 /* 
@@ -401,6 +442,8 @@ check_species (abund_t initial_abundances[],
 void
 alloc_input (inp_t * input_params, int n_initial_abundances, int n_output_abundances)
 {
+  input_params->abundances.n_initial_abundances = n_initial_abundances;
+  input_params->output.n_output_species = n_output_abundances;
   input_params->abundances.initial_abundances = malloc (sizeof(abund_t)*n_initial_abundances);
   input_params->output.output_species = malloc (sizeof(char*)*n_output_abundances);
   int i;
@@ -434,6 +477,7 @@ free_input (inp_t * input_params)
 void 
 alloc_mdl( mdl_t * source_mdl , int n_shells )
 {
+    source_mdl->n_shells = n_shells;
     source_mdl->shell = malloc ( sizeof(shell_t) * n_shells );
 }
 
@@ -446,4 +490,29 @@ free_mdl( mdl_t * source_mdl )
     free(source_mdl->shell);
 }
 
-
+int
+get_nb_active_line(const char * file)
+{
+  FILE *f;
+  char line[MAX_LINE];
+  int line_number = 0;
+  f = fopen (file, "r" );
+  if (!f)
+    {
+      fprintf (stderr, "astrochem: error: can't open %s.\n", file);
+      exit (1);
+    }
+    
+  /* Loop over the lines, and read the shell number, visual
+     extinction, density, gas and dust temperature. */
+  
+  while (fgets (line, MAX_LINE, f) != NULL)
+  {
+    if(line[0] != '#')
+    {
+        line_number++;
+    }
+  }
+  fclose(f);
+  return line_number;
+} 

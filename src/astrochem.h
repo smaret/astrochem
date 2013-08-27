@@ -132,6 +132,7 @@ typedef struct {
 
 typedef struct {
   int n_species;
+  int n_alloc_species;
   char ** species;
   int n_reactions;
   react_t * reactions;
@@ -154,7 +155,6 @@ typedef struct {
   int n_shells;
   int n_time_steps;
   int n_output_abundances;
-  int n_output_routes;
 } res_t;
 
 /* Fonction prototypes
@@ -165,6 +165,7 @@ typedef struct {
 
 void read_input (const char *input_file, inp_t *input_params, int verbose);
 void free_input ( inp_t * input_params );
+int get_nb_active_line(const char * file);
 
 void read_source (const char *source_file, mdl_t *source_mdl,
 		      const int verbose);
@@ -179,9 +180,8 @@ void check_species ( abund_t initial_abundances[], int
 
 void read_network (const char *chem_file, net_t *network, const int verbose);
 void free_network ( net_t *network );
-void alloc_results( res_t * results, int n_time_steps, int n_shells, int n_output_abundances, int n_output_routes);
 
-void alloc_results( res_t * results, int n_time_steps, int n_shells, int n_output_abundances, int n_output_routes);
+void alloc_results( res_t * results, int n_time_steps, int n_shells, int n_output_abundances);
 void free_results ( res_t * results );
 
 int specie_index (const char specie[],const char * const species[], int n_species);

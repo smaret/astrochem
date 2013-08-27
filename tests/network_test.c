@@ -65,7 +65,6 @@ main (void)
   read_network(chem_file, &network, verbose);
   
   /* Check that the values are correct */
-
   if ((network.n_reactions == 18) &&
       (network.n_species == 25) &&
 

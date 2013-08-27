@@ -25,10 +25,6 @@
 #include <math.h>
 #include "../src/astrochem.h"
 
-/* FixMe: Why do we need to define these here? (segfault otherwise) */
-double abundances[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES];
-rout_t routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES];
-
 int
 main (void)
 {
@@ -85,7 +81,7 @@ main (void)
 
   /* Allocate results */
    int n_shells = MAX_SHELLS;
-   alloc_results( &results, input_params.output.time_steps, n_shells, input_params.output.n_output_species,N_OUTPUT_ROUTES);
+   alloc_results( &results, input_params.output.time_steps, n_shells, input_params.output.n_output_species);
 
 
   {

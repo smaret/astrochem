@@ -117,7 +117,7 @@ main (int argc, char *argv[])
 
   /* Allocate results */
    int n_shells = MAX_SHELLS;
-   alloc_results( &results, input_params.output.time_steps, n_shells, input_params.output.n_output_species,N_OUTPUT_ROUTES);
+   alloc_results( &results, input_params.output.time_steps, n_shells, input_params.output.n_output_species);
 
 
   /* Build the vector of time */

@@ -676,15 +676,14 @@ solve (int shell_index, const inp_t *input_params, const shell_t *shell,
  }
 
 void 
-alloc_results( res_t * results, int n_time_steps, int n_shells, int n_output_abundances, int n_output_routes)
+alloc_results( res_t * results, int n_time_steps, int n_shells, int n_output_abundances)
 {
     results->abundances = malloc (sizeof(double) * n_shells * n_time_steps * n_output_abundances);
-    results->routes = malloc (sizeof(rout_t) * n_shells * n_time_steps * n_output_abundances * n_output_routes);
+    results->routes = malloc (sizeof(rout_t) * n_shells * n_time_steps * n_output_abundances * N_OUTPUT_ROUTES);
     results->tim = malloc (sizeof(double) * n_time_steps);
     results->n_time_steps = n_time_steps;
     results->n_shells = n_shells;
     results->n_output_abundances = n_output_abundances;
-    results->n_output_routes = n_output_routes;
 }
 void
 free_results ( res_t * results )
@@ -709,7 +708,7 @@ get_abundance_idx( const res_t * results,int shell_idx, int ts_idx, int abund_id
 int 
 get_route_idx( const res_t * results, int shell_idx, int ts_idx, int abund_idx, int route_idx)
 {
-  return ( shell_idx * ( results->n_output_routes * results->n_output_abundances * results->n_time_steps) 
-           + ts_idx * ( results->n_output_routes * results->n_output_abundances ) 
-           + abund_idx * results->n_output_routes +  route_idx );
+  return ( shell_idx * ( N_OUTPUT_ROUTES * results->n_output_abundances * results->n_time_steps) 
+           + ts_idx * ( N_OUTPUT_ROUTES * results->n_output_abundances ) 
+           + abund_idx * N_OUTPUT_ROUTES +  route_idx );
 }
