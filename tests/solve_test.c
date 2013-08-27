@@ -71,11 +71,12 @@ main (void)
 
   /* Read them */
 
-  read_input ("input.ini", &input_params, verbose);
+  read_network ("network.chm", &network, verbose);
+  
+  read_input ("input.ini", &input_params, &network, verbose);
 
   read_source ("source.mdl", &source_mdl, verbose);
 
-  read_network ("network.chm", &network, verbose);
 
   /* Solve the ODE system */
 

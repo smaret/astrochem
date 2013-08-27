@@ -18,7 +18,7 @@
 
    You should have received a copy of the GNU General Public License
    along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -31,7 +31,7 @@
 
 #define MAX_CHAR_FILENAME 64
 
-void
+  void
 output (int n_shells,const inp_t *input_params,  const net_t *network, const res_t *results, int verbose )
 {
   FILE *f;
@@ -42,95 +42,91 @@ output (int n_shells,const inp_t *input_params,  const net_t *network, const res
 
   if (verbose == 1)
     fprintf (stdout, "Writing abundances in output files... ");
-  
+
   for (i = 0; i < input_params->output.n_output_species; i++)
+  {
+    /* Open the file or exit if an error occurs. */
+
+    strncpy (filename, network->specie_names[input_params->output.output_species_idx [i]]
+        , MAX_CHAR_FILENAME);
+    if (strlen (input_params->output.suffix) != 0)
     {
-      /* Ignore species that are not in the network. */
-      
-      if (specie_index (input_params->output.output_species [i],  (const char * const *) network->species, network->n_species) != - 2)
-	{
-
-	  /* Open the file or exit if an error occurs. */
-
-	  strncpy (filename, input_params->output.output_species[i], MAX_CHAR_FILENAME);
-	  if (strlen (input_params->output.suffix) != 0)
-	    {
-	      strncat (filename, "_", MAX_CHAR_FILENAME - strlen (filename) - 1);
-	      strncat (filename, input_params->output.suffix, MAX_CHAR_FILENAME - strlen (filename) - 1);
-	    }
-	  strncat (filename, ".abun", MAX_CHAR_FILENAME - strlen (filename) -1
-		   - strlen (input_params->output.suffix));
-	  if ((f = fopen (filename, "w")) == NULL)
-	    {
-	      fprintf (stderr, "astrochem: error: can't open %s\n", filename);
-	      exit (1);
-	    }
+      strncat (filename, "_", MAX_CHAR_FILENAME - strlen (filename) - 1);
+      strncat (filename, input_params->output.suffix, MAX_CHAR_FILENAME - strlen (filename) - 1);
+    }
+    strncat (filename, ".abun", MAX_CHAR_FILENAME - strlen (filename) -1
+        - strlen (input_params->output.suffix));
+    if ((f = fopen (filename, "w")) == NULL)
+    {
+      fprintf (stderr, "astrochem: error: can't open %s\n", filename);
+      exit (1);
+    }
 
 #ifdef OUTPUT_TIME_COLUMN
 
-	  /* Write the abundances as in a function of time in different
-	     columns, with a line for each shell. This is a good way to
-	     write data if we have a lot of shells. However, it is
-	     difficult to read if the source has only one (or a few)
-	     shells */
+    /* Write the abundances as in a function of time in different
+       columns, with a line for each shell. This is a good way to
+       write data if we have a lot of shells. However, it is
+       difficult to read if the source has only one (or a few)
+       shells */
 
-	  /* Write the header. */
-	  
-	  fprintf (f, "# %s abundance computed by astrochem\n", input_params->output.output_species[i]);
-	  fprintf (f, "# shell number / time [yr]\n");
-	  fprintf (f, "#\n");
-	  
-	  /* Write the time */
-	  
-	  fprintf (f, "   ");
-	  for (j = 0; j < input_params->output.time_steps; j++)
-	    fprintf (f, "  %8.2e", results->tim[j] / CONST_MKSA_YEAR);
-	  fprintf (f, "\n");
-	  
-	  /* Write the abundance as a function of time for each shell. */
-	  
-	  for (k = 0; k < n_shells; k++)
-	    {
-	      fprintf (f, "%3d", k);
-	      for (j = 0; j < time_steps; j++)
-		fprintf (f, "  %8.2e", abundances[k][j][i]);
-	      fprintf (f, "\n");
-	    }
-	  
-#else
-	  
-	  /* Write abundances as a function of time in different lines,
-	     with a column for each shell. This is better if we have only
-	     one (or a few) shells. */
+    /* Write the header. */
 
-	  /* Write the header. */
-	  
-	  fprintf (f, "# %s abundance computed by astrochem\n", input_params->output.output_species[i]);
-	  fprintf (f, "# time [yr] / shell number\n");
-	  fprintf (f, "#\n");
-	  
-	  /* Write the shell number */
-	  
-	  fprintf (f, "        ");
-	  for (k = 0; k < n_shells; k++)
-	    fprintf (f, "  %8d", k);
-	  fprintf (f, "\n");
-	  
-	  /* Write the abundance as a function of time for each shell. */
-	  
-	  for (j = 0; j < input_params->output.time_steps; j++)
-	    {
-	      fprintf (f, "%8.2e", results->tim[j] / CONST_MKSA_YEAR);
-	      for (k = 0; k < n_shells; k++)
-		fprintf (f, "  %8.2e", results->abundances[get_abundance_idx(results,k,j,i)]);
-	      fprintf (f, "\n");
-	    } 
-	  
-#endif
-     
-	  fclose (f);
-	}
+    fprintf (f, "# %s abundance computed by astrochem\n", input_params->output.output_species[i]);
+    fprintf (f, "# shell number / time [yr]\n");
+    fprintf (f, "#\n");
+
+    /* Write the time */
+
+    fprintf (f, "   ");
+    for (j = 0; j < input_params->output.time_steps; j++)
+      fprintf (f, "  %8.2e", results->tim[j] / CONST_MKSA_YEAR);
+    fprintf (f, "\n");
+
+    /* Write the abundance as a function of time for each shell. */
+
+    for (k = 0; k < n_shells; k++)
+    {
+      fprintf (f, "%3d", k);
+      for (j = 0; j < time_steps; j++)
+        fprintf (f, "  %8.2e", abundances[k][j][i]);
+      fprintf (f, "\n");
     }
+
+#else
+
+    /* Write abundances as a function of time in different lines,
+       with a column for each shell. This is better if we have only
+       one (or a few) shells. */
+
+    /* Write the header. */
+
+    fprintf (f, "# %s abundance computed by astrochem\n", 
+        network->specie_names[ input_params->output.output_species_idx[i] ]);
+    fprintf (f, "# time [yr] / shell number\n");
+    fprintf (f, "#\n");
+
+    /* Write the shell number */
+
+    fprintf (f, "        ");
+    for (k = 0; k < n_shells; k++)
+      fprintf (f, "  %8d", k);
+    fprintf (f, "\n");
+
+    /* Write the abundance as a function of time for each shell. */
+
+    for (j = 0; j < input_params->output.time_steps; j++)
+    {
+      fprintf (f, "%8.2e", results->tim[j] / CONST_MKSA_YEAR);
+      for (k = 0; k < n_shells; k++)
+        fprintf (f, "  %8.2e", results->abundances[get_abundance_idx(results,k,j,i)]);
+      fprintf (f, "\n");
+    } 
+
+#endif
+
+    fclose (f);
+  }
 
   if (verbose == 1)
     fprintf (stdout, "done.\n");
@@ -138,73 +134,67 @@ output (int n_shells,const inp_t *input_params,  const net_t *network, const res
   /* Write formation/destruction routes in output files */
 
   if (input_params->output.trace_routes == 1)
+  {
+    if (verbose == 1)
+      fprintf (stdout, "Writing formation/destruction routes in output files... ");
+
+    for (i = 0; i < input_params->output.n_output_species; i++)
     {
-      if (verbose == 1)
-	fprintf (stdout, "Writing formation/destruction routes in output files... ");
-  
-      for (i = 0; i < input_params->output.n_output_species; i++)
-	{
-	  /* Ignore species that are not in the network. */
-      
-	  if (specie_index (input_params->output.output_species [i],  (char const * const *) network->species, network->n_species) != - 2)
-	    {
+      /* Open the file or exit if an error occurs. */
+      strncpy (filename, network->specie_names[input_params->output.output_species_idx[i]]
+            , MAX_CHAR_FILENAME);
+      if (strlen (input_params->output.suffix) != 0)
+      {
+        strncat (filename, "_", MAX_CHAR_FILENAME - strlen (filename) - 1);
+        strncat (filename, input_params->output.suffix, MAX_CHAR_FILENAME - strlen (filename) - 1);
+      }
+      strncat (filename, ".rout", MAX_CHAR_FILENAME - strlen (filename) -1
+          - strlen (input_params->output.suffix));
+      if ((f = fopen (filename, "w")) == NULL)
+      {
+        fprintf (stderr, "astrochem: error: can't open %s\n", filename);
+        exit (1);
+      }
 
-	      /* Open the file or exit if an error occurs. */
+      /* Write the main formation routes as a function of time
+         and for each shell. For each formation/destruction
+         route, we write the reaction number and the reaction
+         rate. */
 
-	      strncpy (filename, input_params->output.output_species[i], MAX_CHAR_FILENAME);
-	      if (strlen (input_params->output.suffix) != 0)
-		{
-		  strncat (filename, "_", MAX_CHAR_FILENAME - strlen (filename) - 1);
-		  strncat (filename, input_params->output.suffix, MAX_CHAR_FILENAME - strlen (filename) - 1);
-		}
-	      strncat (filename, ".rout", MAX_CHAR_FILENAME - strlen (filename) -1
-		       - strlen (input_params->output.suffix));
-	      if ((f = fopen (filename, "w")) == NULL)
-		{
-		  fprintf (stderr, "astrochem: error: can't open %s\n", filename);
-		  exit (1);
-		}
+      /* Write the header */
 
-	      /* Write the main formation routes as a function of time
-		 and for each shell. For each formation/destruction
-		 route, we write the reaction number and the reaction
-		 rate. */
+      fprintf (f, "# Main %s formation/destruction routes computed by astrochem\n",
+          network->specie_names[input_params->output.output_species_idx[i]]);
+      fprintf (f, "# shell number  time [yr]  reaction number 1  reaction rate 1 [cm-3/s]... \n");
+      fprintf (f, "#\n");
 
-	      /* Write the header */
-	  
-	      fprintf (f, "# Main %s formation/destruction routes computed by astrochem\n",
-		       input_params->output.output_species[i]);
-	      fprintf (f, "# shell number  time [yr]  reaction number 1  reaction rate 1 [cm-3/s]... \n");
-	      fprintf (f, "#\n");
+      /* Write the formation/destruction routes */
 
-	      /* Write the formation/destruction routes */
-
-	      for (k = 0; k < n_shells; k++)
-		{
-		  for (j = 0; j < input_params->output.time_steps; j++)
-		    {
-		      fprintf (f, "%4i", k);
-		      fprintf (f, "  %9.2e", results->tim[j] / CONST_MKSA_YEAR);
-		      for (l = 0; l < N_OUTPUT_ROUTES; l++)
-			{
-			  fprintf (f, "  %4i", results->routes[get_route_idx(results,k,j,i,l)].formation.reaction_no);
-			  fprintf (f, " %9.2e", results->routes[get_route_idx(results,k,j,i,l)].formation.rate);
-			}
-		      fprintf (f, "\n");
-		      fprintf (f, "%4i", k);
-		      fprintf (f, "  %9.2e",  results->tim[j] / CONST_MKSA_YEAR);
-		      for (l = 0; l < N_OUTPUT_ROUTES; l++)
-			{
-			  fprintf (f, "  %4i",  results->routes[get_route_idx(results,k,j,i,l)].destruction.reaction_no);
-			  fprintf (f, " %9.2e", - results->routes[get_route_idx(results,k,j,i,l)].destruction.rate);
-			}
-		      fprintf (f, "\n");
-		    }
-		}
-	    }
-	}
-
-      if (verbose == 1)
-	fprintf (stdout, "done.\n");
+      for (k = 0; k < n_shells; k++)
+      {
+        for (j = 0; j < input_params->output.time_steps; j++)
+        {
+          fprintf (f, "%4i", k);
+          fprintf (f, "  %9.2e", results->tim[j] / CONST_MKSA_YEAR);
+          for (l = 0; l < N_OUTPUT_ROUTES; l++)
+          {
+            fprintf (f, "  %4i", results->routes[get_route_idx(results,k,j,i,l)].formation.reaction_no);
+            fprintf (f, " %9.2e", results->routes[get_route_idx(results,k,j,i,l)].formation.rate);
+          }
+          fprintf (f, "\n");
+          fprintf (f, "%4i", k);
+          fprintf (f, "  %9.2e",  results->tim[j] / CONST_MKSA_YEAR);
+          for (l = 0; l < N_OUTPUT_ROUTES; l++)
+          {
+            fprintf (f, "  %4i",  results->routes[get_route_idx(results,k,j,i,l)].destruction.reaction_no);
+            fprintf (f, " %9.2e", - results->routes[get_route_idx(results,k,j,i,l)].destruction.rate);
+          }
+          fprintf (f, "\n");
+        }
+      }
     }
+
+    if (verbose == 1)
+      fprintf (stdout, "done.\n");
+  }
 }

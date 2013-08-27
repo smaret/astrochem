@@ -95,25 +95,25 @@ main (int argc, char *argv[])
       }
     input_file = argv[0];
   }
-    
-  /* Read the input file */
 
-  read_input (input_file, &input_params, verbose);
+ /* Read the input file */
+  read_input_file_names (input_file, &input_params.files, verbose);
+  
+  /* Read the chemical network file */
+  read_network (input_params.files.chem_file, &network, verbose);
+   
+  /* Read the input file */
+  read_input (input_file, &input_params, &network , verbose);
   
   /* Read the source model file */
-
   read_source (input_params.files.source_file, &source_mdl, verbose);
-
-  /* Read the chemical network file */
-
-  read_network (input_params.files.chem_file, &network, verbose);
 
   /* Check that the initial_abundance and output_species structure do
      not contain any specie that is not in the network. */
 
-  check_species (input_params.abundances.initial_abundances, input_params.abundances.n_initial_abundances,
+  /*check_species (input_params.abundances.initial_abundances, input_params.abundances.n_initial_abundances,
 		 input_params.output.output_species, input_params.output.n_output_species, network.species, 
-		 network.n_species);
+		 network.n_species);*/
 
   /* Allocate results */
    int n_shells = MAX_SHELLS;

@@ -58,7 +58,7 @@
 /* Data structures */
 
 typedef struct {
-  char specie[MAX_CHAR_SPECIES];
+  int specie_idx;
   double abundance;
 } abund_t;
 
@@ -87,7 +87,7 @@ typedef struct {
 } abundances_t;
 
 typedef struct {
-  char ** output_species;
+  int * output_species_idx;
   int n_output_species;
   int time_steps;
   int trace_routes;
@@ -133,7 +133,7 @@ typedef struct {
 typedef struct {
   int n_species;
   int n_alloc_species;
-  char ** species;
+  char ** specie_names;
   int n_reactions;
   react_t * reactions;
 } net_t;
@@ -163,7 +163,9 @@ typedef struct {
    that uses the new "input_params", "source_mdl", "network" and
    "results" data structures. */
 
-void read_input (const char *input_file, inp_t *input_params, int verbose);
+void read_input (const char *input_file, inp_t *input_params, const net_t * network, int verbose);
+void read_input_file_names (const char *input_file, files_t *files, int verbose);
+
 void free_input ( inp_t * input_params );
 int get_nb_active_line(const char * file);
 
