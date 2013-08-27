@@ -131,30 +131,6 @@ read_network (const char *chem_file, net_t *network, const int verbose)
       
       /* Read the reactants, products, and reaction parameters. */
       
- /*     if ((sscanf (line, "%s -> %s %lf %lf %lf %d %d",
-		   reactant1, product1, 
-		   &alpha, &beta, &gamma, &reaction_type, &reaction_no) == 7) ||
-	  (sscanf (line, "%s + %s -> %s %lf %lf %lf %d %d",
-		   reactant1, reactant2, product1, 
-		   &alpha, &beta, &gamma, &reaction_type, &reaction_no) == 8) || 
-	  (sscanf (line, "%s + %s -> %s + %s %lf %lf %lf %d %d",
-		   reactant1, reactant2, product1, product2,
-		   &alpha, &beta, &gamma, &reaction_type, &reaction_no) == 9) ||
-	  (sscanf (line, "%s + %s -> %s + %s + %s %lf %lf %lf %d %d",
-		   reactant1, reactant2, product1, product2, product3,
-		   &alpha, &beta, &gamma, &reaction_type, &reaction_no) == 10) ||
-	  (sscanf (line, "%s + %s -> %s + %s + %s + %s %lf %lf %lf %d %d",
-		   reactant1, reactant2, product1, product2, product3, product4,
-		   &alpha, &beta, &gamma, &reaction_type, &reaction_no) == 11) ||
-	  (sscanf (line, "%s + %s + %s -> %s + %s %lf %lf %lf %d %d",
-		   reactant1, reactant2, reactant3, product1, product2,
-		   &alpha, &beta, &gamma, &reaction_type, &reaction_no) == 10))
-	;
-      else 
-	{
-	  input_error (chem_file, line_number);
-	}
-*/
       char * localLine=line;
       char * localLine2=strchr(line,' ');
       char str [MAX_CHAR_SPECIES];
@@ -248,69 +224,6 @@ read_network (const char *chem_file, net_t *network, const int verbose)
         }
 
       }
-      /* Ignore the following species: cosmic-ray, uv-photon,
-	 photon. Replace them by an empty string, and re-sort
-	 species. */
-      
-/*      if ((strcmp (reactant1, "cosmic-ray") == 0) ||
-	  (strcmp (reactant1, "uv-photon") == 0) ||
-	  (strcmp (reactant1, "photon") == 0))
-	{
-	  strcpy (reactant1, reactant2);
-	  strcpy (reactant2, reactant3);
-	  strcpy (reactant3, "");
-	}
-      if ((strcmp (reactant2, "cosmic-ray") == 0) ||
-	  (strcmp (reactant2, "uv-photon") == 0) ||
-	  (strcmp (reactant2, "photon") == 0))
-	{
-	  strcpy (reactant2, reactant3);
-	  strcpy (reactant3, "");
-	}
-      if ((strcmp (reactant3, "cosmic-ray") == 0) ||
-	  (strcmp (reactant3, "uv-photon") == 0) ||
-	  (strcmp (reactant3, "photon") == 0))
-	{
-	  strcpy (reactant3, "");
-	}
-      if ((strcmp (product1, "cosmic-ray") == 0) ||
-	  (strcmp (product1, "uv-photon") == 0) ||
-	  (strcmp (product1, "photon") == 0))
-	{
-	  strcpy (product1, product2);
-	  strcpy (product2, product3);
-	  strcpy (product3, "");
-	}
-      if ((strcmp (product2, "cosmic-ray") == 0) ||
-	  (strcmp (product2, "uv-photon") == 0) ||
-	  (strcmp (product2, "photon") == 0))
-	{
-	  strcpy (product2, product3);
-	  strcpy (product3, "");
-	}
-      if ((strcmp (product3, "cosmic-ray") == 0) ||
-	  (strcmp (product3, "uv-photon") == 0) ||
-	  (strcmp (product3, "photon") == 0))
-	{
-	  strcpy (product3, "");
-	}
-      if ((strcmp (product4, "cosmic-ray") == 0) ||
-	  (strcmp (product4, "uv-photon") == 0) ||
-	  (strcmp (product4, "photon") == 0))
-	{
-	  strcpy (product4, "");
-	}
-*/
-      /* Fill the array of species. */
-    
-    /*  add_specie (reactant1, network->species, &network->n_species);
-      add_specie (reactant2, network->species, &network->n_species);
-      add_specie (reactant3, network->species, &network->n_species);
-      add_specie (product1, network->species, &network->n_species);
-      add_specie (product2, network->species, &network->n_species);
-      add_specie (product3, network->species, &network->n_species);
-      add_specie (product4, network->species, &network->n_species);
-*/
       /* Fill the array of reactions. Exit if of the reactant and
 	 product is not in the specie array. */
       
@@ -367,55 +280,6 @@ read_network (const char *chem_file, net_t *network, const int verbose)
 
   fclose (f);
 }
-
-/*
-  Add a specie in the species array, if not already present.
-*/
-/*void  
-add_specie (char *new_specie, char *species[],
-	    int *n_species)
-{
-  int i;
-     
-  if (strcmp (new_specie, "") == 0)
-    return;
-  for (i = 0; i < *n_species; i++)
-    {
-      if (strcmp (species[i], new_specie) == 0)
-	return;
-    }
-  i = *n_species;
-  if (i < MAX_SPECIES)
-    {
-      if ((species[i] = malloc (sizeof (char) * MAX_CHAR_SPECIES)) == NULL)
-	{
-	  fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__, 
-		   "array allocation failed.\n");
-	  exit (1);
-	}
-      if (strlen (new_specie) < MAX_CHAR_SPECIES - 1)
-	{
-	  strcpy (species[i], new_specie);
-	  (*n_species)++;
-	}
-      else
-	{
-	  fprintf (stderr, "astrochem: error: the number of characters of some "
-		   "species of the chemical network file exceeds %i.\n",
-		   MAX_CHAR_SPECIES);
-	  exit (1);
-	}
-    } 
-  else
-    {
-      fprintf (stderr, "astrochem: error: the number of species in the chemical"
-	       "network file exceeds %i.\n", MAX_SPECIES);
-      exit (1); 
-    }
-  
-  return;
-}
-*/
 
 int  
 add_specie (char *new_specie, net_t* network)
