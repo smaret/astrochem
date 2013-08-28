@@ -35,6 +35,7 @@
    parameters, solver parameters, and initial abundances.
  */ 
 
+typedef enum { R_STATIC = 0, R_DYNAMIC = 1,R_TIMES = 2} SOURCE_READ_MODE;
 void alloc_input (inp_t * input_params, int n_initial_abundances, int n_output_abundances);
 void alloc_mdl( mdl_t * source_mdl , int n_cells , int n_time_steps);
 
@@ -347,10 +348,10 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
   char line[MAX_LINE];
   int line_number = 0;
   int n_cell = 0;
-  int ts = 0;
+  int ts;
   int allocated = 0;
   int n_line = get_nb_active_line(source_file);
-  int mode = 0; //0 static, 1 dynamic
+  SOURCE_READ_MODE mode = R_STATIC; //0 static, 1 dynamic, 2 time_step reading
   double av,nh,tgas,tdust;
   /* Check the model has at least one cell */
   if ( n_line == 0 )
@@ -377,77 +378,59 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
   {
     line_number++;
     if (line[0] == '#') continue; /* Skip comments */
-    if(line[0] == 'D') //Header
+    if(allocated==0)
     {
-      int nts;
-      sscanf(line,"D %d",nts);
-      alloc_mdl(source_mdl, n_line/nts,nts);
-      mode=1;
-      allocated=1;
-      continue;
-    }
-    else if(allocated==0)
-    {
-      alloc_mdl(source_mdl, n_line,1);
-      allocated=1;
-    }
-
-    //Dynamic mode
-    if(mode==1)
-    {
-      if (ts < source_mdl->n_time_steps )
+      if(strncmp(line,"[times]",7)==0) 
       {
-        int tmp_cell,ts_val;
-        if (sscanf (line, "%d %d %lf %lf %lf %lf", 
-              &tmp_cell,&ts_val, &av, &nh, &tgas, &tdust) != 6)
+        int nts=0;
+        fgets (line, MAX_LINE, f);
+        while(strncmp(line,"[cells]",7)!=0)
         {
-          fprintf (stderr, "astrochem: error: incorrect format in source file %s.\n", 
-              source_file);
-          exit (1);
+          nts++;
+          fgets (line, MAX_LINE, f);
         }
-        if(tmp_cell==0)
-        {
-          source_mdl->time_steps[ts] = ts_val;
-        }
-        else if(tmp_cell==n_cell+1)
-        {
-          ts=0;
-          n_cell=tmp_cell;
-        }
-        else if(tmp_cell != n_cell)
-        {
-          fprintf (stderr, "astrochem: error: incorrect format in source file %s. next cell %i is not past cell %i +1 \n", 
-              source_file, tmp_cell, n_cell );
-          exit (1);
-        }
-        if(n_cell < source_mdl->n_cells)
-        {
-          if(ts_val != source_mdl->time_steps[ts])
-          {
-            fprintf (stderr, "astrochem: error: incorrect format in source file %s. with cell %i , time_steps n°%i == %i, should be %i  \n", 
-                source_file, n_cell, ts, ts_val, source_mdl->time_steps[ts] );
-            exit (1);
-          }
-          source_mdl->cell[n_cell].av[ts] = av;
-          source_mdl->cell[n_cell].nh[ts] = nh;
-          source_mdl->cell[n_cell].tgas[ts] = tgas;
-          source_mdl->cell[n_cell].tdust[ts] = tdust;
-          ts++;
-        }
-        else
-        {
-          fprintf (stderr, "astrochem: error: the number of cells in %s exceed %i\n", 
-              source_file, source_mdl->n_cells);
-          exit (1);
-        }
+        fseek(f,0,SEEK_SET);
+        alloc_mdl(source_mdl, ((n_line-2)/nts)-1,nts); // n_line contains [times] and [cells] and (n_line-2)/nts contain the [times] section.
+        source_mdl->mode = DYNAMIC;
+        allocated=1;
+        continue;
       }
       else
       {
-        fprintf (stderr, "astrochem: error: the number of time steps in %s exceed %i.\n", 
-            source_file, source_mdl->n_time_steps);
-        exit (1);
-
+        alloc_mdl(source_mdl, n_line,1);
+        source_mdl->mode = STATIC;
+        allocated=1;
       }
+    }
+    if(strncmp(line,"[times]",7)==0) 
+    {
+      mode=R_TIMES;
+      ts=0;
+      continue;
+    }
+    if(strncmp(line,"[cells]",7)==0) 
+    {
+      mode=R_DYNAMIC;
+      ts=0;
+      continue;
+    }
+    //Reading time steps
+    if(mode==R_TIMES)
+    {
+      int tmp_ts;
+      double ts_val;
+      sscanf (line, "%d %lf",&tmp_ts,&ts_val);//Format and value not checked
+      source_mdl->time_steps[tmp_ts] = ts_val;
+    }
+    //Dynamic mode
+    else if(mode==R_DYNAMIC)
+    {
+      int tmp_cell,tmp_ts;
+      sscanf (line, "%d %d %lf %lf %lf %lf",&tmp_cell,&tmp_ts, &av, &nh, &tgas, &tdust); //Format and value not checked
+      source_mdl->cell[tmp_cell].av[tmp_ts] = av;
+      source_mdl->cell[tmp_cell].nh[tmp_ts] = nh;
+      source_mdl->cell[tmp_cell].tgas[tmp_ts] = tgas;
+      source_mdl->cell[tmp_cell].tdust[tmp_ts] = tdust;
     }
     //Static mode
     else
@@ -458,8 +441,8 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
         if (sscanf (line, "%d %lf %lf %lf %lf", 
               &tmp, &av, &nh, &tgas, &tdust) != 5)
         {
-          fprintf (stderr, "astrochem: error: incorrect format in source file %s.\n", 
-              source_file);
+          fprintf (stderr, "astrochem: %s: %d: error: incorrect format in source file %s .\n", 
+                __FILE__, __LINE__,source_file);
           exit (1);
         }
         source_mdl->cell[n_cell].av[0] = av;

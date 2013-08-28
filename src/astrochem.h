@@ -57,6 +57,8 @@
 
 /* Data structures */
 
+typedef enum { STATIC = 0, DYNAMIC =1} SOURCE_MODE;
+
 typedef struct {
   int specie_idx;
   double abundance;
@@ -114,6 +116,7 @@ typedef struct {
   int * time_steps;
   int n_time_steps;
   int n_cells;
+  SOURCE_MODE mode;
 } mdl_t;
 
 
