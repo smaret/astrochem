@@ -63,25 +63,11 @@ read_input (const char *input_file, inp_t *input_params, const net_t * network, 
     exit (EXIT_FAILURE);
   }
 
-  int n_initial_abundances=0;
   int n_output_species=0;
+  int n_initial_abundances = get_nb_active_line_section(input_file,"abundances");
   while (fgets (line, MAX_LINE, f) != NULL)
   {
-    if(strcmp(line,"[abundances]\n") == 0 )
-    {
-      while (fgets (line, MAX_LINE, f) != NULL)
-      {
-        if (sscanf (line, "%s = %s", parameter, value ) == 2)
-        { 
-          n_initial_abundances++;
-        }
-        else
-        {
-          break;
-        }
-      }
-    }
-    else if(strncmp(line,"abundances",10)==0)
+    if(strncmp(line,"abundances",10)==0)
     {
       char * localStr = &line[9];
       while(localStr!=NULL)
@@ -91,7 +77,6 @@ read_input (const char *input_file, inp_t *input_params, const net_t * network, 
         n_output_species++;
       }
     }
-
   }
   if(n_initial_abundances > MAX_INITIAL_ABUNDANCES)
   {
@@ -350,16 +335,9 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
   int n_cell = 0;
   int ts;
   int allocated = 0;
-  int n_line = get_nb_active_line(source_file);
   SOURCE_READ_MODE mode = R_STATIC; //0 static, 1 dynamic, 2 time_step reading
   double av,nh,tgas,tdust;
-  /* Check the model has at least one cell */
-  if ( n_line == 0 )
-  {
-    fprintf (stderr, "astrochem: error: no valid lines found in %s.\n",
-        source_file);
-    exit (1);
-  }
+
 
 
   /* Open the input file or exit if we can't open it */
@@ -369,6 +347,14 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
   if (!f)
   {
     fprintf (stderr, "astrochem: error: can't open %s.\n", source_file);
+    exit (1);
+  }
+  int n_line = get_nb_active_line(source_file);
+  /* Check the model has at least one cell */
+  if ( n_line == 0 )
+  {
+    fprintf (stderr, "astrochem: error: no valid lines found in %s.\n",
+        source_file);
     exit (1);
   }
 
@@ -382,23 +368,18 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
     {
       if(strncmp(line,"[times]",7)==0) 
       {
-        int nts=0;
-        fgets (line, MAX_LINE, f);
-        while(strncmp(line,"[cells]",7)!=0)
-        {
-          nts++;
-          fgets (line, MAX_LINE, f);
-        }
-        fseek(f,0,SEEK_SET);
-        int mod_line = ( (n_line-2) % nts );
-        if(mod_line != 0 )
+        int nts = get_nb_active_line_section(source_file,"times");
+        int n_cells_times = get_nb_active_line_section(source_file,"cells");
+        if(n_cells_times % nts != 0 )
         {
           fprintf (stderr, "astrochem: %s: %d: error: incorrect format in source file %s .\n", 
               __FILE__, __LINE__,source_file);
           exit (1);
         }
-        alloc_mdl(source_mdl, ((n_line-2)/nts)-1,nts); // n_line contains [times] and [cells] and (n_line-2)/nts contain the [times] section.
+        alloc_mdl(source_mdl, n_cells_times/nts,nts); // n_line contains [times] and [cells] and (n_line-2)/nts contain the [times] section.
         source_mdl->mode = DYNAMIC;
+        mode=R_TIMES;
+        ts=0;
         allocated=1;
         continue;
       }
@@ -408,12 +389,6 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
         source_mdl->mode = STATIC;
         allocated=1;
       }
-    }
-    if(strncmp(line,"[times]",7)==0) 
-    {
-      mode=R_TIMES;
-      ts=0;
-      continue;
     }
     if(strncmp(line,"[cells]",7)==0) 
     {
@@ -588,6 +563,51 @@ free_mdl( mdl_t * source_mdl )
 }
 
   int
+get_nb_active_line_section(const char * file, const char * section)
+{
+  FILE *f;
+  char line[MAX_LINE];
+  int line_number = 0;
+  f = fopen (file, "r" );
+  int section_flag = 0;
+  int section_len = strlen(section);
+  char full_section [section_len+2];
+  full_section[0]='[';
+  strcpy(&full_section[1],section);
+  full_section[section_len+1]=']';
+  if (!f)
+  {
+    fprintf (stderr, "astrochem: error: can't open %s.\n", file);
+    exit (1);
+  }
+  while (fgets (line, MAX_LINE, f) != NULL)
+  {
+    if(line[0] != '#')
+    {
+      if(section_flag==0)
+      {
+        if(strncmp(line,full_section,section_len+2)==0)
+        {
+          section_flag=1;
+        }
+      }
+      else 
+      {
+        if(line[0]=='[')
+        {
+          break;
+        }
+        else
+        {
+          line_number++;
+        }
+      }
+    }
+  }
+  fclose(f);
+  return line_number;
+}
+  int
 get_nb_active_line(const char * file)
 {
   FILE *f;
@@ -599,10 +619,6 @@ get_nb_active_line(const char * file)
     fprintf (stderr, "astrochem: error: can't open %s.\n", file);
     exit (1);
   }
-
-  /* Loop over the lines, and read the cell number, visual
-     extinction, density, gas and dust temperature. */
-
   while (fgets (line, MAX_LINE, f) != NULL)
   {
     if(line[0] != '#')
