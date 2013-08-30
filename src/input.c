@@ -508,7 +508,7 @@ alloc_mdl( mdl_t * source_mdl , int n_cells , int n_time_steps)
         __FILE__, __LINE__); 
     exit(1);
   }
-  if ( (source_mdl->time_steps = malloc ( sizeof(cell_t) * n_time_steps ) ) == NULL )
+  if ( (source_mdl->time_steps = malloc ( sizeof(int) * n_time_steps ) ) == NULL )
   {
     fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
         __FILE__, __LINE__); 
