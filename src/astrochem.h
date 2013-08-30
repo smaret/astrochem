@@ -38,7 +38,7 @@
 
 #define MAX_INITIAL_ABUNDANCES 128  /* Maximum initial abundances in the input file */
 #define MAX_CHAR_SPECIES 32         /* Maximum number of characters in a specie name */
-#define MAX_SHELLS 256              /* Maximum number of shells in the model file */
+#define MAX_SHELLS 256              /* Maximum number of cells in the model file */
 #define MAX_OUTPUT_ABUNDANCES 32    /* Maximum output abundances in the output file */
 #define MAX_TIME_STEPS 128          /* Maximum number of time steps the output file */
 #define MAX_REACTIONS 32768         /* Maximum number of reactions in the network file */
@@ -57,8 +57,10 @@
 
 /* Data structures */
 
+typedef enum { STATIC = 0, DYNAMIC =1} SOURCE_MODE;
+
 typedef struct {
-  char specie[MAX_CHAR_SPECIES];
+  int specie_idx;
   double abundance;
 } abund_t;
 
@@ -82,16 +84,16 @@ typedef struct {
 } solver_t;
 
 typedef struct {
-  abund_t initial_abundances[MAX_INITIAL_ABUNDANCES];
+  abund_t * initial_abundances;
   int n_initial_abundances;
 } abundances_t;
 
 typedef struct {
-  char *output_species[MAX_OUTPUT_ABUNDANCES];
+  int * output_species_idx;
   int n_output_species;
   int time_steps;
   int trace_routes;
-  char suffix;
+  char suffix[MAX_LINE];
 } output_t;
 
 typedef struct {
@@ -103,15 +105,18 @@ typedef struct {
 } inp_t;
 
 typedef struct {
-    double av;
-    double nh;
-    double tgas;
-    double tdust;
-  } shell_t;
+    double * av;
+    double * nh;
+    double * tgas;
+    double * tdust;
+  } cell_t;
 
 typedef struct {
-  shell_t shell[MAX_SHELLS];
-  int n_shells;
+  cell_t * cell;
+  int * time_steps;
+  int n_time_steps;
+  int n_cells;
+  SOURCE_MODE mode;
 } mdl_t;
 
 
@@ -132,9 +137,10 @@ typedef struct {
 
 typedef struct {
   int n_species;
-  char* species[MAX_SPECIES];
+  int n_alloc_species;
+  char ** specie_names;
   int n_reactions;
-  react_t reactions[MAX_REACTIONS];
+  react_t * reactions;
 } net_t;
 
 typedef struct {
@@ -148,9 +154,12 @@ typedef struct {
 } rout_t;
 
 typedef struct {
-  double abundances[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES];
-  rout_t routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES];
-  double tim[MAX_TIME_STEPS];
+  double * abundances;
+  rout_t * routes;
+  double * tim;
+  int n_cells;
+  int n_time_steps;
+  int n_output_abundances;
 } res_t;
 
 /* Fonction prototypes
@@ -159,12 +168,16 @@ typedef struct {
    that uses the new "input_params", "source_mdl", "network" and
    "results" data structures. */
 
-void read_input (const char *input_file, inp_t *input_params, int verbose);
+void read_input (const char *input_file, inp_t *input_params, const net_t * network, int verbose);
+void read_input_file_names (const char *input_file, files_t *files, int verbose);
 
-void free_input_struct ( inp_t * input_params );
+void free_input ( inp_t * input_params );
+int get_nb_active_line(const char * file);
 
 void read_source (const char *source_file, mdl_t *source_mdl,
 		      const int verbose);
+void free_mdl( mdl_t * source_mdl );
+
 
 void input_error (const char *input_f, int line_number);
 
@@ -173,6 +186,10 @@ void check_species ( abund_t initial_abundances[], int
 		    n_output_species, char *species[], int n_species);
 
 void read_network (const char *chem_file, net_t *network, const int verbose);
+void free_network ( net_t *network );
+
+void alloc_results( res_t * results, int n_time_steps, int n_cells, int n_output_abundances);
+void free_results ( res_t * results );
 
 int specie_index (const char specie[],const char * const species[], int n_species);
 
@@ -181,8 +198,9 @@ double rate(double alpha, double beta, double gamm, int reaction_type,
 	    double chi, double cosmic, double grain_size,
 	    double grain_abundance, double ice_abundance);
 
-int solve (int shell_index, const inp_t *input_params, const shell_t *shell,
+int solve (int cell_index, const inp_t *input_params, const cell_t *cell,
 	   const net_t *network, res_t *results, int verbose);
-
-void output (int n_shells, const inp_t *input_params, const net_t *network,
+int get_abundance_idx( const res_t * results,int cell_idx, int ts_idx, int abund_idx);
+int get_route_idx( const res_t * results, int cell_idx, int ts_idx, int abund_idx, int route_idx);
+void output (int n_cells, const inp_t *input_params, const net_t *network,
 	     const res_t *results, int verbose);
