@@ -113,7 +113,7 @@ typedef struct {
 
 typedef struct {
   cell_t * cell;
-  int * time_steps;
+  double * time_steps;
   int n_time_steps;
   int n_cells;
   SOURCE_MODE mode;
@@ -156,7 +156,6 @@ typedef struct {
 typedef struct {
   double * abundances;
   rout_t * routes;
-  double * tim;
   int n_cells;
   int n_time_steps;
   int n_output_abundances;
@@ -174,7 +173,7 @@ void read_input_file_names (const char *input_file, files_t *files, int verbose)
 void free_input ( inp_t * input_params );
 int get_nb_active_line(const char * file);
 
-void read_source (const char *source_file, mdl_t *source_mdl,
+void read_source (const char *source_file, mdl_t *source_mdl,const inp_t * input_params,
 		      const int verbose);
 void free_mdl( mdl_t * source_mdl );
 
@@ -199,8 +198,8 @@ double rate(double alpha, double beta, double gamm, int reaction_type,
 	    double grain_abundance, double ice_abundance);
 
 int solve (int cell_index, const inp_t *input_params, const cell_t *cell,
-	   const net_t *network, res_t *results, int verbose);
+	   const net_t *network, int n_time_steps, const double * time_steps , res_t *results, int verbose);
 int get_abundance_idx( const res_t * results,int cell_idx, int ts_idx, int abund_idx);
 int get_route_idx( const res_t * results, int cell_idx, int ts_idx, int abund_idx, int route_idx);
-void output (int n_cells, const inp_t *input_params, const net_t *network,
+void output (int n_cells, const inp_t *input_params, const mdl_t * source_mdl, const net_t *network,
 	     const res_t *results, int verbose);

@@ -32,7 +32,7 @@
 #define MAX_CHAR_FILENAME 64
 
   void
-output (int n_shells,const inp_t *input_params,  const net_t *network, const res_t *results, int verbose )
+output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const net_t *network, const res_t *results, int verbose )
 {
   FILE *f;
   char filename[MAX_CHAR_FILENAME];
@@ -79,8 +79,8 @@ output (int n_shells,const inp_t *input_params,  const net_t *network, const res
     /* Write the time */
 
     fprintf (f, "   ");
-    for (j = 0; j < input_params->output.time_steps; j++)
-      fprintf (f, "  %8.2e", results->tim[j] / CONST_MKSA_YEAR);
+    for (j = 0; j < source_mdl->n_time_steps; j++)
+      fprintf (f, "  %8.2e", source_mdl->time_steps[j] / CONST_MKSA_YEAR);
     fprintf (f, "\n");
 
     /* Write the abundance as a function of time for each shell. */
@@ -117,7 +117,7 @@ output (int n_shells,const inp_t *input_params,  const net_t *network, const res
 
     for (j = 0; j < input_params->output.time_steps; j++)
     {
-      fprintf (f, "%8.2e", results->tim[j] / CONST_MKSA_YEAR);
+      fprintf (f, "%8.2e", source_mdl->time_steps[j] / CONST_MKSA_YEAR);
       for (k = 0; k < n_shells; k++)
         fprintf (f, "  %8.2e", results->abundances[get_abundance_idx(results,k,j,i)]);
       fprintf (f, "\n");
@@ -175,7 +175,7 @@ output (int n_shells,const inp_t *input_params,  const net_t *network, const res
         for (j = 0; j < input_params->output.time_steps; j++)
         {
           fprintf (f, "%4i", k);
-          fprintf (f, "  %9.2e", results->tim[j] / CONST_MKSA_YEAR);
+          fprintf (f, "  %9.2e", source_mdl->time_steps[j] / CONST_MKSA_YEAR);
           for (l = 0; l < N_OUTPUT_ROUTES; l++)
           {
             fprintf (f, "  %4i", results->routes[get_route_idx(results,k,j,i,l)].formation.reaction_no);
@@ -183,7 +183,7 @@ output (int n_shells,const inp_t *input_params,  const net_t *network, const res
           }
           fprintf (f, "\n");
           fprintf (f, "%4i", k);
-          fprintf (f, "  %9.2e",  results->tim[j] / CONST_MKSA_YEAR);
+          fprintf (f, "  %9.2e",  source_mdl->time_steps[j] / CONST_MKSA_YEAR);
           for (l = 0; l < N_OUTPUT_ROUTES; l++)
           {
             fprintf (f, "  %4i",  results->routes[get_route_idx(results,k,j,i,l)].destruction.reaction_no);

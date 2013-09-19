@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <math.h>
 
 #ifdef HAVE_OPENMP
 #include <omp.h>
@@ -106,7 +105,7 @@ main (int argc, char *argv[])
   read_input (input_file, &input_params, &network , verbose);
 
   /* Read the source model file */
-  read_source (input_params.files.source_file, &source_mdl, verbose);
+  read_source (input_params.files.source_file, &source_mdl, &input_params,verbose);
 
   /* Check that the initial_abundance and output_species structure do
      not contain any specie that is not in the network. */
@@ -118,30 +117,6 @@ main (int argc, char *argv[])
   /* Allocate results */
   alloc_results( &results, input_params.output.time_steps, source_mdl.n_cells, input_params.output.n_output_species);
 
-
-  /* Build the vector of time */
-
-  {
-    int i;
-
-    for (i = 0; i <  input_params.output.time_steps; i++)
-    {
-      if (i < MAX_TIME_STEPS)
-        results.tim[i] = pow (10., log10 ( input_params.solver.ti) + i 
-            * (log10 (input_params.solver.tf) - log10 (input_params.solver.ti)) 
-            / (input_params.output.time_steps - 1));
-      else
-      {
-        fprintf (stderr, "astrochem: error: the number of time" 
-            "steps in %s exceed %i.\n", input_file, MAX_TIME_STEPS);
-        free_input (&input_params);
-        free_mdl (&source_mdl);
-        free_network (&network);
-        free_results (&results);
-        return(EXIT_FAILURE);
-      }
-    }
-  }
 
   /* Solve the ODE system for each cell. */
 
@@ -160,7 +135,7 @@ main (int argc, char *argv[])
       {
         if (verbose >= 1)
           fprintf (stdout, "Computing abundances in cell %d...\n", cell_index);
-        solve (cell_index, &input_params, &source_mdl.cell[cell_index], &network, &results, verbose);
+        solve (cell_index, &input_params, &source_mdl.cell[cell_index], &network, source_mdl.n_time_steps, source_mdl.time_steps, &results, verbose);
         if (verbose >= 1)
           fprintf (stdout, "Done with cell %d.\n", cell_index);
       }
@@ -173,7 +148,7 @@ main (int argc, char *argv[])
 
   }
   /* Write the abundances in output files */
-  output (source_mdl.n_cells, &input_params, &network, &results, verbose);
+  output (source_mdl.n_cells, &input_params, &source_mdl, &network, &results, verbose);
   free_input (&input_params);
   free_mdl (&source_mdl);
   free_network (&network);

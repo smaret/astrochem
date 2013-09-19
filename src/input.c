@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <math.h>
 #include "astrochem.h"
 
 /*
@@ -327,7 +328,7 @@ input_error (const char *input_file, int line_number)
  */
 
   void 
-read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
+read_source (const char *source_file, mdl_t *source_mdl, const inp_t * input_params, const int verbose)
 {
   FILE *f;
   char line[MAX_LINE];
@@ -385,9 +386,24 @@ read_source (const char *source_file, mdl_t *source_mdl,const int verbose)
       }
       else
       {
-        alloc_mdl(source_mdl, n_line,1);
+        alloc_mdl(source_mdl, n_line, input_params->output.time_steps);
         source_mdl->mode = STATIC;
         allocated=1;
+        /* Build the vector of time */
+        int i;
+        for (i = 0; i <  input_params->output.time_steps; i++)
+        {
+          if (i < MAX_TIME_STEPS)
+            source_mdl->time_steps[i] = pow (10., log10 ( input_params->solver.ti) + i 
+                * (log10 (input_params->solver.tf) - log10 (input_params->solver.ti)) 
+                / (input_params->output.time_steps - 1));
+          else
+          {
+            fprintf (stderr, "astrochem: error: the number of time" 
+                "steps exceed %i.\n", MAX_TIME_STEPS);
+            exit(1);
+          }
+        }
       }
     }
     if(strncmp(line,"[cells]",7)==0) 
@@ -508,7 +524,7 @@ alloc_mdl( mdl_t * source_mdl , int n_cells , int n_time_steps)
         __FILE__, __LINE__); 
     exit(1);
   }
-  if ( (source_mdl->time_steps = malloc ( sizeof(int) * n_time_steps ) ) == NULL )
+  if ( (source_mdl->time_steps = malloc ( sizeof(double) * n_time_steps ) ) == NULL )
   {
     fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
         __FILE__, __LINE__); 

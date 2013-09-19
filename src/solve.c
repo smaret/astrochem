@@ -380,7 +380,7 @@ jacobian (int N __attribute__ ((unused)),
 
   int
 solve (int cell_index, const inp_t *input_params, const cell_t *cell,
-    const net_t *network, res_t *results, int verbose)
+    const net_t *network, int n_time_steps, const double * time_steps, res_t * results, int verbose)
 {
   realtype t = 0.0;
   params_t params;                  /* Parameters for f() and jacobian() */
@@ -487,9 +487,9 @@ solve (int cell_index, const inp_t *input_params, const cell_t *cell,
 
     /* Solve the system for each time step. */
 
-    for (i = 0; i < input_params->output.time_steps; i++)
+    for (i = 0; i < n_time_steps; i++)
     {
-      CVode (cvode_mem, (realtype) results->tim[i], y, &t, CV_NORMAL);
+      CVode (cvode_mem, (realtype) time_steps[i], y, &t, CV_NORMAL);
 
       /* Print the cell number, time and time step after each call. */
 
@@ -668,12 +668,6 @@ alloc_results( res_t * results, int n_time_steps, int n_cells, int n_output_abun
         __FILE__, __LINE__); 
     exit(1);
   }
-  if (( results->tim = malloc (sizeof(double) * n_time_steps)) == NULL )
-  { 
-    fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
-        __FILE__, __LINE__); 
-    exit(1);
-  }
   results->n_time_steps = n_time_steps;
   results->n_cells = n_cells;
   results->n_output_abundances = n_output_abundances;
@@ -681,7 +675,6 @@ alloc_results( res_t * results, int n_time_steps, int n_cells, int n_output_abun
   void
 free_results ( res_t * results )
 {
-  free(results->tim);
   free(results->routes);
   free(results->abundances);
 }
