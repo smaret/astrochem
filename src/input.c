@@ -378,7 +378,6 @@ read_source (const char *source_file, mdl_t *source_mdl, const inp_t * input_par
           exit (1);
         }
         alloc_mdl(source_mdl, n_cells_times/nts,nts); // n_line contains [times] and [cells] and (n_line-2)/nts contain the [times] section.
-        source_mdl->mode = DYNAMIC;
         mode=R_TIMES;
         ts=0;
         allocated=1;
@@ -387,7 +386,6 @@ read_source (const char *source_file, mdl_t *source_mdl, const inp_t * input_par
       else
       {
         alloc_mdl(source_mdl, n_line, input_params->output.time_steps);
-        source_mdl->mode = STATIC;
         allocated=1;
         /* Build the vector of time */
         int i;

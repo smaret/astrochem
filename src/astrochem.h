@@ -116,7 +116,6 @@ typedef struct {
   double * time_steps;
   int n_time_steps;
   int n_cells;
-  SOURCE_MODE mode;
 } mdl_t;
 
 

@@ -107,13 +107,6 @@ main (int argc, char *argv[])
   /* Read the source model file */
   read_source (input_params.files.source_file, &source_mdl, &input_params,verbose);
 
-  /* Check that the initial_abundance and output_species structure do
-     not contain any specie that is not in the network. */
-
-  /*check_species (input_params.abundances.initial_abundances, input_params.abundances.n_initial_abundances,
-    input_params.output.output_species, input_params.output.n_output_species, network.species, 
-    network.n_species);*/
-
   /* Allocate results */
   alloc_results( &results, input_params.output.time_steps, source_mdl.n_cells, input_params.output.n_output_species);
 
@@ -129,8 +122,6 @@ main (int argc, char *argv[])
 #ifdef HAVE_OPENMP
 #pragma omp for schedule (dynamic, 1) nowait
 #endif
-    if( source_mdl.mode==STATIC)
-    {
       for (cell_index = 0; cell_index < source_mdl.n_cells; cell_index++)
       {
         if (verbose >= 1)
@@ -139,13 +130,6 @@ main (int argc, char *argv[])
         if (verbose >= 1)
           fprintf (stdout, "Done with cell %d.\n", cell_index);
       }
-    }
-    else
-    {
-      printf("Dynamic solve to be implemented");
-    }
-
-
   }
   /* Write the abundances in output files */
   output (source_mdl.n_cells, &input_params, &source_mdl, &network, &results, verbose);
