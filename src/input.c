@@ -365,28 +365,31 @@ read_source (const char *source_file, mdl_t *source_mdl, const inp_t * input_par
   {
     line_number++;
     if (line[0] == '#') continue; /* Skip comments */
-    if(allocated==0)
+
+    if(allocated==0) //First line without comment determine if it is a static or dynamic source.
     {
-      if(strncmp(line,"[times]",7)==0) 
+      if(strncmp(line,"[times]",7)==0) // Dynamic source file begin with [times] section
       {
         int nts = get_nb_active_line_section(source_file,"times");
         int n_cells_times = get_nb_active_line_section(source_file,"cells");
-        if(n_cells_times % nts != 0 )
+        if(n_cells_times % nts != 0 ) 
         {
           fprintf (stderr, "astrochem: %s: %d: error: incorrect format in source file %s .\n", 
               __FILE__, __LINE__,source_file);
           exit (1);
         }
-        alloc_mdl(source_mdl, n_cells_times/nts,nts); // n_line contains [times] and [cells] and (n_line-2)/nts contain the [times] section.
-        mode=R_TIMES;
+        alloc_mdl(source_mdl, n_cells_times/nts,nts); //n_cells_times contain the number of cells times the number of time steps.
+        mode=R_TIMES; // First thing to do is reading the time steps.
+        source_mdl->mode = DYNAMIC;
         ts=0;
-        allocated=1;
+        allocated=1; // Inform loop that the source type have been determined and structure have been allocated
         continue;
       }
-      else
+      else //Static source
       {
         alloc_mdl(source_mdl, n_line, input_params->output.time_steps);
-        allocated=1;
+        source_mdl->mode = STATIC;
+        allocated=1; // Inform loop that the source type have been determined and structure have been allocated
         /* Build the vector of time */
         int i;
         for (i = 0; i <  input_params->output.time_steps; i++)
@@ -404,13 +407,13 @@ read_source (const char *source_file, mdl_t *source_mdl, const inp_t * input_par
         }
       }
     }
-    if(strncmp(line,"[cells]",7)==0) 
+    if(strncmp(line,"[cells]",7)==0) //Time to read the cells 
     {
       mode=R_DYNAMIC;
       ts=0;
       continue;
     }
-    //Reading time steps
+    //Dynamic mode, reading time steps
     if(mode==R_TIMES)
     {
       int tmp_ts;
@@ -427,7 +430,7 @@ read_source (const char *source_file, mdl_t *source_mdl, const inp_t * input_par
         exit (1);
       }
     }
-    //Dynamic mode
+    //Dynamic mode, reading cells
     else if(mode==R_DYNAMIC)
     {
       int tmp_cell,tmp_ts;
@@ -446,7 +449,7 @@ read_source (const char *source_file, mdl_t *source_mdl, const inp_t * input_par
         exit (1);
       }
     }
-    //Static mode
+    //Static mode, reading cells
     else
     {
       if (n_cell < source_mdl->n_cells )

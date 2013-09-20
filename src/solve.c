@@ -379,7 +379,7 @@ jacobian (int N __attribute__ ((unused)),
  */
 
   int
-solve (int cell_index, const inp_t *input_params, const cell_t *cell,
+solve (int cell_index, const inp_t *input_params, SOURCE_MODE mode, const cell_t *cell,
     const net_t *network, int n_time_steps, const double * time_steps, res_t * results, int verbose)
 {
   realtype t = 0.0;

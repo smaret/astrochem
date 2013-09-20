@@ -116,6 +116,7 @@ typedef struct {
   double * time_steps;
   int n_time_steps;
   int n_cells;
+  SOURCE_MODE mode;
 } mdl_t;
 
 
@@ -196,7 +197,7 @@ double rate(double alpha, double beta, double gamm, int reaction_type,
 	    double chi, double cosmic, double grain_size,
 	    double grain_abundance, double ice_abundance);
 
-int solve (int cell_index, const inp_t *input_params, const cell_t *cell,
+int solve (int cell_index, const inp_t *input_params, SOURCE_MODE mode, const cell_t *cell,
 	   const net_t *network, int n_time_steps, const double * time_steps , res_t *results, int verbose);
 int get_abundance_idx( const res_t * results,int cell_idx, int ts_idx, int abund_idx);
 int get_route_idx( const res_t * results, int cell_idx, int ts_idx, int abund_idx, int route_idx);

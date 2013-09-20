@@ -126,7 +126,7 @@ main (int argc, char *argv[])
       {
         if (verbose >= 1)
           fprintf (stdout, "Computing abundances in cell %d...\n", cell_index);
-        solve (cell_index, &input_params, &source_mdl.cell[cell_index], &network, source_mdl.n_time_steps, source_mdl.time_steps, &results, verbose);
+        solve (cell_index, &input_params, source_mdl.mode, &source_mdl.cell[cell_index], &network, source_mdl.n_time_steps, source_mdl.time_steps, &results, verbose);
         if (verbose >= 1)
           fprintf (stdout, "Done with cell %d.\n", cell_index);
       }
