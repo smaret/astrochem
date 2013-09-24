@@ -55,8 +55,7 @@ read_network (const char *chem_file, net_t *network, const int verbose)
   }
   if( n_reactions == 0)
   {
-    fprintf (stderr, "astrochem: error: the number of reactions is zero.\n", 
-        MAX_REACTIONS);
+    fprintf (stderr, "astrochem: error: the number of reactions is zero.\n");
     exit(1);
   }
   int n_alloc_species = n_reactions/10;
@@ -277,7 +276,7 @@ add_specie (char *new_specie, net_t* network)
  */
 
   int 
-find_specie (const char *specie, net_t * network)
+find_specie (const char *specie, const net_t * network)
 {
   int i;
 
@@ -344,7 +343,7 @@ realloc_network_species ( net_t * network, int n_species )
 {
   if(n_species < network->n_species)
   {
-    fprintf (stderr, "astrochem: %s:%d: %s cannot realloc over existing species : "
+    fprintf (stderr, "astrochem: %s:%d:  cannot realloc over existing species : "
         "n_species : %i, new_size: %i\n", __FILE__, __LINE__,  network->n_species, n_species );
     exit (1);
   }

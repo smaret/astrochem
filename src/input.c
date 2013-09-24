@@ -39,6 +39,7 @@
 typedef enum { R_STATIC = 0, R_DYNAMIC = 1,R_TIMES = 2} SOURCE_READ_MODE;
 void alloc_input (inp_t * input_params, int n_initial_abundances, int n_output_abundances);
 void alloc_mdl( mdl_t * source_mdl , int n_cells , int n_time_steps);
+int get_nb_active_line_section(const char * file, const char * section);
 
   void
 read_input (const char *input_file, inp_t *input_params, const net_t * network, int verbose)
@@ -334,7 +335,6 @@ read_source (const char *source_file, mdl_t *source_mdl, const inp_t * input_par
   char line[MAX_LINE];
   int line_number = 0;
   int n_cell = 0;
-  int ts;
   int allocated = 0;
   SOURCE_READ_MODE mode = R_STATIC; //0 static, 1 dynamic, 2 time_step reading
   double av,nh,tgas,tdust;
@@ -381,7 +381,6 @@ read_source (const char *source_file, mdl_t *source_mdl, const inp_t * input_par
         alloc_mdl(source_mdl, n_cells_times/nts,nts); //n_cells_times contain the number of cells times the number of time steps.
         mode=R_TIMES; // First thing to do is reading the time steps.
         source_mdl->mode = DYNAMIC;
-        ts=0;
         allocated=1; // Inform loop that the source type have been determined and structure have been allocated
         continue;
       }
@@ -410,7 +409,6 @@ read_source (const char *source_file, mdl_t *source_mdl, const inp_t * input_par
     if(strncmp(line,"[cells]",7)==0) //Time to read the cells 
     {
       mode=R_DYNAMIC;
-      ts=0;
       continue;
     }
     //Dynamic mode, reading time steps
@@ -656,7 +654,6 @@ read_input_file_names (const char *input_file, files_t *files, int verbose)
   char parameter[MAX_LINE];
   char value[MAX_LINE];
   int  line_number = 0;
-  int  i = 0, j = 0;
   errno = 0;
 
   /* Open the input file or exit if we can't open it. */

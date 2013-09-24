@@ -35,6 +35,7 @@
 #define TIME_STEPS_DEFAULT 32
 #define TRACE_ROUTES_DEFAULT 0
 #define N_OUTPUT_ROUTES 16
+#define M_PI 3.14159265358979323846
 
 #define MAX_INITIAL_ABUNDANCES 128  /* Maximum initial abundances in the input file */
 #define MAX_CHAR_SPECIES 32         /* Maximum number of characters in a specie name */
@@ -184,6 +185,7 @@ void check_species ( abund_t initial_abundances[], int
 		    n_initial_abundances, char *output_species[], int
 		    n_output_species, char *species[], int n_species);
 
+int find_specie (const char *specie, const net_t * network);
 void read_network (const char *chem_file, net_t *network, const int verbose);
 void free_network ( net_t *network );
 
