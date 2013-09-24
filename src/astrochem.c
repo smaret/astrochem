@@ -32,11 +32,11 @@
 
 #include "astrochem.h"
 
-
 void usage (void);
+
 void version (void);
 
-  int
+int
 main (int argc, char *argv[])
 {
   inp_t input_params;
@@ -55,70 +55,72 @@ main (int argc, char *argv[])
     int opt;
 
     static struct option longopts[] = {
-      {"help",    no_argument, NULL, 'h'},
+      {"help", no_argument, NULL, 'h'},
       {"version", no_argument, NULL, 'V'},
       {"verbose", no_argument, NULL, 'v'},
-      {"quiet",   no_argument, NULL, 'q'},
+      {"quiet", no_argument, NULL, 'q'},
       {0, 0, 0, 0}
     };
 
-    while ((opt = getopt_long(argc, argv, "hVvq", longopts, NULL)) != -1)
-    {
-      switch (opt)
+    while ((opt = getopt_long (argc, argv, "hVvq", longopts, NULL)) != -1)
       {
-        case 'h':
-          usage ();
-          exit (0);
-          break;
-        case 'V':
-          version ();
-          exit (0);
-          break;
-        case 'v':
-          verbose = 2;
-          break;
-        case 'q':
-          verbose = 0;
-          break;
-        default:
-          usage ();
-          exit (1);
-      }
-    };
+	switch (opt)
+	  {
+	  case 'h':
+	    usage ();
+	    exit (0);
+	    break;
+	  case 'V':
+	    version ();
+	    exit (0);
+	    break;
+	  case 'v':
+	    verbose = 2;
+	    break;
+	  case 'q':
+	    verbose = 0;
+	    break;
+	  default:
+	    usage ();
+	    exit (1);
+	  }
+      };
     argc -= optind;
     argv += optind;
-    if (argc != 1) 
-    {
-      usage ();
-      exit (1);
-    }
+    if (argc != 1)
+      {
+	usage ();
+	exit (1);
+      }
     input_file = argv[0];
   }
 
-  /* Read the input file */
+  /* Read the names of chemical network and the source model file in
+     input file. */
+
   read_input_file_names (input_file, &input_params.files, verbose);
 
-  /* Read the chemical network file */
+  /* Read the chemical network file. */
+
   read_network (input_params.files.chem_file, &network, verbose);
 
-  /* Read the input file */
-  read_input (input_file, &input_params, &network , verbose);
+  /* Read the input file. */
+  read_input (input_file, &input_params, &network, verbose);
 
-  /* Read the source model file */
+  /* Read the source model file. */
   read_source (input_params.files.source_file, &source_mdl, &input_params,verbose);
 
-  /* Allocate results */
-  alloc_results( &results, input_params.output.time_steps, source_mdl.n_cells, input_params.output.n_output_species);
+  /* Allocate the structure containing the results. */
 
+  alloc_results (&results, input_params.output.time_steps, source_mdl.n_cells,
+		 input_params.output.n_output_species);
 
   /* Solve the ODE system for each cell. */
 
-#ifdef HAVE_OPENMP  
+#ifdef HAVE_OPENMP
 #pragma omp parallel shared (abundances) private (cell_index)
 #endif
-
   {
-
 #ifdef HAVE_OPENMP
 #pragma omp for schedule (dynamic, 1) nowait
 #endif
@@ -144,7 +146,7 @@ main (int argc, char *argv[])
    Display help message.
  */
 
-  void
+void
 usage (void)
 {
   fprintf (stdout, "Usage: astrochem [option...] [file]\n\n");
@@ -154,7 +156,8 @@ usage (void)
   fprintf (stdout, "   -v, --verbose      Verbose mode\n");
   fprintf (stdout, "   -q, --quiet        Suppress all messages\n");
   fprintf (stdout, "\n");
-  fprintf (stdout, "See the astrochem(1) manual page for more information.\n");
+  fprintf (stdout,
+	   "See the astrochem(1) manual page for more information.\n");
   fprintf (stdout, "Report bugs to <%s>.\n", PACKAGE_BUGREPORT);
 }
 
@@ -162,7 +165,7 @@ usage (void)
    Display version.
  */
 
-  void
+void
 version (void)
 {
   fprintf (stdout, "This is astrochem, version %s\n", PACKAGE_VERSION);
@@ -178,7 +181,9 @@ version (void)
 #endif
   fprintf (stdout, "Copyright (c) 2006-2013 Sebastien Maret\n");
   fprintf (stdout, "\n");
-  fprintf (stdout, "This is free software. You may redistribute copies of it under the terms\n");
-  fprintf (stdout, "of the GNU General Public License. There is NO WARRANTY, to the extent\n");
+  fprintf (stdout,
+	   "This is free software. You may redistribute copies of it under the terms\n");
+  fprintf (stdout,
+	   "of the GNU General Public License. There is NO WARRANTY, to the extent\n");
   fprintf (stdout, "permitted by law.\n");
 }

@@ -72,7 +72,7 @@ main (void)
   /* Read them */
 
   read_network ("network.chm", &network, verbose);
-  
+
   read_input ("input.ini", &input_params, &network, verbose);
 
   read_source ("source.mdl", &source_mdl, &input_params, verbose);
@@ -81,7 +81,8 @@ main (void)
   /* Solve the ODE system */
 
   /* Allocate results */
-   alloc_results( &results, input_params.output.time_steps, source_mdl.n_cells, input_params.output.n_output_species);
+  alloc_results (&results, input_params.output.time_steps, source_mdl.n_cells,
+		 input_params.output.n_output_species);
 
   cell_index = 0.;
   solve (cell_index, &input_params, source_mdl.mode, &source_mdl.cell[cell_index], &network, source_mdl.n_time_steps, source_mdl.time_steps, &results, verbose);
@@ -99,42 +100,47 @@ main (void)
       {
 	x_abundance = 1.0 * exp (-1e-9 *  source_mdl.time_steps[i]);
 	y_abundance = 1.0 - x_abundance;
-	x_abs_err = fabs( results.abundances[get_abundance_idx(&results,0,i,0)] - x_abundance);
-	y_abs_err = fabs( results.abundances[get_abundance_idx(&results,0,i,1)] - y_abundance);
+	x_abs_err =
+	  fabs (results.abundances[get_abundance_idx (&results, 0, i, 0)] -
+		x_abundance);
+	y_abs_err =
+	  fabs (results.abundances[get_abundance_idx (&results, 0, i, 1)] -
+		y_abundance);
 	x_rel_err = x_abs_err / x_abundance;
 	y_rel_err = y_abs_err / y_abundance;
 
 	/* Errors accumulate after each time step, so the actual error
 	   on the abundance is somewhat larger than the solver
 	   relative tolerance. */
-	if ((x_abs_err >input_params.solver.abs_err) && (x_rel_err > input_params.solver.rel_err * 5e2))
+	if ((x_abs_err > input_params.solver.abs_err)
+	    && (x_rel_err > input_params.solver.rel_err * 5e2))
 	  {
 	    fprintf (stderr, "solve_test: %s:%d: incorrect abundance at t=%12.6e: expected %12.6e, got %12.6e.\n",
 		     __FILE__, __LINE__, source_mdl.time_steps[i], x_abundance, results.abundances[get_abundance_idx(&results,0,i,0)]); 
 	    free_input (&input_params);
-        free_mdl (&source_mdl );
+	    free_mdl (&source_mdl);
 	    free_network (&network);
 	    free_results (&results);
 	    return EXIT_FAILURE;
 	  }
 
-	if ((y_abs_err > input_params.solver.abs_err) && (y_rel_err > input_params.solver.rel_err * 5e2))
+	if ((y_abs_err > input_params.solver.abs_err)
+	    && (y_rel_err > input_params.solver.rel_err * 5e2))
 	  {
 	    fprintf (stderr, "solve_test: %s:%d: incorrect abundance at t=%12.6e: expected %12.6e, got %12.6e.\n",
 		     __FILE__, __LINE__, source_mdl.time_steps[i], y_abundance, results.abundances[get_abundance_idx(&results,0,i,1)]); 
 	    free_input (&input_params);
-        free_mdl (&source_mdl );
+	    free_mdl (&source_mdl);
 	    free_network (&network);
 	    free_results (&results);
 	    return EXIT_FAILURE;
 	  }
       }
   }
-  
-  free_input (&input_params );
-  free_mdl (&source_mdl );
+
+  free_input (&input_params);
+  free_mdl (&source_mdl);
   free_network (&network);
   free_results (&results);
   return EXIT_SUCCESS;
 }
-

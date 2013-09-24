@@ -47,14 +47,17 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
   {
     /* Open the file or exit if an error occurs. */
 
-    strncpy (filename, network->specie_names[input_params->output.output_species_idx [i]]
-        , MAX_CHAR_FILENAME);
+    strncpy (filename,
+        network->species_names[input_params->
+        output.output_species_idx[i]],
+        MAX_CHAR_FILENAME);
     if (strlen (input_params->output.suffix) != 0)
     {
       strncat (filename, "_", MAX_CHAR_FILENAME - strlen (filename) - 1);
-      strncat (filename, input_params->output.suffix, MAX_CHAR_FILENAME - strlen (filename) - 1);
+      strncat (filename, input_params->output.suffix,
+          MAX_CHAR_FILENAME - strlen (filename) - 1);
     }
-    strncat (filename, ".abun", MAX_CHAR_FILENAME - strlen (filename) -1
+    strncat (filename, ".abun", MAX_CHAR_FILENAME - strlen (filename) - 1
         - strlen (input_params->output.suffix));
     if ((f = fopen (filename, "w")) == NULL)
     {
@@ -71,14 +74,14 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
        shells */
 
     /* Write the header. */
-
-    fprintf (f, "# %s abundance computed by astrochem\n", input_params->output.output_species[i]);
+    fprintf (f, "# %s abundance computed by astrochem\n",
+        input_params->output.output_species[i]);
     fprintf (f, "# shell number / time [yr]\n");
     fprintf (f, "#\n");
 
     /* Write the time */
-
     fprintf (f, "   ");
+
     for (j = 0; j < source_mdl->n_time_steps; j++)
       fprintf (f, "  %8.2e", source_mdl->time_steps[j] / CONST_MKSA_YEAR);
     fprintf (f, "\n");
@@ -101,8 +104,9 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
 
     /* Write the header. */
 
-    fprintf (f, "# %s abundance computed by astrochem\n", 
-        network->specie_names[ input_params->output.output_species_idx[i] ]);
+    fprintf (f, "# %s abundance computed by astrochem\n",
+        network->species_names[input_params->
+        output.output_species_idx[i]]);
     fprintf (f, "# time [yr] / shell number\n");
     fprintf (f, "#\n");
 
@@ -114,14 +118,16 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
     fprintf (f, "\n");
 
     /* Write the abundance as a function of time for each shell. */
-
     for (j = 0; j < input_params->output.time_steps; j++)
     {
       fprintf (f, "%8.2e", source_mdl->time_steps[j] / CONST_MKSA_YEAR);
+
       for (k = 0; k < n_shells; k++)
-        fprintf (f, "  %8.2e", results->abundances[get_abundance_idx(results,k,j,i)]);
+        fprintf (f, "  %8.2e",
+            results->abundances[get_abundance_idx
+            (results, k, j, i)]);
       fprintf (f, "\n");
-    } 
+    }
 
 #endif
 
@@ -135,14 +141,16 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
 
   if (input_params->output.trace_routes == 1)
   {
-    if (verbose == 1)
-      fprintf (stdout, "Writing formation/destruction routes in output files... ");
+      if (verbose == 1)
+        fprintf (stdout,
+            "Writing formation/destruction routes in output files... ");
 
     for (i = 0; i < input_params->output.n_output_species; i++)
     {
+
       /* Open the file or exit if an error occurs. */
-      strncpy (filename, network->specie_names[input_params->output.output_species_idx[i]]
-            , MAX_CHAR_FILENAME);
+      strncpy (filename, network->species_names[input_params->output.output_species_idx[i]]
+          , MAX_CHAR_FILENAME);
       if (strlen (input_params->output.suffix) != 0)
       {
         strncat (filename, "_", MAX_CHAR_FILENAME - strlen (filename) - 1);
@@ -164,7 +172,7 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
       /* Write the header */
 
       fprintf (f, "# Main %s formation/destruction routes computed by astrochem\n",
-          network->specie_names[input_params->output.output_species_idx[i]]);
+          network->species_names[input_params->output.output_species_idx[i]]);
       fprintf (f, "# shell number  time [yr]  reaction number 1  reaction rate 1 [cm-3/s]... \n");
       fprintf (f, "#\n");
 
@@ -192,6 +200,7 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
           fprintf (f, "\n");
         }
       }
+
     }
 
     if (verbose == 1)
