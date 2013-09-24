@@ -74,8 +74,9 @@ read_input (const char *input_file, inp_t * input_params,
 
   /* Count the number of initial abundances and output species (needed
      to allocate the data structure). */
-  
-  n_initial_abundances = get_nb_active_line_section (input_file, "abundances");
+
+  n_initial_abundances =
+    get_nb_active_line_section (input_file, "abundances");
   while (fgets (line, MAX_LINE, f) != NULL)
     {
       if (strncmp (line, "abundances", 10) == 0)
@@ -88,19 +89,6 @@ read_input (const char *input_file, inp_t * input_params,
 	      n_output_species++;
 	    }
 	}
-    }
-  if (n_initial_abundances > MAX_INITIAL_ABUNDANCES)
-    {
-      fprintf (stderr, "astrochem: error: the number of species "
-	       "in %s exceed %i.\n", input_file, MAX_INITIAL_ABUNDANCES);
-      exit (1);
-    }
-  if (n_output_species > MAX_OUTPUT_ABUNDANCES)
-    {
-      fprintf (stderr,
-	       "astrochem: error: the number of species in output exceeds %i.\n",
-	       MAX_OUTPUT_ABUNDANCES);
-      exit (1);
     }
 
   /* Reset stream to beginning of file */
@@ -204,29 +192,28 @@ read_input (const char *input_file, inp_t * input_params,
 		    }
 		  else
 		    {
-		      input_params->abundances.
-			initial_abundances[i].species_idx =
-			find_species (parameter, network);
-		      input_params->abundances.
-			initial_abundances[i].abundance = atof (value);
+		      input_params->abundances.initial_abundances[i].
+			species_idx = find_species (parameter, network);
+		      input_params->abundances.initial_abundances[i].
+			abundance = atof (value);
 
 		      /* Compute the total grain density */
 
 		      {
 			int g, gm, gp;
-			
+
 			g = find_species ("grain", network);
 			gm = find_species ("grain(-)", network);
 			gp = find_species ("grain(+)", network);
-			if (input_params->abundances.
-			    initial_abundances[i].species_idx == g
-			    || input_params->abundances.
-			    initial_abundances[i].species_idx == gm
-			    || input_params->abundances.
-			    initial_abundances[i].species_idx == gp)
+			if (input_params->abundances.initial_abundances[i].
+			    species_idx == g
+			    || input_params->abundances.initial_abundances[i].
+			    species_idx == gm
+			    || input_params->abundances.initial_abundances[i].
+			    species_idx == gp)
 			  input_params->phys.grain_abundance +=
-			    input_params->abundances.
-			    initial_abundances[i].abundance;
+			    input_params->abundances.initial_abundances[i].
+			    abundance;
 		      }
 		      i++;
 		    }
@@ -291,7 +278,8 @@ read_input (const char *input_file, inp_t * input_params,
 				   "but is not in the network.\n",
 				   output_specie);
 			}
-		      input_params->output.output_species_idx[j] = species_idx;
+		      input_params->output.output_species_idx[j] =
+			species_idx;
 		      j++;
 		    }
 		}
@@ -423,11 +411,13 @@ read_source (const char *source_file, mdl_t * source_mdl, const int verbose)
 	      int n_cells_times;
 
 	      nts = get_nb_active_line_section (source_file, "times");
-	      n_cells_times = get_nb_active_line_section (source_file, "cells");
+	      n_cells_times =
+		get_nb_active_line_section (source_file, "cells");
 	      if (n_cells_times % nts != 0)
 		{
 		  fprintf (stderr,
-			   "astrochem: error: incorrect format in source file %s .\n", source_file);
+			   "astrochem: error: incorrect format in source file %s .\n",
+			   source_file);
 		  exit (1);
 		}
 	      alloc_mdl (source_mdl, n_cells_times / nts, nts);
@@ -458,7 +448,7 @@ read_source (const char *source_file, mdl_t * source_mdl, const int verbose)
 	  int tmp_ts;
 	  double ts_val;
 
-	  sscanf (line, "%d %lf", &tmp_ts, &ts_val); /* Format and value not checked */
+	  sscanf (line, "%d %lf", &tmp_ts, &ts_val);	/* Format and value not checked */
 	  if (tmp_ts < source_mdl->n_time_steps)
 	    {
 	      source_mdl->time_steps[tmp_ts] = ts_val;
@@ -473,7 +463,7 @@ read_source (const char *source_file, mdl_t * source_mdl, const int verbose)
 	}
 
       /* Read the cells (dynamic source) */
-      
+
       else if (mode == R_DYNAMIC)
 	{
 	  int tmp_cell, tmp_ts;
@@ -575,7 +565,7 @@ void
 alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps)
 {
   int i;
-  
+
   source_mdl->n_cells = n_cells;
   source_mdl->n_time_steps = n_time_steps;
   if ((source_mdl->cell = malloc (sizeof (cell_t) * n_cells)) == NULL)
