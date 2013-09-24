@@ -35,6 +35,7 @@
 #define TIME_STEPS_DEFAULT 32
 #define TRACE_ROUTES_DEFAULT 0
 #define N_OUTPUT_ROUTES 16
+#define M_PI 3.14159265358979323846
 
 #define MAX_CHAR_SPECIES 32	/* Maximum number of characters in a specie name */
 
@@ -181,12 +182,11 @@ void read_input_file_names (const char *input_file, files_t * files,
 
 void free_input (inp_t * input_params);
 
+void read_source (const char *source_file, mdl_t *source_mdl,const inp_t * input_params,
+		      const int verbose);
+void free_mdl( mdl_t * source_mdl );
+
 int get_nb_active_line (const char *file);
-
-void read_source (const char *source_file, mdl_t * source_mdl,
-		  const int verbose);
-
-void free_mdl (mdl_t * source_mdl);
 
 void input_error (const char *input_f, int line_number);
 
@@ -194,9 +194,9 @@ void check_species (abund_t initial_abundances[], int
 		    n_initial_abundances, char *output_species[], int
 		    n_output_species, char *species[], int n_species);
 
-void read_network (const char *chem_file, net_t * network, const int verbose);
+int find_species (const char *species, const net_t * network);
 
-int find_species (const char *specie, const net_t * network);
+void read_network (const char *chem_file, net_t * network, const int verbose);
 
 void free_network (net_t * network);
 
@@ -205,16 +205,10 @@ void alloc_results (res_t * results, int n_time_steps, int n_cells,
 
 void free_results (res_t * results);
 
-int specie_index (const char specie[], const char *const species[],
-		  int n_species);
-
 double rate (double alpha, double beta, double gamm, int reaction_type,
 	     int reaction_no, double nh, double av, double tgas, double tdust,
 	     double chi, double cosmic, double grain_size,
 	     double grain_abundance, double ice_abundance);
-
-int solve (int cell_index, const inp_t * input_params, const cell_t * cell,
-	   const net_t * network, res_t * results, int verbose);
 
 int get_abundance_idx (const res_t * results, int cell_idx, int ts_idx,
 		       int abund_idx);
@@ -222,5 +216,8 @@ int get_abundance_idx (const res_t * results, int cell_idx, int ts_idx,
 int get_route_idx (const res_t * results, int cell_idx, int ts_idx,
 		   int abund_idx, int route_idx);
 
-void output (int n_cells, const inp_t * input_params, const net_t * network,
-	     const res_t * results, int verbose);
+int solve (int cell_index, const inp_t *input_params, SOURCE_MODE mode, const cell_t *cell,
+	   const net_t *network, int n_time_steps, const double * time_steps , res_t *results, int verbose);
+
+void output (int n_cells, const inp_t *input_params, const mdl_t * source_mdl, const net_t *network,
+	     const res_t *results, int verbose);

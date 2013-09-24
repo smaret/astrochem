@@ -28,14 +28,14 @@
 #include <string.h>
 #include "astrochem.h"
 
-int add_specie (char *new_specie, net_t * network);
+int add_species (char *new_species, net_t * network);
 
 void alloc_network (net_t * network, int n_species, int n_reactions);
 
 void realloc_network_species (net_t * network, int n_species);
 
 /*
-  Add a specie in the species array, if not already present.
+  Add a species in the species array, if not already present.
 */
 
 void
@@ -167,7 +167,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
 		  }
 		break;
 	      }
-	    /* Yet another specie to add. */
+	    /* Yet another species to add. */
 	    else
 	      {
 		strncpy (str, localLine, localLine2 - localLine);
@@ -179,43 +179,43 @@ read_network (const char *chem_file, net_t * network, const int verbose)
 		    if (mode == 1)
 		      {
 			network->reactions[n].reactant1 =
-			  add_specie (str, network);
+			  add_species (str, network);
 			mode++;
 		      }
 		    else if (mode == 2)
 		      {
 			network->reactions[n].reactant2 =
-			  add_specie (str, network);
+			  add_species (str, network);
 			mode++;
 		      }
 		    else if (mode == 3)
 		      {
 			network->reactions[n].reactant3 =
-			  add_specie (str, network);
+			  add_species (str, network);
 			mode++;
 		      }
 		    else if (mode == 4)
 		      {
 			network->reactions[n].product1 =
-			  add_specie (str, network);
+			  add_species (str, network);
 			mode++;
 		      }
 		    else if (mode == 5)
 		      {
 			network->reactions[n].product2 =
-			  add_specie (str, network);
+			  add_species (str, network);
 			mode++;
 		      }
 		    else if (mode == 6)
 		      {
 			network->reactions[n].product3 =
-			  add_specie (str, network);
+			  add_species (str, network);
 			mode++;
 		      }
 		    else if (mode == 7)
 		      {
 			network->reactions[n].product4 =
-			  add_specie (str, network);
+			  add_species (str, network);
 			mode++;
 		      }
 		    else
@@ -256,15 +256,15 @@ read_network (const char *chem_file, net_t * network, const int verbose)
 */
 
 int
-add_specie (char *new_specie, net_t * network)
+add_species (char *new_species, net_t * network)
 {
   int i;
 
-  if (strcmp (new_specie, "") == 0)
+  if (strcmp (new_species, "") == 0)
     return -1;
   for (i = 0; i < network->n_species; i++)
     {
-      if (strcmp (network->species_names[i], new_specie) == 0)
+      if (strcmp (network->species_names[i], new_species) == 0)
 	return i;
     }
   i = network->n_species;
@@ -279,9 +279,9 @@ add_specie (char *new_specie, net_t * network)
 	       "array allocation failed.\n");
       exit (1);
     }
-  if (strlen (new_specie) < MAX_CHAR_SPECIES - 1)
+  if (strlen (new_species) < MAX_CHAR_SPECIES - 1)
     {
-      strcpy (network->species_names[i], new_specie);
+      strcpy (network->species_names[i], new_species);
       (network->n_species)++;
     }
   else
@@ -295,29 +295,29 @@ add_specie (char *new_specie, net_t * network)
 }
 
 /* 
-   Look up the index of a given specie in the species array.
+   Look up the index of a given species in the species array.
  */
 
-int
-find_species (const char *specie, const net_t * network)
+  int 
+find_species (const char *species, const net_t * network)
 {
   int i;
 
-  /* Return -1 if the specie name is empty. */
-  if (strcmp (specie, "") == 0)
+  /* Return -1 if the species name is empty. */
+  if (strcmp (species, "") == 0)
     {
       return -1;
     }
   for (i = 0; i < network->n_species; i++)
     {
-      if (strncmp (network->species_names[i], specie,
+      if (strncmp (network->species_names[i], species,
 		   sizeof (char) * MAX_CHAR_SPECIES) == 0)
 	{
 	  return i;
 	}
     }
 
-  /* Return -2 if we can not find the specie */
+  /* Return -2 if we can not find the species */
   return -2;
 }
 
