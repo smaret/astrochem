@@ -28,7 +28,7 @@
 #include <string.h>
 #include "astrochem.h"
 
-int add_specie (char *new_specie, net_t * network);
+int add_species (char *new_specie, net_t * network);
 
 void realloc_network_species (net_t * network, int n_species);
 
@@ -156,43 +156,43 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                   if (mode == 1)
                     {
                       network->reactions[n].reactant1 =
-                        add_specie (str, network);
+                        add_species (str, network);
                       mode++;
                     }
                   else if (mode == 2)
                     {
                       network->reactions[n].reactant2 =
-                        add_specie (str, network);
+                        add_species (str, network);
                       mode++;
                     }
                   else if (mode == 3)
                     {
                       network->reactions[n].reactant3 =
-                        add_specie (str, network);
+                        add_species (str, network);
                       mode++;
                     }
                   else if (mode == 4)
                     {
                       network->reactions[n].product1 =
-                        add_specie (str, network);
+                        add_species (str, network);
                       mode++;
                     }
                   else if (mode == 5)
                     {
                       network->reactions[n].product2 =
-                        add_specie (str, network);
+                        add_species (str, network);
                       mode++;
                     }
                   else if (mode == 6)
                     {
                       network->reactions[n].product3 =
-                        add_specie (str, network);
+                        add_species (str, network);
                       mode++;
                     }
                   else if (mode == 7)
                     {
                       network->reactions[n].product4 =
-                        add_specie (str, network);
+                        add_species (str, network);
                       mode++;
                     }
                   else
@@ -229,7 +229,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
 }
 
 int
-add_specie (char *new_specie, net_t * network)
+add_species (char *new_specie, net_t * network)
 {
   int i;
   if (strcmp (new_specie, "") == 0)
