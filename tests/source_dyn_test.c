@@ -30,6 +30,7 @@ main (void)
   FILE *f;
 
   mdl_t source_mdl;
+  inp_t fake;
   int verbose = 0;
 
   /* Create the input.ini file */
@@ -87,10 +88,10 @@ main (void)
 
   /* Read it */
 
-  read_source ("./source_dyn.mdl", &source_mdl, verbose);
+  read_source ("./source_dyn.mdl", &source_mdl, &fake, verbose);
   /* Check that the values are correct */
   if ((source_mdl.n_cells == 3) &&
-      (source_mdl.n_time_steps == 11) &&
+      (source_mdl.ts.n_time_steps == 11) &&
       (source_mdl.cell[0].av[0] == 0.0) &&
       (source_mdl.cell[0].nh[0] == 1e4) && 
       (source_mdl.cell[0].tgas[0] == 10) &&
@@ -102,7 +103,8 @@ main (void)
       (source_mdl.cell[2].av[10] == 1.57) &&
       (source_mdl.cell[2].nh[10] == 2.97e4) &&
       (source_mdl.cell[2].tgas[10] == 24.96) &&
-      (source_mdl.cell[2].tdust[10] == 24.96))
+      (source_mdl.cell[2].tdust[10] == 24.96) &&
+      (source_mdl.ts.time_steps[5] - 0.00000297 < 0.0001 ))
   {
     free_mdl(&source_mdl);
     return EXIT_SUCCESS;

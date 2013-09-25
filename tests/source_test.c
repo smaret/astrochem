@@ -30,6 +30,10 @@ main (void)
   FILE *f;
 
   mdl_t source_mdl;
+  inp_t fake;
+  fake.output.time_steps = 128;
+  fake.solver.ti = 0.000001  * CONST_MKSA_YEAR;
+  fake.solver.tf = 10000000  * CONST_MKSA_YEAR;
   int verbose = 0;
 
   /* Create the input.ini file */
@@ -44,7 +48,8 @@ main (void)
 
   /* Read it */
 
-  read_source ("source.mdl", &source_mdl, verbose);
+  read_source ("source.mdl", &source_mdl, &fake, verbose);
+
   /* Check that the values are correct */
   if ((source_mdl.n_cells == 3) && 
       (source_mdl.cell[0].av[0] == 0.1) &&
@@ -58,7 +63,10 @@ main (void)
       (source_mdl.cell[2].av[0] == 10.0) &&
       (source_mdl.cell[2].nh[0] == 1e4) &&
       (source_mdl.cell[2].tgas[0] == 8) &&
-      (source_mdl.cell[2].tdust[0] == 7))
+      (source_mdl.cell[2].tdust[0] == 7) &&
+      (source_mdl.ts.time_steps[10] - 332.988055 < 0.0001) && 
+      (source_mdl.ts.time_steps[23] - 7130.784562 < 0.0001) &&
+      (source_mdl.ts.time_steps[47] - 2040939.960351 < 0.0001) )
     {
       free_mdl(&source_mdl);
       return EXIT_SUCCESS;

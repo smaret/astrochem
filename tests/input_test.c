@@ -119,22 +119,22 @@ main (void)
       (input_params.solver.rel_err == 1e-6) && 
       (input_params.output.time_steps == 64) &&
       (input_params.abundances.n_initial_abundances == 14) &&
-      (strcmp (network.specie_names[input_params.abundances.initial_abundances[0].specie_idx], "H2") == 0) &&
+      (strcmp (network.species_names[input_params.abundances.initial_abundances[0].species_idx], "H2") == 0) &&
       (input_params.abundances.initial_abundances[0].abundance == 0.5) &&
-      (strcmp (network.specie_names[input_params.abundances.initial_abundances[1].specie_idx], "He") == 0) &&
+      (strcmp (network.species_names[input_params.abundances.initial_abundances[1].species_idx], "He") == 0) &&
       (input_params.abundances.initial_abundances[1].abundance == 0.14) &&
-      (strcmp (network.specie_names[input_params.abundances.initial_abundances[2].specie_idx], "N") == 0) &&
+      (strcmp (network.species_names[input_params.abundances.initial_abundances[2].species_idx], "N") == 0) &&
       (input_params.abundances.initial_abundances[2].abundance == 2.14e-5) &&
-      (strcmp (network.specie_names[input_params.abundances.initial_abundances[3].specie_idx], "O") == 0) &&
+      (strcmp (network.species_names[input_params.abundances.initial_abundances[3].species_idx], "O") == 0) &&
       (input_params.abundances.initial_abundances[3].abundance == 1.76e-4) &&
-      (strcmp (network.specie_names[input_params.abundances.initial_abundances[4].specie_idx], "C(+)") == 0) &&
+      (strcmp (network.species_names[input_params.abundances.initial_abundances[4].species_idx], "C(+)") == 0) &&
       (input_params.abundances.initial_abundances[4].abundance == 7.30e-5) &&
       (input_params.output.n_output_species == 14) &&
-      (strcmp (network.specie_names[input_params.output.output_species_idx[0]], "CO") == 0) &&
-      (strcmp (network.specie_names[input_params.output.output_species_idx[1]], "C(+)") == 0) &&
-      (strcmp (network.specie_names[input_params.output.output_species_idx[2]], "C") == 0) &&
-      (strcmp (network.specie_names[input_params.output.output_species_idx[3]], "e(-)") == 0) &&
-      (strcmp (network.specie_names[input_params.output.output_species_idx[4]], "OH") == 0))
+      (strcmp (network.species_names[input_params.output.output_species_idx[0]], "CO") == 0) &&
+      (strcmp (network.species_names[input_params.output.output_species_idx[1]], "C(+)") == 0) &&
+      (strcmp (network.species_names[input_params.output.output_species_idx[2]], "C") == 0) &&
+      (strcmp (network.species_names[input_params.output.output_species_idx[3]], "e(-)") == 0) &&
+      (strcmp (network.species_names[input_params.output.output_species_idx[4]], "OH") == 0))
     {
       free_input (&input_params);
       free_network (&network);
