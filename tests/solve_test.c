@@ -84,7 +84,7 @@ main (void)
    alloc_results( &results, input_params.output.time_steps, source_mdl.n_cells, input_params.output.n_output_species);
 
   cell_index = 0.;
-  solve (cell_index, &input_params, source_mdl.mode, &source_mdl.cell[cell_index], &network, & source_mdl.ts, &results, verbose);
+  solve (cell_index, &input_params, source_mdl.mode, &source_mdl.cell[cell_index], &network, &source_mdl.ts, &results, verbose);
 
   {
     int i;

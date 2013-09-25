@@ -54,6 +54,7 @@
 
 typedef enum
 { STATIC = 0, DYNAMIC = 1 } SOURCE_MODE;
+
 typedef char species_name_t[MAX_CHAR_SPECIES];
 
 typedef struct

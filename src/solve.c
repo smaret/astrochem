@@ -499,7 +499,6 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
     int i, j;
 
     /* Solve the system for each time step. */
-
     for (i = 0; i < ts->n_time_steps; i++)
       {
         CVode (cvode_mem, (realtype) ts->time_steps[i], y, &t, CV_NORMAL);
