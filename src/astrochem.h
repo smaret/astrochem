@@ -37,13 +37,7 @@
 #define N_OUTPUT_ROUTES 16
 #define M_PI 3.14159265358979323846
 
-#define MAX_INITIAL_ABUNDANCES 128  /* Maximum initial abundances in the input file */
 #define MAX_CHAR_SPECIES 32         /* Maximum number of characters in a specie name */
-#define MAX_SHELLS 256              /* Maximum number of cells in the model file */
-#define MAX_OUTPUT_ABUNDANCES 32    /* Maximum output abundances in the output file */
-#define MAX_TIME_STEPS 128          /* Maximum number of time steps the output file */
-#define MAX_REACTIONS 32768         /* Maximum number of reactions in the network file */
-#define MAX_SPECIES 4096            /* Maximum number of species in the network file */
 
 #define CONST_MKSA_YEAR 3.1536e7
 #define CONST_CGSM_BOLTZMANN (1.3806503e-16)
@@ -59,9 +53,10 @@
 /* Data structures */
 
 typedef enum { STATIC = 0, DYNAMIC =1} SOURCE_MODE;
+typedef char species_name_t [MAX_CHAR_SPECIES];
 
 typedef struct {
-  int specie_idx;
+  int species_idx;
   double abundance;
 } abund_t;
 
@@ -113,9 +108,13 @@ typedef struct {
   } cell_t;
 
 typedef struct {
+    double * time_steps;
+      int n_time_steps;
+} time_steps_t;
+
+typedef struct {
   cell_t * cell;
-  double * time_steps;
-  int n_time_steps;
+  time_steps_t ts;
   int n_cells;
   SOURCE_MODE mode;
 } mdl_t;
@@ -139,7 +138,7 @@ typedef struct {
 typedef struct {
   int n_species;
   int n_alloc_species;
-  char ** specie_names;
+  species_name_t * species_names;
   int n_reactions;
   react_t * reactions;
 } net_t;
@@ -167,17 +166,20 @@ typedef struct {
    Fontions names with a _new suffix correspond to the new prototypes
    that uses the new "input_params", "source_mdl", "network" and
    "results" data structures. */
+void alloc_input (inp_t * input_params, int n_initial_abundances, int n_output_abundances);
 
 void read_input (const char *input_file, inp_t *input_params, const net_t * network, int verbose);
+
 void read_input_file_names (const char *input_file, files_t *files, int verbose);
 
 void free_input ( inp_t * input_params );
+
 int get_nb_active_line(const char * file);
 
 void read_source (const char *source_file, mdl_t *source_mdl,const inp_t * input_params,
 		      const int verbose);
-void free_mdl( mdl_t * source_mdl );
 
+void free_mdl( mdl_t * source_mdl );
 
 void input_error (const char *input_f, int line_number);
 
@@ -185,14 +187,17 @@ void check_species ( abund_t initial_abundances[], int
 		    n_initial_abundances, char *output_species[], int
 		    n_output_species, char *species[], int n_species);
 
-int find_specie (const char *specie, const net_t * network);
+int find_species (const char *specie, const net_t * network);
+
+void alloc_network ( net_t * network, int n_species, int n_reactions );
+
 void read_network (const char *chem_file, net_t *network, const int verbose);
+
 void free_network ( net_t *network );
 
 void alloc_results( res_t * results, int n_time_steps, int n_cells, int n_output_abundances);
-void free_results ( res_t * results );
 
-int specie_index (const char specie[],const char * const species[], int n_species);
+void free_results ( res_t * results );
 
 double rate(double alpha, double beta, double gamm, int reaction_type,
 	    int reaction_no, double nh, double av, double tgas, double tdust,
@@ -200,8 +205,11 @@ double rate(double alpha, double beta, double gamm, int reaction_type,
 	    double grain_abundance, double ice_abundance);
 
 int solve (int cell_index, const inp_t *input_params, SOURCE_MODE mode, const cell_t *cell,
-	   const net_t *network, int n_time_steps, const double * time_steps , res_t *results, int verbose);
+	   const net_t *network, const time_steps_t * ts , res_t *results, int verbose);
+
 int get_abundance_idx( const res_t * results,int cell_idx, int ts_idx, int abund_idx);
+
 int get_route_idx( const res_t * results, int cell_idx, int ts_idx, int abund_idx, int route_idx);
+
 void output (int n_cells, const inp_t *input_params, const mdl_t * source_mdl, const net_t *network,
 	     const res_t *results, int verbose);

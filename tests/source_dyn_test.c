@@ -91,7 +91,7 @@ main (void)
   read_source ("./source_dyn.mdl", &source_mdl, &fake, verbose);
   /* Check that the values are correct */
   if ((source_mdl.n_cells == 3) &&
-      (source_mdl.n_time_steps == 11) &&
+      (source_mdl.ts.n_time_steps == 11) &&
       (source_mdl.cell[0].av[0] == 0.0) &&
       (source_mdl.cell[0].nh[0] == 1e4) && 
       (source_mdl.cell[0].tgas[0] == 10) &&
@@ -104,7 +104,7 @@ main (void)
       (source_mdl.cell[2].nh[10] == 2.97e4) &&
       (source_mdl.cell[2].tgas[10] == 24.96) &&
       (source_mdl.cell[2].tdust[10] == 24.96) &&
-      (source_mdl.time_steps[5] - 0.00000297 < 0.0001 ))
+      (source_mdl.ts.time_steps[5] - 0.00000297 < 0.0001 ))
   {
     free_mdl(&source_mdl);
     return EXIT_SUCCESS;

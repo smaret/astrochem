@@ -64,9 +64,9 @@ main (void)
       (source_mdl.cell[2].nh[0] == 1e4) &&
       (source_mdl.cell[2].tgas[0] == 8) &&
       (source_mdl.cell[2].tdust[0] == 7) &&
-      (source_mdl.time_steps[10] - 332.988055 < 0.0001) && 
-      (source_mdl.time_steps[23] - 7130.784562 < 0.0001) &&
-      (source_mdl.time_steps[47] - 2040939.960351 < 0.0001) )
+      (source_mdl.ts.time_steps[10] - 332.988055 < 0.0001) && 
+      (source_mdl.ts.time_steps[23] - 7130.784562 < 0.0001) &&
+      (source_mdl.ts.time_steps[47] - 2040939.960351 < 0.0001) )
     {
       free_mdl(&source_mdl);
       return EXIT_SUCCESS;

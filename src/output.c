@@ -47,7 +47,7 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
   {
     /* Open the file or exit if an error occurs. */
 
-    strncpy (filename, network->specie_names[input_params->output.output_species_idx [i]]
+    strncpy (filename, network->species_names[input_params->output.output_species_idx [i]]
         , MAX_CHAR_FILENAME);
     if (strlen (input_params->output.suffix) != 0)
     {
@@ -102,7 +102,7 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
     /* Write the header. */
 
     fprintf (f, "# %s abundance computed by astrochem\n", 
-        network->specie_names[ input_params->output.output_species_idx[i] ]);
+        network->species_names[ input_params->output.output_species_idx[i] ]);
     fprintf (f, "# time [yr] / shell number\n");
     fprintf (f, "#\n");
 
@@ -117,7 +117,7 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
 
     for (j = 0; j < input_params->output.time_steps; j++)
     {
-      fprintf (f, "%8.2e", source_mdl->time_steps[j] / CONST_MKSA_YEAR);
+      fprintf (f, "%8.2e", source_mdl->ts.time_steps[j] / CONST_MKSA_YEAR);
       for (k = 0; k < n_shells; k++)
         fprintf (f, "  %8.2e", results->abundances[get_abundance_idx(results,k,j,i)]);
       fprintf (f, "\n");
@@ -141,7 +141,7 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
     for (i = 0; i < input_params->output.n_output_species; i++)
     {
       /* Open the file or exit if an error occurs. */
-      strncpy (filename, network->specie_names[input_params->output.output_species_idx[i]]
+      strncpy (filename, network->species_names[input_params->output.output_species_idx[i]]
             , MAX_CHAR_FILENAME);
       if (strlen (input_params->output.suffix) != 0)
       {
@@ -164,7 +164,7 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
       /* Write the header */
 
       fprintf (f, "# Main %s formation/destruction routes computed by astrochem\n",
-          network->specie_names[input_params->output.output_species_idx[i]]);
+          network->species_names[input_params->output.output_species_idx[i]]);
       fprintf (f, "# shell number  time [yr]  reaction number 1  reaction rate 1 [cm-3/s]... \n");
       fprintf (f, "#\n");
 
@@ -175,7 +175,7 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
         for (j = 0; j < input_params->output.time_steps; j++)
         {
           fprintf (f, "%4i", k);
-          fprintf (f, "  %9.2e", source_mdl->time_steps[j] / CONST_MKSA_YEAR);
+          fprintf (f, "  %9.2e", source_mdl->ts.time_steps[j] / CONST_MKSA_YEAR);
           for (l = 0; l < N_OUTPUT_ROUTES; l++)
           {
             fprintf (f, "  %4i", results->routes[get_route_idx(results,k,j,i,l)].formation.reaction_no);
@@ -183,7 +183,7 @@ output (int n_shells,const inp_t *input_params, const mdl_t * source_mdl, const 
           }
           fprintf (f, "\n");
           fprintf (f, "%4i", k);
-          fprintf (f, "  %9.2e",  source_mdl->time_steps[j] / CONST_MKSA_YEAR);
+          fprintf (f, "  %9.2e",  source_mdl->ts.time_steps[j] / CONST_MKSA_YEAR);
           for (l = 0; l < N_OUTPUT_ROUTES; l++)
           {
             fprintf (f, "  %4i",  results->routes[get_route_idx(results,k,j,i,l)].destruction.reaction_no);

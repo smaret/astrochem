@@ -380,7 +380,7 @@ jacobian (int N __attribute__ ((unused)),
 
   int
 solve (int cell_index, const inp_t *input_params, SOURCE_MODE mode, const cell_t *cell,
-    const net_t *network, int n_time_steps, const double * time_steps, res_t * results, int verbose)
+    const net_t *network, const time_steps_t * ts, res_t * results, int verbose)
 {
   realtype t = 0.0;
   params_t params;                  /* Parameters for f() and jacobian() */
@@ -408,7 +408,7 @@ solve (int cell_index, const inp_t *input_params, SOURCE_MODE mode, const cell_t
     }
     for (i = 0; i < input_params->abundances.n_initial_abundances; i++)
     {
-      NV_Ith_S (y, input_params->abundances.initial_abundances[i].specie_idx) = 
+      NV_Ith_S (y, input_params->abundances.initial_abundances[i].species_idx) = 
         input_params->abundances.initial_abundances[i].abundance * cell->nh[0];
     }
   }
@@ -487,9 +487,9 @@ solve (int cell_index, const inp_t *input_params, SOURCE_MODE mode, const cell_t
 
     /* Solve the system for each time step. */
 
-    for (i = 0; i < n_time_steps; i++)
+    for (i = 0; i < ts->n_time_steps; i++)
     {
-      CVode (cvode_mem, (realtype) time_steps[i], y, &t, CV_NORMAL);
+      CVode (cvode_mem, (realtype) ts->time_steps[i], y, &t, CV_NORMAL);
 
       /* Print the cell number, time and time step after each call. */
 

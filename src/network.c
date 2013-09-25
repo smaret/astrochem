@@ -28,7 +28,7 @@
 #include <string.h>
 #include "astrochem.h"
 
-/*void add_specie (char *new_specie, char *specie_names[], 
+/*void add_specie (char *new_specie, char *species_names[], 
   int *n_species);*/
 int add_specie (char *new_specie, net_t* network);
 
@@ -47,12 +47,6 @@ read_network (const char *chem_file, net_t *network, const int verbose)
 
   // Get size of dynamic arrays from file
   int n_reactions = get_nb_active_line(chem_file);
-  if( n_reactions > MAX_REACTIONS )
-  {
-    fprintf (stderr, "astrochem: error: the number of reactions exceed %i.\n", 
-        MAX_REACTIONS);
-    exit(1);
-  }
   if( n_reactions == 0)
   {
     fprintf (stderr, "astrochem: error: the number of reactions is zero.\n");
@@ -208,8 +202,8 @@ read_network (const char *chem_file, net_t *network, const int verbose)
   }
   if(n!=network->n_reactions)
   {
-    fprintf (stderr, "astrochem: error: incorect number of reactions, different from %i," 
-        "file %s may be corrupt.\n", MAX_REACTIONS,chem_file);
+    fprintf (stderr, "astrochem: error: incorect number of reactions" 
+        "file %s may be corrupt.\n", chem_file);
     exit(1);
   }
   realloc_network_species(network,network->n_species);
@@ -231,34 +225,18 @@ add_specie (char *new_specie, net_t* network)
     return -1;
   for (i = 0; i < network->n_species; i++)
   {
-    if (strcmp (network->specie_names[i], new_specie) == 0)
+    if (strcmp (network->species_names[i], new_specie) == 0)
       return i;
   }
   i = network->n_species;
   while( i >= network->n_alloc_species )
   {
-    if(i==MAX_SPECIES)
-    {
-      fprintf (stderr, "astrochem: error: the number of species in the chemical"
-          "network file exceeds %i.\n", MAX_SPECIES);
-      exit (1); 
-    }
     int new_alloc_size = network->n_alloc_species*2;
-    if(new_alloc_size > MAX_SPECIES )
-    {
-      new_alloc_size = MAX_SPECIES;
-    }
     realloc_network_species(network,new_alloc_size);
-  }
-  if ((network->specie_names[i] = malloc (sizeof (char) * MAX_CHAR_SPECIES)) == NULL)
-  {
-    fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__, 
-        "array allocation failed.\n");
-    exit (1);
   }
   if (strlen (new_specie) < MAX_CHAR_SPECIES - 1)
   {
-    strcpy (network->specie_names[i], new_specie);
+    strcpy (network->species_names[i], new_specie);
     (network->n_species)++;
   }
   else
@@ -276,7 +254,7 @@ add_specie (char *new_specie, net_t* network)
  */
 
   int 
-find_specie (const char *specie, const net_t * network)
+find_species (const char *specie, const net_t * network)
 {
   int i;
 
@@ -287,7 +265,7 @@ find_specie (const char *specie, const net_t * network)
   }
   for (i = 0; i < network->n_species; i++)
   {
-    if (strncmp (network->specie_names[i], specie, 
+    if (strncmp (network->species_names[i], specie, 
           sizeof (char) * MAX_CHAR_SPECIES) == 0)
     {
       return i;
@@ -306,7 +284,8 @@ alloc_network ( net_t * network, int n_species, int n_reactions )
 {
   network->n_alloc_species = n_species;
   network->n_species = 0;
-  if ((network->specie_names = malloc (sizeof(char*) * n_species )) == NULL )
+  if ((network->species_names = 
+        malloc (sizeof(species_name_t) * n_species )) == NULL )
   {
     fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__, 
         "array allocation failed.\n");
@@ -321,10 +300,6 @@ alloc_network ( net_t * network, int n_species, int n_reactions )
     exit (1);
   }
   int i;
-  for (i=0; i<n_species; i++)
-  {
-    network->specie_names[i] = NULL;
-  }
   for (i=0; i<n_reactions; i++)
   {
     network->reactions[i].reactant1 = -1;
@@ -335,7 +310,6 @@ alloc_network ( net_t * network, int n_species, int n_reactions )
     network->reactions[i].product3 = -1;
     network->reactions[i].product4 = -1;
   }
-
 }
 
   void
@@ -348,16 +322,11 @@ realloc_network_species ( net_t * network, int n_species )
     exit (1);
   }
   network->n_alloc_species = n_species;
-  if(( network->specie_names = realloc (network->specie_names,sizeof(char*) * n_species )) == NULL )
+  if(( network->species_names = realloc (network->species_names,sizeof(species_name_t) * n_species )) == NULL )
   {
     fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__, 
         "array allocation failed.\n");
     exit (1);
-  }
-  int i;
-  for (i=network->n_species; i<n_species; i++)
-  {
-    network->specie_names[i] = NULL;
   }
 }
 
@@ -367,15 +336,7 @@ realloc_network_species ( net_t * network, int n_species )
   void
 free_network (net_t * network)
 {
-  int i;
-  for (i=0; i<network->n_species; i++)
-  {
-    if(network->specie_names[i] != NULL )
-    {
-      free (network->specie_names[i]);
-    }
-  }
   free(network->reactions);
-  free(network->specie_names);
+  free(network->species_names);
 }
 
