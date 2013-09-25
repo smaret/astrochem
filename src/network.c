@@ -55,7 +55,6 @@ read_network (const char *chem_file, net_t * network, const int verbose)
   //Allocate network dynamic array
   alloc_network (network, n_alloc_species, n_reactions);
   network->n_species = 0;
-
   if (verbose >= 1)
     {
       fprintf (stdout, "Reading reactions network from %s... ", chem_file);
@@ -269,7 +268,6 @@ int
 find_species (const species_name_t specie, const net_t * network)
 {
   int i;
-
   /* Return -1 if the specie name is empty. */
   if (strcmp (specie, "") == 0)
     {
