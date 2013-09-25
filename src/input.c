@@ -38,10 +38,8 @@
 
 typedef enum
 { R_STATIC = 0, R_DYNAMIC = 1, R_TIMES = 2 } SOURCE_READ_MODE;
-void alloc_input (inp_t * input_params, int n_initial_abundances,
-		  int n_output_abundances);
-void alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps);
 int get_nb_active_line_section (const char *file, const char *section);
+void alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps);
 
 void
 read_input (const char *input_file, inp_t * input_params,
@@ -180,25 +178,26 @@ read_input (const char *input_file, inp_t * input_params,
 		    }
 		  else
 		    {
-		      input_params->abundances.initial_abundances[i].
-			species_idx = find_species (parameter, network);
-		      input_params->abundances.initial_abundances[i].
-			abundance = atof (value);
+		      input_params->abundances.
+			initial_abundances[i].species_idx =
+			find_species (parameter, network);
+		      input_params->abundances.
+			initial_abundances[i].abundance = atof (value);
 
 		      /* Compute the total grain density */
 		      int g, gm, gp;
 		      g = find_species ("grain", network);
 		      gm = find_species ("grain(-)", network);
 		      gp = find_species ("grain(+)", network);
-		      if (input_params->abundances.initial_abundances[i].
-			  species_idx == g
-			  || input_params->abundances.initial_abundances[i].
-			  species_idx == gm
-			  || input_params->abundances.initial_abundances[i].
-			  species_idx == gp)
+		      if (input_params->abundances.
+			  initial_abundances[i].species_idx == g
+			  || input_params->abundances.
+			  initial_abundances[i].species_idx == gm
+			  || input_params->abundances.
+			  initial_abundances[i].species_idx == gp)
 			input_params->phys.grain_abundance +=
-			  input_params->abundances.initial_abundances[i].
-			  abundance;
+			  input_params->abundances.
+			  initial_abundances[i].abundance;
 		      i++;
 		    }
 		}
@@ -542,14 +541,21 @@ alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps)
 {
   source_mdl->n_cells = n_cells;
   source_mdl->ts.n_time_steps = n_time_steps;
-  if ((source_mdl->cell = malloc (sizeof (cell_t) * n_cells)) == NULL)
+  if ((source_mdl->ts.time_steps =
+       malloc (sizeof (double) * n_time_steps)) == NULL)
     {
       fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
 	       __FILE__, __LINE__);
       exit (1);
     }
-  if ((source_mdl->ts.time_steps =
-       malloc (sizeof (double) * n_time_steps)) == NULL)
+  double *data;
+  if ((data = malloc (4 * n_cells * n_time_steps * sizeof (double))) == NULL)
+    {
+      fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+	       __FILE__, __LINE__);
+      exit (1);
+    }
+  if ((source_mdl->cell = malloc (sizeof (cell_t) * n_cells)) == NULL)
     {
       fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
 	       __FILE__, __LINE__);
@@ -558,34 +564,10 @@ alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps)
   int i;
   for (i = 0; i < n_cells; i++)
     {
-      if ((source_mdl->cell[i].nh =
-	   malloc (sizeof (double) * n_time_steps)) == NULL)
-	{
-	  fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
-		   __FILE__, __LINE__);
-	  exit (1);
-	}
-      if ((source_mdl->cell[i].av =
-	   malloc (sizeof (double) * n_time_steps)) == NULL)
-	{
-	  fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
-		   __FILE__, __LINE__);
-	  exit (1);
-	}
-      if ((source_mdl->cell[i].tgas =
-	   malloc (sizeof (double) * n_time_steps)) == NULL)
-	{
-	  fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
-		   __FILE__, __LINE__);
-	  exit (1);
-	}
-      if ((source_mdl->cell[i].tdust =
-	   malloc (sizeof (double) * n_time_steps)) == NULL)
-	{
-	  fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
-		   __FILE__, __LINE__);
-	  exit (1);
-	}
+      source_mdl->cell[i].nh = &(data[4 * i * n_time_steps]);
+      source_mdl->cell[i].av = &(data[(4 * i + 1) * n_time_steps]);
+      source_mdl->cell[i].tgas = &(data[(4 * i + 2) * n_time_steps]);
+      source_mdl->cell[i].tdust = &(data[(4 * i + 3) * n_time_steps]);
     }
 }
 
@@ -595,14 +577,7 @@ alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps)
 void
 free_mdl (mdl_t * source_mdl)
 {
-  int i;
-  for (i = 0; i < source_mdl->n_cells; i++)
-    {
-      free (source_mdl->cell[i].av);
-      free (source_mdl->cell[i].nh);
-      free (source_mdl->cell[i].tgas);
-      free (source_mdl->cell[i].tdust);
-    }
+  free (source_mdl->cell[0].nh);
   free (source_mdl->cell);
   free (source_mdl->ts.time_steps);
 }
