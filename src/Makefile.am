@@ -27,7 +27,7 @@ astrochem_SOURCES = astrochem.c astrochem.h input.c network.c rates.c solve.c ou
 
 chmconvert_SOURCES = chmconvert.py
 
-chmconvert: chmconvert.py
+chmconvert$(EXEEXT): chmconvert.py
 	cp $? $@
 	chmod a+x $@
 
@@ -41,11 +41,11 @@ plabun_SOURCES = plabun.py
 
 plroute_SOURCES = plroute.py
 
-plabun:	plabun.py
+plabun$(EXEEXT): plabun.py
 	cp $? $@
 	chmod a+x $@
 
-plroute: plroute.py
+plroute$(EXEEXT): plroute.py
 	cp $? $@
 	chmod a+x $@
 

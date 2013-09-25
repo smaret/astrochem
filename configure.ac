@@ -1,4 +1,4 @@
-#  configure.in - Autoconf file for Astrochem
+#  configure.ac - Autoconf file for Astrochem
 #
 #  Copyright (c) 2006-2013 Sebastien Maret
 # 
