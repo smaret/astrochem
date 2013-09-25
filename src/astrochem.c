@@ -33,11 +33,11 @@
 
 #include "astrochem.h"
 
-void usage (void);
 
+void usage (void);
 void version (void);
 
-int
+  int
 main (int argc, char *argv[])
 {
   inp_t input_params;
@@ -56,123 +56,123 @@ main (int argc, char *argv[])
     int opt;
 
     static struct option longopts[] = {
-      {"help", no_argument, NULL, 'h'},
+      {"help",    no_argument, NULL, 'h'},
       {"version", no_argument, NULL, 'V'},
       {"verbose", no_argument, NULL, 'v'},
-      {"quiet", no_argument, NULL, 'q'},
+      {"quiet",   no_argument, NULL, 'q'},
       {0, 0, 0, 0}
     };
 
-    while ((opt = getopt_long (argc, argv, "hVvq", longopts, NULL)) != -1)
+    while ((opt = getopt_long(argc, argv, "hVvq", longopts, NULL)) != -1)
+    {
+      switch (opt)
       {
-	switch (opt)
-	  {
-	  case 'h':
-	    usage ();
-	    exit (0);
-	    break;
-	  case 'V':
-	    version ();
-	    exit (0);
-	    break;
-	  case 'v':
-	    verbose = 2;
-	    break;
-	  case 'q':
-	    verbose = 0;
-	    break;
-	  default:
-	    usage ();
-	    exit (1);
-	  }
-      };
+        case 'h':
+          usage ();
+          exit (0);
+          break;
+        case 'V':
+          version ();
+          exit (0);
+          break;
+        case 'v':
+          verbose = 2;
+          break;
+        case 'q':
+          verbose = 0;
+          break;
+        default:
+          usage ();
+          exit (1);
+      }
+    };
     argc -= optind;
     argv += optind;
-    if (argc != 1)
-      {
-	usage ();
-	exit (1);
-      }
+    if (argc != 1) 
+    {
+      usage ();
+      exit (1);
+    }
     input_file = argv[0];
   }
 
-  /* Read the names of chemical network and the source model file in
-     input file. */
-
+  /* Read the input file */
   read_input_file_names (input_file, &input_params.files, verbose);
 
-  /* Read the chemical network file. */
-
+  /* Read the chemical network file */
   read_network (input_params.files.chem_file, &network, verbose);
 
-  /* Read the input file. */
+  /* Read the input file */
+  read_input (input_file, &input_params, &network , verbose);
 
-  read_input (input_file, &input_params, &network, verbose);
-
-  /* Read the source model file. */
-
+  /* Read the source model file */
   read_source (input_params.files.source_file, &source_mdl, verbose);
 
-  /* Allocate the structure containing the results. */
+  /* Check that the initial_abundance and output_species structure do
+     not contain any specie that is not in the network. */
 
-  alloc_results (&results, input_params.output.time_steps, source_mdl.n_cells,
-		 input_params.output.n_output_species);
+  /*check_species (input_params.abundances.initial_abundances, input_params.abundances.n_initial_abundances,
+    input_params.output.output_species, input_params.output.n_output_species, network.species, 
+    network.n_species);*/
 
-  /* Build the vector of time. */
+  /* Allocate results */
+  alloc_results( &results, input_params.output.time_steps, source_mdl.n_cells, input_params.output.n_output_species);
+
+
+  /* Build the vector of time */
 
   {
     int i;
 
-    for (i = 0; i < input_params.output.time_steps; i++)
+    for (i = 0; i <  input_params.output.time_steps; i++)
+    {
+      if (i < MAX_TIME_STEPS)
+        results.tim[i] = pow (10., log10 ( input_params.solver.ti) + i 
+            * (log10 (input_params.solver.tf) - log10 (input_params.solver.ti)) 
+            / (input_params.output.time_steps - 1));
+      else
       {
-	if (i < MAX_TIME_STEPS)
-	  results.tim[i] = pow (10., log10 (input_params.solver.ti) + i
-				* (log10 (input_params.solver.tf) -
-				   log10 (input_params.solver.ti)) /
-				(input_params.output.time_steps - 1));
-	else
-	  {
-	    fprintf (stderr, "astrochem: error: the number of time"
-		     "steps in %s exceed %i.\n", input_file, MAX_TIME_STEPS);
-	    free_input (&input_params);
-	    free_mdl (&source_mdl);
-	    free_network (&network);
-	    free_results (&results);
-	    return (EXIT_FAILURE);
-	  }
+        fprintf (stderr, "astrochem: error: the number of time" 
+            "steps in %s exceed %i.\n", input_file, MAX_TIME_STEPS);
+        free_input (&input_params);
+        free_mdl (&source_mdl);
+        free_network (&network);
+        free_results (&results);
+        return(EXIT_FAILURE);
       }
+    }
   }
 
   /* Solve the ODE system for each cell. */
 
-#ifdef HAVE_OPENMP
+#ifdef HAVE_OPENMP  
 #pragma omp parallel shared (abundances) private (cell_index)
 #endif
+
   {
+
 #ifdef HAVE_OPENMP
 #pragma omp for schedule (dynamic, 1) nowait
 #endif
-    if (source_mdl.mode == STATIC)
+    if( source_mdl.mode==STATIC)
+    {
+      for (cell_index = 0; cell_index < source_mdl.n_cells; cell_index++)
       {
-	for (cell_index = 0; cell_index < source_mdl.n_cells; cell_index++)
-	  {
-	    if (verbose >= 1)
-	      fprintf (stdout, "Computing abundances in cell %d...\n",
-		       cell_index);
-	    solve (cell_index, &input_params, &source_mdl.cell[cell_index],
-		   &network, &results, verbose);
-	    if (verbose >= 1)
-	      fprintf (stdout, "Done with cell %d.\n", cell_index);
-	  }
+        if (verbose >= 1)
+          fprintf (stdout, "Computing abundances in cell %d...\n", cell_index);
+        solve (cell_index, &input_params, &source_mdl.cell[cell_index], &network, &results, verbose);
+        if (verbose >= 1)
+          fprintf (stdout, "Done with cell %d.\n", cell_index);
       }
+    }
     else
-      {
-	printf ("Dynamic solve to be implemented");
-      }
+    {
+      printf("Dynamic solve to be implemented");
+    }
+
+
   }
-
-  /* Write the abundances in output files. */
-
+  /* Write the abundances in output files */
   output (source_mdl.n_cells, &input_params, &network, &results, verbose);
   free_input (&input_params);
   free_mdl (&source_mdl);
@@ -185,7 +185,7 @@ main (int argc, char *argv[])
    Display help message.
  */
 
-void
+  void
 usage (void)
 {
   fprintf (stdout, "Usage: astrochem [option...] [file]\n\n");
@@ -195,8 +195,7 @@ usage (void)
   fprintf (stdout, "   -v, --verbose      Verbose mode\n");
   fprintf (stdout, "   -q, --quiet        Suppress all messages\n");
   fprintf (stdout, "\n");
-  fprintf (stdout,
-	   "See the astrochem(1) manual page for more information.\n");
+  fprintf (stdout, "See the astrochem(1) manual page for more information.\n");
   fprintf (stdout, "Report bugs to <%s>.\n", PACKAGE_BUGREPORT);
 }
 
@@ -204,7 +203,7 @@ usage (void)
    Display version.
  */
 
-void
+  void
 version (void)
 {
   fprintf (stdout, "This is astrochem, version %s\n", PACKAGE_VERSION);
@@ -220,9 +219,7 @@ version (void)
 #endif
   fprintf (stdout, "Copyright (c) 2006-2013 Sebastien Maret\n");
   fprintf (stdout, "\n");
-  fprintf (stdout,
-	   "This is free software. You may redistribute copies of it under the terms\n");
-  fprintf (stdout,
-	   "of the GNU General Public License. There is NO WARRANTY, to the extent\n");
+  fprintf (stdout, "This is free software. You may redistribute copies of it under the terms\n");
+  fprintf (stdout, "of the GNU General Public License. There is NO WARRANTY, to the extent\n");
   fprintf (stdout, "permitted by law.\n");
 }

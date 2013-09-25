@@ -31,7 +31,7 @@ equaltol (double value1, double value2, double reltol)
 {
   /* Checks if two double are equal within a given relative
      tolerance */
-
+  
   if (value1 == 0)
     return 1;
   if (fabs ((value1 - value2) / value1) <= reltol)
@@ -39,7 +39,7 @@ equaltol (double value1, double value2, double reltol)
   else
     return 1;
 }
-
+  
 int
 main (void)
 {
@@ -48,20 +48,20 @@ main (void)
   double gamm = 0;
   int reaction_type = 0;
   int reaction_no = 0;
-  double nh = 1e4;
+  double nh  = 1e4;
   double av = 10;
   double tgas = 10;
   double tdust = 10;
   double chi = 1;
   double cosmic = 1.3e-17;
-  double grain_size = 1e-5;	/* cm */
+  double grain_size = 1e-5; /* cm */
   double grain_abundance = 1.32e-12;
   double ice_abundance = 0.;
   double k;
 
   /* e(-) attachment on grains:
      e(-) + grain -> grain(-) */
-
+  
   reaction_type = -1;
   alpha = 6.90e-15;
   beta = .5;
@@ -74,7 +74,7 @@ main (void)
 
   /* H2 formation on grains:
      H + H -> H2 */
-
+  
   reaction_type = 0;
   alpha = 4.95e-17;
   beta = .5;
@@ -197,3 +197,4 @@ main (void)
 
   return EXIT_SUCCESS;
 }
+
