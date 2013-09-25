@@ -43,7 +43,7 @@ void alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps);
 
 void
 read_input (const char *input_file, inp_t * input_params,
-	    const net_t * network, int verbose)
+            const net_t * network, int verbose)
 {
   FILE *f;
   char line[MAX_LINE];
@@ -62,7 +62,7 @@ read_input (const char *input_file, inp_t * input_params,
   if (!f)
     {
       fprintf (stderr, "astrochem: error: Can't open %s: %s\n", input_file,
-	       strerror (errno));
+               strerror (errno));
       exit (EXIT_FAILURE);
     }
 
@@ -72,21 +72,21 @@ read_input (const char *input_file, inp_t * input_params,
   while (fgets (line, MAX_LINE, f) != NULL)
     {
       if (strncmp (line, "abundances", 10) == 0)
-	{
-	  char *localStr = &line[9];
-	  while (localStr != NULL)
-	    {
-	      localStr++;
-	      localStr = strchr (localStr, ',');
-	      n_output_species++;
-	    }
-	}
+        {
+          char *localStr = &line[9];
+          while (localStr != NULL)
+            {
+              localStr++;
+              localStr = strchr (localStr, ',');
+              n_output_species++;
+            }
+        }
     }
   //Reset stream to beginning of file
   if (fseek (f, 0, SEEK_SET) != 0)
     {
       fprintf (stderr, "astrochem: error seeking begining of input file "
-	       "%s .\n", input_file);
+               "%s .\n", input_file);
       exit (1);
     }
 
@@ -114,177 +114,176 @@ read_input (const char *input_file, inp_t * input_params,
     {
       line_number++;
       if (line[0] == '#')
-	continue;		/* Skip comments */
+        continue;               /* Skip comments */
       if (sscanf (line, "[ %512[a-zA-Z] ]", keyword) == 1)
-	;
+        ;
       else if (sscanf (line, "%s = %s", parameter, value) == 2)
-	{
+        {
 
-	  /* Source and chemical network files */
+          /* Source and chemical network files */
 
-	  if (strcmp (keyword, "files") == 0)
-	    {
-	      if (strcmp (parameter, "source") == 0)
-		strncpy (input_params->files.source_file, value, MAX_LINE);
-	      else if (strcmp (parameter, "chem") == 0)
-		strncpy (input_params->files.chem_file, value, MAX_LINE);
-	      else
-		input_error (input_file, line_number);	/* Unknown parameter */
-	    }
+          if (strcmp (keyword, "files") == 0)
+            {
+              if (strcmp (parameter, "source") == 0)
+                strncpy (input_params->files.source_file, value, MAX_LINE);
+              else if (strcmp (parameter, "chem") == 0)
+                strncpy (input_params->files.chem_file, value, MAX_LINE);
+              else
+                input_error (input_file, line_number);  /* Unknown parameter */
+            }
 
-	  /* Physical parameters */
+          /* Physical parameters */
 
-	  else if (strcmp (keyword, "phys") == 0)
-	    {
-	      if (strcmp (parameter, "chi") == 0)
-		input_params->phys.chi = atof (value);
-	      else if (strcmp (parameter, "cosmic") == 0)
-		input_params->phys.cosmic = atof (value);
-	      else if (strcmp (parameter, "grain_size") == 0)
-		input_params->phys.grain_size = atof (value) * 1e-4;	/* microns -> cm */
-	      else
-		input_error (input_file, line_number);
-	    }
+          else if (strcmp (keyword, "phys") == 0)
+            {
+              if (strcmp (parameter, "chi") == 0)
+                input_params->phys.chi = atof (value);
+              else if (strcmp (parameter, "cosmic") == 0)
+                input_params->phys.cosmic = atof (value);
+              else if (strcmp (parameter, "grain_size") == 0)
+                input_params->phys.grain_size = atof (value) * 1e-4;    /* microns -> cm */
+              else
+                input_error (input_file, line_number);
+            }
 
-	  /* Solver parameters. Times are converted from
-	     year to seconds */
+          /* Solver parameters. Times are converted from
+             year to seconds */
 
-	  else if (strcmp (keyword, "solver") == 0)
-	    {
-	      if (strcmp (parameter, "ti") == 0)
-		input_params->solver.ti = atof (value) * CONST_MKSA_YEAR;
-	      else if (strcmp (parameter, "tf") == 0)
-		input_params->solver.tf = atof (value) * CONST_MKSA_YEAR;
-	      else if (strcmp (parameter, "abs_err") == 0)
-		input_params->solver.abs_err = atof (value);
-	      else if (strcmp (parameter, "rel_err") == 0)
-		input_params->solver.rel_err = atof (value);
-	      else
-		input_error (input_file, line_number);
-	    }
+          else if (strcmp (keyword, "solver") == 0)
+            {
+              if (strcmp (parameter, "ti") == 0)
+                input_params->solver.ti = atof (value) * CONST_MKSA_YEAR;
+              else if (strcmp (parameter, "tf") == 0)
+                input_params->solver.tf = atof (value) * CONST_MKSA_YEAR;
+              else if (strcmp (parameter, "abs_err") == 0)
+                input_params->solver.abs_err = atof (value);
+              else if (strcmp (parameter, "rel_err") == 0)
+                input_params->solver.rel_err = atof (value);
+              else
+                input_error (input_file, line_number);
+            }
 
-	  /* Initial abundances */
+          /* Initial abundances */
 
-	  else if (strcmp (keyword, "abundances") == 0)
-	    {
-	      if (i < input_params->abundances.n_initial_abundances)
-		{
-		  int species_idx = find_species (parameter, network);
-		  if (species_idx < 0)
-		    {
-		      fprintf (stderr,
-			       "astrochem: warning: %s initial abundance given, "
-			       "but is not in the network.\n", parameter);
-		    }
-		  else
-		    {
-		      input_params->abundances.
-			initial_abundances[i].species_idx =
-			find_species (parameter, network);
-		      input_params->abundances.
-			initial_abundances[i].abundance = atof (value);
+          else if (strcmp (keyword, "abundances") == 0)
+            {
+              if (i < input_params->abundances.n_initial_abundances)
+                {
+                  int species_idx = find_species (parameter, network);
+                  if (species_idx < 0)
+                    {
+                      fprintf (stderr,
+                               "astrochem: warning: %s initial abundance given, "
+                               "but is not in the network.\n", parameter);
+                    }
+                  else
+                    {
+                      input_params->abundances.initial_abundances[i].
+                        species_idx = find_species (parameter, network);
+                      input_params->abundances.initial_abundances[i].
+                        abundance = atof (value);
 
-		      /* Compute the total grain density */
-		      int g, gm, gp;
-		      g = find_species ("grain", network);
-		      gm = find_species ("grain(-)", network);
-		      gp = find_species ("grain(+)", network);
-		      if (input_params->abundances.
-			  initial_abundances[i].species_idx == g
-			  || input_params->abundances.
-			  initial_abundances[i].species_idx == gm
-			  || input_params->abundances.
-			  initial_abundances[i].species_idx == gp)
-			input_params->phys.grain_abundance +=
-			  input_params->abundances.
-			  initial_abundances[i].abundance;
-		      i++;
-		    }
-		}
-	      else
-		{
-		  fprintf (stderr,
-			   "astrochem: error: the number of species is incorrect, != %i, file "
-			   "%s may be corrupt .\n",
-			   input_params->abundances.n_initial_abundances,
-			   input_file);
-		  exit (1);
-		}
-	    }
+                      /* Compute the total grain density */
+                      int g, gm, gp;
+                      g = find_species ("grain", network);
+                      gm = find_species ("grain(-)", network);
+                      gp = find_species ("grain(+)", network);
+                      if (input_params->abundances.initial_abundances[i].
+                          species_idx == g
+                          || input_params->abundances.initial_abundances[i].
+                          species_idx == gm
+                          || input_params->abundances.initial_abundances[i].
+                          species_idx == gp)
+                        input_params->phys.grain_abundance +=
+                          input_params->abundances.initial_abundances[i].
+                          abundance;
+                      i++;
+                    }
+                }
+              else
+                {
+                  fprintf (stderr,
+                           "astrochem: error: the number of species is incorrect, != %i, file "
+                           "%s may be corrupt .\n",
+                           input_params->abundances.n_initial_abundances,
+                           input_file);
+                  exit (1);
+                }
+            }
 
-	  /* Output */
+          /* Output */
 
-	  else if (strcmp (keyword, "output") == 0)
-	    {
-	      if (strcmp (parameter, "time_steps") == 0)
-		input_params->output.time_steps = atoi (value);
-	      else if (strcmp (parameter, "abundances") == 0)
+          else if (strcmp (keyword, "output") == 0)
+            {
+              if (strcmp (parameter, "time_steps") == 0)
+                input_params->output.time_steps = atoi (value);
+              else if (strcmp (parameter, "abundances") == 0)
 
-		/* Loop over the species (separated by a comma), and
-		   copy them in the ouput_species array */
-		{
-		  const char delimiter[] = ",";
-		  char *output_specie;
+                /* Loop over the species (separated by a comma), and
+                   copy them in the ouput_species array */
+                {
+                  const char delimiter[] = ",";
+                  char *output_specie;
 
-		  /* Structure initialization */
+                  /* Structure initialization */
 
-		  if (j >= input_params->output.n_output_species)
-		    {
-		      fprintf (stderr,
-			       "astrochem: error: the number of species in output exceeds %i.\n",
-			       input_params->output.n_output_species);
-		      exit (1);
-		    }
-		  output_specie = strtok (value, delimiter);
-		  int species_idx = find_species (output_specie, network);
-		  if (species_idx < 0)
-		    {
-		      fprintf (stderr,
-			       "astrochem: warning: %s abundance requested, "
-			       "but is not in the network.\n", output_specie);
-		    }
-		  input_params->output.output_species_idx[j] = species_idx;
-		  j++;
-		  while ((output_specie = strtok (NULL, delimiter)) != NULL)
-		    {
-		      if (j >= input_params->output.n_output_species)
-			{
-			  fprintf (stderr,
-				   "astrochem: error: the number of species in output exceeds %i.\n",
-				   input_params->output.n_output_species);
-			  exit (1);
-			}
-		      int species_idx = find_species (output_specie, network);
-		      if (species_idx < 0)
-			{
-			  fprintf (stderr,
-				   "astrochem: warning: %s abundance requested, "
-				   "but is not in the network.\n",
-				   output_specie);
-			}
-		      input_params->output.output_species_idx[j] =
-			species_idx;
-		      j++;
-		    }
-		}
-	      else if (strcmp (parameter, "trace_routes") == 0)
-		input_params->output.trace_routes = atoi (value);
-	      else if (strcmp (parameter, "suffix") == 0)
-		strncpy (input_params->output.suffix, value, MAX_LINE);
-	      else
-		input_error (input_file, line_number);
-	    }
+                  if (j >= input_params->output.n_output_species)
+                    {
+                      fprintf (stderr,
+                               "astrochem: error: the number of species in output exceeds %i.\n",
+                               input_params->output.n_output_species);
+                      exit (1);
+                    }
+                  output_specie = strtok (value, delimiter);
+                  int species_idx = find_species (output_specie, network);
+                  if (species_idx < 0)
+                    {
+                      fprintf (stderr,
+                               "astrochem: warning: %s abundance requested, "
+                               "but is not in the network.\n", output_specie);
+                    }
+                  input_params->output.output_species_idx[j] = species_idx;
+                  j++;
+                  while ((output_specie = strtok (NULL, delimiter)) != NULL)
+                    {
+                      if (j >= input_params->output.n_output_species)
+                        {
+                          fprintf (stderr,
+                                   "astrochem: error: the number of species in output exceeds %i.\n",
+                                   input_params->output.n_output_species);
+                          exit (1);
+                        }
+                      int species_idx = find_species (output_specie, network);
+                      if (species_idx < 0)
+                        {
+                          fprintf (stderr,
+                                   "astrochem: warning: %s abundance requested, "
+                                   "but is not in the network.\n",
+                                   output_specie);
+                        }
+                      input_params->output.output_species_idx[j] =
+                        species_idx;
+                      j++;
+                    }
+                }
+              else if (strcmp (parameter, "trace_routes") == 0)
+                input_params->output.trace_routes = atoi (value);
+              else if (strcmp (parameter, "suffix") == 0)
+                strncpy (input_params->output.suffix, value, MAX_LINE);
+              else
+                input_error (input_file, line_number);
+            }
 
-	  /* Unknown or unspecified keyword */
+          /* Unknown or unspecified keyword */
 
-	  else
-	    input_error (input_file, line_number - 1);	/* Unknown or unspecified keyword */
-	}
+          else
+            input_error (input_file, line_number - 1);  /* Unknown or unspecified keyword */
+        }
 
       /* Error while reading a parameter/values */
 
       else
-	input_error (input_file, line_number);
+        input_error (input_file, line_number);
     }
 
   /* Close the file */
@@ -298,29 +297,29 @@ read_input (const char *input_file, inp_t * input_params,
   if (strcmp (input_params->files.chem_file, "") == 0)
     {
       fprintf (stderr,
-	       "astrochem: error: no chemical network file specified in %s.\n",
-	       input_file);
+               "astrochem: error: no chemical network file specified in %s.\n",
+               input_file);
       exit (1);
     }
   if (strcmp (input_params->files.source_file, "") == 0)
     {
       fprintf (stderr,
-	       "astrochem: error: no source model file specified in %s.\n",
-	       input_file);
+               "astrochem: error: no source model file specified in %s.\n",
+               input_file);
       exit (1);
     }
   if (input_params->solver.ti <= 0.)
     {
       fprintf (stderr,
-	       "astrochem: warning: incorrect ti value specified in %s."
-	       "Assuming default value.\n", input_file);
+               "astrochem: warning: incorrect ti value specified in %s."
+               "Assuming default value.\n", input_file);
       input_params->solver.ti = TI_DEFAULT;
     }
   if (input_params->solver.tf < input_params->solver.ti)
     {
       fprintf (stderr,
-	       "astrochem: warning: incorrect tf value specified in %s."
-	       "Assuming default value.\n", input_file);
+               "astrochem: warning: incorrect tf value specified in %s."
+               "Assuming default value.\n", input_file);
       input_params->solver.tf = TF_DEFAULT;
     }
 }
@@ -334,7 +333,7 @@ void
 input_error (const char *input_file, int line_number)
 {
   fprintf (stderr, "astrochem: error: incorrect input in %s line %i.\n",
-	   input_file, line_number);
+           input_file, line_number);
   exit (1);
 }
 
@@ -344,14 +343,14 @@ input_error (const char *input_file, int line_number)
 
 void
 read_source (const char *source_file, mdl_t * source_mdl,
-	     const inp_t * input_params, const int verbose)
+             const inp_t * input_params, const int verbose)
 {
   FILE *f;
   char line[MAX_LINE];
   int line_number = 0;
   int n_cell = 0;
   int allocated = 0;
-  SOURCE_READ_MODE mode = R_STATIC;	//0 static, 1 dynamic, 2 time_step reading
+  SOURCE_READ_MODE mode = R_STATIC;     //0 static, 1 dynamic, 2 time_step reading
   double av, nh, tgas, tdust;
 
 
@@ -370,7 +369,7 @@ read_source (const char *source_file, mdl_t * source_mdl,
   if (n_line == 0)
     {
       fprintf (stderr, "astrochem: error: no valid lines found in %s.\n",
-	       source_file);
+               source_file);
       exit (1);
     }
 
@@ -380,119 +379,119 @@ read_source (const char *source_file, mdl_t * source_mdl,
     {
       line_number++;
       if (line[0] == '#')
-	continue;		/* Skip comments */
+        continue;               /* Skip comments */
 
-      if (allocated == 0)	//First line without comment determine if it is a static or dynamic source.
-	{
-	  if (strncmp (line, "[times]", 7) == 0)	// Dynamic source file begin with [times] section
-	    {
-	      int nts = get_nb_active_line_section (source_file, "times");
-	      int n_cells_times =
-		get_nb_active_line_section (source_file, "cells");
-	      if (n_cells_times % nts != 0)
-		{
-		  fprintf (stderr,
-			   "astrochem: %s: %d: error: incorrect format in source file %s .\n",
-			   __FILE__, __LINE__, source_file);
-		  exit (1);
-		}
-	      alloc_mdl (source_mdl, n_cells_times / nts, nts);	//n_cells_times contain the number of cells times the number of time steps.
-	      mode = R_TIMES;	// First thing to do is reading the time steps.
-	      source_mdl->mode = DYNAMIC;
-	      allocated = 1;	// Inform loop that the source type have been determined and structure have been allocated
-	      continue;
-	    }
-	  else			//Static source
-	    {
-	      alloc_mdl (source_mdl, n_line, input_params->output.time_steps);
-	      source_mdl->mode = STATIC;
-	      allocated = 1;	// Inform loop that the source type have been determined and structure have been allocated
-	      /* Build the vector of time */
-	      int i;
-	      for (i = 0; i < input_params->output.time_steps; i++)
-		{
-		  source_mdl->ts.time_steps[i] =
-		    pow (10.,
-			 log10 (input_params->solver.ti) +
-			 i * (log10 (input_params->solver.tf) -
-			      log10 (input_params->solver.ti)) /
-			 (input_params->output.time_steps - 1));
-		}
-	    }
-	}
-      if (strncmp (line, "[cells]", 7) == 0)	//Time to read the cells 
-	{
-	  mode = R_DYNAMIC;
-	  continue;
-	}
+      if (allocated == 0)       //First line without comment determine if it is a static or dynamic source.
+        {
+          if (strncmp (line, "[times]", 7) == 0)        // Dynamic source file begin with [times] section
+            {
+              int nts = get_nb_active_line_section (source_file, "times");
+              int n_cells_times =
+                get_nb_active_line_section (source_file, "cells");
+              if (n_cells_times % nts != 0)
+                {
+                  fprintf (stderr,
+                           "astrochem: %s: %d: error: incorrect format in source file %s .\n",
+                           __FILE__, __LINE__, source_file);
+                  exit (1);
+                }
+              alloc_mdl (source_mdl, n_cells_times / nts, nts); //n_cells_times contain the number of cells times the number of time steps.
+              mode = R_TIMES;   // First thing to do is reading the time steps.
+              source_mdl->mode = DYNAMIC;
+              allocated = 1;    // Inform loop that the source type have been determined and structure have been allocated
+              continue;
+            }
+          else                  //Static source
+            {
+              alloc_mdl (source_mdl, n_line, input_params->output.time_steps);
+              source_mdl->mode = STATIC;
+              allocated = 1;    // Inform loop that the source type have been determined and structure have been allocated
+              /* Build the vector of time */
+              int i;
+              for (i = 0; i < input_params->output.time_steps; i++)
+                {
+                  source_mdl->ts.time_steps[i] =
+                    pow (10.,
+                         log10 (input_params->solver.ti) +
+                         i * (log10 (input_params->solver.tf) -
+                              log10 (input_params->solver.ti)) /
+                         (input_params->output.time_steps - 1));
+                }
+            }
+        }
+      if (strncmp (line, "[cells]", 7) == 0)    //Time to read the cells 
+        {
+          mode = R_DYNAMIC;
+          continue;
+        }
       //Dynamic mode, reading time steps
       if (mode == R_TIMES)
-	{
-	  int tmp_ts;
-	  double ts_val;
-	  sscanf (line, "%d %lf", &tmp_ts, &ts_val);	//Format and value not checked
-	  if (tmp_ts < source_mdl->ts.n_time_steps)
-	    {
-	      source_mdl->ts.time_steps[tmp_ts] = ts_val;
-	    }
-	  else
-	    {
-	      fprintf (stderr,
-		       "astrochem: error: the time_steps idx %i in %s exceed %i.\n",
-		       tmp_ts, source_file, source_mdl->ts.n_time_steps);
-	      exit (1);
-	    }
-	}
+        {
+          int tmp_ts;
+          double ts_val;
+          sscanf (line, "%d %lf", &tmp_ts, &ts_val);    //Format and value not checked
+          if (tmp_ts < source_mdl->ts.n_time_steps)
+            {
+              source_mdl->ts.time_steps[tmp_ts] = ts_val;
+            }
+          else
+            {
+              fprintf (stderr,
+                       "astrochem: error: the time_steps idx %i in %s exceed %i.\n",
+                       tmp_ts, source_file, source_mdl->ts.n_time_steps);
+              exit (1);
+            }
+        }
       //Dynamic mode, reading cells
       else if (mode == R_DYNAMIC)
-	{
-	  int tmp_cell, tmp_ts;
-	  sscanf (line, "%d %d %lf %lf %lf %lf", &tmp_cell, &tmp_ts, &av, &nh, &tgas, &tdust);	//Format and value not checked
-	  if (tmp_ts < source_mdl->ts.n_time_steps
-	      || tmp_cell < source_mdl->n_cells)
-	    {
-	      source_mdl->cell[tmp_cell].av[tmp_ts] = av;
-	      source_mdl->cell[tmp_cell].nh[tmp_ts] = nh;
-	      source_mdl->cell[tmp_cell].tgas[tmp_ts] = tgas;
-	      source_mdl->cell[tmp_cell].tdust[tmp_ts] = tdust;
-	    }
-	  else
-	    {
-	      fprintf (stderr,
-		       "astrochem: error: the time_steps idx %i in %s exceed %i or the cell idx %i exceed %i.\n",
-		       tmp_ts, source_file, source_mdl->ts.n_time_steps,
-		       tmp_cell, source_mdl->n_cells);
-	      exit (1);
-	    }
-	}
+        {
+          int tmp_cell, tmp_ts;
+          sscanf (line, "%d %d %lf %lf %lf %lf", &tmp_cell, &tmp_ts, &av, &nh, &tgas, &tdust);  //Format and value not checked
+          if (tmp_ts < source_mdl->ts.n_time_steps
+              || tmp_cell < source_mdl->n_cells)
+            {
+              source_mdl->cell[tmp_cell].av[tmp_ts] = av;
+              source_mdl->cell[tmp_cell].nh[tmp_ts] = nh;
+              source_mdl->cell[tmp_cell].tgas[tmp_ts] = tgas;
+              source_mdl->cell[tmp_cell].tdust[tmp_ts] = tdust;
+            }
+          else
+            {
+              fprintf (stderr,
+                       "astrochem: error: the time_steps idx %i in %s exceed %i or the cell idx %i exceed %i.\n",
+                       tmp_ts, source_file, source_mdl->ts.n_time_steps,
+                       tmp_cell, source_mdl->n_cells);
+              exit (1);
+            }
+        }
       //Static mode, reading cells
       else
-	{
-	  if (n_cell < source_mdl->n_cells)
-	    {
-	      int tmp;
-	      if (sscanf (line, "%d %lf %lf %lf %lf",
-			  &tmp, &av, &nh, &tgas, &tdust) != 5)
-		{
-		  fprintf (stderr,
-			   "astrochem: %s: %d: error: incorrect format in source file %s .\n",
-			   __FILE__, __LINE__, source_file);
-		  exit (1);
-		}
-	      source_mdl->cell[n_cell].av[0] = av;
-	      source_mdl->cell[n_cell].nh[0] = nh;
-	      source_mdl->cell[n_cell].tgas[0] = tgas;
-	      source_mdl->cell[n_cell].tdust[0] = tdust;
-	      n_cell++;
-	    }
-	  else
-	    {
-	      fprintf (stderr,
-		       "astrochem: error: the number of cells in %s exceed %i.\n",
-		       source_file, source_mdl->n_cells);
-	      exit (1);
-	    }
-	}
+        {
+          if (n_cell < source_mdl->n_cells)
+            {
+              int tmp;
+              if (sscanf (line, "%d %lf %lf %lf %lf",
+                          &tmp, &av, &nh, &tgas, &tdust) != 5)
+                {
+                  fprintf (stderr,
+                           "astrochem: %s: %d: error: incorrect format in source file %s .\n",
+                           __FILE__, __LINE__, source_file);
+                  exit (1);
+                }
+              source_mdl->cell[n_cell].av[0] = av;
+              source_mdl->cell[n_cell].nh[0] = nh;
+              source_mdl->cell[n_cell].tgas[0] = tgas;
+              source_mdl->cell[n_cell].tdust[0] = tdust;
+              n_cell++;
+            }
+          else
+            {
+              fprintf (stderr,
+                       "astrochem: error: the number of cells in %s exceed %i.\n",
+                       source_file, source_mdl->n_cells);
+              exit (1);
+            }
+        }
     }
   /* Close the file */
   fclose (f);
@@ -503,7 +502,7 @@ read_source (const char *source_file, mdl_t * source_mdl,
  */
 void
 alloc_input (inp_t * input_params, int n_initial_abundances,
-	     int n_output_abundances)
+             int n_output_abundances)
 {
   input_params->abundances.n_initial_abundances = n_initial_abundances;
   input_params->output.n_output_species = n_output_abundances;
@@ -511,14 +510,14 @@ alloc_input (inp_t * input_params, int n_initial_abundances,
        malloc (sizeof (abund_t) * n_initial_abundances)) == NULL)
     {
       fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
-	       __FILE__, __LINE__);
+               __FILE__, __LINE__);
       exit (1);
     }
   if ((input_params->output.output_species_idx =
        malloc (sizeof (char *) * n_output_abundances)) == NULL)
     {
       fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
-	       __FILE__, __LINE__);
+               __FILE__, __LINE__);
       exit (1);
     }
 }
@@ -545,20 +544,20 @@ alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps)
        malloc (sizeof (double) * n_time_steps)) == NULL)
     {
       fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
-	       __FILE__, __LINE__);
+               __FILE__, __LINE__);
       exit (1);
     }
   double *data;
   if ((data = malloc (4 * n_cells * n_time_steps * sizeof (double))) == NULL)
     {
       fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
-	       __FILE__, __LINE__);
+               __FILE__, __LINE__);
       exit (1);
     }
   if ((source_mdl->cell = malloc (sizeof (cell_t) * n_cells)) == NULL)
     {
       fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
-	       __FILE__, __LINE__);
+               __FILE__, __LINE__);
       exit (1);
     }
   int i;
@@ -603,26 +602,26 @@ get_nb_active_line_section (const char *file, const char *section)
   while (fgets (line, MAX_LINE, f) != NULL)
     {
       if (line[0] != '#')
-	{
-	  if (section_flag == 0)
-	    {
-	      if (strncmp (line, full_section, section_len + 2) == 0)
-		{
-		  section_flag = 1;
-		}
-	    }
-	  else
-	    {
-	      if (line[0] == '[')
-		{
-		  break;
-		}
-	      else
-		{
-		  line_number++;
-		}
-	    }
-	}
+        {
+          if (section_flag == 0)
+            {
+              if (strncmp (line, full_section, section_len + 2) == 0)
+                {
+                  section_flag = 1;
+                }
+            }
+          else
+            {
+              if (line[0] == '[')
+                {
+                  break;
+                }
+              else
+                {
+                  line_number++;
+                }
+            }
+        }
     }
   fclose (f);
   return line_number;
@@ -643,9 +642,9 @@ get_nb_active_line (const char *file)
   while (fgets (line, MAX_LINE, f) != NULL)
     {
       if (line[0] != '#')
-	{
-	  line_number++;
-	}
+        {
+          line_number++;
+        }
     }
   fclose (f);
   return line_number;
@@ -670,7 +669,7 @@ read_input_file_names (const char *input_file, files_t * files, int verbose)
   if (!f)
     {
       fprintf (stderr, "astrochem: error: Can't open %s: %s\n", input_file,
-	       strerror (errno));
+               strerror (errno));
       exit (EXIT_FAILURE);
     }
 
@@ -684,22 +683,22 @@ read_input_file_names (const char *input_file, files_t * files, int verbose)
     {
       line_number++;
       if (line[0] == '#')
-	continue;		/* Skip comments */
+        continue;               /* Skip comments */
       if (sscanf (line, "[ %512[a-zA-Z] ]", keyword) == 1)
-	;
+        ;
       else if (sscanf (line, "%s = %s", parameter, value) == 2)
-	{
-	  /* Source and chemical network files */
-	  if (strcmp (keyword, "files") == 0)
-	    {
-	      if (strcmp (parameter, "source") == 0)
-		strncpy (files->source_file, value, MAX_LINE);
-	      else if (strcmp (parameter, "chem") == 0)
-		strncpy (files->chem_file, value, MAX_LINE);
-	      else
-		input_error (input_file, line_number);	/* Unknown parameter */
-	    }
-	}
+        {
+          /* Source and chemical network files */
+          if (strcmp (keyword, "files") == 0)
+            {
+              if (strcmp (parameter, "source") == 0)
+                strncpy (files->source_file, value, MAX_LINE);
+              else if (strcmp (parameter, "chem") == 0)
+                strncpy (files->chem_file, value, MAX_LINE);
+              else
+                input_error (input_file, line_number);  /* Unknown parameter */
+            }
+        }
     }
   fclose (f);
 }

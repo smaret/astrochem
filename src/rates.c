@@ -34,7 +34,7 @@ rate (double alpha, double beta, double gamm, int reaction_type,
       double tgas, double tdust, double chi, double cosmic,
       double grain_size, double grain_abundance, double ice_abundance)
 {
-  double k;			/* Reaction rate (cm^-3 s^-1) */
+  double k;                     /* Reaction rate (cm^-3 s^-1) */
 
   /* Reactions types and rates. The nomencalture is similar to the one
      of the Ohio State University database for astrochemistry, but it
@@ -90,59 +90,59 @@ rate (double alpha, double beta, double gamm, int reaction_type,
     case 20:
       /* Depletion on the grains */
       {
-	double thermal_veloc = pow (8 * CONST_CGSM_BOLTZMANN * tgas
-				    / (M_PI * beta * CONST_CGSM_MASS_PROTON),
-				    0.5);
-	k =
-	  M_PI * pow (grain_size,
-		      2) * alpha * thermal_veloc * grain_abundance * nh;
-	break;
+        double thermal_veloc = pow (8 * CONST_CGSM_BOLTZMANN * tgas
+                                    / (M_PI * beta * CONST_CGSM_MASS_PROTON),
+                                    0.5);
+        k =
+          M_PI * pow (grain_size,
+                      2) * alpha * thermal_veloc * grain_abundance * nh;
+        break;
       }
 
     case 21:
       /* Thermal desorption */
       {
-	double v0 = pow (2 * GRAIN_SITES_PER_CM2 * gamm * CONST_CGSM_BOLTZMANN
-			 / (M_PI * M_PI * beta * CONST_CGSM_MASS_PROTON),
-			 0.5);
-	k = v0 * exp (-gamm / tdust);
-	break;
+        double v0 = pow (2 * GRAIN_SITES_PER_CM2 * gamm * CONST_CGSM_BOLTZMANN
+                         / (M_PI * M_PI * beta * CONST_CGSM_MASS_PROTON),
+                         0.5);
+        k = v0 * exp (-gamm / tdust);
+        break;
       }
 
     case 22:
       /* Cosmic ray desorption */
       {
-	if (alpha == 0.0)
-	  {
-	    double v0 =
-	      pow (2 * GRAIN_SITES_PER_CM2 * gamm * CONST_CGSM_BOLTZMANN /
-		   (M_PI * M_PI * beta * CONST_CGSM_MASS_PROTON),
-		   0.5);
-	    k = v0 * FRACTION_TIME_GRAIN_70K * exp (-gamm / 70.);
-	    break;
-	  }
-	else
-	  {
-	    k = alpha;
-	    break;
-	  }
+        if (alpha == 0.0)
+          {
+            double v0 =
+              pow (2 * GRAIN_SITES_PER_CM2 * gamm * CONST_CGSM_BOLTZMANN /
+                   (M_PI * M_PI * beta * CONST_CGSM_MASS_PROTON),
+                   0.5);
+            k = v0 * FRACTION_TIME_GRAIN_70K * exp (-gamm / 70.);
+            break;
+          }
+        else
+          {
+            k = alpha;
+            break;
+          }
       }
 
     case 23:
       /* Photo-desorption */
       {
-	double x = (ice_abundance * nh) / (GRAIN_SITES_PER_CM2 * M_PI
-					   * pow (grain_size, 2)
-					   * grain_abundance * nh);
-	double Ypd = alpha * (1 - exp (-x / gamm));
-	k = chi * AVERAGE_UV_IRSF * exp (-2 * av) * M_PI * pow (grain_size, 2)
-	  * grain_abundance * nh * Ypd;
-	break;
+        double x = (ice_abundance * nh) / (GRAIN_SITES_PER_CM2 * M_PI
+                                           * pow (grain_size, 2)
+                                           * grain_abundance * nh);
+        double Ypd = alpha * (1 - exp (-x / gamm));
+        k = chi * AVERAGE_UV_IRSF * exp (-2 * av) * M_PI * pow (grain_size, 2)
+          * grain_abundance * nh * Ypd;
+        break;
       }
 
     default:
       fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__,
-	       "unknown reaction type.\n");
+               "unknown reaction type.\n");
       exit (1);
     }
   return k;
