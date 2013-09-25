@@ -42,7 +42,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
    species, we assume a number equal to the number of reactions
    divided by 10, and we reallocate the array if needed. 
    
-  /* Find the input file. We first look in the current directory, and 
+   Find the input file. We first look in the current directory, and 
      then in the PKGDATADIR directory. Exit if we can't find it. */
 
   char chem_file1[MAX_LINE];

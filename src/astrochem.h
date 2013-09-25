@@ -34,7 +34,10 @@
 #define TIME_STEPS_DEFAULT 32
 #define TRACE_ROUTES_DEFAULT 0
 #define N_OUTPUT_ROUTES 16
-#define M_PI 3.14159265358979323846
+
+#ifndef M_PI
+#define M_PI  3.14159265358979323846264338327950288
+#endif
 
 #define MAX_CHAR_SPECIES 32     /* Maximum number of characters in a specie name */
 
