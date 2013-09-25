@@ -28,16 +28,9 @@
 #include <string.h>
 #include "astrochem.h"
 
-/*void add_specie (char *new_specie, char *species_names[], 
-  int *n_species);*/
 int add_specie (char *new_specie, net_t * network);
 
-void alloc_network (net_t * network, int n_species, int n_reactions);
-
 void realloc_network_species (net_t * network, int n_species);
-/*
-   Add a specie in the species array, if not already present.
- */
 
 void
 read_network (const char *chem_file, net_t * network, const int verbose)
@@ -61,6 +54,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
 
   //Allocate network dynamic array
   alloc_network (network, n_alloc_species, n_reactions);
+  network->n_species = 0;
 
   if (verbose >= 1)
     {
@@ -218,8 +212,10 @@ read_network (const char *chem_file, net_t * network, const int verbose)
     }
   if (n != network->n_reactions)
     {
-      fprintf (stderr, "astrochem: error: incorect number of reactions"
-	       "file %s may be corrupt.\n", chem_file);
+      fprintf (stderr,
+	       "astrochem: error: incorect number of reactions %i, different from %i,"
+	       "file %s may be corrupt.\n", n, network->n_reactions,
+	       chem_file);
       exit (1);
     }
   realloc_network_species (network, network->n_species);
@@ -282,7 +278,7 @@ find_species (const species_name_t specie, const net_t * network)
   for (i = 0; i < network->n_species; i++)
     {
       if (strncmp (network->species_names[i], specie,
-		   sizeof (char) * MAX_CHAR_SPECIES) == 0)
+		   sizeof (species_name_t)) == 0)
 	{
 	  return i;
 	}
@@ -299,7 +295,6 @@ void
 alloc_network (net_t * network, int n_species, int n_reactions)
 {
   network->n_alloc_species = n_species;
-  network->n_species = 0;
   if ((network->species_names =
        malloc (sizeof (species_name_t) * n_species)) == NULL)
     {
@@ -334,7 +329,7 @@ realloc_network_species (net_t * network, int n_species)
   if (n_species < network->n_species)
     {
       fprintf (stderr,
-	       "astrochem: %s:%d:  cannot realloc over existing species : "
+	       "astrochem: %s:%d: cannot realloc over existing species : "
 	       "n_species : %i, new_size: %i\n", __FILE__, __LINE__,
 	       network->n_species, n_species);
       exit (1);

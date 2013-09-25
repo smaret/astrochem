@@ -49,8 +49,8 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
       /* Open the file or exit if an error occurs. */
 
       strncpy (filename,
-	       network->species_names[input_params->output.
-				      output_species_idx[i]],
+	       network->species_names[input_params->
+				      output.output_species_idx[i]],
 	       MAX_CHAR_FILENAME);
       if (strlen (input_params->output.suffix) != 0)
 	{
@@ -107,8 +107,8 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
       /* Write the header. */
 
       fprintf (f, "# %s abundance computed by astrochem\n",
-	       network->species_names[input_params->output.
-				      output_species_idx[i]]);
+	       network->species_names[input_params->
+				      output.output_species_idx[i]]);
       fprintf (f, "# time [yr] / shell number\n");
       fprintf (f, "#\n");
 
@@ -127,8 +127,8 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
 		   source_mdl->ts.time_steps[j] / CONST_MKSA_YEAR);
 	  for (k = 0; k < n_shells; k++)
 	    fprintf (f, "  %8.2e",
-		     results->
-		     abundances[get_abundance_idx (results, k, j, i)]);
+		     results->abundances[get_abundance_idx
+					 (results, k, j, i)]);
 	  fprintf (f, "\n");
 	}
 
@@ -152,8 +152,8 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
 	{
 	  /* Open the file or exit if an error occurs. */
 	  strncpy (filename,
-		   network->species_names[input_params->output.
-					  output_species_idx[i]],
+		   network->species_names[input_params->
+					  output.output_species_idx[i]],
 		   MAX_CHAR_FILENAME);
 	  if (strlen (input_params->output.suffix) != 0)
 	    {
@@ -180,8 +180,8 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
 
 	  fprintf (f,
 		   "# Main %s formation/destruction routes computed by astrochem\n",
-		   network->species_names[input_params->output.
-					  output_species_idx[i]]);
+		   network->species_names[input_params->
+					  output.output_species_idx[i]]);
 	  fprintf (f,
 		   "# shell number  time [yr]  reaction number 1  reaction rate 1 [cm-3/s]... \n");
 	  fprintf (f, "#\n");
@@ -198,13 +198,13 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
 		  for (l = 0; l < N_OUTPUT_ROUTES; l++)
 		    {
 		      fprintf (f, "  %4i",
-			       results->
-			       routes[get_route_idx (results, k, j, i, l)].
-			       formation.reaction_no);
+			       results->routes[get_route_idx
+					       (results, k, j, i,
+						l)].formation.reaction_no);
 		      fprintf (f, " %9.2e",
-			       results->
-			       routes[get_route_idx (results, k, j, i, l)].
-			       formation.rate);
+			       results->routes[get_route_idx
+					       (results, k, j, i,
+						l)].formation.rate);
 		    }
 		  fprintf (f, "\n");
 		  fprintf (f, "%4i", k);
@@ -213,13 +213,13 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
 		  for (l = 0; l < N_OUTPUT_ROUTES; l++)
 		    {
 		      fprintf (f, "  %4i",
-			       results->
-			       routes[get_route_idx (results, k, j, i, l)].
-			       destruction.reaction_no);
+			       results->routes[get_route_idx
+					       (results, k, j, i,
+						l)].destruction.reaction_no);
 		      fprintf (f, " %9.2e",
-			       -results->
-			       routes[get_route_idx (results, k, j, i, l)].
-			       destruction.rate);
+			       -results->routes[get_route_idx
+						(results, k, j, i,
+						 l)].destruction.rate);
 		    }
 		  fprintf (f, "\n");
 		}
