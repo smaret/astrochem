@@ -36,7 +36,13 @@
 #define TRACE_ROUTES_DEFAULT 0
 #define N_OUTPUT_ROUTES 16
 
+#define MAX_INITIAL_ABUNDANCES 128	/* Maximum initial abundances in the input file */
 #define MAX_CHAR_SPECIES 32	/* Maximum number of characters in a specie name */
+#define MAX_SHELLS 256		/* Maximum number of cells in the model file */
+#define MAX_OUTPUT_ABUNDANCES 32	/* Maximum output abundances in the output file */
+#define MAX_TIME_STEPS 128	/* Maximum number of time steps the output file */
+#define MAX_REACTIONS 32768	/* Maximum number of reactions in the network file */
+#define MAX_SPECIES 4096	/* Maximum number of species in the network file */
 
 #define CONST_MKSA_YEAR 3.1536e7
 #define CONST_CGSM_BOLTZMANN (1.3806503e-16)

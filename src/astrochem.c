@@ -125,10 +125,21 @@ main (int argc, char *argv[])
 
     for (i = 0; i < input_params.output.time_steps; i++)
       {
-	results.tim[i] = pow (10., log10 (input_params.solver.ti) + i
-			      * (log10 (input_params.solver.tf) -
-				 log10 (input_params.solver.ti)) /
-			      (input_params.output.time_steps - 1));
+	if (i < MAX_TIME_STEPS)
+	  results.tim[i] = pow (10., log10 (input_params.solver.ti) + i
+				* (log10 (input_params.solver.tf) -
+				   log10 (input_params.solver.ti)) /
+				(input_params.output.time_steps - 1));
+	else
+	  {
+	    fprintf (stderr, "astrochem: error: the number of time"
+		     "steps in %s exceed %i.\n", input_file, MAX_TIME_STEPS);
+	    free_input (&input_params);
+	    free_mdl (&source_mdl);
+	    free_network (&network);
+	    free_results (&results);
+	    return (EXIT_FAILURE);
+	  }
       }
   }
 

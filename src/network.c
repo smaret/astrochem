@@ -57,6 +57,13 @@ read_network (const char *chem_file, net_t * network, const int verbose)
      below). */
 
   n_reactions = get_nb_active_line (chem_file);
+  if (n_reactions > MAX_REACTIONS)
+    {
+      fprintf (stderr,
+	       "astrochem: error: the number of reactions exceed %i.\n",
+	       MAX_REACTIONS);
+      exit (1);
+    }
   if (n_reactions == 0)
     {
       fprintf (stderr,
@@ -236,8 +243,8 @@ read_network (const char *chem_file, net_t * network, const int verbose)
   if (n != network->n_reactions)
     {
       fprintf (stderr,
-	       "astrochem: error: incorrect number of reactions in %s,"
-	       "file might be corrupted.\n", chem_file);
+	       "astrochem: error: incorect number of reactions, different from %i,"
+	       "file %s may be corrupted.\n", MAX_REACTIONS, chem_file);
       exit (1);
     }
   realloc_network_species (network, network->n_species);
@@ -259,6 +266,7 @@ int
 add_specie (char *new_specie, net_t * network)
 {
   int i;
+  int new_alloc_size;
 
   if (strcmp (new_specie, "") == 0)
     return -1;
@@ -270,7 +278,19 @@ add_specie (char *new_specie, net_t * network)
   i = network->n_species;
   while (i >= network->n_alloc_species)
     {
-      realloc_network_species (network, network->n_alloc_species * 2);
+      if (i == MAX_SPECIES)
+	{
+	  fprintf (stderr,
+		   "astrochem: error: the number of species in the chemical"
+		   "network file exceeds %i.\n", MAX_SPECIES);
+	  exit (1);
+	}
+      new_alloc_size = network->n_alloc_species * 2;
+      if (new_alloc_size > MAX_SPECIES)
+	{
+	  new_alloc_size = MAX_SPECIES;
+	}
+      realloc_network_species (network, new_alloc_size);
     }
   if ((network->species_names[i] =
        malloc (sizeof (char) * MAX_CHAR_SPECIES)) == NULL)
