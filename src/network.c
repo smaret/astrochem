@@ -254,7 +254,7 @@ add_specie (char *new_specie, net_t* network)
  */
 
   int 
-find_species (const char *specie, const net_t * network)
+find_species (const species_name_t specie, const net_t * network)
 {
   int i;
 

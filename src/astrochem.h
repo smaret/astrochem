@@ -187,7 +187,7 @@ void check_species ( abund_t initial_abundances[], int
 		    n_initial_abundances, char *output_species[], int
 		    n_output_species, char *species[], int n_species);
 
-int find_species (const char *specie, const net_t * network);
+int find_species (const species_name_t specie, const net_t * network);
 
 void alloc_network ( net_t * network, int n_species, int n_reactions );
 
