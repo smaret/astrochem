@@ -414,8 +414,8 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
     for (i = 0; i < input_params->abundances.n_initial_abundances; i++)
       {
 	NV_Ith_S (y,
-		  input_params->abundances.initial_abundances[i].
-		  species_idx) =
+		  input_params->abundances.
+		  initial_abundances[i].species_idx) =
 	  input_params->abundances.initial_abundances[i].abundance *
 	  cell->nh[0];
       }
@@ -594,10 +594,9 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
 			formation_route.reaction_no =
 			  network->reactions[k].reaction_no;
 			min_rate =
-			  results->
-			  routes[get_route_idx
-				 (results, cell_index, i, j,
-				  0)].formation.rate;
+			  results->routes[get_route_idx
+					  (results, cell_index, i, j,
+					   0)].formation.rate;
 			min_rate_index = 0;
 			for (l = 1; l < N_OUTPUT_ROUTES; l++)
 			  {
@@ -664,10 +663,9 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
 			  network->reactions[k].reaction_no;
 
 			min_rate =
-			  results->
-			  routes[get_route_idx
-				 (results, cell_index, i, j,
-				  0)].destruction.rate;
+			  results->routes[get_route_idx
+					  (results, cell_index, i, j,
+					   0)].destruction.rate;
 			min_rate_index = 0;
 			for (l = 1; l < N_OUTPUT_ROUTES; l++)
 			  {
