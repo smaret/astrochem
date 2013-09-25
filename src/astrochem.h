@@ -24,7 +24,6 @@
 
 #define MAX_LINE 512            /* Maximum number of characters in each input file
                                    line */
-
 #define CHI_DEFAULT 1
 #define COSMIC_DEFAULT 1.3e-17
 #define GRAIN_SIZE_DEFAULT 1e-5 /* Grain radius, in cm */
