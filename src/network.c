@@ -42,11 +42,29 @@ read_network (const char *chem_file, net_t * network, const int verbose)
    species, we assume a number equal to the number of reactions
    divided by 10, and we reallocate the array if needed. 
    
-   Fixme: get_nb_active_line() does not look for chem_file in
-   PKGDATADIR if it isn't found in the current directory (see
-   below). */ 
-  // Get size of dynamic arrays from file
-  int n_reactions = get_nb_active_line (chem_file);
+  /* Find the input file. We first look in the current directory, and 
+     then in the PKGDATADIR directory. Exit if we can't find it. */
+
+  char chem_file1[MAX_LINE];
+  strcpy (chem_file1, chem_file);
+  f = fopen (chem_file1, "r");
+  if (!f)
+    {
+      strncpy (chem_file1, PKGDATADIR, sizeof (chem_file1) - 1);
+      strncat (chem_file1, "/",
+               sizeof (chem_file1) - strlen (chem_file1) - 1);
+      strncat (chem_file1, chem_file,
+               sizeof (chem_file1) - strlen (chem_file1) - 1);
+      f = fopen (chem_file1, "r");
+      if (!f)
+        {
+          fprintf (stderr, "aaastrochem: error: can't find %s.\n", chem_file);
+          exit (1);
+        }
+    }
+  fclose (f);
+
+  int n_reactions = get_nb_active_line (chem_file1);
   if (n_reactions == 0)
     {
       fprintf (stderr,
@@ -64,35 +82,14 @@ read_network (const char *chem_file, net_t * network, const int verbose)
   network->n_species = 0;
   if (verbose >= 1)
     {
-      fprintf (stdout, "Reading reactions network from %s... ", chem_file);
+      fprintf (stdout, "Reading reactions network from %s... ", chem_file1);
       fflush (stdout);
     }
 
-  /* Open the input file. We first look in the current directory, and 
-     then in the PKGDATADIR directory. Exit if we can't find it. */
-/* FixMe: this part of the code should be executed *before*
-          +     get_nb_active_line() is called (see above). */ 
-  f = fopen (chem_file, "r");
-  if (!f)
-    {
-      char chem_file1[MAX_LINE];
 
-      strncpy (chem_file1, PKGDATADIR, sizeof (chem_file1) - 1);
-      strncat (chem_file1, "/",
-               sizeof (chem_file1) - strlen (chem_file1) - 1);
-      strncat (chem_file1, chem_file,
-               sizeof (chem_file1) - strlen (chem_file1) - 1);
-      f = fopen (chem_file1, "r");
-      if (!f)
-        {
-          fprintf (stderr, "astrochem: error: can't find %s.\n", chem_file);
-          exit (1);
-        }
-    }
-
+  f = fopen (chem_file1, "r");
   /* Loop over the lines, and look for the reactants and products, and
      the parameters of the reactions. */
-
   int n = 0;
   while (fgets (line, MAX_LINE, f) != NULL)
     {
@@ -148,7 +145,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                           &network->reactions[n].reaction_type,
                           &network->reactions[n].reaction_no) != 5)
                 {
-                  input_error (chem_file, n + 1);
+                  input_error (chem_file1, n + 1);
                 }
               break;
             }
@@ -205,7 +202,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                     }
                   else
                     {
-                      input_error (chem_file, n + 1);
+                      input_error (chem_file1, n + 1);
                       break;
                     }
                 }
@@ -222,7 +219,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
       fprintf (stderr,
                "astrochem: error: incorect number of reactions %i, different from %i,"
                "file %s may be corrupt.\n", n, network->n_reactions,
-               chem_file);
+               chem_file1);
       exit (1);
     }
   realloc_network_species (network, network->n_species);
