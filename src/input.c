@@ -38,8 +38,10 @@
 
 typedef enum
 { R_STATIC = 0, R_DYNAMIC = 1, R_TIMES = 2 } SOURCE_READ_MODE;
-int get_nb_active_line_section (const char *file, const char *section);
+
 void alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps);
+
+int get_nb_active_line_section (const char *file, const char *section);
 
 void
 read_input (const char *input_file, inp_t * input_params,
@@ -90,8 +92,9 @@ read_input (const char *input_file, inp_t * input_params,
       exit (1);
     }
 
-  /* Set the default values for parameters in the input file, in case
-     the user didn't specify them. */
+  /* Allocate a data structure for the input, and set the default
+     values for parameters in the input file, in case the user doesn't
+     specify them. */ 
   alloc_input (input_params, n_initial_abundances, n_output_species);
   strcpy (input_params->files.source_file, "");
   strcpy (input_params->files.chem_file, "");

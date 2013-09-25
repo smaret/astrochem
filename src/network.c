@@ -37,7 +37,14 @@ read_network (const char *chem_file, net_t * network, const int verbose)
 {
   FILE *f;
   char line[MAX_LINE];
-
+/* Allocate the network structure. We get the number of reactions
+   from the number of lines in the network file. For the number of
+   species, we assume a number equal to the number of reactions
+   divided by 10, and we reallocate the array if needed. 
+   
+   Fixme: get_nb_active_line() does not look for chem_file in
+   PKGDATADIR if it isn't found in the current directory (see
+   below). */ 
   // Get size of dynamic arrays from file
   int n_reactions = get_nb_active_line (chem_file);
   if (n_reactions == 0)
@@ -63,7 +70,8 @@ read_network (const char *chem_file, net_t * network, const int verbose)
 
   /* Open the input file. We first look in the current directory, and 
      then in the PKGDATADIR directory. Exit if we can't find it. */
-
+/* FixMe: this part of the code should be executed *before*
+          +     get_nb_active_line() is called (see above). */ 
   f = fopen (chem_file, "r");
   if (!f)
     {

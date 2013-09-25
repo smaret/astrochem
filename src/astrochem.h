@@ -178,11 +178,7 @@ typedef struct
   int n_output_abundances;
 } res_t;
 
-/* Fonction prototypes
-
-   Fontions names with a _new suffix correspond to the new prototypes
-   that uses the new "input_params", "source_mdl", "network" and
-   "results" data structures. */
+/* Fonction prototypes */
 
 void alloc_input (inp_t * input_params, int n_initial_abundances,
                   int n_output_abundances);
