@@ -616,7 +616,7 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
                                              min_rate_index);
                             results->routes[idx].formation.rate =
                               formation_route.rate;
-                            results->routes[idx].formation.reaction_no =
+                            results->routes[idx].formation.reaction_no = 
                               formation_route.reaction_no;
                           }
                       }
@@ -708,6 +708,7 @@ void
 alloc_results (res_t * results, int n_time_steps, int n_cells,
                int n_output_abundances)
 {
+  int i;
   if ((results->abundances =
        malloc (sizeof (double) * n_cells * n_time_steps *
                n_output_abundances)) == NULL)
@@ -716,6 +717,10 @@ alloc_results (res_t * results, int n_time_steps, int n_cells,
                __FILE__, __LINE__);
       exit (1);
     }
+  for(i=0;i<n_cells * n_time_steps * n_output_abundances; i++)
+  {
+    results->abundances[i]=0;
+  }
   if ((results->routes =
        malloc (sizeof (rout_t) * n_cells * n_time_steps *
                n_output_abundances * N_OUTPUT_ROUTES)) == NULL)
@@ -724,6 +729,13 @@ alloc_results (res_t * results, int n_time_steps, int n_cells,
                __FILE__, __LINE__);
       exit (1);
     }
+  for(i=0;i<n_cells * n_time_steps * n_output_abundances * N_OUTPUT_ROUTES; i++)
+  {
+    results->routes[i].formation.reaction_no=0;
+    results->routes[i].formation.rate=0;
+    results->routes[i].destruction.reaction_no=0;
+    results->routes[i].destruction.rate=0;
+  }
   results->n_time_steps = n_time_steps;
   results->n_cells = n_cells;
   results->n_output_abundances = n_output_abundances;

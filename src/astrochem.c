@@ -109,7 +109,7 @@ main (int argc, char *argv[])
                verbose);
 
   /* Allocate results */
-  alloc_results (&results, input_params.output.time_steps, source_mdl.n_cells,
+  alloc_results (&results, source_mdl.ts.n_time_steps, source_mdl.n_cells,
                  input_params.output.n_output_species);
 
 
