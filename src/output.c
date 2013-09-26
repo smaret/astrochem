@@ -121,7 +121,7 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
 
       /* Write the abundance as a function of time for each shell. */
 
-      for (j = 0; j < input_params->output.time_steps; j++)
+      for (j = 0; j < source_mdl->ts.n_time_steps; j++)
         {
           fprintf (f, "%8.2e",
                    source_mdl->ts.time_steps[j] / CONST_MKSA_YEAR);
@@ -190,7 +190,7 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
 
           for (k = 0; k < n_shells; k++)
             {
-              for (j = 0; j < input_params->output.time_steps; j++)
+              for (j = 0; j < source_mdl->ts.n_time_steps; j++)
                 {
                   fprintf (f, "%4i", k);
                   fprintf (f, "  %9.2e",
@@ -224,6 +224,7 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
                   fprintf (f, "\n");
                 }
             }
+           fclose(f);
         }
 
       if (verbose == 1)
