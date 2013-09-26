@@ -414,8 +414,8 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
     for (i = 0; i < input_params->abundances.n_initial_abundances; i++)
       {
         NV_Ith_S (y,
-                  input_params->abundances.initial_abundances[i].
-                  species_idx) =
+                  input_params->abundances.
+                  initial_abundances[i].species_idx) =
           input_params->abundances.initial_abundances[i].abundance *
           cell->nh[0];
       }
@@ -701,6 +701,9 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
   return (0);
 }
 
+/* 
+   Allocate the results structures
+   */
 void
 alloc_results (res_t * results, int n_time_steps, int n_cells,
                int n_output_abundances)
@@ -726,6 +729,9 @@ alloc_results (res_t * results, int n_time_steps, int n_cells,
   results->n_output_abundances = n_output_abundances;
 }
 
+/* 
+   Free the results structures
+   */
 void
 free_results (res_t * results)
 {
@@ -734,7 +740,7 @@ free_results (res_t * results)
 }
 
 /* 
-   Get index in array from all idx
+   Get index in abundances array from all idx
  */
 int
 get_abundance_idx (const res_t * results, int cell_idx, int ts_idx,
@@ -745,7 +751,7 @@ get_abundance_idx (const res_t * results, int cell_idx, int ts_idx,
 }
 
 /* 
-   Get index in array from all idx
+   Get index in route array from all idx
  */
 int
 get_route_idx (const res_t * results, int cell_idx, int ts_idx, int abund_idx,
