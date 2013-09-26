@@ -104,7 +104,7 @@ main (void)
       (source_mdl.cell[2].nh[10] == 2.97e4) &&
       (source_mdl.cell[2].tgas[10] == 24.96) &&
       (source_mdl.cell[2].tdust[10] == 24.96) &&
-      (source_mdl.ts.time_steps[5] - 0.00000297 < 0.0001 ))
+      (source_mdl.ts.time_steps[5] / CONST_MKSA_YEAR - 2.97e-6 < 0.01e-6 ))
   {
     free_mdl(&source_mdl);
     return EXIT_SUCCESS;

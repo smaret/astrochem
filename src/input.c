@@ -435,7 +435,7 @@ read_source (const char *source_file, mdl_t * source_mdl,
           sscanf (line, "%d %lf", &tmp_ts, &ts_val);    //Format and value not checked
           if (tmp_ts < source_mdl->ts.n_time_steps)
             {
-              source_mdl->ts.time_steps[tmp_ts] = ts_val;
+              source_mdl->ts.time_steps[tmp_ts] = ts_val * CONST_MKSA_YEAR; // seconds
             }
           else
             {
