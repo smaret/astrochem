@@ -414,8 +414,8 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
     for (i = 0; i < input_params->abundances.n_initial_abundances; i++)
       {
         NV_Ith_S (y,
-                  input_params->abundances.initial_abundances[i].
-                  species_idx) =
+                  input_params->abundances.
+                  initial_abundances[i].species_idx) =
           input_params->abundances.initial_abundances[i].abundance *
           cell->nh[0];
       }
@@ -616,7 +616,7 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
                                              min_rate_index);
                             results->routes[idx].formation.rate =
                               formation_route.rate;
-                            results->routes[idx].formation.reaction_no =
+                            results->routes[idx].formation.reaction_no = 
                               formation_route.reaction_no;
                           }
                       }
@@ -701,10 +701,14 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
   return (0);
 }
 
+/* 
+   Allocate the results structures
+   */
 void
 alloc_results (res_t * results, int n_time_steps, int n_cells,
                int n_output_abundances)
 {
+  int i;
   if ((results->abundances =
        malloc (sizeof (double) * n_cells * n_time_steps *
                n_output_abundances)) == NULL)
@@ -713,6 +717,10 @@ alloc_results (res_t * results, int n_time_steps, int n_cells,
                __FILE__, __LINE__);
       exit (1);
     }
+  for(i=0;i<n_cells * n_time_steps * n_output_abundances; i++)
+  {
+    results->abundances[i]=0;
+  }
   if ((results->routes =
        malloc (sizeof (rout_t) * n_cells * n_time_steps *
                n_output_abundances * N_OUTPUT_ROUTES)) == NULL)
@@ -721,11 +729,21 @@ alloc_results (res_t * results, int n_time_steps, int n_cells,
                __FILE__, __LINE__);
       exit (1);
     }
+  for(i=0;i<n_cells * n_time_steps * n_output_abundances * N_OUTPUT_ROUTES; i++)
+  {
+    results->routes[i].formation.reaction_no=0;
+    results->routes[i].formation.rate=0;
+    results->routes[i].destruction.reaction_no=0;
+    results->routes[i].destruction.rate=0;
+  }
   results->n_time_steps = n_time_steps;
   results->n_cells = n_cells;
   results->n_output_abundances = n_output_abundances;
 }
 
+/* 
+   Free the results structures
+   */
 void
 free_results (res_t * results)
 {
@@ -734,7 +752,7 @@ free_results (res_t * results)
 }
 
 /* 
-   Get index in array from all idx
+   Get index in abundances array from all idx
  */
 int
 get_abundance_idx (const res_t * results, int cell_idx, int ts_idx,
@@ -745,7 +763,7 @@ get_abundance_idx (const res_t * results, int cell_idx, int ts_idx,
 }
 
 /* 
-   Get index in array from all idx
+   Get index in route array from all idx
  */
 int
 get_route_idx (const res_t * results, int cell_idx, int ts_idx, int abund_idx,
