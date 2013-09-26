@@ -30,12 +30,6 @@
 #include <math.h>
 #include "astrochem.h"
 
-/*
-   Read the input file containing the parameters needed by the code:
-   name of the chemistry network and source file names, physical 
-   parameters, solver parameters, and initial abundances.
- */
-
 typedef enum
 { R_STATIC = 0, R_DYNAMIC = 1, R_TIMES = 2 } SOURCE_READ_MODE;
 
@@ -43,6 +37,11 @@ void alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps);
 
 int get_nb_active_line_section (const char *file, const char *section);
 
+/*
+   Read the input file containing the parameters needed by the code:
+   name of the chemistry network and source file names, physical 
+   parameters, solver parameters, and initial abundances.
+ */
 void
 read_input (const char *input_file, inp_t * input_params,
             const net_t * network, int verbose)
@@ -57,7 +56,6 @@ read_input (const char *input_file, inp_t * input_params,
   errno = 0;
 
   /* Open the input file or exit if we can't open it. */
-
   if (verbose == 1)
     fprintf (stdout, "Reading input from %s.\n", input_file);
   f = fopen (input_file, "r");
@@ -94,7 +92,7 @@ read_input (const char *input_file, inp_t * input_params,
 
   /* Allocate a data structure for the input, and set the default
      values for parameters in the input file, in case the user doesn't
-     specify them. */ 
+     specify them. */
   alloc_input (input_params, n_initial_abundances, n_output_species);
   strcpy (input_params->files.source_file, "");
   strcpy (input_params->files.chem_file, "");
@@ -181,25 +179,26 @@ read_input (const char *input_file, inp_t * input_params,
                     }
                   else
                     {
-                      input_params->abundances.initial_abundances[i].
-                        species_idx = find_species (parameter, network);
-                      input_params->abundances.initial_abundances[i].
-                        abundance = atof (value);
+                      input_params->abundances.
+                        initial_abundances[i].species_idx =
+                        find_species (parameter, network);
+                      input_params->abundances.
+                        initial_abundances[i].abundance = atof (value);
 
                       /* Compute the total grain density */
                       int g, gm, gp;
                       g = find_species ("grain", network);
                       gm = find_species ("grain(-)", network);
                       gp = find_species ("grain(+)", network);
-                      if (input_params->abundances.initial_abundances[i].
-                          species_idx == g
-                          || input_params->abundances.initial_abundances[i].
-                          species_idx == gm
-                          || input_params->abundances.initial_abundances[i].
-                          species_idx == gp)
+                      if (input_params->abundances.
+                          initial_abundances[i].species_idx == g
+                          || input_params->abundances.
+                          initial_abundances[i].species_idx == gm
+                          || input_params->abundances.
+                          initial_abundances[i].species_idx == gp)
                         input_params->phys.grain_abundance +=
-                          input_params->abundances.initial_abundances[i].
-                          abundance;
+                          input_params->abundances.
+                          initial_abundances[i].abundance;
                       i++;
                     }
                 }
@@ -388,6 +387,7 @@ read_source (const char *source_file, mdl_t * source_mdl,
         {
           if (strncmp (line, "[times]", 7) == 0)        // Dynamic source file begin with [times] section
             {
+              // Get the number of time steps, the number of cells*time_steps, check correctness
               int nts = get_nb_active_line_section (source_file, "times");
               int n_cells_times =
                 get_nb_active_line_section (source_file, "cells");
@@ -398,17 +398,22 @@ read_source (const char *source_file, mdl_t * source_mdl,
                            __FILE__, __LINE__, source_file);
                   exit (1);
                 }
-              alloc_mdl (source_mdl, n_cells_times / nts, nts); //n_cells_times contain the number of cells times the number of time steps.
-              mode = R_TIMES;   // First thing to do is reading the time steps.
+              //Allocate the model
+              alloc_mdl (source_mdl, n_cells_times / nts, nts);
+              //Set reading flag to read time steps
+              mode = R_TIMES;
+              //Set source flag to dynamic
               source_mdl->mode = DYNAMIC;
-              allocated = 1;    // Inform loop that the source type have been determined and structure have been allocated
+              allocated = 1;
               continue;
             }
           else                  //Static source
             {
+              //Allocate static model
               alloc_mdl (source_mdl, n_line, input_params->output.time_steps);
+              //Set source flag to static
               source_mdl->mode = STATIC;
-              allocated = 1;    // Inform loop that the source type have been determined and structure have been allocated
+              allocated = 1;
               /* Build the vector of time */
               int i;
               for (i = 0; i < input_params->output.time_steps; i++)
@@ -424,6 +429,7 @@ read_source (const char *source_file, mdl_t * source_mdl,
         }
       if (strncmp (line, "[cells]", 7) == 0)    //Time to read the cells 
         {
+          //Set reading flag to read the dynamic cells
           mode = R_DYNAMIC;
           continue;
         }
@@ -449,7 +455,9 @@ read_source (const char *source_file, mdl_t * source_mdl,
       else if (mode == R_DYNAMIC)
         {
           int tmp_cell, tmp_ts;
-          sscanf (line, "%d %d %lf %lf %lf %lf", &tmp_cell, &tmp_ts, &av, &nh, &tgas, &tdust);  //Format and value not checked
+          //Format and value not checked
+          sscanf (line, "%d %d %lf %lf %lf %lf", &tmp_cell, &tmp_ts, &av, &nh,
+                  &tgas, &tdust);
           if (tmp_ts < source_mdl->ts.n_time_steps
               || tmp_cell < source_mdl->n_cells)
             {
@@ -550,6 +558,12 @@ alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps)
                __FILE__, __LINE__);
       exit (1);
     }
+  /* We use a memory alignement technique, so  all cells will be aligned and in each cells, 
+     nh[], av[], tgas[] and tdust[] will be aligned
+     First allocate a big data block wich will contain all data of all cells.
+     Then allocate a array of struct of pointer wich will contain all pointer to the data
+     Finally point each pointer to the right block of data.
+   */
   double *data;
   if ((data = malloc (4 * n_cells * n_time_steps * sizeof (double))) == NULL)
     {
@@ -579,11 +593,17 @@ alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps)
 void
 free_mdl (mdl_t * source_mdl)
 {
+  // This is to free the big block of data
   free (source_mdl->cell[0].nh);
   free (source_mdl->cell);
   free (source_mdl->ts.time_steps);
 }
 
+/*
+   Get the number of non commented line in a section
+   in a file beggining by [section] and ending with 
+   [other_section] or eof.
+   */
 int
 get_nb_active_line_section (const char *file, const char *section)
 {
@@ -630,6 +650,9 @@ get_nb_active_line_section (const char *file, const char *section)
   return line_number;
 }
 
+/*
+   Get the number of non-commented line in a file
+   */
 int
 get_nb_active_line (const char *file)
 {
@@ -653,6 +676,9 @@ get_nb_active_line (const char *file)
   return line_number;
 }
 
+/*
+   Read only chem_file and network_file from a input.ini file
+   */
 void
 read_input_file_names (const char *input_file, files_t * files, int verbose)
 {

@@ -28,21 +28,21 @@
 #include <string.h>
 #include "astrochem.h"
 
-int add_species (char *new_specie, net_t * network);
+int add_species (char *new_species, net_t * network);
 
 void realloc_network_species (net_t * network, int n_species);
 
+/* Allocate the network structure. We get the number of reactions
+   from the number of lines in the network file. For the number of
+   species, we assume a number equal to the number of reactions
+   divided by 10, and we reallocate the array if needed. */
 void
 read_network (const char *chem_file, net_t * network, const int verbose)
 {
   FILE *f;
   char line[MAX_LINE];
-/* Allocate the network structure. We get the number of reactions
-   from the number of lines in the network file. For the number of
-   species, we assume a number equal to the number of reactions
-   divided by 10, and we reallocate the array if needed. 
-   
-   Find the input file. We first look in the current directory, and 
+
+/*   Find the input file. We first look in the current directory, and 
      then in the PKGDATADIR directory. Exit if we can't find it. */
 
   char chem_file1[MAX_LINE];
@@ -64,6 +64,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
     }
   fclose (f);
 
+  // Get the number of reaction and estimates number of species to alloc
   int n_reactions = get_nb_active_line (chem_file1);
   if (n_reactions == 0)
     {
@@ -105,17 +106,19 @@ read_network (const char *chem_file, net_t * network, const int verbose)
           exit (1);
         }
 
-      /* Read the reactants, products, and reaction parameters. */
       char *localLine = line;
       char *localLine2 = strchr (line, ' ');
       char str[MAX_CHAR_SPECIES];
       int mode = 1;
       int ending = 0;
+
+      /* Read the reactants, products, and reaction parameters. one after another */
       while (localLine != NULL)
         {
           // Analyse current char
           if (localLine[0] == '-')
             {
+              // We read a "->" time to read products
               localLine = localLine2 + 1;
               localLine2 = strchr (localLine, ' ');
               mode = 4;
@@ -124,6 +127,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
             }
           else if (localLine[0] == '+')
             {
+              // We read a "+", let's read another species
               localLine = localLine2 + 1;
               localLine2 = strchr (localLine, ' ');
               ending = 0;
@@ -131,6 +135,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
             }
           else if (localLine[0] == ' ')
             {
+              // We read a " ", lets read another char
               localLine = localLine2 + 1;
               localLine2 = strchr (localLine, ' ');
               continue;
@@ -138,6 +143,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
           // Last part of the line
           else if (ending == 1)
             {
+              //No more species to read, let's read the ending of reactions.
               if (sscanf (localLine, "%lf %lf %lf %d %d",
                           &network->reactions[n].alpha,
                           &network->reactions[n].beta,
@@ -149,15 +155,18 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                 }
               break;
             }
-          // Yet another specie to add
           else
             {
+              // Yet another specie to add
               strncpy (str, localLine, localLine2 - localLine);
               str[localLine2 - localLine] = '\0';
+              //Some species are not to read
               if ((strcmp (str, "cosmic-ray") != 0) &&
                   (strcmp (str, "uv-photon") != 0) &&
                   (strcmp (str, "photon") != 0))
                 {
+                  /* Add the species in list  
+                     Find the correct place for this species in the reactions */
                   if (mode == 1)
                     {
                       network->reactions[n].reactant1 =
@@ -214,6 +223,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
         }
       n++;
     }
+  // Check number of reactions
   if (n != network->n_reactions)
     {
       fprintf (stderr,
@@ -222,6 +232,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                chem_file1);
       exit (1);
     }
+  /* Free non used memory space */
   realloc_network_species (network, network->n_species);
   if (verbose >= 1)
     {
@@ -233,26 +244,34 @@ read_network (const char *chem_file, net_t * network, const int verbose)
   fclose (f);
 }
 
+/*
+   Add a species in the network and return it's index
+   If already present, just return the index
+   */
 int
-add_species (char *new_specie, net_t * network)
+add_species (char *new_species, net_t * network)
 {
   int i;
-  if (strcmp (new_specie, "") == 0)
+  if (strcmp (new_species, "") == 0)
     return -1;
+  //Look for the species, if it exists, return index
   for (i = 0; i < network->n_species; i++)
     {
-      if (strcmp (network->species_names[i], new_specie) == 0)
+      if (strcmp (network->species_names[i], new_species) == 0)
         return i;
     }
+  // Check species array size and reallocate if necessary
   i = network->n_species;
   while (i >= network->n_alloc_species)
     {
       int new_alloc_size = network->n_alloc_species * 2;
       realloc_network_species (network, new_alloc_size);
     }
-  if (strlen (new_specie) < MAX_CHAR_SPECIES - 1)
+  //Check length of species name
+  if (strlen (new_species) < MAX_CHAR_SPECIES - 1)
     {
-      strcpy (network->species_names[i], new_specie);
+      //Add species in network
+      strcpy (network->species_names[i], new_species);
       (network->n_species)++;
     }
   else
@@ -266,9 +285,8 @@ add_species (char *new_specie, net_t * network)
 }
 
 /* 
-   Look up the index of a given specie in the species array.
+   Look up the index of a given species in the species array.
  */
-
 int
 find_species (const species_name_t specie, const net_t * network)
 {
@@ -326,6 +344,9 @@ alloc_network (net_t * network, int n_species, int n_reactions)
     }
 }
 
+/* 
+   Reallocate species array, without overwriting existing species 
+   */
 void
 realloc_network_species (net_t * network, int n_species)
 {
