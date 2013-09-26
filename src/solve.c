@@ -392,7 +392,7 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
   N_Vector y;                   /* Work array for the solver */
   void *cvode_mem;              /* Memory space for the solver */
   double *reac_rates;           /* Reaction rates */
-
+  double min_nh;                 /* Minimum density */
 
   /* Allocate the work array and fill it with the initial
      concentrations. Ignore species that are not in the
@@ -449,6 +449,23 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
       }
   }
 
+  /* Compute the minimum density to set the absolute tolerance of the
+     solver */
+
+  min_nh = cell->nh[0];
+  if (mode == DYNAMIC)
+    {
+      int i;
+      
+      for (i = 1; i < ts->n_time_steps; i++)
+	{
+	  if (cell->nh[i] < min_nh)
+	    {
+	      min_nh = cell->nh[i];
+	    }
+	}
+    }
+  
   /* Fill out a structure containing the parameters of the function
      defining the ODE system and the jacobian. */
 
@@ -481,7 +498,7 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
       ||
       (CVodeSStolerances
        (cvode_mem, input_params->solver.rel_err,
-        input_params->solver.abs_err * cell->nh[0]) != CV_SUCCESS)
+        input_params->solver.abs_err * min_nh) != CV_SUCCESS)
 #ifdef USE_LAPACK
       || ((CVLapackDense (cvode_mem, network->n_species) != CV_SUCCESS))
 #else
@@ -501,6 +518,32 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
     /* Solve the system for each time step. */
     for (i = 0; i < ts->n_time_steps; i++)
       {
+
+	/* In dynamic mode, we need to recompute the rates and to
+	   update the params structure, because the density,
+	   temperature, etc. change at each time step */
+
+	if (i!= 0 && mode == DYNAMIC)
+	  {
+	    params.nh = cell->nh[i];
+	    params.av = cell->av[i];
+	    params.tgas = cell->tgas[i];
+	    params.tdust = cell->tdust[i];
+	    for (j = 0; j < network->n_reactions; j++)
+	      {
+		reac_rates[j] = rate (network->reactions[j].alpha,
+				      network->reactions[j].beta,
+				      network->reactions[j].gamma,
+				      network->reactions[j].reaction_type,
+				      network->reactions[j].reaction_no,
+				      cell->nh[i], cell->av[i], cell->tgas[i],
+				      cell->tdust[i], input_params->phys.chi,
+				      input_params->phys.cosmic,
+				      input_params->phys.grain_size,
+				      input_params->phys.grain_abundance, 0.); // FixMe: what to do with ice abundance?
+	      }
+	  }
+
         CVode (cvode_mem, (realtype) ts->time_steps[i], y, &t, CV_NORMAL);
 
         /* Print the cell number, time and time step after each call. */
@@ -510,9 +553,9 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
             realtype h;
 
             CVodeGetLastStep (cvode_mem, &h);
-            fprintf (stdout, "cell = %3i  t = %8.2e  delta_t = %8.2e\n",
+            fprintf (stdout, "cell = %3i  t = %8.2e  delta_t = %8.2e  nh = %8.2e\n",
                      cell_index, (double) t / CONST_MKSA_YEAR,
-                     (double) h / CONST_MKSA_YEAR);
+                     (double) h / CONST_MKSA_YEAR, cell->nh[i]);
           }
 
         /* Fill the array of abundances with the output species
@@ -523,11 +566,22 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
         for (j = 0; j < input_params->output.n_output_species; j++)
           {
             int idx = get_abundance_idx (results, cell_index, i, j);
-            results->abundances[idx]
-              =
-              (double) NV_Ith_S (y,
-                                 input_params->output.output_species_idx[j]) /
-              cell->nh[0];
+	    if (mode == STATIC)
+	      {
+		results->abundances[idx]
+		  =
+		  (double) NV_Ith_S (y,
+				     input_params->output.output_species_idx[j]) /
+		  cell->nh[0];
+	      }
+	    else
+	      {
+		results->abundances[idx]
+		  =
+		  (double) NV_Ith_S (y,
+				     input_params->output.output_species_idx[j]) /
+		  cell->nh[i];
+	      }
             if (results->abundances[idx] < MIN_ABUNDANCE)
               results->abundances[idx] = 0.;
           }
