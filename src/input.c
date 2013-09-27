@@ -558,10 +558,16 @@ alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps)
                __FILE__, __LINE__);
       exit (1);
     }
-  /* We use a memory alignement technique, so  all cells will be aligned and in each cells, 
-     nh[], av[], tgas[] and tdust[] will be aligned
-     First allocate a big data block wich will contain all data of all cells.
-     Then allocate a array of struct of pointer wich will contain all pointer to the data
+  /* We want the cells in source strcutres have the following layout in memory :
+
+     [ cells[i] -> [  [ nh[0] , nh[1], .. , nh[n_time_steps-1] ] , [av[0], av[1], ..,] , [ tgas[0],.. ], [ tdust[0] ] ] , cells[i+1] -> ... ]
+     although cells[i] et cells[i+1] could be pointing at two very different place, we want it to be memory contiguous 
+                             
+                             
+     We use a memory alignement technique, so  all cells will be contiguous and in each cells, 
+     nh[], av[], tgas[] and tdust[] will be contiguous
+     First allocate a big data block wich will contain all data of all cells, ie all nh,av,tgas,tdust , for ech time steps, for each cells.
+     Then allocate a array of struct of pointer wich will contain all pointer to the data.
      Finally point each pointer to the right block of data.
    */
   double *data;
