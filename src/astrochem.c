@@ -114,15 +114,8 @@ main (int argc, char *argv[])
 
 
   /* Solve the ODE system for each cell. */
-
 #ifdef HAVE_OPENMP
-#pragma omp parallel shared (abundances) private (cell_index)
-#endif
-
-  {
-
-#ifdef HAVE_OPENMP
-#pragma omp for schedule (dynamic, 1) nowait
+#pragma omp parallel for schedule (dynamic, 1)
 #endif
     for (cell_index = 0; cell_index < source_mdl.n_cells; cell_index++)
       {
@@ -135,7 +128,6 @@ main (int argc, char *argv[])
         if (verbose >= 1)
           fprintf (stdout, "Done with cell %d.\n", cell_index);
       }
-  }
   /* Write the abundances in output files */
   output (source_mdl.n_cells, &input_params, &source_mdl, &network, &results,
           verbose);
