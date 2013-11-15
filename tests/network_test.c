@@ -1,5 +1,5 @@
 /* 
-   network_test.c - Test the read_network() function
+   network.test.c - Test the read_network.) function
    
    Copyright (c) 2006-2013 Sebastien Maret
    
@@ -29,18 +29,14 @@ main (void)
 {
   FILE *f;
   char chem_file[MAX_LINE];
-
-  struct react reactions[MAX_REACTIONS];
-  char *species[MAX_SPECIES];
-  int n_reactions;
-  int n_species;
-
+  net_t network;
+  
   int verbose = 0;
 
   /* Create the network.chm file */
 
   f = fopen ("network.chm", "w");
-  fprintf (f, "# This network file was created by network_test\n");
+  fprintf (f, "# This network file was created by network test\n");
   fprintf (f, "# The reaction were extracted form the OSU 2008 network\n");
   fprintf (f, "H            + H                           -> H2                                                           4.95e-17  5.00e-01  0.00e+00  0    1\n");
   fprintf (f, "C(+)         + grain(-)                    -> C            + grain                                         4.90e-17  5.00e-01  0.00e+00  0    3\n");
@@ -66,58 +62,61 @@ main (void)
 
   /* Read it */
 
-  read_network (chem_file, reactions, &n_reactions, 
-		species, &n_species, verbose);
-  
+  read_network(chem_file, &network, verbose);
+ network.reactions[0].reactant2 =  find_species("H", &network);
   /* Check that the values are correct */
-
-  if ((n_reactions == 18) &&
-      (n_species == 25) &&
+  if ((network.n_reactions == 18) &&
+      (network.n_species == 25) &&
 
       /* Reaction #1 */
-      (reactions[0].reactant1 == specie_index ("H", species, n_species)) &&
-      (reactions[0].reactant2 == specie_index ("H", species, n_species)) &&
-      (reactions[0].reactant3 == -1) &&
-      (reactions[0].product1 == specie_index ("H2", species, n_species)) &&
-      (reactions[0].product2 == -1) &&
-      (reactions[0].product3 == -1) &&
-      (reactions[0].product4 == -1) &&
-      (reactions[0].alpha == 4.95e-17) &&
-      (reactions[0].beta == .5) &&
-      (reactions[0].gamma == 0) &&
-      (reactions[0].reaction_type == 0) &&
-      (reactions[0].reaction_no == 1) &&
+      (network.reactions[0].reactant1 == find_species("H", &network)) &&
+      (network.reactions[0].reactant2 ==  find_species("H", &network)) &&
+      (network.reactions[0].reactant3 == -1) &&
+      (network.reactions[0].product1 ==  find_species("H2", &network)) &&
+      (network.reactions[0].product2 == -1) &&
+      (network.reactions[0].product3 == -1) &&
+      (network.reactions[0].product4 == -1) &&
+      (network.reactions[0].alpha == 4.95e-17) &&
+      (network.reactions[0].beta == .5) &&
+      (network.reactions[0].gamma == 0) &&
+      (network.reactions[0].reaction_type == 0) &&
+      (network.reactions[0].reaction_no == 1) &&
 
       /* Reaction #176 */
-      (reactions[4].reactant1 == specie_index ("CH5N", species, n_species)) &&
-      (reactions[4].reactant2 == -1) &&
-      (reactions[4].reactant3 == -1) &&
-      (reactions[4].product1 == specie_index ("HCN", species, n_species)) &&
-      (reactions[4].product2 == specie_index ("H2", species, n_species)) &&
-      (reactions[4].product3 == specie_index ("H", species, n_species)) &&
-      (reactions[4].product4 == specie_index ("H", species, n_species)) &&
-      (reactions[4].alpha == 1.41e3) &&
-      (reactions[4].beta == 0) &&
-      (reactions[4].gamma == 0) &&
-      (reactions[4].reaction_type == 1) &&
-      (reactions[4].reaction_no == 176) &&
+      (network.reactions[4].reactant1 == find_species("CH5N", &network)) &&
+      (network.reactions[4].reactant2 == -1) &&
+      (network.reactions[4].reactant3 == -1) &&
+      (network.reactions[4].product1 ==  find_species("HCN", &network)) &&
+      (network.reactions[4].product2 ==  find_species("H2", &network)) &&
+      (network.reactions[4].product3 ==  find_species("H", &network)) &&
+      (network.reactions[4].product4 ==  find_species("H", &network) )&&
+      (network.reactions[4].alpha == 1.41e3) &&
+      (network.reactions[4].beta == 0) &&
+      (network.reactions[4].gamma == 0) &&
+      (network.reactions[4].reaction_type == 1) &&
+      (network.reactions[4].reaction_no == 176) &&
 
       /* Reaction #4227 */
-      (reactions[14].reactant1 == specie_index ("C(+)", species, n_species)) &&
-      (reactions[14].reactant2 == specie_index ("e(-)", species, n_species)) &&
-      (reactions[14].reactant3 == -1) &&
-      (reactions[14].product1 == specie_index ("C", species, n_species)) &&
-      (reactions[14].product2 == -1) &&
-      (reactions[14].product3 == -1) &&
-      (reactions[14].product4 == -1) &&
-      (reactions[14].alpha == 4.40e-12) &&
-      (reactions[14].beta == -.61) &&
-      (reactions[14].gamma == 0) &&
-      (reactions[14].reaction_type == 10) &&
-      (reactions[14].reaction_no == 4227))
-
-    return EXIT_SUCCESS;
+      (network.reactions[14].reactant1 == find_species("C(+)", &network) )&&
+      (network.reactions[14].reactant2 == find_species("e(-)", &network) )&&
+      (network.reactions[14].reactant3 == -1) &&
+      (network.reactions[14].product1 == find_species("C", &network) )&&
+      (network.reactions[14].product2 == -1) &&
+      (network.reactions[14].product3 == -1) &&
+      (network.reactions[14].product4 == -1) &&
+      (network.reactions[14].alpha == 4.40e-12) &&
+      (network.reactions[14].beta == -.61) &&
+      (network.reactions[14].gamma == 0) &&
+      (network.reactions[14].reaction_type == 10) &&
+      (network.reactions[14].reaction_no == 4227))
+    {
+      free_network (&network);
+      return EXIT_SUCCESS;
+    }
   else
-    return EXIT_FAILURE;
+    {
+      free_network (&network);
+      return EXIT_FAILURE;
+    }
 }
 

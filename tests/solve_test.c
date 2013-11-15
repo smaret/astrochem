@@ -25,48 +25,15 @@
 #include <math.h>
 #include "../src/astrochem.h"
 
-/* FixMe: Why do we need to define these here? (segfault otherwise) */
-double abundances[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES];
-struct rout routes[MAX_SHELLS][MAX_TIME_STEPS][MAX_OUTPUT_ABUNDANCES][N_OUTPUT_ROUTES];
-
 int
 main (void)
 {
   FILE *f;
-
-  char chem_file[MAX_LINE]; 
-  char source_file[MAX_LINE];
-  char suffix[MAX_LINE];
-  double chi;
-  double cosmic;
-  double grain_size;
-  double grain_abundance;
-  double ti;
-  double tf;
-  double abs_err;
-  double rel_err;
-  struct abund initial_abundances[MAX_INITIAL_ABUNDANCES];
-  int n_initial_abundances;
-  char *output_species[MAX_OUTPUT_ABUNDANCES];
-  int n_output_species;
-  int time_steps; 
-  int trace_routes;
-
-  int n_shells;
-  int shell[MAX_SHELLS];
-  double av[MAX_SHELLS];
-  double nh[MAX_SHELLS];
-  double tgas[MAX_SHELLS];
-  double tdust[MAX_SHELLS];
-  int shell_index;
-
-  struct react reactions[MAX_REACTIONS];
-  char *species[MAX_SPECIES];
-  int n_reactions;
-  int n_species;
-
-  double tim[MAX_TIME_STEPS];
-
+  int cell_index;
+  inp_t input_params;
+  mdl_t source_mdl;
+  net_t network;
+  res_t results;
   int verbose = 0;
 
   /* Create the input.ini, source.mdl and network_chm files */
@@ -104,46 +71,20 @@ main (void)
 
   /* Read them */
 
-  read_input ("input.ini", chem_file, source_file, &chi, &cosmic,
-	      &grain_size, &grain_abundance, &ti, &tf, &abs_err, &rel_err,
-	      initial_abundances, &n_initial_abundances,
-	      output_species, &n_output_species, &time_steps,
-	      &trace_routes, suffix, verbose);
+  read_network ("network.chm", &network, verbose);
+  
+  read_input ("input.ini", &input_params, &network, verbose);
 
-  read_source ("source.mdl", shell, &n_shells, av, nh,
-	       tgas, tdust, verbose);
+  read_source ("source.mdl", &source_mdl, &input_params, verbose);
 
-  read_network ("network.chm", reactions, &n_reactions, 
-		species, &n_species, verbose);
 
   /* Solve the ODE system */
 
-  {
-    int i;
+  /* Allocate results */
+   alloc_results( &results, input_params.output.time_steps, source_mdl.n_cells, input_params.output.n_output_species);
 
-    for (i = 0; i < time_steps; i++)
-      {   
-	if (i < MAX_TIME_STEPS)
-	  tim[i] = pow (10., log10 (ti) + i * (log10 (tf) - log10(ti)) 
-			/ (time_steps - 1));
-	else
-	  return EXIT_FAILURE;
-      }
-  }
-
-  shell_index = 0.;
-  solve (chi, cosmic, grain_size, grain_abundance, 
-	 abs_err, rel_err, initial_abundances,
-	 n_initial_abundances, output_species,
-	 n_output_species, av[shell_index],
-	 nh[shell_index], tgas[shell_index],
-	 tdust[shell_index], reactions, n_reactions,
-	 species, n_species, shell_index, tim,
-	 time_steps, abundances, trace_routes,
-	 routes, verbose);
-
-
-  /* Check the abundances */
+  cell_index = 0.;
+  solve (cell_index, &input_params, source_mdl.mode, &source_mdl.cell[cell_index], &network, &source_mdl.ts, &results, verbose);
 
   {
     int i;
@@ -154,36 +95,46 @@ main (void)
     double y_abs_err;
     double y_rel_err;
 
-    for (i = 0; i < time_steps; i++)
+    for (i = 0; i <  source_mdl.ts.n_time_steps; i++)
       {
-	x_abundance = 1.0 * exp (-1e-9 * tim[i]);
+	x_abundance = 1.0 * exp (-1e-9 *  source_mdl.ts.time_steps[i]);
 	y_abundance = 1.0 - x_abundance;
-
-	x_abs_err = fabs(abundances[0][i][0] - x_abundance);
-	y_abs_err = fabs(abundances[0][i][1] - y_abundance);
+	x_abs_err = fabs( results.abundances[get_abundance_idx(&results,0,i,0)] - x_abundance);
+	y_abs_err = fabs( results.abundances[get_abundance_idx(&results,0,i,1)] - y_abundance);
 	x_rel_err = x_abs_err / x_abundance;
 	y_rel_err = y_abs_err / y_abundance;
 
 	/* Errors accumulate after each time step, so the actual error
 	   on the abundance is somewhat larger than the solver
 	   relative tolerance. */
-	
-	if ((x_abs_err > abs_err) && (x_rel_err > rel_err * 5e2))
+	if ((x_abs_err >input_params.solver.abs_err) && (x_rel_err > input_params.solver.rel_err * 5e2))
 	  {
 	    fprintf (stderr, "solve_test: %s:%d: incorrect abundance at t=%12.6e: expected %12.6e, got %12.6e.\n",
-		     __FILE__, __LINE__, tim[i], x_abundance, abundances[0][i][0]); 
+		     __FILE__, __LINE__, source_mdl.ts.time_steps[i], x_abundance, results.abundances[get_abundance_idx(&results,0,i,0)]); 
+	    free_input (&input_params);
+        free_mdl (&source_mdl );
+	    free_network (&network);
+	    free_results (&results);
 	    return EXIT_FAILURE;
-	    }
+	  }
 
-	if ((y_abs_err > abs_err) && (y_rel_err > rel_err * 5e2))
+	if ((y_abs_err > input_params.solver.abs_err) && (y_rel_err > input_params.solver.rel_err * 5e2))
 	  {
 	    fprintf (stderr, "solve_test: %s:%d: incorrect abundance at t=%12.6e: expected %12.6e, got %12.6e.\n",
-		     __FILE__, __LINE__, tim[i], y_abundance, abundances[0][i][1]); 
+		     __FILE__, __LINE__, source_mdl.ts.time_steps[i], y_abundance, results.abundances[get_abundance_idx(&results,0,i,1)]); 
+	    free_input (&input_params);
+        free_mdl (&source_mdl );
+	    free_network (&network);
+	    free_results (&results);
 	    return EXIT_FAILURE;
 	  }
       }
   }
-    
+  
+  free_input (&input_params );
+  free_mdl (&source_mdl );
+  free_network (&network);
+  free_results (&results);
   return EXIT_SUCCESS;
 }
 

@@ -17,7 +17,7 @@
 
    You should have received a copy of the GNU General Public License
    along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -28,293 +28,353 @@
 #include <string.h>
 #include "astrochem.h"
 
-void add_specie (char *new_specie, char *species[], 
-		 int *n_species);
+int add_species (char *new_species, net_t * network);
 
-void 
-read_network (const char *chem_file, struct react reactions[],
-	      int *n_reactions, char *species[],
-	      int *n_species, int verbose)
+void realloc_network_species (net_t * network, int n_species);
+
+/* Allocate the network structure. We get the number of reactions
+   from the number of lines in the network file. For the number of
+   species, we assume a number equal to the number of reactions
+   divided by 10, and we reallocate the array if needed. */
+void
+read_network (const char *chem_file, net_t * network, const int verbose)
 {
   FILE *f;
   char line[MAX_LINE];
-  int  line_number = 0;
-  char reactant1[MAX_CHAR_SPECIES];
-  char reactant2[MAX_CHAR_SPECIES];
-  char reactant3[MAX_CHAR_SPECIES]; 
-  char product1[MAX_CHAR_SPECIES];
-  char product2[MAX_CHAR_SPECIES];
-  char product3[MAX_CHAR_SPECIES];
-  char product4[MAX_CHAR_SPECIES];
-  double alpha;
-  double beta;
-  double gamma;
-  int reaction_type;
-  int reaction_no;
-  
-  *n_species = 0;
-  *n_reactions = 0;
 
+/*   Find the input file. We first look in the current directory, and 
+     then in the PKGDATADIR directory. Exit if we can't find it. */
+
+  char chem_file1[MAX_LINE];
+  strcpy (chem_file1, chem_file);
+  f = fopen (chem_file1, "r");
+  if (!f)
+    {
+      strncpy (chem_file1, PKGDATADIR, sizeof (chem_file1) - 1);
+      strncat (chem_file1, "/",
+               sizeof (chem_file1) - strlen (chem_file1) - 1);
+      strncat (chem_file1, chem_file,
+               sizeof (chem_file1) - strlen (chem_file1) - 1);
+      f = fopen (chem_file1, "r");
+      if (!f)
+        {
+          fprintf (stderr, "aaastrochem: error: can't find %s.\n", chem_file);
+          exit (1);
+        }
+    }
+  fclose (f);
+
+  // Get the number of reaction and estimates number of species to alloc
+  int n_reactions = get_nb_active_line (chem_file1);
+  if (n_reactions == 0)
+    {
+      fprintf (stderr,
+               "astrochem: error: the number of reactions is zero.\n");
+      exit (1);
+    }
+  int n_alloc_species = n_reactions / 10;
+  if (n_alloc_species == 0)
+    {
+      n_alloc_species = 1;
+    }
+
+  //Allocate network dynamic array
+  alloc_network (network, n_alloc_species, n_reactions);
+  network->n_species = 0;
   if (verbose >= 1)
     {
-      fprintf (stdout, "Reading reactions network from %s... ", chem_file);
+      fprintf (stdout, "Reading reactions network from %s... ", chem_file1);
       fflush (stdout);
     }
 
-  /* Open the input file. We first look in the current directory, and 
-     then in the PKGDATADIR directory. Exit if we can't find it. */
-  
-  f = fopen (chem_file, "r");
-  if ( !f )
-    {
-      char chem_file1[MAX_LINE];
-      
-      strncpy (chem_file1, PKGDATADIR, sizeof (chem_file1) - 1);
-      strncat (chem_file1, "/", sizeof (chem_file1) - strlen (chem_file1) - 1);
-      strncat (chem_file1, chem_file, sizeof (chem_file1) - strlen (chem_file1) - 1);
-      f = fopen (chem_file1, "r");
-      if ( !f )
-	{
-	  fprintf (stderr, "astrochem: error: can't find %s.\n", chem_file);
-	  exit (1);
-	}
-    }
-  
+
+  f = fopen (chem_file1, "r");
   /* Loop over the lines, and look for the reactants and products, and
      the parameters of the reactions. */
-  
+  int n = 0;
   while (fgets (line, MAX_LINE, f) != NULL)
     {
-      line_number++;
-      if (line[0] == '#') continue; /* Skip comments. */
-      
-      /* Initialize reactants, products, and reaction parameters. */
-    
-      strcpy (reactant1, "");
-      strcpy (reactant2, "");
-      strcpy (reactant3, "");
-      strcpy (product1, "");
-      strcpy (product2, "");
-      strcpy (product3, "");
-      strcpy (product4, "");
-      alpha = 0;
-      beta = 0;
-      gamma = 0;
-      reaction_type = 0;
-      reaction_no = 0;
-      
-      /* Read the reactants, products, and reaction parameters. */
-      
-      if ((sscanf (line, "%s -> %s %lf %lf %lf %d %d",
-		   reactant1, product1, 
-		   &alpha, &beta, &gamma, &reaction_type, &reaction_no) == 7) ||
-	  (sscanf (line, "%s + %s -> %s %lf %lf %lf %d %d",
-		   reactant1, reactant2, product1, 
-		   &alpha, &beta, &gamma, &reaction_type, &reaction_no) == 8) || 
-	  (sscanf (line, "%s + %s -> %s + %s %lf %lf %lf %d %d",
-		   reactant1, reactant2, product1, product2,
-		   &alpha, &beta, &gamma, &reaction_type, &reaction_no) == 9) ||
-	  (sscanf (line, "%s + %s -> %s + %s + %s %lf %lf %lf %d %d",
-		   reactant1, reactant2, product1, product2, product3,
-		   &alpha, &beta, &gamma, &reaction_type, &reaction_no) == 10) ||
-	  (sscanf (line, "%s + %s -> %s + %s + %s + %s %lf %lf %lf %d %d",
-		   reactant1, reactant2, product1, product2, product3, product4,
-		   &alpha, &beta, &gamma, &reaction_type, &reaction_no) == 11) ||
-	  (sscanf (line, "%s + %s + %s -> %s + %s %lf %lf %lf %d %d",
-		   reactant1, reactant2, reactant3, product1, product2,
-		   &alpha, &beta, &gamma, &reaction_type, &reaction_no) == 10))
-	;
-      else 
-	{
-	  input_error (chem_file, line_number);
-	}
+      if (line[0] == '#')
+        continue;               /* Skip comments. */
 
-      /* Ignore the following species: cosmic-ray, uv-photon,
-	 photon. Replace them by an empty string, and re-sort
-	 species. */
-      
-      if ((strcmp (reactant1, "cosmic-ray") == 0) ||
-	  (strcmp (reactant1, "uv-photon") == 0) ||
-	  (strcmp (reactant1, "photon") == 0))
-	{
-	  strcpy (reactant1, reactant2);
-	  strcpy (reactant2, reactant3);
-	  strcpy (reactant3, "");
-	}
-      if ((strcmp (reactant2, "cosmic-ray") == 0) ||
-	  (strcmp (reactant2, "uv-photon") == 0) ||
-	  (strcmp (reactant2, "photon") == 0))
-	{
-	  strcpy (reactant2, reactant3);
-	  strcpy (reactant3, "");
-	}
-      if ((strcmp (reactant3, "cosmic-ray") == 0) ||
-	  (strcmp (reactant3, "uv-photon") == 0) ||
-	  (strcmp (reactant3, "photon") == 0))
-	{
-	  strcpy (reactant3, "");
-	}
-      if ((strcmp (product1, "cosmic-ray") == 0) ||
-	  (strcmp (product1, "uv-photon") == 0) ||
-	  (strcmp (product1, "photon") == 0))
-	{
-	  strcpy (product1, product2);
-	  strcpy (product2, product3);
-	  strcpy (product3, "");
-	}
-      if ((strcmp (product2, "cosmic-ray") == 0) ||
-	  (strcmp (product2, "uv-photon") == 0) ||
-	  (strcmp (product2, "photon") == 0))
-	{
-	  strcpy (product2, product3);
-	  strcpy (product3, "");
-	}
-      if ((strcmp (product3, "cosmic-ray") == 0) ||
-	  (strcmp (product3, "uv-photon") == 0) ||
-	  (strcmp (product3, "photon") == 0))
-	{
-	  strcpy (product3, "");
-	}
-      if ((strcmp (product4, "cosmic-ray") == 0) ||
-	  (strcmp (product4, "uv-photon") == 0) ||
-	  (strcmp (product4, "photon") == 0))
-	{
-	  strcpy (product4, "");
-	}
+      if (n >= network->n_reactions)
+        {
+          fprintf (stderr,
+                   "astrochem: error: incorect number of reactions exceed %i,"
+                   "file %s may be corrupt.\n", network->n_reactions,
+                   chem_file);
+          exit (1);
+        }
 
-      /* Fill the array of species. */
-    
-      add_specie (reactant1, species, n_species);
-      add_specie (reactant2, species, n_species);
-      add_specie (reactant3, species, n_species);
-      add_specie (product1, species, n_species);
-      add_specie (product2, species, n_species);
-      add_specie (product3, species, n_species);
-      add_specie (product4, species, n_species);
+      char *localLine = line;
+      char *localLine2 = strchr (line, ' ');
+      char str[MAX_CHAR_SPECIES];
+      int mode = 1;
+      int ending = 0;
 
-      /* Fill the array of reactions. Exit if of the reactant and
-	 product is not in the specie array. */
-      
-      if (*n_reactions < MAX_REACTIONS) 
-	{
-	  if (((reactions[*n_reactions].reactant1 = 
-		specie_index (reactant1, species, *n_species)) == -2) ||
-	      ((reactions[*n_reactions].reactant2 = 
-		specie_index (reactant2, species, *n_species)) == -2) ||
-	      ((reactions[*n_reactions].reactant3 = 
-		specie_index (reactant3, species, *n_species)) == -2) ||
-	      ((reactions[*n_reactions].product1 = 
-		specie_index (product1, species, *n_species)) == -2)  ||
-	      ((reactions[*n_reactions].product2 = 
-		specie_index (product2, species, *n_species)) == -2)  ||
-	      ((reactions[*n_reactions].product3 = 
-		specie_index (product3, species, *n_species)) == -2)  ||
-	      ((reactions[*n_reactions].product4 = 
-		specie_index (product4, species, *n_species)) == -2))
-	    {
-	      fprintf (stderr, "astrochem: %s:%d: can't find specie index.\n",
-		       __FILE__, __LINE__); 
-	      exit(1);
-	    }
-	  reactions[*n_reactions].alpha = alpha;
-	  reactions[*n_reactions].beta = beta;
-	  reactions[*n_reactions].gamma = gamma;
-	  reactions[*n_reactions].reaction_type = reaction_type;
-	  reactions[*n_reactions].reaction_no = reaction_no;
-	  (*n_reactions)++;
-	}
-      else
-	{
-	  fprintf (stderr, "astrochem: error: the number of reactions exceed %i.\n", 
-		   MAX_REACTIONS);
-	  exit(1);
-	}
+      /* Read the reactants, products, and reaction parameters. one after another */
+      while (localLine != NULL)
+        {
+          // Analyse current char
+          if (localLine[0] == '-')
+            {
+              // We read a "->" time to read products
+              localLine = localLine2 + 1;
+              localLine2 = strchr (localLine, ' ');
+              mode = 4;
+              ending = 0;
+              continue;
+            }
+          else if (localLine[0] == '+')
+            {
+              // We read a "+", let's read another species
+              localLine = localLine2 + 1;
+              localLine2 = strchr (localLine, ' ');
+              ending = 0;
+              continue;
+            }
+          else if (localLine[0] == ' ')
+            {
+              // We read a " ", lets read another char
+              localLine = localLine2 + 1;
+              localLine2 = strchr (localLine, ' ');
+              continue;
+            }
+          // Last part of the line
+          else if (ending == 1)
+            {
+              //No more species to read, let's read the ending of reactions.
+              if (sscanf (localLine, "%lf %lf %lf %d %d",
+                          &network->reactions[n].alpha,
+                          &network->reactions[n].beta,
+                          &network->reactions[n].gamma,
+                          &network->reactions[n].reaction_type,
+                          &network->reactions[n].reaction_no) != 5)
+                {
+                  input_error (chem_file1, n + 1);
+                }
+              break;
+            }
+          else
+            {
+              // Yet another specie to add
+              strncpy (str, localLine, localLine2 - localLine);
+              str[localLine2 - localLine] = '\0';
+              //Some species are not to read
+              if ((strcmp (str, "cosmic-ray") != 0) &&
+                  (strcmp (str, "uv-photon") != 0) &&
+                  (strcmp (str, "photon") != 0))
+                {
+                  /* Add the species in list  
+                     Find the correct place for this species in the reactions */
+                  if (mode == 1)
+                    {
+                      network->reactions[n].reactant1 =
+                        add_species (str, network);
+                      mode++;
+                    }
+                  else if (mode == 2)
+                    {
+                      network->reactions[n].reactant2 =
+                        add_species (str, network);
+                      mode++;
+                    }
+                  else if (mode == 3)
+                    {
+                      network->reactions[n].reactant3 =
+                        add_species (str, network);
+                      mode++;
+                    }
+                  else if (mode == 4)
+                    {
+                      network->reactions[n].product1 =
+                        add_species (str, network);
+                      mode++;
+                    }
+                  else if (mode == 5)
+                    {
+                      network->reactions[n].product2 =
+                        add_species (str, network);
+                      mode++;
+                    }
+                  else if (mode == 6)
+                    {
+                      network->reactions[n].product3 =
+                        add_species (str, network);
+                      mode++;
+                    }
+                  else if (mode == 7)
+                    {
+                      network->reactions[n].product4 =
+                        add_species (str, network);
+                      mode++;
+                    }
+                  else
+                    {
+                      input_error (chem_file1, n + 1);
+                      break;
+                    }
+                }
+              // Move to next space
+              localLine = localLine2 + 1;
+              localLine2 = strchr (localLine, ' ');
+              ending = 1;
+            }
+        }
+      n++;
     }
-  
+  // Check number of reactions
+  if (n != network->n_reactions)
+    {
+      fprintf (stderr,
+               "astrochem: error: incorect number of reactions %i, different from %i,"
+               "file %s may be corrupt.\n", n, network->n_reactions,
+               chem_file1);
+      exit (1);
+    }
+  /* Free non used memory space */
+  realloc_network_species (network, network->n_species);
   if (verbose >= 1)
     {
-      fprintf (stdout, "done.\n");  
-      fprintf (stdout, "Found %d reactions involving %d species.\n", 
-	       *n_reactions, *n_species);
+      fprintf (stdout, "done.\n");
+      fprintf (stdout, "Found %d reactions involving %d species.\n",
+               network->n_reactions, network->n_species);
     }
- 
   /* Close the file. */
-
   fclose (f);
 }
 
 /*
-  Add a specie in the species array, if not already present.
-*/
-
-void  
-add_specie (char *new_specie, char *species[],
-	    int *n_species)
+   Add a species in the network and return it's index
+   If already present, just return the index
+   */
+int
+add_species (char *new_species, net_t * network)
 {
   int i;
-     
-  if (strcmp (new_specie, "") == 0)
-    return;
-  for (i = 0; i < *n_species; i++)
+  if (strcmp (new_species, "") == 0)
+    return -1;
+  //Look for the species, if it exists, return index
+  for (i = 0; i < network->n_species; i++)
     {
-      if (strcmp (species[i], new_specie) == 0)
-	return;
+      if (strcmp (network->species_names[i], new_species) == 0)
+        return i;
     }
-  i = *n_species;
-  if (i < MAX_SPECIES)
+  // Check species array size and reallocate if necessary
+  i = network->n_species;
+  while (i >= network->n_alloc_species)
     {
-      if ((species[i] = malloc (sizeof (char) * MAX_CHAR_SPECIES)) == NULL)
-	{
-	  fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__, 
-		   "array allocation failed.\n");
-	  exit (1);
-	}
-      if (strlen (new_specie) < MAX_CHAR_SPECIES - 1)
-	{
-	  strcpy (species[i], new_specie);
-	  (*n_species)++;
-	}
-      else
-	{
-	  fprintf (stderr, "astrochem: error: the number of characters of some "
-		   "species of the chemical network file exceeds %i.\n",
-		   MAX_CHAR_SPECIES);
-	  exit (1);
-	}
-    } 
+      int new_alloc_size = network->n_alloc_species * 2;
+      realloc_network_species (network, new_alloc_size);
+    }
+  //Check length of species name
+  if (strlen (new_species) < MAX_CHAR_SPECIES - 1)
+    {
+      //Add species in network
+      strcpy (network->species_names[i], new_species);
+      (network->n_species)++;
+    }
   else
     {
-      fprintf (stderr, "astrochem: error: the number of species in the chemical"
-	       "network file exceeds %i.\n", MAX_SPECIES);
-      exit (1); 
+      fprintf (stderr, "astrochem: error: the number of characters of some "
+               "species of the chemical network file exceeds %i.\n",
+               MAX_CHAR_SPECIES);
+      exit (1);
     }
-  
-  return;
+  return i;
 }
 
 /* 
-  Look up the index of a given specie in the species array.
-*/
-
-int 
-specie_index (const char *specie, char *species[], int n_species)
+   Look up the index of a given species in the species array.
+ */
+int
+find_species (const species_name_t specie, const net_t * network)
 {
   int i;
-  
   /* Return -1 if the specie name is empty. */
   if (strcmp (specie, "") == 0)
     {
       return -1;
     }
-  for (i = 0; i < n_species; i++)
+  for (i = 0; i < network->n_species; i++)
     {
-      if (strncmp (species[i], specie, 
-		   sizeof (char) * MAX_CHAR_SPECIES) == 0)
-	{
-	  return i;
-	}
+      if (strncmp (network->species_names[i], specie,
+                   sizeof (species_name_t)) == 0)
+        {
+          return i;
+        }
     }
 
   /* Return -2 if we can not find the specie */
   return -2;
+}
+
+/*
+   Alloc the network structure.
+ */
+void
+alloc_network (net_t * network, int n_species, int n_reactions)
+{
+  network->n_alloc_species = n_species;
+  if ((network->species_names =
+       malloc (sizeof (species_name_t) * n_species)) == NULL)
+    {
+      fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__,
+               "array allocation failed.\n");
+      exit (1);
+    }
+
+  network->n_reactions = n_reactions;
+  if ((network->reactions = malloc (sizeof (react_t) * n_reactions)) == NULL)
+    {
+      fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__,
+               "array allocation failed.\n");
+      exit (1);
+    }
+  int i;
+  for (i = 0; i < n_reactions; i++)
+    {
+      network->reactions[i].reactant1 = -1;
+      network->reactions[i].reactant2 = -1;
+      network->reactions[i].reactant3 = -1;
+      network->reactions[i].product1 = -1;
+      network->reactions[i].product2 = -1;
+      network->reactions[i].product3 = -1;
+      network->reactions[i].product4 = -1;
+    }
+}
+
+/* 
+   Reallocate species array, without overwriting existing species 
+   */
+void
+realloc_network_species (net_t * network, int n_species)
+{
+  if (n_species < network->n_species)
+    {
+      fprintf (stderr,
+               "astrochem: %s:%d: cannot realloc over existing species : "
+               "n_species : %i, new_size: %i\n", __FILE__, __LINE__,
+               network->n_species, n_species);
+      exit (1);
+    }
+  network->n_alloc_species = n_species;
+  if ((network->species_names =
+       realloc (network->species_names,
+                sizeof (species_name_t) * n_species)) == NULL)
+    {
+      fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__,
+               "array allocation failed.\n");
+      exit (1);
+    }
+}
+
+/*
+   Free the network structure.
+ */
+void
+free_network (net_t * network)
+{
+  free (network->reactions);
+  free (network->species_names);
 }

@@ -29,20 +29,18 @@ main (void)
 {
   FILE *f;
 
-  int n_shells;
-  int shell[MAX_SHELLS];
-  double av[MAX_SHELLS];
-  double nh[MAX_SHELLS];
-  double tgas[MAX_SHELLS];
-  double tdust[MAX_SHELLS];
-
+  mdl_t source_mdl;
+  inp_t fake;
+  fake.output.time_steps = 128;
+  fake.solver.ti = 0.000001  * CONST_MKSA_YEAR;
+  fake.solver.tf = 10000000  * CONST_MKSA_YEAR;
   int verbose = 0;
 
   /* Create the input.ini file */
 
   f = fopen ("source.mdl", "w");
   fprintf (f, "# This source model file was created by source_test\n");
-  fprintf (f, "# shell number, Av [mag], n(H) [cm^-3], Tgas [K], Tdust [K]\n");
+  fprintf (f, "# cell number, Av [mag], n(H) [cm^-3], Tgas [K], Tdust [K]\n");
   fprintf (f, "0	 0.1	1e+02	15.0	12.0\n");
   fprintf (f, "1	 1.0	1e+03	11.0	10.0\n");
   fprintf (f, "2	10.0	1e+04	 8.0	 7.0\n");
@@ -50,26 +48,34 @@ main (void)
 
   /* Read it */
 
-  read_source ("source.mdl", shell, &n_shells, av, nh,
-	       tgas, tdust, verbose);
-  
-  /* Check that the values are correct */
+  read_source ("source.mdl", &source_mdl, &fake, verbose);
 
-  if ((n_shells == 3) &&
-      (av[0] == 0.1) &&
-      (nh[0] == 1e2) &&
-      (tgas[0] == 15) &&
-      (tdust[0] == 12) &&
-      (av[1] == 1.0) &&
-      (nh[1] == 1e3) &&
-      (tgas[1] == 11) &&
-      (tdust[1] == 10) &&
-      (av[2] == 10.0) &&
-      (nh[2] == 1e4) &&
-      (tgas[2] == 8) &&
-      (tdust[2] == 7))
-    return EXIT_SUCCESS;
+  /* Check that the values are correct */
+  if ((source_mdl.n_cells == 3) && 
+      (source_mdl.cell[0].av[0] == 0.1) &&
+      (source_mdl.cell[0].nh[0] == 1e2) && 
+      (source_mdl.cell[0].tgas[0] == 15) &&
+      (source_mdl.cell[0].tdust[0] == 12) &&
+      (source_mdl.cell[1].av[0] == 1.0) &&
+      (source_mdl.cell[1].nh[0] == 1e3) &&
+      (source_mdl.cell[1].tgas[0] == 11) &&
+      (source_mdl.cell[1].tdust[0] == 10) &&
+      (source_mdl.cell[2].av[0] == 10.0) &&
+      (source_mdl.cell[2].nh[0] == 1e4) &&
+      (source_mdl.cell[2].tgas[0] == 8) &&
+      (source_mdl.cell[2].tdust[0] == 7) &&
+      (source_mdl.ts.time_steps[10] - 332.988055 < 0.0001) && 
+      (source_mdl.ts.time_steps[23] - 7130.784562 < 0.0001) &&
+      (source_mdl.ts.time_steps[47] - 2040939.960351 < 0.0001) )
+    {
+      free_mdl(&source_mdl);
+      return EXIT_SUCCESS;
+    }
+
   else
+  {
+    free_mdl(&source_mdl);
     return EXIT_FAILURE;
+  }
 }
 

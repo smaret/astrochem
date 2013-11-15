@@ -17,9 +17,9 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
-TESTS = input_test source_test network_test rate_test solve_test
+TESTS = input_test source_test source_dyn_test network_test rate_test solve_test
 
-check_PROGRAMS = input_test source_test network_test rate_test solve_test
+check_PROGRAMS = input_test source_test source_dyn_test network_test rate_test solve_test
 
 input_test_SOURCES = input_test.c
 
@@ -28,6 +28,10 @@ input_test_LDADD = ../src/input.o ../src/network.o
 source_test_SOURCES = source_test.c
 
 source_test_LDADD = ../src/input.o ../src/network.o
+
+source_dyn_test_SOURCES = source_dyn_test.c
+
+source_dyn_test_LDADD = ../src/input.o ../src/network.o
 
 network_test_SOURCES = network_test.c
 
@@ -48,6 +52,6 @@ benchmark-bin: benchmark.py
 	sed -e 's,\@PYTHON\@,${PYTHON},g' $? > benchmark
 	chmod a+x benchmark
 
-CLEANFILES = input.ini source.mdl network.chm *.abun
+CLEANFILES = input.ini source.mdl source_dyn.mdl network.chm *.abun
 
 EXTRA_DIST = benchmark.py
