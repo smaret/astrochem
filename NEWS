@@ -6,6 +6,12 @@ astrochem-0.6 (Not released yet)
 
 * Numpy module is now mandatory (fixes issue #3)
 
+* Suppress autoconf and automake warnings (fixes issue #5)
+
+* Code parameters have been regrouped into data structures, for a sake
+  of clarity. These data structures are dynamically allocated, so
+  there is no limit on the numbers of shells or reactions anymore.
+
 astrochem-0.5 (October 15, 2012)
 --------------------------------
 
