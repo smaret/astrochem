@@ -1,20 +1,6 @@
 To-do list
 ==========
 
-For release 0.6:
-----------------
+A to-do list can be found here:
+https://github.com/smaret/astrochem/issues?labels=Feature+request
 
-* Implement time-dependant sources
-
-Long-term to-dos:
------------------
-
-* Move solve() to a library that can be called from other codes
-  (e.g. hydrodynamics or MHD codes).
-
-* Implement 2D geometry.
-
-* Implement grain surface chemistry.
-
-* Intercept convergence errors from CVODE, and exit gracefully if they
-  occur.
