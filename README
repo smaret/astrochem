@@ -42,9 +42,9 @@ also has a man page.
 Reporting bugs
 --------------
 
-A list of known bugs can be found in the BUGS file. If you find a bug
-which is not listed in this file please report it to
-<sebastien.maret@obs.ujf-grenoble.fr>
+A list of known bugs can be found here:
+http://github.com/smaret/astrochem/issues?labels=Bug
+If you find a bug which is not listed there, please open a new issue.
 
 How to contribute
 -----------------
@@ -52,10 +52,12 @@ How to contribute
 You can help the development of Astrochem in a number of ways: by
 testing the package and reporting any bugs that you find; by making
 improvements that you develop available to others; by working on the
-problems or items listed in the BUGS or TODO file.
+problems or items listed here:
+http://github.com/smaret/astrochem/issues
 
 More information
 ----------------
 
-For more information on Astrochem and its development, please contact
-<sebastien.maret@obs.ujf-grenoble.fr>
+For more information on Astrochem and its development, please see the
+project page on GitHub:
+http://github.com/smaret/astrochem
