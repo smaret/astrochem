@@ -32,7 +32,7 @@
 
 \newcommand{\version}{@PACKAGE_VERSION@}
 \newcommand{\updated}{@RELEASE_DATE@}
-\newcommand{\bugreport}{\url{sebastien.maret@obs.ujf-grenoble.fr}}
+\newcommand{\bugreport}{\url{@PACKAGE_BUGREPORT@}}
 
 \newcommand{\conc}[1]{n(\mathrm{#1})}
 
