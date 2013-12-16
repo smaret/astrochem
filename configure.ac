@@ -82,6 +82,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/plroute.1
 		 doc/chmconvert.1
 		 doc/examples/Makefile
+		 doc/examples/dynamic/Makefile
 		 lib/Makefile
 		 lib/libastrochem.py
                  src/Makefile

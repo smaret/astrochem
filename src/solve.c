@@ -392,7 +392,7 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
   N_Vector y;                   /* Work array for the solver */
   void *cvode_mem;              /* Memory space for the solver */
   double *reac_rates;           /* Reaction rates */
-
+  double min_nh;                 /* Minimum density */
 
   /* Allocate the work array and fill it with the initial
      concentrations. Ignore species that are not in the
@@ -449,9 +449,26 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
       }
   }
 
+  /* Compute the minimum density to set the absolute tolerance of the
+     solver */
+
+  min_nh = cell->nh[0];
+  if (mode == DYNAMIC)
+    {
+      int i;
+
+      for (i = 1; i < ts->n_time_steps; i++)
+	{
+	  if (cell->nh[i] < min_nh)
+	    {
+	      min_nh = cell->nh[i];
+	    }
+	}
+    }
+  
   /* Fill out a structure containing the parameters of the function
      defining the ODE system and the jacobian. */
-
+  
   params.reac_rates = reac_rates;
   params.reactions = network->reactions;
   params.n_reactions = network->n_reactions;
@@ -481,7 +498,7 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
       ||
       (CVodeSStolerances
        (cvode_mem, input_params->solver.rel_err,
-        input_params->solver.abs_err * cell->nh[0]) != CV_SUCCESS)
+        input_params->solver.abs_err * min_nh) != CV_SUCCESS)
 #ifdef USE_LAPACK
       || ((CVLapackDense (cvode_mem, network->n_species) != CV_SUCCESS))
 #else
@@ -501,6 +518,38 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
     /* Solve the system for each time step. */
     for (i = 0; i < ts->n_time_steps; i++)
       {
+
+	/* In dynamic mode, we need to recompute the rates and to
+	   update the params structure, because the density,
+	   temperature, etc. change at each time step. We also need to
+	   scale the concentrations with the density, so that the
+	   abundances stay constant. */
+
+	if (i!= 0 && mode == DYNAMIC)
+	  {
+	    params.nh = cell->nh[i];
+	    params.av = cell->av[i];
+	    params.tgas = cell->tgas[i];
+	    params.tdust = cell->tdust[i];
+	    for (j = 0; j < network->n_reactions; j++)
+	      {
+		reac_rates[j] = rate (network->reactions[j].alpha,
+				      network->reactions[j].beta,
+				      network->reactions[j].gamma,
+				      network->reactions[j].reaction_type,
+				      network->reactions[j].reaction_no,
+				      cell->nh[i], cell->av[i], cell->tgas[i],
+				      cell->tdust[i], input_params->phys.chi,
+				      input_params->phys.cosmic,
+				      input_params->phys.grain_size,
+				      input_params->phys.grain_abundance, 0.);
+	      }
+	    for (j = 0; j < network->n_species; j++)
+	      {
+		NV_Ith_S (y, j) *= cell->nh[i+1] / cell->nh[i];
+	      }
+	  }
+
         CVode (cvode_mem, (realtype) ts->time_steps[i], y, &t, CV_NORMAL);
 
         /* Print the cell number, time and time step after each call. */
@@ -523,11 +572,16 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
         for (j = 0; j < input_params->output.n_output_species; j++)
           {
             int idx = get_abundance_idx (results, cell_index, i, j);
-            results->abundances[idx]
-              =
-              (double) NV_Ith_S (y,
-                                 input_params->output.output_species_idx[j]) /
-              cell->nh[0];
+	    if (mode == STATIC)
+	      {
+		results->abundances[idx] =
+		  (double) NV_Ith_S (y, input_params->output.output_species_idx[j]) / cell->nh[0];
+	      }
+	    else
+	      {
+		results->abundances[idx] =
+		  (double) NV_Ith_S (y, input_params->output.output_species_idx[j]) / cell->nh[i];
+	      }
             if (results->abundances[idx] < MIN_ABUNDANCE)
               results->abundances[idx] = 0.;
           }
@@ -703,7 +757,8 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
 
 /* 
    Allocate the results structures
-   */
+*/
+
 void
 alloc_results (res_t * results, int n_time_steps, int n_cells,
                int n_output_abundances)
@@ -743,7 +798,8 @@ alloc_results (res_t * results, int n_time_steps, int n_cells,
 
 /* 
    Free the results structures
-   */
+*/
+
 void
 free_results (res_t * results)
 {
@@ -753,7 +809,8 @@ free_results (res_t * results)
 
 /* 
    Get index in abundances array from all idx
- */
+*/
+
 int
 get_abundance_idx (const res_t * results, int cell_idx, int ts_idx,
                    int abund_idx)
@@ -764,7 +821,8 @@ get_abundance_idx (const res_t * results, int cell_idx, int ts_idx,
 
 /* 
    Get index in route array from all idx
- */
+*/
+
 int
 get_route_idx (const res_t * results, int cell_idx, int ts_idx, int abund_idx,
                int route_idx)
