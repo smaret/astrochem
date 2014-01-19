@@ -54,9 +54,17 @@ CLEANFILES += plabun.py plroute.py
 endif
 
 install-exec-hook:
-	cd $(DESTDIR)$(bindir)
-	sed -i -e 's,$${prefix},${prefix},g' chmconvert
+	mv $(DESTDIR)$(bindir)/chmconvert $(DESTDIR)$(bindir)/chmconvert.tmp
+	sed -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/chmconvert.tmp > $(DESTDIR)$(bindir)/chmconvert
+	chmod a+x $(DESTDIR)$(bindir)/chmconvert
+	rm -f $(DESTDIR)$(bindir)/chmconvert.tmp
 if HAVE_PYMOD_BIGGLES
-	sed -i -e 's,$${prefix},${prefix},g' plabun
-	sed -i -e 's,$${prefix},${prefix},g' plroute
+	mv $(DESTDIR)$(bindir)/plabun $(DESTDIR)$(bindir)/plabun.tmp
+	sed -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/plabun.tmp > $(DESTDIR)$(bindir)/plabun
+	chmod a+x $(DESTDIR)$(bindir)/plabun
+	rm -f $(DESTDIR)$(bindir)/plabun.tmp
+	mv $(DESTDIR)$(bindir)/plroute $(DESTDIR)$(bindir)/plroute.tmp
+	sed -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/plroute.tmp > $(DESTDIR)$(bindir)/plroute
+	chmod a+x $(DESTDIR)$(bindir)/plroute
+	rm -f $(DESTDIR)$(bindir)/plroute.tmp
 endif
