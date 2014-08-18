@@ -1323,12 +1323,7 @@ The following authors have contributed to Astrochem:
 \section{Contributing to Astrochem}
 \label{sec:contr-astr}
 
-You can help the development of Astrochem in a number of ways: by
-testing the package and reporting any bugs that you find; by making
-improvements that you develop available to others; by working on the
-problems or items listed in the BUGS or TODO file.
-
-Astrochem is hosted by Github, a web-based hosting service for
+Astrochem is hosted by GitHub, a web-based hosting service for
 software development that uses the Git revision control system. The
 Astrochem repository on GitHub is located at the following address:
 
@@ -1339,5 +1334,10 @@ Astrochem repository on GitHub is located at the following address:
 From this page, you can download Astrochem source code, either as a
 tar file, or using Git. Latest releases source are available from this
 page as well. Bugs and issues may also be reported there.
+
+You can help the development of Astrochem in a number of ways: by
+testing the package and reporting any bugs that you find; by making
+improvements that you develop available to others; by working on the
+problems or items listed on GitHub.
 
 \end{document}
