@@ -19,4 +19,4 @@
 
 SUBDIRS = lib src networks doc tests
 
-EXTRA_DIST = BUGS
+EXTRA_DIST = README.md BUGS
