@@ -16,7 +16,7 @@
 #  WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #  General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -51,7 +51,7 @@ Options:
    -y, --yrange=ymin,ymax   Set the y axis range
    -c, --chmfile=file       Specify chemical network file
    -p, --percent            Print the relative contribution of each route
-   
+
 See the plroute(1) man page for more information"""
     print "Report bugs to <%s>." % PACKAGE_BUGREPORT
 
@@ -87,7 +87,7 @@ def curveblank(xvalues, yvalues, blanking = 0, linecolor = "black",
        blanking:    blanking value for y (default 0)
        linecolor:   curve color (default "black")
        linetype:    curve type (default "solid")
-       
+
     """
 
     x = []
@@ -104,7 +104,7 @@ def curveblank(xvalues, yvalues, blanking = 0, linecolor = "black",
             x = []
             y = []
     if len(x) >= 2:
-        c.append(biggles.Curve(x, y, linecolor = linecolor, 
+        c.append(biggles.Curve(x, y, linecolor = linecolor,
                                linetype = linetype, linewidth = 2))
 
     return c
@@ -176,7 +176,7 @@ def main():
         args = args[1:]
         if len(args) != 1:
             usage()
-            sys.exit(1)            
+            sys.exit(1)
 
     filename = args[0]
 
@@ -217,7 +217,7 @@ def main():
         sys.exit(1)
     except ValueError:
         sys.stderr.write("plroute: error: can't read %s.\n" % filename)
-        sys.exit(1)            
+        sys.exit(1)
 
     p1.xtitle = p2.xtitle = "Time (yr)"
     p1.xlog = p2.xlog = 1
@@ -344,7 +344,7 @@ def main():
     curves_d.append(c[0])
     for ci in c:
         p2.add(ci)
-    
+
     # Draw the plot key
     if chmfile:
         xkey, ykey = .25, .4
@@ -352,7 +352,7 @@ def main():
         xkey, ykey = .65, .4
     p1.add(biggles.PlotKey(xkey, ykey, curves_f))
     p2.add(biggles.PlotKey(xkey, ykey, curves_d))
-    
+
     t[0,0] = p1
     t[0,1] = p2
 
@@ -361,4 +361,4 @@ def main():
     else:
         t.show()
 
-main()  
+main()

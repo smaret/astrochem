@@ -15,7 +15,7 @@
 #  WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #  General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -48,14 +48,14 @@ Options:
    -c, --cell=index         Set the cell number (default 0)
    -x, --xrange=xmin,xmax   Set the x axis range
    -y, --yrange=ymin,ymax   Set the y axis range
-   
+
 See the plabun(1) man page for more information"""
     print "Report bugs to <%s>." % PACKAGE_BUGREPORT
 
 def version():
     """
     Display version number
-    
+
     """
 
     print "This is plabun, version %s" % PACKAGE_VERSION
@@ -129,7 +129,7 @@ def main():
         args = args[1:]
         if len(args) == 0:
             usage()
-            sys.exit(1)            
+            sys.exit(1)
     elif args[0] == "av":
         sys.stderr.write("plabun: error: av command is deprecated.\n")
         sys.exit()
@@ -138,7 +138,7 @@ def main():
     if len(filenames) > 6:
         sys.stderr.write("plabun: warning: at most 6 species can be plotted, ignoring others.\n")
         filenames = filenames[0:5]
-	
+
     p = biggles.FramedPlot()
     p.title = "Abundances"
     p.xtitle = "Time (yr)"
@@ -153,11 +153,11 @@ def main():
 
     # Stack for line colors
     linecolor_stack = ["red", "blue", "green", "yellow", "orange", "cyan"]
-    
+
     # Plot the abundances in each file
 
     for filename in filenames:
-        
+
         # Read the abundance file
         try:
             time, abund = readabun(filename)
@@ -202,10 +202,10 @@ def main():
     if len(curves) == 0:
         sys.stderr.write("plabun: error: nothing to plot.\n")
         sys.exit(1)
-    
+
     if output:
 	p.write_eps(output)
     else:
         p.show()
 
-main()			  
+main()

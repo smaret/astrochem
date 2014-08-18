@@ -15,7 +15,7 @@
 #  WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #  General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -60,7 +60,7 @@ def main():
     Main function for chmconvert
 
     """
-    
+
     # Parse options and check arguments. Display help message if
     # an unknown option is given.
     try:
@@ -88,20 +88,20 @@ def main():
         sys.stderr.write("chmconvert: error: no file to convert.\n")
         sys.stderr.write("Type \'chmconvert --help\' for more information.\n")
         sys.exit(1)
-        
+
     # Guess the format from the file extension
     if len(network_file.rsplit('.', 1)) == 2:
         network_file_base, network_file_ext = network_file.rsplit('.', 1)
     else:
         sys.stderr.write("chmconvert: error: file has no extension.\n")
-        sys.exit(1)  
+        sys.exit(1)
     if network_file_ext in ["osu", "kida"]:
         fileformat = network_file_ext
     else:
-        sys.stderr.write("chmconvert: error: unknown network format \"%s\".\n" 
+        sys.stderr.write("chmconvert: error: unknown network format \"%s\".\n"
                          % network_file_ext)
         sys.exit(1)
-		
+
     # Open input and output files. We set fileout to stdout if
     # the --output option was not set.
     try:
@@ -111,19 +111,19 @@ def main():
         sys.exit(1)
     if not output:
         fileout = sys.stdout
-    else:		
+    else:
         try:
             fileout = open(output, 'w')
         except:
             sys.stderr.write("chmconvert: error: can't open %s.\n" % output)
             sys.exit(1)
-	    
+
     # Read the network file and convert it
     try:
         net = network.fromfile(filein, fileformat = fileformat)
     except Exception, err:
         sys.stderr.write("chmconvert: %s.\n" % err)
-        sys.exit(1)        
+        sys.exit(1)
     filein.close()
 
     # If the network originates from KIDA, make sure that reaction
@@ -136,6 +136,6 @@ def main():
     # Write the converted network to a file:
     net.tofile(fileout)
     fileout.close()
-    
+
 if __name__ == "__main__":
     main()

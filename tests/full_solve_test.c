@@ -1,4 +1,4 @@
-/* 
+/*
    network_test.c - Test the solve() function
    
    Copyright (c) 2006-2014 Sebastien Maret
@@ -23,7 +23,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "../src/astrochem.h"
+#include "../src/libastrochem.h"
+#include "../src/solve.h"
 
 int
 main (void)
@@ -72,7 +73,7 @@ main (void)
   /* Read them */
 
   read_network ("network.chm", &network, verbose);
-  
+
   read_input ("input.ini", &input_params, &network, verbose);
 
   read_source ("source.mdl", &source_mdl, &input_params, verbose);
@@ -84,7 +85,7 @@ main (void)
    alloc_results( &results, input_params.output.time_steps, source_mdl.n_cells, input_params.output.n_output_species);
 
   cell_index = 0.;
-  solve (cell_index, &input_params, source_mdl.mode, &source_mdl.cell[cell_index], &network, &source_mdl.ts, &results, verbose);
+  full_solve (cell_index, &input_params, source_mdl.mode, &source_mdl.cell[cell_index], &network, &source_mdl.ts, &results, verbose);
 
   {
     int i;
@@ -110,7 +111,7 @@ main (void)
 	if ((x_abs_err >input_params.solver.abs_err) && (x_rel_err > input_params.solver.rel_err * 5e2))
 	  {
 	    fprintf (stderr, "solve_test: %s:%d: incorrect abundance at t=%12.6e: expected %12.6e, got %12.6e.\n",
-		     __FILE__, __LINE__, source_mdl.ts.time_steps[i], x_abundance, results.abundances[get_abundance_idx(&results,0,i,0)]); 
+		     __FILE__, __LINE__, source_mdl.ts.time_steps[i], x_abundance, results.abundances[get_abundance_idx(&results,0,i,0)]);
 	    free_input (&input_params);
         free_mdl (&source_mdl );
 	    free_network (&network);
@@ -121,7 +122,7 @@ main (void)
 	if ((y_abs_err > input_params.solver.abs_err) && (y_rel_err > input_params.solver.rel_err * 5e2))
 	  {
 	    fprintf (stderr, "solve_test: %s:%d: incorrect abundance at t=%12.6e: expected %12.6e, got %12.6e.\n",
-		     __FILE__, __LINE__, source_mdl.ts.time_steps[i], y_abundance, results.abundances[get_abundance_idx(&results,0,i,1)]); 
+		     __FILE__, __LINE__, source_mdl.ts.time_steps[i], y_abundance, results.abundances[get_abundance_idx(&results,0,i,1)]);
 	    free_input (&input_params);
         free_mdl (&source_mdl );
 	    free_network (&network);
@@ -130,11 +131,10 @@ main (void)
 	  }
       }
   }
-  
+
   free_input (&input_params );
   free_mdl (&source_mdl );
   free_network (&network);
   free_results (&results);
   return EXIT_SUCCESS;
 }
-

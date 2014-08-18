@@ -31,6 +31,7 @@ AC_ARG_ENABLE([openmp],	AC_HELP_STRING([--enable-openmp], [enable openmp (defaul
 
 # Check for programs
 AC_PROG_CC
+AC_PROG_RANLIB
 AC_PROG_F77
 AC_F77_WRAPPERS
 AM_PATH_PYTHON([2.4],, AC_MSG_ERROR(Could not find Python >=2.4. Please set PYTHON to Python interpreter path.))

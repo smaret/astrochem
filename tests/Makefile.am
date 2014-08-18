@@ -17,9 +17,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
-TESTS = input_test source_test source_dyn_test network_test rate_test solve_test
+AM_CFLAGS = -Wall
 
-check_PROGRAMS = input_test source_test source_dyn_test network_test rate_test solve_test
+TESTS = input_test source_test source_dyn_test network_test rate_test full_solve_test abundances_test solver_test
+
+check_PROGRAMS = input_test source_test source_dyn_test network_test rate_test full_solve_test abundances_test solver_test
 
 input_test_SOURCES = input_test.c
 
@@ -41,9 +43,18 @@ rate_test_SOURCES = rate_test.c
 
 rate_test_LDADD = ../src/rates.o
 
-solve_test_SOURCES = solve_test.c
+full_solve_test_SOURCES = full_solve_test.c
 
-solve_test_LDADD = ../src/input.o ../src/network.o ../src/solve.o ../src/rates.o
+full_solve_test_LDADD = ../src/input.o ../src/network.o ../src/solve.o ../src/rates.o
+
+abundances_test_SOURCES = abundances_test.c
+
+abundances_test_LDADD = ../src/solve.o ../src/network.o ../src/rates.o ../src/input.o
+
+solver_test_SOURCES = solver_test.c
+
+solver_test_LDADD = ../src/solve.o ../src/network.o ../src/rates.o ../src/input.o
+
 
 benchmark: benchmark-bin
 	./benchmark

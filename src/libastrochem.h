@@ -1,4 +1,4 @@
-/* 
+/*
    astrochem.h - Function prototypes, various constant and data
    structures for Astrochem.
 
@@ -18,9 +18,14 @@
 
    You should have received a copy of the GNU General Public License
    along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
-*/
+   */
 
 /* Various definitions and constants */
+
+#ifndef _LIBASTROCHEM_H_
+#define _LIBASTROCHEM_H_
+
+#include <nvector/nvector_serial.h>
 
 #define MAX_LINE 512            /* Maximum number of characters in each input file
                                    line */
@@ -70,6 +75,10 @@ typedef struct
   char chem_file[MAX_LINE];
   char source_file[MAX_LINE];
 } files_t;
+
+/**
+ * @brief struct containing physics parameters
+ */
 
 typedef struct
 {
@@ -180,10 +189,51 @@ typedef struct
   int n_output_abundances;
 } res_t;
 
+typedef enum { false, true } bool;
+
+typedef struct
+{
+  double *reac_rates;
+  const react_t *reactions;
+  int n_reactions;
+  int n_species;
+  double nh;
+  double av;
+  double tgas;
+  double tdust;
+  double chi;
+  double cosmic;
+  double grain_size;
+  double grain_abundance;
+} params_t;
+
+typedef struct
+{
+  void* cvode_mem;
+  N_Vector y;
+  params_t params;
+  double density;
+} astrochem_mem_t;
+
+
 /* Fonction prototypes */
 
-void alloc_input (inp_t * input_params, int n_initial_abundances,
-                  int n_output_abundances);
+int alloc_abundances( const net_t* network, double** abundances );
+
+void free_abundances( double* abundances );
+
+int set_initial_abundances( const char** species, int n_initialized_abundances,
+                            const double* initial_abundances, const net_t* network, double* abundances );
+
+int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
+                 const double* abundances , double density, double abs_err, double rel_err,
+                 astrochem_mem_t* astrochem_mem );
+
+int solve( const astrochem_mem_t* astrochem_mem, const net_t* network,
+           double* abundances, double time , int verbose );
+
+void solver_close( astrochem_mem_t* astrochem_mem );
+
 
 void read_input (const char *input_file, inp_t * input_params,
                  const net_t * network, int verbose);
@@ -193,22 +243,14 @@ void read_input_file_names (const char *input_file, files_t * files,
 
 void free_input (inp_t * input_params);
 
-int get_nb_active_line (const char *file);
-
 void read_source (const char *source_file, mdl_t * source_mdl,
                   const inp_t * input_params, const int verbose);
 
 void free_mdl (mdl_t * source_mdl);
 
-void input_error (const char *input_f, int line_number);
-
-void check_species (abund_t initial_abundances[], int
+/*void check_species (abund_t initial_abundances[], int
                     n_initial_abundances, char *output_species[], int
-                    n_output_species, char *species[], int n_species);
-
-int find_species (const species_name_t specie, const net_t * network);
-
-void alloc_network (net_t * network, int n_species, int n_reactions);
+                    n_output_species, char *species[], int n_species);*/
 
 void read_network (const char *chem_file, net_t * network, const int verbose);
 
@@ -219,21 +261,14 @@ void alloc_results (res_t * results, int n_time_steps, int n_cells,
 
 void free_results (res_t * results);
 
-double rate (double alpha, double beta, double gamm, int reaction_type,
-             int reaction_no, double nh, double av, double tgas, double tdust,
-             double chi, double cosmic, double grain_size,
-             double grain_abundance, double ice_abundance);
+int full_solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
+                const cell_t * cell, const net_t * network,
+                const time_steps_t * ts, res_t * results, int verbose);
 
-int solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
-           const cell_t * cell, const net_t * network,
-           const time_steps_t * ts, res_t * results, int verbose);
-
-int get_abundance_idx (const res_t * results, int cell_idx, int ts_idx,
-                       int abund_idx);
-
-int get_route_idx (const res_t * results, int cell_idx, int ts_idx,
-                   int abund_idx, int route_idx);
 
 void output (int n_cells, const inp_t * input_params,
              const mdl_t * source_mdl, const net_t * network,
              const res_t * results, int verbose);
+
+
+#endif // _LIBASTROCHEM_H_

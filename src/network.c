@@ -1,4 +1,4 @@
-/* 
+/*
    network.c - Read the chemical network file
 
    Copyright (c) 2006-2014 Sebastien Maret
@@ -26,7 +26,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "astrochem.h"
+
+#include "libastrochem.h"
+#include "network.h"
+
+#include "input.h"
 
 int add_species (char *new_species, net_t * network);
 
@@ -42,7 +46,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
   FILE *f;
   char line[MAX_LINE];
 
-/*   Find the input file. We first look in the current directory, and 
+/*   Find the input file. We first look in the current directory, and
      then in the PKGDATADIR directory. Exit if we can't find it. */
 
   char chem_file1[MAX_LINE];
@@ -165,7 +169,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                   (strcmp (str, "uv-photon") != 0) &&
                   (strcmp (str, "photon") != 0))
                 {
-                  /* Add the species in list  
+                  /* Add the species in list
                      Find the correct place for this species in the reactions */
                   if (mode == 1)
                     {
@@ -284,7 +288,7 @@ add_species (char *new_species, net_t * network)
   return i;
 }
 
-/* 
+/*
    Look up the index of a given species in the species array.
  */
 int
@@ -344,8 +348,8 @@ alloc_network (net_t * network, int n_species, int n_reactions)
     }
 }
 
-/* 
-   Reallocate species array, without overwriting existing species 
+/*
+   Reallocate species array, without overwriting existing species
    */
 void
 realloc_network_species (net_t * network, int n_species)

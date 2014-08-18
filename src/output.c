@@ -27,7 +27,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "astrochem.h"
+
+#include "libastrochem.h"
+#include "solve.h"
 
 #define MAX_CHAR_FILENAME 64
 

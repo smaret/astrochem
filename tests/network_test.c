@@ -22,7 +22,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../src/astrochem.h"
+#include "../src/libastrochem.h"
+#include "../src/network.h"
 
 int
 main (void)

@@ -1,4 +1,4 @@
-/* 
+/*
    input.c - Read the input files needed by Astrochem.
 
    Copyright (c) 2006-2014 Sebastien Maret
@@ -28,7 +28,11 @@
 #include <string.h>
 #include <errno.h>
 #include <math.h>
-#include "astrochem.h"
+
+#include "libastrochem.h"
+#include "input.h"
+
+#include "network.h"
 
 typedef enum
 { R_STATIC = 0, R_DYNAMIC = 1, R_TIMES = 2 } SOURCE_READ_MODE;
@@ -39,7 +43,7 @@ int get_nb_active_line_section (const char *file, const char *section);
 
 /*
    Read the input file containing the parameters needed by the code:
-   name of the chemistry network and source file names, physical 
+   name of the chemistry network and source file names, physical
    parameters, solver parameters, and initial abundances.
  */
 void
@@ -293,7 +297,7 @@ read_input (const char *input_file, inp_t * input_params,
   fclose (f);
 
   /* Check that the source file name and the chemical file name were specified
-     in the input file. Also check that other parameters have acceptable 
+     in the input file. Also check that other parameters have acceptable
      values. */
 
   if (strcmp (input_params->files.chem_file, "") == 0)
@@ -427,7 +431,7 @@ read_source (const char *source_file, mdl_t * source_mdl,
                 }
             }
         }
-      if (strncmp (line, "[cells]", 7) == 0)    //Time to read the cells 
+      if (strncmp (line, "[cells]", 7) == 0)    //Time to read the cells
         {
           //Set reading flag to read the dynamic cells
           mode = R_DYNAMIC;
@@ -508,7 +512,7 @@ read_source (const char *source_file, mdl_t * source_mdl,
   fclose (f);
 }
 
-/* 
+/*
    Alloc the input structure.
  */
 void
@@ -533,7 +537,7 @@ alloc_input (inp_t * input_params, int n_initial_abundances,
     }
 }
 
-/* 
+/*
    Free the input structure.
  */
 void
@@ -561,10 +565,10 @@ alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps)
   /* We want the cells in source strcutres have the following layout in memory :
 
      [ cells[i] -> [  [ nh[0] , nh[1], .. , nh[n_time_steps-1] ] , [av[0], av[1], ..,] , [ tgas[0],.. ], [ tdust[0] ] ] , cells[i+1] -> ... ]
-     although cells[i] et cells[i+1] could be pointing at two very different place, we want it to be memory contiguous 
-                             
-                             
-     We use a memory alignement technique, so  all cells will be contiguous and in each cells, 
+     although cells[i] et cells[i+1] could be pointing at two very different place, we want it to be memory contiguous
+
+
+     We use a memory alignement technique, so  all cells will be contiguous and in each cells,
      nh[], av[], tgas[] and tdust[] will be contiguous
      First allocate a big data block wich will contain all data of all cells, ie all nh,av,tgas,tdust , for ech time steps, for each cells.
      Then allocate a array of struct of pointer wich will contain all pointer to the data.
@@ -607,7 +611,7 @@ free_mdl (mdl_t * source_mdl)
 
 /*
    Get the number of non commented line in a section
-   in a file beggining by [section] and ending with 
+   in a file beggining by [section] and ending with
    [other_section] or eof.
    */
 int

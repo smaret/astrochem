@@ -13,17 +13,25 @@
 #  WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #  General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
 AM_CFLAGS = -DPKGDATADIR=\"$(pkgdatadir)\"
 
-AM_CFLAGS += ${OPENMP_CFLAGS}
+AM_CFLAGS += ${OPENMP_CFLAGS} -Wall
 
-bin_PROGRAMS = astrochem chmconvert
 
-astrochem_SOURCES = astrochem.c astrochem.h input.c network.c rates.c solve.c output.c
+noinst_LIBRARIES = libastrochem.a
+libastrochem_a_SOURCES = input.c network.c rates.c solve.c output.c
+
+bin_PROGRAMS = astrochem apiuser chmconvert
+astrochem_SOURCES = astrochem.c
+astrochem_LDADD = libastrochem.a
+
+apiuser_SOURCES = apiuser.c
+apiuser_LDADD = libastrochem.a
+
 
 chmconvert_SOURCES = chmconvert.py
 
@@ -33,7 +41,7 @@ chmconvert$(EXEEXT): chmconvert.py
 
 CLEANFILES = chmconvert.py
 
-if HAVE_PYMOD_BIGGLES 
+if HAVE_PYMOD_BIGGLES
 
 bin_PROGRAMS += plabun plroute
 

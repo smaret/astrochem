@@ -2,7 +2,7 @@
    Astrochem - compute the abundances of chemical species in the
    interstellar medium as as function of time.
 
-   Copyright (c) 2006-2014 Sebastien Maret
+   Copyright (c) 2006-2013 Sebastien Maret
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -39,14 +39,7 @@ void version (void);
 int
 main (int argc, char *argv[])
 {
-  inp_t input_params;
-  mdl_t source_mdl;
-  net_t network;
-  res_t results;
-  int cell_index;
-
   int verbose = 1;
-  char *input_file;
 
   /* Parse options and command line arguments. Diplay help
      message if no (or more than one) argument is given. */
@@ -87,54 +80,62 @@ main (int argc, char *argv[])
         };
       argc -= optind;
       argv += optind;
-      if (argc != 1)
+      if (argc != 0)
         {
           usage ();
-          exit (1);
+          return 1;
         }
-      input_file = argv[0];
     }
 
-  /* Read the input file */
-  read_input_file_names (input_file, &input_params.files, verbose);
+  char *chem_file = "../networks/osu2009.chm";
+  net_t network;
+  read_network(chem_file, &network, verbose );
 
-  /* Read the chemical network file */
-  read_network (input_params.files.chem_file, &network, verbose);
+  phys_t phys;
+  phys.cosmic = 1e-17;
+  phys.chi = 0;
+  phys.grain_size = GRAIN_SIZE_DEFAULT;
+  phys.grain_abundance = 0;
 
-  /* Read the input file */
-  read_input (input_file, &input_params, &network, verbose);
+  double abs_err, rel_err;
+  abs_err = ABS_ERR_DEFAULT;
+  rel_err = REL_ERR_DEFAULT;
 
-  /* Read the source model file */
-  read_source (input_params.files.source_file, &source_mdl, &input_params,
-               verbose);
+  const char* species[]  = {"CO", "HCO(+)", "e(-)"};
+  const double initial_abundances[] = {1e-4, 1e-9, 1e-9};
 
-  /* Allocate results */
-  alloc_results (&results, source_mdl.ts.n_time_steps, source_mdl.n_cells,
-                 input_params.output.n_output_species);
+  double *abundances;
+  alloc_abundances( &network, &abundances ); // Allocate the abundances array; it contains all species.
+  set_initial_abundances(species, 3, initial_abundances, &network, abundances); // Set initial abundances
 
+  double density = 1000;
+  double av = 20;
+  double temperature = 10;
 
-  /* Solve the ODE system for each cell. */
-#ifdef HAVE_OPENMP
-#pragma omp parallel for schedule (dynamic, 1)
-#endif
-  for (cell_index = 0; cell_index < source_mdl.n_cells; cell_index++)
+  cell_t cell;
+  cell.nh = &density;
+  cell.av = &av;
+  cell.tgas = &temperature;
+  cell.tdust = &temperature; // Assume tgas = tdust in this specific case
+
+  astrochem_mem_t astrochem_mem;
+
+  if( solver_init( &cell, &network, &phys, abundances , density, abs_err, rel_err, &astrochem_mem ) != 0 )
     {
-      if (verbose >= 1)
-        fprintf (stdout, "Computing abundances in cell %d...\n",
-                 cell_index);
-      full_solve (cell_index, &input_params, source_mdl.mode,
-                  &source_mdl.cell[cell_index], &network, &source_mdl.ts,
-                  &results, verbose);
-      if (verbose >= 1)
-        fprintf (stdout, "Done with cell %d.\n", cell_index);
+      return EXIT_FAILURE;
     }
-  /* Write the abundances in output files */
-  output (source_mdl.n_cells, &input_params, &source_mdl, &network, &results,
-          verbose);
-  free_input (&input_params);
-  free_mdl (&source_mdl);
+  int i;
+  double time = 0;
+  for( i = 0; i< 1000000 ; i++)
+    {
+      time += 1e-6; // advance time
+      solve( &astrochem_mem, &network, abundances, time, verbose);
+
+      /* Do something with the results of abundances computations */
+    }
+  solver_close( &astrochem_mem );
+  free_abundances( abundances );
   free_network (&network);
-  free_results (&results);
   return (EXIT_SUCCESS);
 }
 
@@ -145,7 +146,7 @@ main (int argc, char *argv[])
 void
 usage (void)
 {
-  fprintf (stdout, "Usage: astrochem [option...] [file]\n\n");
+  fprintf (stdout, "Usage: apiuser [option...]\n\n");
   fprintf (stdout, "Options:\n");
   fprintf (stdout, "   -h, --help         Display this help\n");
   fprintf (stdout, "   -V, --version      Print program version\n");
@@ -165,17 +166,12 @@ void
 version (void)
 {
   fprintf (stdout, "This is astrochem, version %s\n", PACKAGE_VERSION);
-#ifdef HAVE_OPENMP
-  fprintf (stdout, "OpenMP support enabled, ");
-#else
-  fprintf (stdout, "OpenMP support disabled, ");
-#endif
 #ifdef USE_LAPACK
   fprintf (stdout, "LAPACK support enabled.\n");
 #else
   fprintf (stdout, "LAPACK support disabled.\n");
 #endif
-  fprintf (stdout, "Copyright (c) 2006-2014 Sebastien Maret\n");
+  fprintf (stdout, "Copyright (c) 2006-2013 Sebastien Maret\n");
   fprintf (stdout, "\n");
   fprintf (stdout,
            "This is free software. You may redistribute copies of it under the terms\n");
