@@ -23,28 +23,29 @@ ways with the tools provided with Astrochem. Chemical reactions and
 their rates are written in a format which is meant to be easy to read
 and to edit. A tool to convert the chemical networks from the OSU and
 KIDA databases into this format is also provided. Astrochem is written
-in C, and its source code is distributed under the terms of the GNU
-General Public License (GPL).
+in C, and its source code is distributed under the terms of the [GNU
+General Public License (GPL)](COPYING.md).
 
 Installation
 ------------
 
 Astrochem installation follows a standard procedure and is fairly
-straightforward. Instructions can be found in the INSTALL file.
+straightforward. Instructions can be found in the
+[INSTALL.md](./INSTALL.md) file.
 
 Documentation
 -------------
 
 Astrochem comes with a comprehensive documentation manual. The LaTeX
-source of the manual can be found in the doc/ directory. Each command
-also has a man page.
+source of the manual can be found in the [doc/](./doc/)
+directory. Each command also has a man page.
 
 Reporting bugs
 --------------
 
-A list of known bugs can be found here:
-http://github.com/smaret/astrochem/issues?labels=Bug
-If you find a bug which is not listed there, please open a new issue.
+A list of known bugs can be found
+[here.](http://github.com/smaret/astrochem/issues?labels=Bug) If you
+find a bug which is not listed there, please open a new issue.
 
 How to contribute
 -----------------
@@ -52,12 +53,11 @@ How to contribute
 You can help the development of Astrochem in a number of ways: by
 testing the package and reporting any bugs that you find; by making
 improvements that you develop available to others; by working on the
-problems or items listed here:
-http://github.com/smaret/astrochem/issues
+problems or items listed
+[here.](http://github.com/smaret/astrochem/issues)
 
 More information
 ----------------
 
 For more information on Astrochem and its development, please see the
-project page on GitHub:
-http://github.com/smaret/astrochem
+[project page on GitHub.](http://github.com/smaret/astrochem)

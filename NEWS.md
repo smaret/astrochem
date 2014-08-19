@@ -21,12 +21,12 @@ astrochem-0.5 (October 15, 2012)
 * Fixed a segmentation fault that ocurred when the number of species
   in output was greater than the maximum.
 
-* Dropped the "time" and "av" commands from plroute and plabun; both
+* Dropped the `time` and `av` commands from `plroute` and `plabun`; both
   commands now plot abundances and formation/destruction routes as a
   function of time.
 
 * Added some information on the OpenMP and LAPACK support in
-  "astrochem --version".
+  `astrochem --version`.
 
 * Fixed a bug in the detection of the LAPACK library. Astrochem now
   uses LAPACK by default.
