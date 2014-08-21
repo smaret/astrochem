@@ -46,6 +46,7 @@ if test x$ax_lapack_ok = xyes; then
 fi
 AC_CHECK_LIB(sundials_cvode, main,, AC_MSG_ERROR(Could not find SUNDIALS/CVODE library. Make sure you set CFLAGS to include the include directory and set LDFLAGS to include the library directory.))
 AC_CHECK_LIB(sundials_nvecserial, main,, AC_MSG_ERROR(Could not find SUNDIALS/NVECSERIAL library. Make sure you set CFLAGS to include the include directory and set LDFLAGS to include the library directory.))
+AC_CHECK_TYPE(DlsMat,, AC_MSG_ERROR(DlsMat type is undefined. Make sure that your SUNDIALS version >= 2.4.0), [[#include <cvode/cvode_direct.h>]])
 AC_CHECK_LIB(sundials_cvode, CVLapackDense,, AC_MSG_WARN(SUNDIALS was compiled without LAPACK.))
 if test x$ac_cv_lib_sundials_cvode_CVLapackDense = xyes && test x$ax_lapack_ok = xyes; then
    use_lapack="yes"
