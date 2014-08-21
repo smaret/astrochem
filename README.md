@@ -50,11 +50,8 @@ find a bug which is not listed there, please open a new issue.
 How to contribute
 -----------------
 
-You can help the development of Astrochem in a number of ways: by
-testing the package and reporting any bugs that you find; by making
-improvements that you develop available to others; by working on the
-problems or items listed
-[here.](http://github.com/smaret/astrochem/issues)
+Contributions to Astrochem are welcome. Please see the
+[CONTRIBUTING.md](./CONTRIBUTING.md/) file for instructions.
 
 More information
 ----------------
