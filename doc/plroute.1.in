@@ -2,7 +2,7 @@
 .\"
 .\"  plroute.1 - Manual page for plroute
 .\"
-.\"  Copyright (c) 2006-2013 Sebastien Maret
+.\"  Copyright (c) 2006-2014 Sebastien Maret
 .\" 
 .\"  This file is part of Astrochem.
 .\"
@@ -69,7 +69,7 @@ Written by Sebastien Maret.
 Report bugs to
 .Aq sebastien.maret@obs.ujf-grenoble.fr .
 .Sh COPYRIGHT
-Copyright \(co 2006-2013 Sebastien Maret
+Copyright \(co 2006-2014 Sebastien Maret
 .Pp
 This is free software. You may redistribute copies of it under the
 terms of the GNU General Public License. There is NO WARRANTY, to the

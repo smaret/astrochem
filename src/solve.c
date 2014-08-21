@@ -2,7 +2,7 @@
    solve.c - Build the ODE system and the jacobian matrix, and solve
    the system with CVODE.
 
-   Copyright (c) 2006-2013 Sebastien Maret
+   Copyright (c) 2006-2014 Sebastien Maret
 
    This file is part of Astrochem.
 

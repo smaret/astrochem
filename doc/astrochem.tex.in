@@ -1,6 +1,6 @@
 %  astrochem.tex - Astrochem documentation manual
 %
-%  Copyright (c) 2006-2013 Sebastien Maret
+%  Copyright (c) 2006-2014 Sebastien Maret
 %
 %  This file is part of Astrochem.
 %
@@ -69,7 +69,7 @@
   abundance of chemical species in the interstellar medium. It
   corresponds to Astrochem version \version.
   Please report any errors in this manual to \bugreport.
-  \\ \\ \noindent Copyright \copyright \, 2006-2013 S\'ebastien
+  \\ \\ \noindent Copyright \copyright \, 2006-2014 S\'ebastien
   Maret
 }
 
