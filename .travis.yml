@@ -1,4 +1,4 @@
 language: c
 before_install: sudo apt-get update
-install: sudo apt-get install gfortran libsundials-serial-dev python-numpy
+install: sudo apt-get install gfortran libsundials-serial-dev liblapack-dev python-numpy
 script: ./bootstrap && ./configure CC=gcc FC=gfortran && make && make check
