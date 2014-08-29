@@ -1,0 +1,3 @@
+language: c
+install: sudo apt-get install gfortran libsundials-serial-dev python-numpy
+script: ./bootstrap && ./configure CC=gcc FC=gfortran && make && make check
