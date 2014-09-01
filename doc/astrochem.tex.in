@@ -22,7 +22,7 @@
 \usepackage{url,graphicx,fancyvrb}
 \usepackage[hmargin=2.5cm,vmargin=2.5cm]{geometry}
 \usepackage{verbatim} 
-\usepackage{natbib}
+\usepackage[round]{natbib}
 
 \newcommand{\aap}{A\&A}
 \newcommand{\apj}{ApJ}
@@ -1297,7 +1297,7 @@ is a multiple of the number of threads (e.g. 64 shells for 8 threads)
 so that all cores 100\% of the time during the computation.
 
 \bibliography{astrochem.bib}
-\bibliographystyle{apj}
+\bibliographystyle{abbrvnat}
 
 \newpage
 \appendix
