@@ -48,7 +48,6 @@ doc/astrochem.out
 doc/astrochem.bbl
 doc/astrochem.blg
 doc/astrochem.pdf
-doc/fig*.pdf
 
 # Ignore object files and binaries
 *.o
