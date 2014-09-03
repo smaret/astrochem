@@ -22,15 +22,16 @@ AM_CFLAGS = -DPKGDATADIR=\"$(pkgdatadir)\"
 AM_CFLAGS += ${OPENMP_CFLAGS} -Wall
 
 
-noinst_LIBRARIES = libastrochem.a
-libastrochem_a_SOURCES = input.c network.c rates.c solve.c output.c
+lib_LTLIBRARIES = libastrochem.la
+libastrochem_la_SOURCES = input.c network.c rates.c solve.c output.c
+libastrochem_la_LDFLAGS = -version-info 0:0:0
 
 bin_PROGRAMS = astrochem apiuser chmconvert
 astrochem_SOURCES = astrochem.c
-astrochem_LDADD = libastrochem.a
+astrochem_LDADD = -lastrochem
 
 apiuser_SOURCES = apiuser.c
-apiuser_LDADD = libastrochem.a
+apiuser_LDADD = -lastrochem
 
 
 chmconvert_SOURCES = chmconvert.py
