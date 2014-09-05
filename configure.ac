@@ -77,6 +77,38 @@ else
    have_openmp="no"
 fi
 
+# configure path to cython using "./configure --with-cython=/path/to/cython"
+# or else find it on the path
+AC_ARG_WITH([cython],[AS_HELP_STRING([--with-cython], [path to cython binary to use (otherwise find in PATH) @<:@default=check@:>@])],
+        [],
+        [with_cython=check])
+AS_IF([test "x$with_cython" == xcheck], [
+    AC_PATH_PROG([CYTHON], [cython], [cython])
+    cython_path="$ac_cv_path_CYTHON"
+  ], 
+  [test "x$with_cython" != xno], [cython_path="$with_cython"])
+
+AS_IF([test "x$cython_path" == x], [
+python_bindings=false 
+])
+AS_IF([test "x$cython_path" == x], [
+AC_MSG_WARN([[Cannot find cython, which is required to build pyplinkseq bindings.  They will not be built.]])
+])
+
+AC_ARG_VAR([PYTHON_INCLUDE], [Include flags for python, bypassing python-config])
+AC_ARG_VAR([PYTHON_CONFIG], [Path to python-config])
+AS_IF([test -z "$PYTHON_INCLUDE"], [
+  AS_IF([test -z "$PYTHON_CONFIG"], [
+    AC_PATH_PROGS([PYTHON_CONFIG],
+                  [python$PYTHON_VERSION-config python-config],
+                  [no])
+    AS_IF([test "$PYTHON_CONFIG" = no], [AC_MSG_ERROR([cannot find python-config for $PYTHON.])])
+  ])
+  AC_MSG_CHECKING([python include flags])
+  PYTHON_INCLUDE=`$PYTHON_CONFIG --includes`
+  AC_MSG_RESULT([$PYTHON_INCLUDE])
+])
+
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
 		 doc/astrochem.tex
@@ -93,6 +125,7 @@ AC_CONFIG_FILES([Makefile
 		 src/plabun.py
 		 src/plroute.py
 		 networks/Makefile
+		 cython/Makefile
 		 tests/Makefile])
 
 AC_OUTPUT
