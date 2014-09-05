@@ -25,6 +25,7 @@ AM_CFLAGS += ${OPENMP_CFLAGS} -Wall
 lib_LTLIBRARIES = libastrochem.la
 libastrochem_la_SOURCES = input.c network.c rates.c solve.c output.c
 libastrochem_la_LDFLAGS = -version-info 0:0:0
+include_HEADERS = libastrochem.h
 
 bin_PROGRAMS = astrochem apiuser chmconvert
 astrochem_SOURCES = astrochem.c
