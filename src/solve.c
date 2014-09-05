@@ -47,9 +47,14 @@ static int jacobian (long int N, realtype t, N_Vector y, N_Vector fy,
                      DlsMat J, void *params, N_Vector tmp1,
                      N_Vector tmp2, N_Vector tmp3);
 
-/*
-   Vector defining the ODE system.
-   */
+/**
+ * @brief fonction used in the ODE system.
+ * @param t time
+ * @param y output
+ * @param ydot ydot
+ * @param params user params
+ * @return computed value
+ */
 
 static int
 f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
@@ -775,9 +780,18 @@ int solve( const astrochem_mem_t* astrochem_mem, const net_t* network, double* a
  */
 void solver_close( astrochem_mem_t* astrochem_mem )
 {
-  free (astrochem_mem->params.reac_rates);
-  N_VDestroy_Serial (astrochem_mem->y);
-  CVodeFree (&astrochem_mem->cvode_mem);
+  if( astrochem_mem->params.reac_rates != NULL )
+    {
+      free (astrochem_mem->params.reac_rates);
+    }
+  if( astrochem_mem->y != NULL )
+    {
+      N_VDestroy_Serial (astrochem_mem->y);
+    }
+  if( astrochem_mem->cvode_mem != NULL )
+    {
+      CVodeFree (&astrochem_mem->cvode_mem);
+    }
 }
 
 /**
