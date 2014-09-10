@@ -21,7 +21,7 @@
 
 \usepackage{url,graphicx,fancyvrb}
 \usepackage[hmargin=2.5cm,vmargin=2.5cm]{geometry}
-\usepackage{verbatim} 
+\usepackage{verbatim}
 \usepackage[round]{natbib}
 
 \newcommand{\aap}{A\&A}
@@ -1397,6 +1397,147 @@ export OMP_NUM_THREADS=8
 It is also a good idea to sample the source in a number of cell that
 is a multiple of the number of threads (e.g. 64 cells for 8 threads)
 so that all cores 100\% of the time during the computation.
+
+\section{Calling Astrochem from another code}
+\label{sec:call-astr-from}
+
+Astrochem can be called from another code through an application
+programming interface (API). This allows to compute the chemical
+evolution of a gas cell within another code, typically an hydrodynamic
+or magneto-hydrodynamic (MHD) simulation. In practice, Astrochem
+functions that are part of the API are included in a dynamic library,
+against which other codes may be linked. For the moment, only C is
+supported.
+
+A typical call of Astrochem library from a C code can be decomposed in
+several steps. First, one must select a chemical network file, which
+is done as follows:
+
+\begin{verbatim}
+#include <libastrochem.h>
+
+int verbose = 0;
+char *chem_file = "osu2009.chm";
+net_t network;
+read_network (chem_file, &network, verbose);
+\end{verbatim}
+
+\noindent
+This creates a network structure of type \verb=net_t=\footnote{For a
+  full description of the datatype and functions defined in the API,
+  please see the Doxygen documentation in the \verb=doc/doxygen=
+  directory of Astrochem source code.}. In principle, one should check
+the return code of the \verb=read_network ()= function to make sure
+that no error occured while reading the network file. This is not done
+in this example for a sake of clarity.
+
+The second step is to set the physical parameters of the model. This is
+done by defining a structure of type \verb=phys_t=, and by setting the
+different elements of this structure:
+
+\begin{verbatim}
+phys_t phys;
+phys.cosmic = 1e-17;
+phys.chi = 0;
+phys.grain_abundance = 0;
+\end{verbatim}
+
+\noindent
+The parameters are the same than in input file. Please refer to
+section~\ref{sec:input-file} of this manual for details. As for input
+files, parameters that are not set explicitly are set to their default
+value.
+
+The third step is to allocate a work array that will contain the
+abundances of all species at a given time. We also need to set the
+initial abundances:
+
+\begin{verbatim}
+const char* species[]  = {"CO", "HCO(+)", "e(-)"};
+const double initial_abundances[] = {1e-4, 1e-9, 1e-9};
+double *abundances;
+alloc_abundances (&network, &abundances);
+set_initial_abundances (species, 3, initial_abundances, &network,
+                        abundances);
+\end{verbatim}
+
+\noindent
+Obviously, the species in the \verb=char*= array must be present in
+the network.
+
+The fourth step is to set the initial density, visual extinction and
+temperature of the gas cell:
+
+\begin{verbatim}
+double density = 1000;
+double av = 20;
+double temperature = 10;
+
+cell_t cell;
+cell.nh = &density;
+cell.av = &av;
+cell.tgas = &temperature;
+cell.tdust = &temperature;
+\end{verbatim}
+
+The fifth step is to initialize the solver, and to set the absolute
+and relative error:
+
+\begin{verbatim}
+double abs_err = ABS_ERR_DEFAULT;
+double rel_err = REL_ERR_DEFAULT;
+astrochem_mem_t astrochem_mem;
+
+solver_init (&cell, &network, &phys, abundances , density,
+             abs_err, rel_err, &astrochem_mem );
+\end{verbatim}
+
+\noindent
+The \verb=astrochem_mem= variable is a structure that contains the
+various parameters and work arrays of the solver.
+
+The sixth step is to call the solver to \emph{advance time,} i.e. to
+compute the abundances up to a given time:
+
+\begin{verbatim}
+double time = 0;
+time += 1e-6;
+solve (&astrochem_mem, &network, abundances, time, verbose);
+\end{verbatim}
+
+\noindent
+The \verb=solve()= function updates the abundance array; after a
+successfull call, the array contains the abundances of all species at
+a given time. The choice of the time step is left to the user. It
+should be sufficiently small so that the physical properties of the
+cell do not change much, and can approximated as being constant.
+
+This step is repeated an number of times, until the dynamical
+simulation finishes. Between two calls, the cell properties needs to
+be updated with the new values of the density, temperature, etc. that
+are computed in the dynamical code:
+
+\begin{verbatim}
+time += 1e-6;
+density = 2000;
+temperature = 15;
+solve (&astrochem_mem, &network, abundances, time, verbose);
+\end{verbatim}
+
+\noindent
+In this exemple, \verb=cell.nh=, \verb=cell.tgas=, \verb=cell.tdust=
+and \verb=cell.av= are pointers to \verb=density=, \verb=temperature=,
+etc, so we can simply update the values of \verb=density= and
+\verb=temperature=.
+
+The seventh and final step is to free the arrays and structures that
+are used by Astrochem:
+
+\begin{verbatim}
+solver_close (&astrochem_mem);
+free_abundances (abundances);
+free_network (&network);
+\end{verbatim}
 
 \bibliography{astrochem.bib}
 \bibliographystyle{abbrvnat}
