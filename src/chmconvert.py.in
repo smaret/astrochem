@@ -36,7 +36,7 @@ def usage():
 
     """
 
-    print """Usage: chmconvert [option] [file]
+    print("""Usage: chmconvert [option] [file]
 
 Options:
    -h, --help         Display this help
@@ -44,7 +44,7 @@ Options:
    -o, --output       Write the edited network in a file
 
 See chmconvert(1) man page for a complete list of commands and options.
-Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>."""
+Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>.""")
 
 def version():
     """
@@ -52,12 +52,12 @@ def version():
 
     """
 
-    print "This is chmconvert, version %s" % PACKAGE_VERSION
-    print """Copyright (c) 2006-2016 Sebastien Maret
+    print("This is chmconvert, version %s" % PACKAGE_VERSION)
+    print("""Copyright (c) 2006-2016 Sebastien Maret
 
 This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent
-permitted by law."""
+permitted by law.""")
 
 def main():
     """
@@ -68,8 +68,8 @@ def main():
     # Parse options and check arguments. Display help message if
     # an unknown option is given.
     try:
-	opts, args = getopt.getopt(sys.argv[1:], "hVo:",
-				   ["help", "version", "output"])
+        opts, args = getopt.getopt(sys.argv[1:], "hVo:",
+                                ["help", "version", "output"])
     except getopt.GetoptError:
         usage()
         sys.exit(1)
@@ -125,7 +125,7 @@ def main():
     # Read the network file and convert it
     try:
         net = network_reader.fromfile(filein, fileformat = fileformat)
-    except Exception, err:
+    except Exception as err:
         sys.stderr.write("chmconvert: %s.\n" % err)
         sys.exit(1)
     filein.close()

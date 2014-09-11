@@ -21,7 +21,7 @@ To compile Astrochem you will need:
 3. The [HDF 5 (Hierarchical Data Format) library](http://www.hdfgroup.org/HDF5)
    library.
 
-4. Python (version 2.4 or later, but earlier than version 3.0).
+4. Python (version 2.6 or later).
 
 5. The
    [NumPy](http://numpy.scipy.org/),

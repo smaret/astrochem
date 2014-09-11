@@ -88,8 +88,8 @@ def main():
         # Start time as a subprocess and parse the output
         p = Popen(["time", "-p", "@abs_top_srcdir@/src/astrochem", "-q", "input.ini"], stderr = PIPE)
         output = p.communicate()[1]
-        real, user, sys = map(float, output.split()[1::2])
-        print "[run %2i/%2i] real: %6.3fs  user: %6.3fs  sys: %6.3fs" % (i+1, nrun, real, user, sys) 
+        real, user, sys = list(map(float, output.split()[1::2]))
+        print("[run %2i/%2i] real: %6.3fs  user: %6.3fs  sys: %6.3fs" % (i+1, nrun, real, user, sys)) 
 
         # Compute the average of the run execution times
         real_avg += real
@@ -100,10 +100,10 @@ def main():
     user_avg /= nrun
     sys_avg /= nrun
 
-    print "=========================================="
-    print "Benchmark results:"
-    print "real: %6.3fs  user: %6.3fs  sys: %6.3fs" % (real_avg, user_avg, sys_avg)
-    print "=========================================="    
+    print("==========================================")
+    print("Benchmark results:")
+    print("real: %6.3fs  user: %6.3fs  sys: %6.3fs" % (real_avg, user_avg, sys_avg))
+    print("==========================================")    
 
 if __name__ == "__main__":
     main()

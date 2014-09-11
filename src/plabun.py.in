@@ -41,7 +41,7 @@ def usage():
 
     """
 
-    print """Usage: plabun [options] file specie1 [specie2...]
+    print("""Usage: plabun [options] file specie1 [specie2...]
 
 Plot abundances vs. time
 
@@ -55,8 +55,8 @@ Options:
    -y, --yrange=ymin,ymax   Set the y axis range
    -l, --legacy             To be able to read old output file (.abun)
 
-See the plabun(1) man page for more information"""
-    print "Report bugs to <%s>." % PACKAGE_BUGREPORT
+See the plabun(1) man page for more information""")
+    print("Report bugs to <%s>." % PACKAGE_BUGREPORT)
 
 def version():
     """
@@ -64,12 +64,12 @@ def version():
 
     """
 
-    print "This is plabun, version %s" % PACKAGE_VERSION
-    print """Copyright (c) 2006-2016 Sebastien Maret
+    print("This is plabun, version %s" % PACKAGE_VERSION)
+    print("""Copyright (c) 2006-2016 Sebastien Maret
 
 This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent
-permitted by law."""
+permitted by law.""")
 
 def main():
     """

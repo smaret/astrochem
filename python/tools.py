@@ -119,8 +119,9 @@ class reaction:
         """
 
         if not(isinstance(other, reaction)):
-            raise ValueError, "Argument should be a network instance"
 
+            raise ValueError("Argument should be a network instance")
+        
         if len(self.reactants) != len(other.reactants) or len(self.products) != len(other.products):
             return False
 
@@ -173,7 +174,7 @@ class network_reader:
         for r in reactions:
             if isinstance(r, reaction):
                 continue
-            raise ValueError, "Argument should be a list of network instances"
+            raise ValueError("Argument should be a list of network instances")
 
         self.data = reactions
 
@@ -243,17 +244,17 @@ class network_reader:
                 try:
                     react = line.rsplit(None, 5)[0]
                     rconsts = line.rsplit(None, 5)[1:]
-
-                    reactants = map(lambda x: x.strip(), react.split("->")[0].split(" + "))
-                    products = map(lambda x: x.strip(), react.split("->")[1].split(" + "))
-
+                    
+                    reactants = [x.strip() for x in react.split("->")[0].split(" + ")]
+                    products = [x.strip() for x in react.split("->")[1].split(" + ")]
+                    
                     alpha = float(rconsts[0])
                     beta = float(rconsts[1])
                     gamma = float(rconsts[2])
                     rtype = int(rconsts[3])
                     rnumber = int(rconsts[4])
                 except:
-                    raise Exception, "incorrect input on line %i" % linenumber
+                    raise Exception("incorrect input on line %i" % linenumber)                    
 
                 react = reaction(reactants, products, alpha, beta, gamma,
                                  rtype, rnumber)
@@ -285,7 +286,7 @@ class network_reader:
                 # simply noted 'grain'
                 convert = {"E": "e(-)", "GRAIN0": "grain", "GRAIN+": "grain(+)",
                            "GRAIN-": "grain(-)"}
-                if convert.has_key(species):
+                if species in convert:
                     return convert[species]
 
                 # The charge of ions is in parenthesis.  Be carefull with
@@ -333,7 +334,7 @@ class network_reader:
                         rtype = int(line[91:93])
                         rnumber = int(line[107:111])
                     except:
-                        raise Exception, "incorrect input on line %i" % linenumber
+                        raise Exception("incorrect input on line %i" % linenumber)
 
                     reactants = []
                     for species in [reactant1, reactant2, reactant3]:
@@ -401,7 +402,7 @@ class network_reader:
                 # UV photons are noted "uv-photons"
                 convert = {"e-": "e(-)", "CR": "cosmic-ray", "CRP": "cosmic-ray",
                            "Photon": "photon"}
-                if convert.has_key(species):
+                if species in convert:
                     return convert[species]
 
                 # The charge of ions is in parenthesis.  Be carefull with
@@ -455,7 +456,7 @@ class network_reader:
                     rate_number = int(line[169:170])
                     recommendation = int(line[171:173])
                 except:
-                    raise Exception, "incorrect input on line %i" % linenumber
+                    raise Exception("incorrect input on line %i" % linenumber)
 
                 reactants = []
                 for species in [reactant1, reactant2, reactant3]:
@@ -467,10 +468,10 @@ class network_reader:
                     if species != "":
                         products.append(_format_species_kida(species))
 
-                if rtype in kida2chm_type.keys():
+                if rtype in list(kida2chm_type.keys()):
                     rtype = kida2chm_type[rtype]
                 else:
-                    raise Exception, "unknown reaction type on line %i" % linenumber
+                    raise Exception("unknown reaction type on line %i" % linenumber)
 
                 react = reaction(reactants, products, alpha, beta, gamma,
                                  rtype, rnumber)
@@ -486,7 +487,7 @@ class network_reader:
         elif fileformat == "kida":
             l = _read_kida(f)
         else:
-            raise ValueError, "Unknown format"
+            raise ValueError("Unknown format")
 
         return network_reader(l)
 
@@ -914,7 +915,7 @@ def readabunlegacy(filename):
     f.readline()
 
     # Read all lines
-    lines = map(string.strip, f.readlines())
+    lines = list(map(string.strip, f.readlines()))
 
     # Construct a list of the elements of the array
     a = []
@@ -967,7 +968,7 @@ def readroutlegacy(filename):
     f.readline()
 
     # Read all lines
-    lines = map(string.strip, f.readlines())
+    lines = list(map(string.strip, f.readlines()))
 
     # Construct a list of the elements of the array
     a = []
