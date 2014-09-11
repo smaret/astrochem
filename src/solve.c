@@ -375,7 +375,7 @@ jacobian (long int N __attribute__ ((unused)),
 
 int
 full_solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
-            const cell_t * cell, const net_t * network, const time_steps_t * ts,
+            const cell_table_t * cell, const net_t * network, const time_steps_t * ts,
             res_t * results, int verbose)
 {
 
@@ -421,7 +421,12 @@ full_solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
     }
 
   astrochem_mem_t astrochem_mem;
-  solver_init( cell, network, &input_params->phys, abundances, min_nh, input_params->solver.abs_err,  input_params->solver.rel_err, &astrochem_mem );
+  cell_t cell_unik;
+  cell_unik.av = cell->av[0];
+  cell_unik.nh = cell->nh[0];
+  cell_unik.tgas = cell->tgas[0];
+  cell_unik.tdust = cell->tdust[0];
+  solver_init( &cell_unik, network, &input_params->phys, abundances, min_nh, input_params->solver.abs_err,  input_params->solver.rel_err, &astrochem_mem );
 
     {
       int i, j;
@@ -430,38 +435,20 @@ full_solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
       for (i = 0; i < ts->n_time_steps; i++)
         {
 
-          /* In dynamic mode, we need to recompute the rates and to
-             update the params structure, because the density,
-             temperature, etc. change at each time step. We also need to
-             scale the concentrations with the density, so that the
-             abundances stay constant. */
 
-          if (i!= 0 && mode == DYNAMIC)
+          if (i!=0 && mode == DYNAMIC)
             {
-              astrochem_mem.params.nh = cell->nh[i];
-              astrochem_mem.params.av = cell->av[i];
-              astrochem_mem.params.tgas = cell->tgas[i];
-              astrochem_mem.params.tdust = cell->tdust[i];
-              for (j = 0; j < network->n_reactions; j++)
-                {
-                  astrochem_mem.params.reac_rates[j] = rate (network->reactions[j].alpha,
-                                                             network->reactions[j].beta,
-                                                             network->reactions[j].gamma,
-                                                             network->reactions[j].reaction_type,
-                                                             network->reactions[j].reaction_no,
-                                                             cell->nh[i], cell->av[i], cell->tgas[i],
-                                                             cell->tdust[i], input_params->phys.chi,
-                                                             input_params->phys.cosmic,
-                                                             input_params->phys.grain_size,
-                                                             input_params->phys.grain_abundance, 0.);
-                }
-              for (j = 0; j < network->n_species; j++)
-                {
-                  NV_Ith_S (astrochem_mem.y, j) *= cell->nh[i+1] / cell->nh[i];
-                }
-            }
+              cell_unik.av = cell->av[i];
+              cell_unik.nh = cell->nh[i];
+              cell_unik.tgas = cell->tgas[i];
+              cell_unik.tdust = cell->tdust[i];
 
-          solve( &astrochem_mem, network, abundances,  ts->time_steps[i], verbose );
+              solve( &astrochem_mem, network, abundances,  ts->time_steps[i], &cell_unik, verbose );
+            }
+          else
+            {
+              solve( &astrochem_mem, network, abundances,  ts->time_steps[i], NULL, verbose );
+            }
 
 
           /* Fill the array of abundances with the output species
@@ -694,8 +681,8 @@ int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
                                                   network->reactions[i].gamma,
                                                   network->reactions[i].reaction_type,
                                                   network->reactions[i].reaction_no,
-                                                  cell->nh[0], cell->av[0], cell->tgas[0],
-                                                  cell->tdust[0], phys->chi,
+                                                  cell->nh, cell->av, cell->tgas,
+                                                  cell->tdust, phys->chi,
                                                   phys->cosmic,
                                                   phys->grain_size,
                                                   phys->grain_abundance, 0.);
@@ -707,10 +694,10 @@ int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
   astrochem_mem->params.reactions = network->reactions;
   astrochem_mem->params.n_reactions = network->n_reactions;
   astrochem_mem->params.n_species = network->n_species;
-  astrochem_mem->params.nh = cell->nh[0];
-  astrochem_mem->params.av = cell->av[0];
-  astrochem_mem->params.tgas = cell->tgas[0];
-  astrochem_mem->params.tdust = cell->tdust[0];
+  astrochem_mem->params.nh = cell->nh;
+  astrochem_mem->params.av = cell->av;
+  astrochem_mem->params.tgas = cell->tgas;
+  astrochem_mem->params.tdust = cell->tdust;
   astrochem_mem->params.chi = phys->chi;
   astrochem_mem->params.cosmic = phys->cosmic;
   astrochem_mem->params.grain_size = phys->grain_size;
@@ -749,10 +736,51 @@ int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
 }
 
 /**
- * Solve the ODE system
+ * @brief Solve the ODE system
+ * @param astrochem_mem dedicated memory
+ * @param network network to solve the system with
+ * @param[out] abundances  output abundances
+ * @param time time to compute on
+ * @param new_cell new cell to compute on
+ * @param verbose quiet if 0, verbose if 1
+ * @return 0 if successfull
  */
-int solve( const astrochem_mem_t* astrochem_mem, const net_t* network, double* abundances, double time , int verbose )
+int solve( astrochem_mem_t* astrochem_mem, const net_t* network, double* abundances, double time , const cell_t* new_cell, int verbose )
 {
+
+  /* Computing new reac rate and abundance if cell parameter have evolved
+     since last call */
+  if( new_cell != NULL )
+    {
+      int i,j;
+      for (j = 0; j < network->n_species; j++)
+        {
+          NV_Ith_S (astrochem_mem->y, j) *= new_cell->nh / astrochem_mem->params.nh;
+        }
+
+      for (i = 0; i < network->n_reactions; i++)
+        {
+          astrochem_mem->params.reac_rates[i] = rate (network->reactions[i].alpha,
+                                                      network->reactions[i].beta,
+                                                      network->reactions[i].gamma,
+                                                      network->reactions[i].reaction_type,
+                                                      network->reactions[i].reaction_no,
+                                                      new_cell->nh, new_cell->av, new_cell->tgas,
+                                                      new_cell->tdust, astrochem_mem->params.chi,
+                                                      astrochem_mem->params.cosmic,
+                                                      astrochem_mem->params.grain_size,
+                                                      astrochem_mem->params.grain_abundance, 0.);
+        }
+
+      /* Fill out a structure containing the parameters of the function
+         defining the ODE system and the jacobian. */
+
+      astrochem_mem->params.nh = new_cell->nh;
+      astrochem_mem->params.av = new_cell->av;
+      astrochem_mem->params.tgas = new_cell->tgas;
+      astrochem_mem->params.tdust = new_cell->tdust;
+    }
+
   realtype t = 0.0;
   CVode ( astrochem_mem->cvode_mem, (realtype) time, astrochem_mem->y, &t, CV_NORMAL);
 

@@ -65,10 +65,10 @@ main (void)
   double temperature = 10;
 
   cell_t cell;
-  cell.nh = &density;
-  cell.av = &av;
-  cell.tgas = &temperature;
-  cell.tdust = &temperature; // Assume tgas = tdust in this specific case
+  cell.nh = density;
+  cell.av = av;
+  cell.tgas = temperature;
+  cell.tdust = temperature; // Assume tgas = tdust in this specific case
 
   astrochem_mem_t astrochem_mem;
 
@@ -82,7 +82,7 @@ main (void)
     {
 
       time+= 10;
-      solve( &astrochem_mem, &network, abundances, time, verbose);
+      solve( &astrochem_mem, &network, abundances, time, NULL,verbose);
 
 
       double x_abundance;

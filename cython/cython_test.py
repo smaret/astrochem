@@ -22,8 +22,9 @@ s = astrochem.Solver( c,  "network.chm", p , astrochem._ABS_ERR_DEFAULT, astroch
 for i in range(1, len(times)):
     s.density = density[i]
     s.temperature = temperature[i]
+    c = astrochem.Cell( av , density[i] , temperature[i]  )
     try:
-        abundances = s.solve(times[i])
+        abundances = s.solve(times[i], c )
     except ArithmeticError as e:
         raise "something went wrong: %s" % e
     CO_abundance = abundances["CO"] # abundances is a dict of all species

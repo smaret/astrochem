@@ -122,12 +122,27 @@ typedef struct
 
 typedef struct
 {
-  double *av;
-  double *nh;
-  double *tgas;
-  double *tdust;
+  double *av;    /*!< av */
+  double *nh;    /*!< density */
+  double *tgas;  /*!< gas temperature */
+  double *tdust; /*!< dust temperature */
+} cell_table_t;
+
+/**
+ * @brief struct containing cell parameters
+ */
+typedef struct
+{
+  double av;    /*!< av */
+  double nh;    /*!< density */
+  double tgas;  /*!< gas temperature */
+  double tdust; /*!< dust temperature */
 } cell_t;
 
+
+/**
+ * @brief struct containing array of time steps
+ */
 typedef struct
 {
   double *time_steps;
@@ -136,10 +151,10 @@ typedef struct
 
 typedef struct
 {
-  cell_t *cell;
-  time_steps_t ts;
-  int n_cells;
-  SOURCE_MODE mode;
+  cell_table_t *cell;    /*!< Array of cells */
+  time_steps_t ts; /*!< Time steps */
+  int n_cells;     /*!< Number of cells */
+  SOURCE_MODE mode; /*!< Source mode */
 } mdl_t;
 
 
@@ -229,8 +244,8 @@ int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
                  const double* abundances , double density, double abs_err, double rel_err,
                  astrochem_mem_t* astrochem_mem );
 
-int solve( const astrochem_mem_t* astrochem_mem, const net_t* network,
-           double* abundances, double time , int verbose );
+int solve( astrochem_mem_t* astrochem_mem, const net_t* network,
+           double* abundances, double time , const cell_t* new_cell, int verbose );
 
 void solver_close( astrochem_mem_t* astrochem_mem );
 
@@ -262,7 +277,7 @@ void alloc_results (res_t * results, int n_time_steps, int n_cells,
 void free_results (res_t * results);
 
 int full_solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
-                const cell_t * cell, const net_t * network,
+                const cell_table_t * cell, const net_t * network,
                 const time_steps_t * ts, res_t * results, int verbose);
 
 

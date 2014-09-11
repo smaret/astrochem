@@ -2,7 +2,7 @@ from libc.stdlib cimport malloc, free
 from libc.string cimport strcmp
 from cpython.string cimport PyString_AsString
 
-cdef extern from "libastrochem.h":
+cdef extern from "../src/libastrochem.h":
     cdef double CHI_DEFAULT
     cdef double COSMIC_DEFAULT
     cdef double GRAIN_SIZE_DEFAULT
@@ -25,10 +25,10 @@ cdef extern from "libastrochem.h":
         char **species_names
 
     ctypedef struct cell_t:
-        double* av
-        double* nh
-        double* tgas
-        double* tdust
+        double av
+        double nh
+        double tgas
+        double tdust
 
     ctypedef struct astrochem_mem_t:
         params_t params
@@ -39,7 +39,7 @@ cdef extern from "libastrochem.h":
     void free_abundances( double* abundances )
     int set_initial_abundances( char** species, int n_initialized_abundances, const double* initial_abundances, const net_t* network, double* abundances )
     int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys, const double* abundances , double density, double abs_err, double rel_err, astrochem_mem_t* astrochem_mem )
-    int solve( const astrochem_mem_t* astrochem_mem, const net_t* network, double* abundances, double time , int verbose )
+    int solve( const astrochem_mem_t* astrochem_mem, const net_t* network, double* abundances, double time , const cell_t* new_cell, int verbose )
     void solver_close( astrochem_mem_t* astrochem_mem )
 
 _ABS_ERR_DEFAULT = ABS_ERR_DEFAULT
@@ -88,14 +88,37 @@ cdef class Phys:
             self.thisstruct.grain_abundance = grain_abundance
 
 cdef class Cell:
-    cdef public double av
-    cdef public double nh
-    cdef public double temp
+    cdef public cell_t thisstruct
 
     def __cinit__( self, double av, double nh, double temp ):
-        self.av = av
-        self.nh = nh
-        self.temp = temp
+        self.thisstruct.av = av
+        self.thisstruct.nh = nh
+        self.thisstruct.tdust = temp
+        self.thisstruct.tgas = temp
+
+    property av:
+        def __get__(self):
+            return self.thisstruct.av
+        def __set__(self, double av):
+            self.thisstruct.av = av
+
+    property nh:
+        def __get__(self):
+            return self.thisstruct.nh
+        def __set__(self, double nh):
+            self.thisstruct.nh = nh
+
+    property tgas:
+        def __get__(self):
+            return self.thisstruct.tgas
+        def __set__(self, double tgas):
+            self.thisstruct.tgas = tgas
+
+    property tdust:
+        def __get__(self):
+            return self.thisstruct.tdust
+        def __set__(self, double tdust):
+            self.thisstruct.tdust = tdust
 
 cdef class Solver:
     cdef astrochem_mem_t astrochemstruct
@@ -108,19 +131,8 @@ cdef class Solver:
         self.network = Network( chem_file, verbose )
         cdef net_t c_net = self.network.thisstruct
         cdef phys_t c_phys = phys.thisstruct
-        cdef cell_t c_cell
-        cdef double av
-        cdef double nh
-        cdef double tgas
-        cdef double tdust
-        av = cell.av
-        nh = cell.nh
-        tgas = cell.temp
-        tdust = cell.temp
-        c_cell.av = &av
-        c_cell.nh = &nh
-        c_cell.tgas = &tgas
-        c_cell.tdust = &tdust
+        cdef cell_t c_cell = cell.thisstruct
+
         if alloc_abundances( &c_net , &self.abundances ) != 0 :
             raise MemoryError
         cdef char **initial_abundances_str = <char **>malloc(len(initial_abundances) * sizeof(char *))
@@ -140,9 +152,10 @@ cdef class Solver:
         free_abundances( self.abundances )
         solver_close(  &self.astrochemstruct )
 
-    def solve(self, time ):
+    def solve(self, time , new_cell ):
         cdef net_t c_net = self.network.thisstruct
-        if solve( &self.astrochemstruct, &c_net , self.abundances, time , self.verbose ) != 0:
+        cdef cell_t c_new_cell = new_cell.thisstruct
+        if solve( &self.astrochemstruct, &c_net , self.abundances, time , &c_new_cell, self.verbose ) != 0:
             raise ArithmeticError("Solve Error")
         cdef int i
         cdef bytes py_string

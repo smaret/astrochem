@@ -113,10 +113,10 @@ main (int argc, char *argv[])
   double temperature = 10;
 
   cell_t cell;
-  cell.nh = &density;
-  cell.av = &av;
-  cell.tgas = &temperature;
-  cell.tdust = &temperature; // Assume tgas = tdust in this specific case
+  cell.nh = density;
+  cell.av = av;
+  cell.tgas = temperature;
+  cell.tdust = temperature; // Assume tgas = tdust in this specific case
 
   astrochem_mem_t astrochem_mem;
 
@@ -126,10 +126,12 @@ main (int argc, char *argv[])
     }
   int i;
   double time = 0;
-  for( i = 0; i< 1000000 ; i++)
+  for( i = 0; i< 1000 ; i++)
     {
       time += 1e-6; // advance time
-      solve( &astrochem_mem, &network, abundances, time, verbose);
+      cell.nh+=0.0001; // Modify cell parameter
+      cell.tgas+=0.0000037; // Modify cell parameter
+      solve( &astrochem_mem, &network, abundances, time, &cell, verbose);
 
       /* Do something with the results of abundances computations */
     }
