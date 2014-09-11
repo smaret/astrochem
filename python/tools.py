@@ -921,7 +921,7 @@ def readabunlegacy(filename):
     for line in lines:
         newline = []
         for elem in string.split(line):
-	    elem = string.atof(elem)
+            elem = string.atof(elem)
             newline.append(elem)
         a.append(newline)
 
@@ -974,7 +974,7 @@ def readroutlegacy(filename):
     for line in lines:
         newline = []
         for elem in string.split(line):
-	    elem = string.atof(elem)
+            elem = string.atof(elem)
             newline.append(elem)
         a.append(newline)
 

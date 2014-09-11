@@ -128,8 +128,8 @@ def main():
                                     "yrange=", "chmfile=", "percent",
                                     "legacy"])
     except getopt.GetoptError:
-	usage()
-	sys.exit(1)
+        usage()
+        sys.exit(1)
 
     output = None
     c =  0
@@ -140,15 +140,15 @@ def main():
     legacy = False
 
     for opt, arg in opts:
-	if opt in ("-h", "--help") :
-	    usage()
-	    sys.exit()
-	if opt in ("-V", "--version") :
-	    version()
-	    sys.exit()
-	if opt in ("-o", "--output"):
-	    output = arg
-	if opt in ("-c", "--cell") or opt in ("-s", "--shell"):
+        if opt in ("-h", "--help") :
+            usage()
+            sys.exit()
+        if opt in ("-V", "--version") :
+            version()
+            sys.exit()
+        if opt in ("-o", "--output"):
+            output = arg
+        if opt in ("-c", "--cell") or opt in ("-s", "--shell"):
             if opt in ("-s", "--shell"):
                 sys.stderr.write("plabun: warning: --shell option is deprecated, use --cell instead.\n")
             try:
@@ -176,8 +176,8 @@ def main():
             legacy = True
 
     if len(args) == 0:
-	usage()
-	sys.exit(1)
+        usage()
+        sys.exit(1)
 
     # Ignore commands, for backward compatibility
     if args[0] == "time":
@@ -226,9 +226,9 @@ def main():
     p2.ytitle = "$Destruction rate (cm^{-3} s^{-1})$"
     p1.ylog = p2.ylog = 1
     if xrange:
-	p1.xrange = p2.xrange = xrange
+        p1.xrange = p2.xrange = xrange
     if yrange:
-	p1.yrange = p2.yrange = yrange
+        p1.yrange = p2.yrange = yrange
     curves_f = []
     curves_d = []
 
@@ -522,7 +522,7 @@ def main():
     t[0,1] = p2
 
     if output:
-	t.write_eps(output)
+        t.write_eps(output)
     else:
         t.show()
 
