@@ -23,7 +23,7 @@
 CYTHON_CFLAGS = -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing 
 CYTHON_LDFLAGS = -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -shared 
 
-pkgpyexec_PYTHON = __init__.py
+pkgpyexec_PYTHON = ./module/__init__.py
 pkgpyexec_LTLIBRARIES = libpyastrochem.la
 libpyastrochem_la_SOURCES = libpyastrochem.pyx
 libpyastrochem_la_CFLAGS = ${PYTHON_INCLUDE} $(CYTHON_CFLAGS) -I../src
