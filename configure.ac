@@ -35,6 +35,7 @@ LT_INIT
 AC_PROG_F77
 AC_F77_WRAPPERS
 AM_PATH_PYTHON([2.4],, AC_MSG_ERROR(Could not find Python >=2.4. Please set PYTHON to Python interpreter path.))
+AX_PYTHON_DEVEL([])
 AC_CHECK_PROGS(PDFLATEX, pdflatex, no)
 AC_CHECK_PROGS(BIBTEX, bibtex, no)
 AM_CONDITIONAL(HAVE_PDFLATEX, test $PDFLATEX != no)
@@ -92,21 +93,7 @@ AS_IF([test "x$cython_path" == x], [
 python_bindings=false 
 ])
 AS_IF([test "x$cython_path" == x], [
-AC_MSG_WARN([[Cannot find cython, which is required to build pyplinkseq bindings.  They will not be built.]])
-])
-
-AC_ARG_VAR([PYTHON_INCLUDE], [Include flags for python, bypassing python-config])
-AC_ARG_VAR([PYTHON_CONFIG], [Path to python-config])
-AS_IF([test -z "$PYTHON_INCLUDE"], [
-  AS_IF([test -z "$PYTHON_CONFIG"], [
-    AC_PATH_PROGS([PYTHON_CONFIG],
-                  [python$PYTHON_VERSION-config python-config],
-                  [no])
-    AS_IF([test "$PYTHON_CONFIG" = no], [AC_MSG_ERROR([cannot find python-config for $PYTHON.])])
-  ])
-  AC_MSG_CHECKING([python include flags])
-  PYTHON_INCLUDE=`$PYTHON_CONFIG --includes`
-  AC_MSG_RESULT([$PYTHON_INCLUDE])
+AC_MSG_WARN([[Cannot find cython, which is required to build libpyastrochem bindings.  They will not be built.]])
 ])
 
 AC_CONFIG_FILES([Makefile
