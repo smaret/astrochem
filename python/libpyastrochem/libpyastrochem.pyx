@@ -2,7 +2,7 @@ from libc.stdlib cimport malloc, free
 from libc.string cimport strcmp
 from cpython.string cimport PyString_AsString
 
-cdef extern from "../src/libastrochem.h":
+cdef extern from "../../src/libastrochem.h":
     cdef double CHI_DEFAULT
     cdef double COSMIC_DEFAULT
     cdef double GRAIN_SIZE_DEFAULT

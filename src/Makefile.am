@@ -28,6 +28,8 @@ libastrochem_la_LDFLAGS = -version-info 0:0:0
 include_HEADERS = libastrochem.h
 
 bin_PROGRAMS = astrochem apiuser chmconvert
+noinst_PROGRAMS = chmconvert_local
+
 astrochem_SOURCES = astrochem.c
 astrochem_LDADD = -lastrochem
 
@@ -41,7 +43,14 @@ chmconvert$(EXEEXT): chmconvert.py
 	cp $? $@
 	chmod a+x $@
 
-CLEANFILES = chmconvert.py
+chmconvert_local_SOURCES = chmconvert_local.py
+
+chmconvert_local$(EXEEXT): chmconvert_local.py
+	cp $? $@
+	chmod a+x $@
+
+
+CLEANFILES = chmconvert.py chmconvert_local.py
 
 if HAVE_PYMOD_BIGGLES
 

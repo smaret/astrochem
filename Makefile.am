@@ -19,6 +19,6 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = lib src networks doc tests cython
+SUBDIRS = src doc tests python networks
 
 EXTRA_DIST = README.md

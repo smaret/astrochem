@@ -105,14 +105,16 @@ AC_CONFIG_FILES([Makefile
 		 doc/chmconvert.1
 		 doc/examples/Makefile
 		 doc/examples/dynamic/Makefile
-		 lib/Makefile
-		 lib/libastrochem.py
-                 src/Makefile
+         src/Makefile
 		 src/chmconvert.py
+		 src/chmconvert_local.py
 		 src/plabun.py
 		 src/plroute.py
 		 networks/Makefile
-		 cython/Makefile
+         python/Makefile
+		 python/libastrochemtools/libastrochemtools.py
+		 python/libastrochemtools/Makefile
+		 python/libpyastrochem/Makefile
 		 tests/Makefile])
 
 AC_OUTPUT

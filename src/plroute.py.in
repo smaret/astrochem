@@ -26,7 +26,7 @@ import os.path
 import getopt
 import biggles
 from numpy import *
-from libastrochem import network, readrout, _totex_species
+from astrochem.libastrochemtools import network_reader, readrout, _totex_species
 
 PACKAGE_VERSION = "@PACKAGE_VERSION@"
 PACKAGE_BUGREPORT = "@PACKAGE_BUGREPORT@"
@@ -285,7 +285,7 @@ def main():
     if chmfile:
         try:
             f = open(chmfile)
-            net = network.fromfile(f, fileformat = "chm")
+            net = network_reader.fromfile(f, fileformat = "chm")
             f.close()
         except:
             sys.stderr.write("plroute: error: can't read %s.\n" % chmfile)

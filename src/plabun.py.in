@@ -25,7 +25,7 @@ import os.path
 import getopt
 import biggles
 from numpy import *
-from libastrochem import readabun, _totex_species
+from astrochem.libastrochemtools import readabun, _totex_species
 
 PACKAGE_VERSION = "@PACKAGE_VERSION@"
 PACKAGE_BUGREPORT = "@PACKAGE_BUGREPORT@"

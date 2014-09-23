@@ -1,4 +1,4 @@
-#  libastrochem.py - Python utility library for astrochem
+#  libastrochemtools.py - Python utility library for astrochem
 #
 #  Copyright (c) 2006-2014 Sebastien Maret
 # 
@@ -109,15 +109,15 @@ class reaction:
         
         return tex_r
 
-class network:
+class network_reader:
     """
-    Chemical network class
+    Chemical network reader class
 
     """
 
     def __init__(self, l):
         """
-        Creates a network object
+        Creates a network reader object
 
         Arguments:
         l  -- A list of reactions
@@ -415,7 +415,7 @@ class network:
         else:
             raise ValueError, "Unknown format"
 
-        return network(l)
+        return network_reader(l)
 
     def tofile(self, f, renumber = False):
         """
