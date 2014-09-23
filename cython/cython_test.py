@@ -13,16 +13,14 @@ p = astrochem.Phys()
 p.cosmic = 1e-17
 p.chi = 0
 
-c = astrochem.Cell( av , density[0] , temperature[0]  )
+c = astrochem.Cell( av , density[0] , temperature[0],  temperature[0]  )
 
 verbose = 1
 
 s = astrochem.Solver( c,  "network.chm", p , astrochem._ABS_ERR_DEFAULT, astrochem._REL_ERR_DEFAULT, initial_abundances, density[0], verbose )
 
 for i in range(1, len(times)):
-    s.density = density[i]
-    s.temperature = temperature[i]
-    c = astrochem.Cell( av , density[i] , temperature[i]  )
+    c = astrochem.Cell( av , density[i] , temperature[i],  temperature[i]  )
     try:
         abundances = s.solve(times[i], c )
     except ArithmeticError as e:
