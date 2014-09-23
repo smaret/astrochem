@@ -19,7 +19,12 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
+if HAVE_CYTHON
 pkgpyexec_PYTHON = ./module/__init__.py
+else
+pkgpyexec_PYTHON = ./moduleNoCython/__init__.py
+endif
+
 SUBDIRS = libastrochemtools libpyastrochem 
 
 EXTRA_DIST = README.md

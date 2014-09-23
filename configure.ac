@@ -89,12 +89,12 @@ AS_IF([test "x$with_cython" == xcheck], [
   ], 
   [test "x$with_cython" != xno], [cython_path="$with_cython"])
 
+HAVE_CYTHON="yes"
 AS_IF([test "x$cython_path" == x], [
-python_bindings=false 
-])
-AS_IF([test "x$cython_path" == x], [
+HAVE_CYTHON="no" 
 AC_MSG_WARN([[Cannot find cython, which is required to build libpyastrochem bindings.  They will not be built.]])
 ])
+AM_CONDITIONAL([HAVE_CYTHON], [test "x$cython_path" != x])
 
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
@@ -135,4 +135,5 @@ fi
 echo "Python interpreter: ${PYTHON}
 Python version:     ${PYTHON_VERSION}
 Biggles module:     ${HAVE_PYMOD_BIGGLES}
+Cython:             ${HAVE_CYTHON}
 ============================================="

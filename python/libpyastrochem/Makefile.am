@@ -17,6 +17,8 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
+if HAVE_CYTHON
+
 .pyx.c:
 	@CYTHON@ -o $@ $<
 
@@ -30,3 +32,5 @@ libpyastrochem_la_LIBADD = $(top_builddir)/src/libastrochem.la
 libpyastrochem_la_LDFLAGS = $(CYTHON_LDFLAGS) $(PYTHON_LDFLAGS)  -version-info 0:0:0
 
 CLEANFILES = *.c
+
+endif
