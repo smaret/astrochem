@@ -78,23 +78,25 @@ else
    have_openmp="no"
 fi
 
-# configure path to cython using "./configure --with-cython=/path/to/cython"
-# or else find it on the path
-AC_ARG_WITH([cython],[AS_HELP_STRING([--with-cython], [path to cython binary to use (otherwise find in PATH) @<:@default=check@:>@])],
-        [],
-        [with_cython=check])
-AS_IF([test "x$with_cython" == xcheck], [
-    AC_PATH_PROG([CYTHON], [cython], [cython])
-    cython_path="$ac_cv_path_CYTHON"
-  ], 
-  [test "x$with_cython" != xno], [cython_path="$with_cython"])
+#check for cython
+if test -z $CYTHON; then
+    AC_PATH_PROG( CYTHON, cython )
+else
+    AC_MSG_CHECKING([Checking Cython path $CYTHON is correct])
+    AS_IF($CYTHON -V > /dev/null 2>&1, , CYTHON="")
+    if test -z $CYTHON; then
+        AC_MSG_RESULT([ no ])
+    else
+        AC_MSG_RESULT([ yes ])
+    fi
+fi
 
 HAVE_CYTHON="yes"
-AS_IF([test "x$cython_path" == x], [
+if test -z $CYTHON; then
 HAVE_CYTHON="no" 
 AC_MSG_WARN([[Cannot find cython, which is required to build libpyastrochem bindings.  They will not be built.]])
-])
-AM_CONDITIONAL([HAVE_CYTHON], [test "x$cython_path" != x])
+fi
+AM_CONDITIONAL([HAVE_CYTHON], [test  "x$CYTHON" != "x" ])
 
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
@@ -135,5 +137,5 @@ fi
 echo "Python interpreter: ${PYTHON}
 Python version:     ${PYTHON_VERSION}
 Biggles module:     ${HAVE_PYMOD_BIGGLES}
-Cython:             ${HAVE_CYTHON}
+Python api:         ${HAVE_CYTHON}
 ============================================="

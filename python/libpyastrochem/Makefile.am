@@ -31,6 +31,6 @@ libpyastrochem_la_CFLAGS = $(PYTHON_CPPFLAGS) $(CYTHON_CFLAGS)
 libpyastrochem_la_LIBADD = $(top_builddir)/src/libastrochem.la
 libpyastrochem_la_LDFLAGS = $(CYTHON_LDFLAGS) $(PYTHON_LDFLAGS)  -version-info 0:0:0
 
-CLEANFILES = *.c
-
 endif
+
+CLEANFILES = *.c
