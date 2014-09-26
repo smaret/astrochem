@@ -109,7 +109,6 @@ AC_CONFIG_FILES([Makefile
 		 doc/examples/dynamic/Makefile
          src/Makefile
 		 src/chmconvert.py
-		 src/chmconvert_local.py
 		 src/plabun.py
 		 src/plroute.py
 		 networks/Makefile

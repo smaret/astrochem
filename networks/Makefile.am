@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
-CHMCONVERT = ../src/chmconvert_local
+CHMCONVERT = ../src/chmconvert
 
 EXTRA_DIST = osu2008.osu osu2009.osu
 
