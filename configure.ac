@@ -116,6 +116,8 @@ AC_CONFIG_FILES([Makefile
 		 python/libastrochemtools/libastrochemtools.py
 		 python/libastrochemtools/Makefile
 		 python/libpyastrochem/Makefile
+         tests/python_lib_test.py
+         tests/python_tools_test.py
 		 tests/Makefile])
 
 AC_OUTPUT

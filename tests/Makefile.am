@@ -19,42 +19,41 @@
 
 AM_CFLAGS = -Wall
 
-TESTS = input_test source_test source_dyn_test network_test rate_test full_solve_test abundances_test solver_test
+TESTS = input_test source_test source_dyn_test network_test rate_test full_solve_test abundances_test solver_test python_lib_test python_tools_test
 
-check_PROGRAMS = input_test source_test source_dyn_test network_test rate_test full_solve_test abundances_test solver_test
+check_PROGRAMS = input_test source_test source_dyn_test network_test rate_test full_solve_test abundances_test solver_test python_lib_test python_tools_test
 
 input_test_SOURCES = input_test.c
-
-input_test_LDADD = ../src/input.o ../src/network.o
+input_test_LDADD = $(top_builddir)/src/libastrochem.la
 
 source_test_SOURCES = source_test.c
-
-source_test_LDADD = ../src/input.o ../src/network.o
+source_test_LDADD = $(top_builddir)/src/libastrochem.la
 
 source_dyn_test_SOURCES = source_dyn_test.c
-
-source_dyn_test_LDADD = ../src/input.o ../src/network.o
+source_dyn_test_LDADD = $(top_builddir)/src/libastrochem.la
 
 network_test_SOURCES = network_test.c
-
-network_test_LDADD = ../src/input.o ../src/network.o
+network_test_LDADD = $(top_builddir)/src/libastrochem.la
 
 rate_test_SOURCES = rate_test.c
-
-rate_test_LDADD = ../src/rates.o
+rate_test_LDADD = $(top_builddir)/src/libastrochem.la
 
 full_solve_test_SOURCES = full_solve_test.c
-
-full_solve_test_LDADD = ../src/input.o ../src/network.o ../src/solve.o ../src/rates.o
+full_solve_test_LDADD = $(top_builddir)/src/libastrochem.la
 
 abundances_test_SOURCES = abundances_test.c
-
-abundances_test_LDADD = ../src/solve.o ../src/network.o ../src/rates.o ../src/input.o
+abundances_test_LDADD = $(top_builddir)/src/libastrochem.la
 
 solver_test_SOURCES = solver_test.c
+solver_test_LDADD = $(top_builddir)/src/libastrochem.la
 
-solver_test_LDADD = ../src/solve.o ../src/network.o ../src/rates.o ../src/input.o
+python_lib_test$(EXEEXT): python_lib_test.py
+	cp $? $@
+	chmod a+x $@
 
+python_tools_test$(EXEEXT): python_tools_test.py
+	cp $? $@
+	chmod a+x $@
 
 benchmark: benchmark-bin
 	./benchmark
