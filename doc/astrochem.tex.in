@@ -193,7 +193,7 @@ of the system\footnote{The Jacobian matrix is a $n_\mathrm{s}^2$
 
 \subsection{Gas-phase processes}
 \label{sec:gas-phase-processes}
- 
+
 \subsubsection{Gas-phase reactions}
 \label{sec:gas-phase-reactions}
 
@@ -336,7 +336,7 @@ charged grains. For example, let us consider the following reactions:
 \begin{equation}
   \mathrm{C^{+}} + \mathrm{grain}^{-} \rightarrow \mathrm{C} + \mathrm{grain}
 \end{equation}
- 
+
 The formation rate of charged grains writes as:
 
 \begin{equation}
@@ -365,7 +365,7 @@ where $n_\mathrm{H}$ is the total hydrogen nuclei density\footnote{In
     n_\mathrm{H} = \conc{H} + 2 \, \conc{H_{2}} + 3 \,
     \conc{H_{3}^{+}} + ...
   \end{equation}
-  
+
   Abundances computed by Astrochem are always with respect to
   $n_\mathrm{H}$.}  and $n_\mathrm{d}$ is the total (neutral +
 charged) grain density. The $\frac{n_\mathrm{H}}{n_\mathrm{d}}$ ratio
@@ -514,7 +514,7 @@ The photo-desorption rate of CO is for example
 \begin{equation}
   \frac{\mathrm{d} \conc{CO}}{\mathrm{d} t} = k
   \label{eq:photo-desorption-rate}
-\end{equation}  
+\end{equation}
 
 with:
 \begin{equation}
@@ -1161,7 +1161,7 @@ The following networks are provided with Astrochem:
 These networks can be found in the network directory of the source
 distribution. When installing Astrochem, these file are copied in the
 data installation directory \\(\verb=/usr/local/share/astrochem= by
-default). 
+default).
 
 \subsection{Network file format}
 \label{sec:network-file-format}
@@ -1296,7 +1296,7 @@ reactions, that depends on the ice thickness; therefore the rate for
 these reactions is computed for each solver internal time step.
 
 \begin{table}
-    \renewcommand{\footnoterule}{}  
+    \renewcommand{\footnoterule}{}
     \begin{center}
       \caption{Physical meaning of the rate constants used chemical
         networks and equation used in the code to compute the reaction
@@ -1379,7 +1379,7 @@ for more information):
 \begin{verbatim}
 ./configure --enable-openmp
 \end{verbatim}
- 
+
 \noindent
 The configure script will attempt to detect if your compiler supports
 the OpenMP standard\footnote{Most compilers (including GCC, starting
@@ -1539,8 +1539,132 @@ free_abundances (abundances);
 free_network (&network);
 \end{verbatim}
 
+\section{Calling Astrochem from another code using python API}
+\label{sec:call-astr-from}
+
+Astrochem can be called from another code through an application
+programming interface (API). This allows to compute the chemical
+evolution of a gas cell within another code, typically an hydrodynamic
+or magneto-hydrodynamic (MHD) simulation. In practice, Astrochem
+functions that are part of the API are included in a dynamic library,
+against which other codes may be linked. For the moment, only C is
+supported.
+
+A typical call of Astrochem library from a python code can be decomposed in
+several steps. First, one must import the astrochem python api, considering
+it have been installed in a directory contained in PYTHONPATH
+
+\begin{verbatim}
+import astrochem
+\end{verbatim}
+
+\noindent
+Then, an optionnal step concerning only user who want to compute abundances with dynamic cell parameters.
+If so define array containing your dynamic cell parameter, for example using numpy
+\begin{verbatim}
+import numpy
+
+density = numpy.logspace(4, 6, 128) # typically this would come from an analytical formulae
+tgas = numpy.linspace(10, 100, 128)
+tdust = numpy.linspace(10, 100, 128)
+times = numpy.zeros(128)
+times[1:] = numpy.logspace(-6, 8, 127) # first time is zero
+av = 0 #av is not dynamic here
+\end{verbatim}
+
+
+\noindent
+Then define all the physical parameters, wich are the same than in input file.
+Please refer to section~\ref{sec:input-file} of this manual for details. As for input
+files, parameters that are not set explicitly are set to their default
+value.
+
+\begin{verbatim}
+p = astrochem.Phys()
+p.cosmic = 1e-17
+p.chi = 0
+\end{verbatim}
+
+
+\noindent
+Then define the initial abundances in a dictionnary.
+Obviously, the species in the dictionnary must be present in
+the network wich will be used in the solver, see below.
+
+\begin{verbatim}
+initial_abundances = {"CO": 1e-4, "HCO(+)": 1e-9, "e(-)": 1e-9}
+\end{verbatim}
+
+
+\noindent
+Then set the initial density, visual extinction and
+temperature of the gas cell.
+In the dynamic case:
+\begin{verbatim}
+c = astrochem.Cell( av , density[0] , tgas[0],  tdust[0]  )
+\end{verbatim}
+
+\noindent
+Or in static:
+\begin{verbatim}
+density = 1000
+av = 20
+tgas = 10
+tdust = 10
+c = astrochem.Cell( av , density , tgas,  tdust  )
+\end{verbatim}
+
+
+\noindent
+Then initialize the solver, and set the absolute
+and relative error, also verbose flag, along with the network file to use and initial density for the solver:
+\begin{verbatim}
+verbose = 0
+abs_err = astrochem._ABS_ERR_DEFAULT
+rel_err = astrochem._REL_ERR_DEFAULT
+s = astrochem.Solver( c,  "network.chm", p , abs_err, rel_err,
+    initial_abundances, density[0], verbose )
+\end{verbatim}
+
+\noindent
+Then actual solving can be done by \emph{advancing time,} i.e. we call the solve function in a loop like this.
+With dynamic cell parameters, wich are updated before each call to solve:
+\begin{verbatim}
+for i in range(1, len(times)):
+    c = astrochem.Cell( av , density[i] , temperature[i],  temperature[i]  )
+    try:
+        abundances = s.solve(times[i], c )
+    except ArithmeticError as e:
+        raise "something went wrong: %s" % e
+\end{verbatim}
+
+\noindent
+Or static:
+\begin{verbatim}
+time = 0
+for i in range(1, len(times)):
+    try:
+        abundances = s.solve(times[i] )
+        time+=1e-6
+    except ArithmeticError as e:
+        raise "something went wrong: %s" % e
+\end{verbatim}
+
+\noindent
+The \verb=solve()= function updates the internal abundance array then return it as a dictionnary; after a
+successfull call, the array contains the abundances of all species at
+a given time. The choice of the time step is left to the user. It
+should be sufficiently small so that the physical properties of the
+cell do not change much, and can approximated as being constant.
+
+This step is repeated an number of times, until the dynamical
+simulation finishes. Between two calls, the cell properties can
+be updated with the new values of the density, temperature, etc. as seen in the dynamic code.
+
+
 \bibliography{astrochem.bib}
 \bibliographystyle{abbrvnat}
+
 
 \newpage
 \appendix
