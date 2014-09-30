@@ -40,7 +40,7 @@ X -> Y    1e-9    0    0    2    1
         f.close()
 
         initial_abundances = {"X": 1.0, "Y": 0.0}
-        abs_err = 1e-13;
+        abs_err = 1e-15;
         rel_err = 1e-6;
 
         p = astrochem.Phys()
@@ -50,7 +50,7 @@ X -> Y    1e-9    0    0    2    1
         temp = 10
         c = astrochem.Cell( av, density , temp,  temp  )
 
-        verbose = 1
+        verbose = 0
 
         s = astrochem.Solver( c,  "network.chm", p , abs_err, rel_err, initial_abundances, density, verbose )
 
@@ -62,8 +62,6 @@ X -> Y    1e-9    0    0    2    1
                 abundances = s.solve( time )
             except ArithmeticError as e:
                 raise "something went wrong: %s" % e
-            abundance = abundances["X"] # abundances is a dict of all species
-
             x_abundance = 1.0 * math.exp (-1e-9 *  time);
             y_abundance = 1.0 - x_abundance;
             x_abs_err = math.fabs( abundances["X"] - x_abundance);
@@ -71,10 +69,15 @@ X -> Y    1e-9    0    0    2    1
             x_rel_err = x_abs_err / x_abundance;
             y_rel_err = y_abs_err / y_abundance;
 
-            self.assertLessEqual( x_abs_err, abs_err )
-            self.assertLessEqual( x_rel_err, rel_err*5e2 )
-            self.assertLessEqual( y_abs_err, abs_err )
-            self.assertLessEqual( y_rel_err, rel_err*5e2 )
+            try:
+                self.assertLessEqual( x_abs_err, abs_err )
+            except AssertionError:
+                self.assertLessEqual( x_rel_err, rel_err*5e2 )
+
+            try:
+                self.assertLessEqual( y_abs_err, abs_err )
+            except AssertionError:
+                self.assertLessEqual( y_rel_err, rel_err*5e2 )
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,7 +1,7 @@
 #  configure.ac - Autoconf file for Astrochem
 #
 #  Copyright (c) 2006-2014 Sebastien Maret
-# 
+#
 #  This file is part of Astrochem.
 #
 #  Astrochem is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
 #  WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #  General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -56,7 +56,7 @@ if test x$ac_cv_lib_sundials_cvode_CVLapackDense = xyes && test x$ax_lapack_ok =
    AC_DEFINE([USE_LAPACK], 1, [Define to use LAPACK.])
 else
    use_lapack="no"
-fi  
+fi
 
 # Check for Python modules
 AC_PYTHON_MODULE(numpy)
@@ -93,10 +93,57 @@ fi
 
 HAVE_CYTHON="yes"
 if test -z $CYTHON; then
-HAVE_CYTHON="no" 
+HAVE_CYTHON="no"
 AC_MSG_WARN([[Cannot find cython, which is required to build libpyastrochem bindings.  They will not be built.]])
 fi
 AM_CONDITIONAL([HAVE_CYTHON], [test  "x$CYTHON" != "x" ])
+
+#check for doxygen
+if test -z $DOXYGEN; then
+    AC_PATH_PROG( DOXYGEN, doxygen )
+else
+    AC_MSG_CHECKING([provided doxygen path $DOXYGEN is correct])
+    AS_IF($DOXYGEN -v > /dev/null 2>&1, , DOXYGEN="")
+    if test -z $DOXYGEN; then
+        AC_MSG_RESULT([ no ])
+    else
+        AC_MSG_RESULT([ yes ])
+    fi
+fi
+
+HAVE_DOXYGEN="yes"
+if test -z $DOXYGEN; then
+HAVE_DOXYGEN="no"
+AC_MSG_WARN([[Cannot find doxygen, which is required to build c api documentation.  It will not be built.]])
+fi
+AM_CONDITIONAL([HAVE_DOXYGEN], [test  "x$DOXYGEN" != "x" ])
+
+#check for sphinx
+if test -z $SPHINXBUILD; then
+    AC_PATH_PROG( SPHINXBUILD, sphinx-build )
+else
+    AC_MSG_CHECKING([provided sphinxbuild path $SPHINXBUILD is correct])
+    AS_IF($SPHINXBUILD --version > /dev/null 2>&1, , SPHINXBUILD="")
+    if test -z $SPHINXBUILD; then
+        AC_MSG_RESULT([ no ])
+    else
+        AC_MSG_RESULT([ yes ])
+    fi
+fi
+
+HAVE_SPHINXBUILD="yes"
+if test -z $SPHINXBUILD; then
+HAVE_SPHINXBUILD="no"
+AC_MSG_WARN([[Cannot find sphinxbuild, which is required to build python api documentation.  It will not be built.]])
+fi
+AM_CONDITIONAL([HAVE_SPHINXBUILD], [test  "x$SPHINXBUILD" != "x" ])
+
+#check for breathe
+AC_PYTHON_MODULE(breathe, )
+if test $HAVE_PYMOD_BREATHE = "no"; then
+   AC_MSG_WARN(Cannot find breathe, which is required to build c api documentation in sphinx.  It will not be built.)
+fi
+AM_CONDITIONAL([HAVE_PYMOD_BREATHE], [test $HAVE_PYMOD_BREATHE = "yes"])
 
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
@@ -107,6 +154,10 @@ AC_CONFIG_FILES([Makefile
 		 doc/chmconvert.1
 		 doc/examples/Makefile
 		 doc/examples/dynamic/Makefile
+         doc/doxygen/astrochem.dox
+         doc/doxygen/Makefile
+         doc/sphinx/Makefile
+         doc/sphinx/source/conf.py
          src/Makefile
 		 src/chmconvert.py
 		 src/plabun.py
@@ -139,4 +190,7 @@ echo "Python interpreter: ${PYTHON}
 Python version:     ${PYTHON_VERSION}
 Biggles module:     ${HAVE_PYMOD_BIGGLES}
 Python api:         ${HAVE_CYTHON}
+Doxygen:            ${HAVE_DOXYGEN}
+Sphinx Build:       ${HAVE_SPHINXBUILD}
+Breathe:            ${HAVE_PYMOD_BREATHE}
 ============================================="
