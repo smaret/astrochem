@@ -55,13 +55,9 @@ python_tools_test$(EXEEXT): python_tools_test.py
 	cp $? $@
 	chmod a+x $@
 
-benchmark: benchmark-bin
+benchmark: benchmark.py
+	cp $? $@
+	chmod a+x $@
 	./benchmark
 
-benchmark-bin: benchmark.py
-	sed -e 's,\@PYTHON\@,${PYTHON},g' $? > benchmark
-	chmod a+x benchmark
-
 CLEANFILES = input.ini source.mdl source_dyn.mdl network.chm *.abun
-
-EXTRA_DIST = benchmark.py
