@@ -1,0 +1,85 @@
+#!@PYTHON@
+#
+#  libastrochem_test - Test the libastrochem.py module
+#
+#  Copyright (c) 2006-2012 Sebastien Maret
+#
+#  This file is part of Astrochem.
+#
+#  Astrochem is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published
+#  by the Free Software Foundation, either version 3 of the License,
+#  or (at your option) any later version.
+#
+#  Astrochem is distributed in the hope that it will be useful, but
+#  WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
+
+import sys
+import numpy
+import unittest
+import math
+sys.path.append("@top_builddir@/python/libpyastrochem/.libs")
+import libpyastrochem as astrochem
+
+class TestSequenceFunctions(unittest.TestCase):
+
+    def test_solver_simple(self):
+        """
+        Test if a solver is working properly
+
+        """
+        f = open("network.chm", 'w')
+        f.write("""# This network file was created by tests
+X -> Y    1e-9    0    0    2    1
+""")
+        f.close()
+
+        initial_abundances = {"X": 1.0, "Y": 0.0}
+        abs_err = 1e-15;
+        rel_err = 1e-6;
+
+        p = astrochem.Phys()
+
+        density = 1000
+        av = 20
+        temp = 10
+        c = astrochem.Cell( av, density , temp,  temp  )
+
+        verbose = 0
+
+        s = astrochem.Solver( c,  "network.chm", p , abs_err, rel_err, initial_abundances, density, verbose )
+
+        time = 0
+
+        for i in range(1, 1000):
+            time += 10
+            try:
+                abundances = s.solve( time )
+            except ArithmeticError as e:
+                raise "something went wrong: %s" % e
+            x_abundance = 1.0 * math.exp (-1e-9 *  time);
+            y_abundance = 1.0 - x_abundance;
+            x_abs_err = math.fabs( abundances["X"] - x_abundance);
+            y_abs_err = math.fabs( abundances["Y"] - y_abundance);
+            x_rel_err = x_abs_err / x_abundance;
+            y_rel_err = y_abs_err / y_abundance;
+
+            try:
+                self.assertLessEqual( x_abs_err, abs_err )
+            except AssertionError:
+                self.assertLessEqual( x_rel_err, rel_err*5e2 )
+
+            try:
+                self.assertLessEqual( y_abs_err, abs_err )
+            except AssertionError:
+                self.assertLessEqual( y_rel_err, rel_err*5e2 )
+
+if __name__ == '__main__':
+    unittest.main()
+
+

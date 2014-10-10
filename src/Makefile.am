@@ -1,7 +1,7 @@
 #  Makefile.am - Automake file for Astrochem
 #
 #  Copyright (c) 2006-2014 Sebastien Maret
-# 
+#
 #  This file is part of Astrochem.
 #
 #  Astrochem is free software: you can redistribute it and/or modify
@@ -23,14 +23,17 @@ AM_CFLAGS += ${OPENMP_CFLAGS} -Wall
 
 
 lib_LTLIBRARIES = libastrochem.la
-libastrochem_la_SOURCES = input.c network.c rates.c solve.c output.c
+libastrochem_la_SOURCES = network.c rates.c solve.c
 libastrochem_la_LDFLAGS = -version-info 0:0:0
 include_HEADERS = libastrochem.h
 
 bin_PROGRAMS = astrochem apiuser chmconvert
 
-astrochem_SOURCES = astrochem.c
-astrochem_LDADD = -lastrochem
+astrochem_SOURCES = astrochem.c input.c
+astrochem_CFLAGS = ${HDF5_CFLAGS}
+astrochem_CPPFLAGS = ${HDF5_CPPFLAGS}
+astrochem_LDFLAGS = ${HDF5_LDFLAGS}
+astrochem_LDADD = -lastrochem ${HDF5_LIBS}
 
 apiuser_SOURCES = apiuser.c
 apiuser_LDADD = -lastrochem

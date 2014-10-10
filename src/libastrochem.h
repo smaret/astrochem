@@ -26,6 +26,7 @@
 #define _LIBASTROCHEM_H_
 
 #include <nvector/nvector_serial.h>
+#include <string.h>
 
 #define MAX_LINE 512            /* Maximum number of characters in each input file
                                    line */
@@ -70,12 +71,6 @@ typedef struct
   double abundance;
 } abund_t;
 
-typedef struct
-{
-  char chem_file[MAX_LINE];
-  char source_file[MAX_LINE];
-} files_t;
-
 /**
  * @brief struct containing physics parameters
  */
@@ -102,32 +97,6 @@ typedef struct
   int n_initial_abundances;
 } abundances_t;
 
-typedef struct
-{
-  int *output_species_idx;
-  int n_output_species;
-  int time_steps;
-  int trace_routes;
-  char suffix[MAX_LINE];
-} output_t;
-
-typedef struct
-{
-  files_t files;
-  phys_t phys;
-  solver_t solver;
-  abundances_t abundances;
-  output_t output;
-} inp_t;
-
-typedef struct
-{
-  double *av;    /*!< av */
-  double *nh;    /*!< density */
-  double *tgas;  /*!< gas temperature */
-  double *tdust; /*!< dust temperature */
-} cell_table_t;
-
 /**
  * @brief struct containing cell parameters
  */
@@ -149,13 +118,6 @@ typedef struct
   int n_time_steps;
 } time_steps_t;
 
-typedef struct
-{
-  cell_table_t *cell;    /*!< Array of cells */
-  time_steps_t ts; /*!< Time steps */
-  int n_cells;     /*!< Number of cells */
-  SOURCE_MODE mode; /*!< Source mode */
-} mdl_t;
 
 
 typedef struct
@@ -183,27 +145,9 @@ typedef struct
   react_t *reactions;
 } net_t;
 
-typedef struct
-{
-  int reaction_no;
-  double rate;
-} r_t;
-
-typedef struct
-{
-  r_t destruction;
-  r_t formation;
-} rout_t;
-
-typedef struct
-{
-  double *abundances;
-  rout_t *routes;
-  int n_cells;
-  int n_time_steps;
-  int n_output_abundances;
-} res_t;
-
+/**
+ * @brief bool enum
+ */
 typedef enum { false, true } bool;
 
 typedef struct
@@ -250,40 +194,11 @@ int solve( astrochem_mem_t* astrochem_mem, const net_t* network,
 void solver_close( astrochem_mem_t* astrochem_mem );
 
 
-void read_input (const char *input_file, inp_t * input_params,
-                 const net_t * network, int verbose);
-
-void read_input_file_names (const char *input_file, files_t * files,
-                            int verbose);
-
-void free_input (inp_t * input_params);
-
-void read_source (const char *source_file, mdl_t * source_mdl,
-                  const inp_t * input_params, const int verbose);
-
-void free_mdl (mdl_t * source_mdl);
-
-/*void check_species (abund_t initial_abundances[], int
-                    n_initial_abundances, char *output_species[], int
-                    n_output_species, char *species[], int n_species);*/
 
 void read_network (const char *chem_file, net_t * network, const int verbose);
 
 void free_network (net_t * network);
 
-void alloc_results (res_t * results, int n_time_steps, int n_cells,
-                    int n_output_abundances);
-
-void free_results (res_t * results);
-
-int full_solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
-                const cell_table_t * cell, const net_t * network,
-                const time_steps_t * ts, res_t * results, int verbose);
-
-
-void output (int n_cells, const inp_t * input_params,
-             const mdl_t * source_mdl, const net_t * network,
-             const res_t * results, int verbose);
-
+int get_nb_active_line (const char *file);
 
 #endif // _LIBASTROCHEM_H_

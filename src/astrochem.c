@@ -18,6 +18,15 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
    */
 
+/**
+ * @file astrochem.c
+ * @author Sebastion Maret
+ * @date 28 August 2014
+ * @brief File containing main function of astrochem program,
+ * wich compute abundances and route for a specific chemical network and model
+ */
+
+
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -30,9 +39,18 @@
 #include <omp.h>
 #endif
 
-#include "libastrochem.h"
+#include "astrochem.h"
+#include "input.h"
+#include <hdf5.h>
+#include <math.h>
 
+#ifdef HAVE_OPENMP
+/*Global variable, OpenMP lock*/
+omp_lock_t  lock;
+#endif
 
+#define ABUNDANCE_DATASET_RANK 3
+#define ROUTE_DATASET_RANK 4
 void usage (void);
 void version (void);
 
@@ -42,7 +60,6 @@ main (int argc, char *argv[])
   inp_t input_params;
   mdl_t source_mdl;
   net_t network;
-  res_t results;
   int cell_index;
 
   int verbose = 1;
@@ -108,33 +125,143 @@ main (int argc, char *argv[])
   read_source (input_params.files.source_file, &source_mdl, &input_params,
                verbose);
 
-  /* Allocate results */
-  alloc_results (&results, source_mdl.ts.n_time_steps, source_mdl.n_cells,
-                 input_params.output.n_output_species);
+  // Hdf5 files, datatype and dataspace
+  hid_t       fid, datatype, dataspace, dataset, tsDataset, tsDataspace,  speciesDataset, speciesDataspace, speciesType;
+  datatype = H5Tcopy(H5T_NATIVE_DOUBLE);
+
+
+  hsize_t     dimsf[ ROUTE_DATASET_RANK ]={  source_mdl.n_cells, source_mdl.ts.n_time_steps, input_params.output.n_output_species, N_OUTPUT_ROUTES };
+  fid = H5Fcreate( "output.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT); //TODO Fix name
+  dataspace = H5Screate_simple( ABUNDANCE_DATASET_RANK, dimsf, NULL);
+
+  // Add Atributes
+  hid_t simpleDataspace = H5Screate(H5S_SCALAR);
+  hid_t attrType = H5Tcopy(H5T_C_S1);
+  H5Tset_size ( attrType, MAX_CHAR_FILENAME );
+  H5Tset_strpad(attrType,H5T_STR_NULLTERM);
+  hid_t attrNetwork = H5Acreate( fid, "chem_file", attrType, simpleDataspace, H5P_DEFAULT, H5P_DEFAULT);
+  H5Awrite( attrNetwork, attrType, realpath( input_params.files.chem_file, NULL ) );
+  H5Aclose( attrNetwork );
+  hid_t attrModel = H5Acreate( fid, "source_file", attrType, simpleDataspace, H5P_DEFAULT, H5P_DEFAULT);
+  H5Awrite( attrModel, attrType, realpath( input_params.files.source_file, NULL ) );
+  H5Aclose( attrModel );
+
+  H5Tclose( attrType );
+  H5Sclose( simpleDataspace );
+
+  // Define chunk property
+  hsize_t     chunk_dims[ ROUTE_DATASET_RANK ] = { 1, 1, input_params.output.n_output_species, N_OUTPUT_ROUTES };
+  hid_t prop_id = H5Pcreate(H5P_DATASET_CREATE);
+  H5Pset_chunk(prop_id, ABUNDANCE_DATASET_RANK , chunk_dims);
+
+  // Create dataset
+  dataset = H5Dcreate(fid, "Abundances", datatype, dataspace, H5P_DEFAULT, prop_id, H5P_DEFAULT);
+
+
+  // Create route dataspace
+  hid_t dataspaceRoute = H5Screate_simple( ROUTE_DATASET_RANK, dimsf, NULL);
+
+  // Create route datatype
+  hid_t r_t_datatype = H5Tcreate (H5T_COMPOUND, sizeof(r_t));
+  H5Tinsert( r_t_datatype, "reaction_number", HOFFSET(r_t, reaction_no ), H5T_NATIVE_INT);
+  H5Tinsert( r_t_datatype, "reaction_rate", HOFFSET(r_t, rate), H5T_NATIVE_DOUBLE);
+
+  hid_t route_t_datatype = H5Tcreate (H5T_COMPOUND, sizeof(rout_t));
+  H5Tinsert( route_t_datatype, "formation_rate", HOFFSET(rout_t, formation ), r_t_datatype );
+  H5Tinsert( route_t_datatype, "destruction_rate", HOFFSET(rout_t, destruction ), r_t_datatype );
+
+  // Define route chunk property
+  hid_t route_prop_id = H5Pcreate(H5P_DATASET_CREATE);
+  H5Pset_chunk( route_prop_id, ROUTE_DATASET_RANK, chunk_dims);
+
+
+  // Create each named route dataset
+  hid_t routeDatasets[ input_params.output.n_output_species ];
+  hid_t routeGroup = H5Gcreate( fid, "Routes", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+  int i;
+  char routeName[6] = "route_";
+  char tempName[ MAX_CHAR_SPECIES + sizeof( routeName ) ];
+  char speciesName [ input_params.output.n_output_species ][ MAX_CHAR_SPECIES ];
+  for( i = 0; i < input_params.output.n_output_species ; i++ )
+    {
+      strcpy( tempName, routeName );
+      strcat( tempName, network.species_names[input_params.output.output_species_idx[i]] );
+      strcpy( speciesName[i], network.species_names[input_params.output.output_species_idx[i]] );
+      routeDatasets[i] = H5Dcreate( routeGroup, tempName, route_t_datatype, dataspaceRoute, H5P_DEFAULT, route_prop_id, H5P_DEFAULT);
+    }
+
+  // Timesteps and species
+  hsize_t n_ts = source_mdl.ts.n_time_steps;
+  hsize_t n_species =  input_params.output.n_output_species ;
+  tsDataspace = H5Screate_simple( 1, &n_ts, NULL);
+  speciesDataspace = H5Screate_simple( 1, &n_species, NULL);
+  speciesType = H5Tcopy (H5T_C_S1);
+  H5Tset_size (speciesType, MAX_CHAR_SPECIES );
+  H5Tset_strpad(speciesType,H5T_STR_NULLTERM);
+
+  // Create ts and species datasets
+  tsDataset = H5Dcreate(fid, "TimeSteps", datatype, tsDataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  speciesDataset = H5Dcreate(fid, "Species", speciesType, speciesDataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+  H5Dwrite( tsDataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, source_mdl.ts.time_steps );
+  H5Dwrite( speciesDataset, speciesType, H5S_ALL, H5S_ALL, H5P_DEFAULT, speciesName );
+
+  H5Dclose( tsDataset );
+  H5Dclose( speciesDataset );
+  H5Tclose( speciesType );
+  H5Sclose( tsDataspace );
+  H5Sclose( speciesDataspace );
+
+
+#ifdef HAVE_OPENMP
+  /*Initialize lock*/
+  omp_init_lock(&lock);
 
 
   /* Solve the ODE system for each cell. */
-#ifdef HAVE_OPENMP
+    {
 #pragma omp parallel for schedule (dynamic, 1)
 #endif
-  for (cell_index = 0; cell_index < source_mdl.n_cells; cell_index++)
-    {
-      if (verbose >= 1)
-        fprintf (stdout, "Computing abundances in cell %d...\n",
-                 cell_index);
-      full_solve (cell_index, &input_params, source_mdl.mode,
-                  &source_mdl.cell[cell_index], &network, &source_mdl.ts,
-                  &results, verbose);
-      if (verbose >= 1)
-        fprintf (stdout, "Done with cell %d.\n", cell_index);
+      for (cell_index = 0; cell_index < source_mdl.n_cells; cell_index++)
+        {
+          if (verbose >= 1)
+            fprintf (stdout, "Computing abundances in cell %d...\n",
+                     cell_index);
+          full_solve ( fid, dataset, routeDatasets, dataspace, dataspaceRoute, datatype, route_t_datatype, cell_index, &input_params, source_mdl.mode,
+                       &source_mdl.cell[cell_index], &network, &source_mdl.ts, verbose);
+          if (verbose >= 1)
+            fprintf (stdout, "Done with cell %d.\n", cell_index);
+        }
+#ifdef HAVE_OPENMP
     }
-  /* Write the abundances in output files */
-  output (source_mdl.n_cells, &input_params, &source_mdl, &network, &results,
-          verbose);
+
+
+  /*Finished lock mechanism, destroy it*/
+  omp_destroy_lock(&lock);
+#endif
+
+  /*
+   * Close/release hdf5 resources.
+   */
+  for( i = 0; i <  input_params.output.n_output_species ; i++ )
+    {
+      H5Dclose(routeDatasets[i] );
+    }
+  H5Sclose(dataspaceRoute);
+  H5Pclose(route_prop_id);
+  H5Tclose(r_t_datatype);
+  H5Tclose(route_t_datatype);
+
+  H5Dclose(dataset);
+  H5Pclose(prop_id);
+  H5Sclose(dataspace);
+  H5Tclose(datatype);
+
+  H5Fclose(fid);
+
   free_input (&input_params);
   free_mdl (&source_mdl);
   free_network (&network);
-  free_results (&results);
   return (EXIT_SUCCESS);
 }
 
@@ -182,4 +309,342 @@ version (void)
   fprintf (stdout,
            "of the GNU General Public License. There is NO WARRANTY, to the extent\n");
   fprintf (stdout, "permitted by law.\n");
+}
+
+/**
+ * @brief Solve the ODE system.
+ * Solve the ODE system with fully provided parameters. It initialize and close the solver itself
+ * @param cell_index index of cell to compute on
+ * @param input_params input params
+ * @param mode source mode
+ * @param cell cell to compute on
+ * @param network network to use for solving
+ * @param ts time steps to solve on
+ * @param verbose quit if 0, verbose if 1
+ * @return 0 if sucessfull
+ * @todo Remove complicated code ? TODO
+ */
+int
+full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid_t routeDataspace, hid_t datatype, hid_t routeDatatype, int cell_index, const inp_t * input_params, SOURCE_MODE mode,
+            const cell_table_t * cell, const net_t * network, const time_steps_t * ts,
+            int verbose)
+{
+
+  double *abundances = NULL;
+  alloc_abundances( network, &abundances ); // Allocate the abundances array; it contains all species.
+
+  rout_t* routes = NULL;
+  if (( routes =
+        malloc (sizeof (rout_t) *  input_params->output.n_output_species * N_OUTPUT_ROUTES)) == NULL)
+    {
+      fprintf (stderr, "astrochem: %s:%d: routes allocation failed.\n",
+               __FILE__, __LINE__);
+      exit (1);
+    }
+
+  double* output_abundances = NULL;
+  if (( output_abundances =
+        malloc (sizeof (double) * input_params->output.n_output_species )) == NULL)
+    {
+      fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
+               __FILE__, __LINE__);
+      return -1;
+    }
+
+  // Create the memory dataspace, selecting all output abundances
+  hsize_t size = input_params->output.n_output_species;
+  hid_t memDataspace = H5Screate_simple(1, &size, NULL);
+
+  // Create the file dataspace, and prepare selection of a chunk of the file
+  hid_t fileDataspace = H5Scopy(dataspace);
+  hsize_t     count[3]={  1, 1,  input_params->output.n_output_species };
+
+  // Create the route memory dataspace, selecting all output routes
+  hsize_t routeSize[2] = { input_params->output.n_output_species, N_OUTPUT_ROUTES };
+  hid_t routeMemDataspace = H5Screate_simple(2, routeSize, NULL);
+
+  // Create the route file dataspace, and prepare selection of a chunk of the file
+  hsize_t     routeCount[4]={  1, 1,  input_params->output.n_output_species, N_OUTPUT_ROUTES };
+  hid_t routeFileDataspace = H5Scopy(routeDataspace);
+
+
+  // Initializing abundance
+#if 0 //Ultra complicated code
+  const species_name_t* species = malloc( input_params->abundances.n_initial_abundances * sizeof(*species));
+  double *initial_abundances = malloc( input_params->abundances.n_initial_abundances * sizeof(double) );
+
+  int i;
+  for( i = 0; i <  input_params->abundances.n_initial_abundances ; i++ )
+    {
+      strcpy( network->species_names[input_params->abundances.initial_abundances[i].species_idx ] , species[i] );
+      initial_abundances[i] = input_params->abundances.initial_abundances[i].abundance;
+    }
+  set_initial_abundances( species, 3, initial_abundances, &network, abundances); // Set initial abundances
+#else // same thing , without using api
+  int i;
+  for( i = 0; i <  input_params->abundances.n_initial_abundances ; i++ )
+    {
+      abundances[ input_params->abundances.initial_abundances[i].species_idx ] = input_params->abundances.initial_abundances[i].abundance;
+    }
+#endif
+
+
+  double min_nh;                 /* Minimum density */
+
+  /* Compute the minimum density to set the absolute tolerance of the
+     solver */
+  min_nh = cell->nh[0];
+  if (mode == DYNAMIC)
+    {
+      int i;
+
+      for (i = 1; i < ts->n_time_steps; i++)
+        {
+          if (cell->nh[i] < min_nh)
+            {
+              min_nh = cell->nh[i];
+            }
+        }
+    }
+
+  astrochem_mem_t astrochem_mem;
+  cell_t cell_unik;
+  cell_unik.av = cell->av[0];
+  cell_unik.nh = cell->nh[0];
+  cell_unik.tgas = cell->tgas[0];
+  cell_unik.tdust = cell->tdust[0];
+  solver_init( &cell_unik, network, &input_params->phys, abundances, min_nh, input_params->solver.abs_err,  input_params->solver.rel_err, &astrochem_mem );
+
+    {
+      int i, j;
+
+      /* Solve the system for each time step. */
+      for (i = 0; i < ts->n_time_steps; i++)
+        {
+
+
+          if (i!=0 && mode == DYNAMIC)
+            {
+              cell_unik.av = cell->av[i];
+              cell_unik.nh = cell->nh[i];
+              cell_unik.tgas = cell->tgas[i];
+              cell_unik.tdust = cell->tdust[i];
+
+              solve( &astrochem_mem, network, abundances,  ts->time_steps[i], &cell_unik, verbose );
+            }
+          else
+            {
+              solve( &astrochem_mem, network, abundances,  ts->time_steps[i], NULL, verbose );
+            }
+
+
+          /* Fill the array of abundances with the output species
+             abundances. Ignore species that are not in the
+             network. Abundance that are lower than MIN_ABUNDANCES are
+             set to 0. */
+
+          for (j = 0; j < input_params->output.n_output_species; j++)
+            {
+              if (mode == STATIC)
+                {
+                  output_abundances[j] =
+                   (double) NV_Ith_S (astrochem_mem.y, input_params->output.output_species_idx[j]) / cell->nh[0];
+                }
+              else
+                {
+                  output_abundances[j] =
+                   (double) NV_Ith_S (astrochem_mem.y, input_params->output.output_species_idx[j]) / cell->nh[i];
+                }
+              if (output_abundances[j] < MIN_ABUNDANCE)
+                output_abundances[j] = 0.;
+
+#ifdef HAVE_OPENMP
+              omp_set_lock(&lock);
+#endif
+              // Select a chunk of the file
+              hsize_t     start[3]={  cell_index, i, 0 };
+              H5Sselect_hyperslab( fileDataspace, H5S_SELECT_SET, start, NULL, count , NULL );
+
+              // Write the chunk
+              H5Dwrite(dataset, datatype, memDataspace, fileDataspace, H5P_DEFAULT,
+                       output_abundances );
+
+#ifdef HAVE_OPENMP
+              omp_unset_lock(&lock);
+#endif
+
+            }
+
+          /* Compute the rate of each formation/destruction route for
+             each output specie. */
+
+          if (input_params->output.trace_routes)
+            {
+              for (j = 0; j < input_params->output.n_output_species; j++)
+                {
+                  int k;
+                  int l;
+                  for (l = 0; l < N_OUTPUT_ROUTES; l++)
+                    {
+                      routes[ j*N_OUTPUT_ROUTES + l ].formation.rate = 0;
+                      routes[ j*N_OUTPUT_ROUTES + l ].destruction.rate = 0;
+                    }
+                  for (k = 0; k < network->n_reactions; k++)
+                    {
+                      /* If the species is a product of the
+                         reaction then compute the formation
+                         rate. If the rate is greater than the
+                         smallest rate in the formation route
+                         structure, we add the current reaction
+                         number and rate to that structure. */
+
+                      if ((network->reactions[k].product1 ==
+                           input_params->output.output_species_idx[j])
+                          || (network->reactions[k].product2 ==
+                              input_params->output.output_species_idx[j])
+                          || (network->reactions[k].product3 ==
+                              input_params->output.output_species_idx[j])
+                          || (network->reactions[k].product4 ==
+                              input_params->output.output_species_idx[j]))
+                        {
+                          r_t formation_route;
+                          double min_rate;
+                          unsigned int min_rate_index;
+                          if (network->reactions[k].reaction_type == 0)
+                            {
+                              formation_route.rate = astrochem_mem.params.reac_rates[k];
+                              formation_route.rate *=
+                               NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant1);
+                            }
+                          else if (network->reactions[k].reaction_type == 23)
+                            {
+                              formation_route.rate = astrochem_mem.params.reac_rates[k];
+                            }
+                          else
+                            {
+                              formation_route.rate = astrochem_mem.params.reac_rates[k];
+                              formation_route.rate *=
+                               NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant1);
+                              if (network->reactions[k].reactant2 != -1)
+                                formation_route.rate *=
+                                 NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant2);
+                              if (network->reactions[k].reactant3 != -1)
+                                formation_route.rate *=
+                                 NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant3);
+                            }
+                          formation_route.reaction_no =
+                           network->reactions[k].reaction_no;
+                          min_rate = routes[ j*N_OUTPUT_ROUTES  ].formation.rate;
+                          min_rate_index = 0;
+                          for (l = 1; l < N_OUTPUT_ROUTES; l++)
+                            {
+                              if (routes[ j*N_OUTPUT_ROUTES + l ].formation.rate <
+                                  min_rate)
+                                {
+                                  min_rate =
+                                   routes[ j*N_OUTPUT_ROUTES + l ].formation.rate;
+                                  min_rate_index = (unsigned int) l;
+                                }
+                            }
+                          if (formation_route.rate > min_rate)
+                            {
+                              routes[ j*N_OUTPUT_ROUTES + min_rate_index ].formation.rate = formation_route.rate;
+                              routes[ j*N_OUTPUT_ROUTES + min_rate_index ].formation.reaction_no = formation_route.reaction_no;
+                            }
+                        }
+
+                      /* If the species is reactant of the reaction
+                         then compute the destruction rate. */
+
+                      if ((network->reactions[k].reactant1 ==
+                           input_params->output.output_species_idx[j])
+                          || (network->reactions[k].reactant2 ==
+                              input_params->output.output_species_idx[j])
+                          || (network->reactions[k].reactant3 ==
+                              input_params->output.output_species_idx[j]))
+                        {
+                          r_t destruction_route;
+                          double min_rate;
+                          unsigned int min_rate_index;
+
+                          if (network->reactions[k].reaction_type == 0)
+                            {
+                              destruction_route.rate = astrochem_mem.params.reac_rates[k];
+                              destruction_route.rate *=
+                               NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant1);
+                            }
+                          else if (network->reactions[k].reaction_type == 23)
+                            {
+                              destruction_route.rate = astrochem_mem.params.reac_rates[k];
+                            }
+                          else
+                            {
+                              destruction_route.rate = astrochem_mem.params.reac_rates[k];
+                              if (network->reactions[k].reactant1 != -1)
+                                destruction_route.rate *=
+                                 NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant1);
+                              if (network->reactions[k].reactant2 != -1)
+                                destruction_route.rate *=
+                                 NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant2);
+                              if (network->reactions[k].reactant3 != -1)
+                                destruction_route.rate *=
+                                 NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant3);
+                            }
+                          destruction_route.reaction_no =
+                           network->reactions[k].reaction_no;
+
+                          min_rate = routes[ j*N_OUTPUT_ROUTES  ].destruction.rate;
+                          min_rate_index = 0;
+                          for (l = 1; l < N_OUTPUT_ROUTES; l++)
+                            {
+                              if (routes[ j*N_OUTPUT_ROUTES + l ].destruction.rate <
+                                  min_rate)
+                                {
+                                  min_rate =
+                                   routes[ j*N_OUTPUT_ROUTES + l ].destruction.rate;
+                                  min_rate_index = (unsigned int) l;
+                                }
+                            }
+                          if (destruction_route.rate > min_rate)
+                            {
+                              routes[ j*N_OUTPUT_ROUTES + min_rate_index ].destruction.rate = destruction_route.rate;
+                              routes[ j*N_OUTPUT_ROUTES + min_rate_index ].destruction.reaction_no = destruction_route.reaction_no;
+                            }
+                        }
+                    }
+                }
+#ifdef HAVE_OPENMP
+          omp_set_lock(&lock);
+#endif
+          // Selecting a chunk of the file
+          hsize_t     routeStart[4]={  cell_index, i, 0, 0 };
+          H5Sselect_hyperslab( routeFileDataspace, H5S_SELECT_SET, routeStart, NULL, routeCount , NULL );
+
+          int spec_idx;
+          for( spec_idx = 0; spec_idx < input_params->output.n_output_species; spec_idx++ )
+            {
+              // Writing in each route datasets
+              H5Dwrite( routeDatasets[ spec_idx ], routeDatatype, routeMemDataspace, routeFileDataspace, H5P_DEFAULT,
+                        routes );
+            }
+
+#ifdef HAVE_OPENMP
+          omp_unset_lock(&lock);
+#endif
+            }
+        }
+
+    }
+  // Cleaning up hdf5
+  H5Sclose(memDataspace);
+  H5Sclose(fileDataspace);
+  H5Sclose(routeMemDataspace);
+  H5Sclose(routeFileDataspace);
+
+  // Free
+  free( output_abundances );
+  free( routes );
+  free_abundances( abundances );
+  solver_close( &astrochem_mem );
+  return (0);
 }

@@ -31,4 +31,6 @@ void alloc_network (net_t * network, int n_species, int n_reactions);
 
 int find_species (const species_name_t specie, const net_t * network);
 
+void network_file_error (const char *chem_file, int line_number);
+
 #endif // _NETWORK_H_

@@ -145,6 +145,12 @@ if test $HAVE_PYMOD_BREATHE = "no"; then
 fi
 AM_CONDITIONAL([HAVE_PYMOD_BREATHE], [test $HAVE_PYMOD_BREATHE = "yes"])
 
+#check for hdf5
+AX_LIB_HDF5()
+if test "$with_hdf5" = "no"; then
+    AC_MSG_ERROR([Unable to find HDF5, cannot compile astrochem.])
+fi
+
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
 		 doc/astrochem.tex
@@ -167,6 +173,7 @@ AC_CONFIG_FILES([Makefile
 		 python/libastrochemtools/libastrochemtools.py
 		 python/libastrochemtools/Makefile
 		 python/libpyastrochem/Makefile
+         tests/astrochem_test.py
          tests/python_lib_test.py
          tests/python_tools_test.py
          tests/benchmark.py

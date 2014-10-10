@@ -30,8 +30,6 @@
 #include "libastrochem.h"
 #include "network.h"
 
-#include "input.h"
-
 int add_species (char *new_species, net_t * network);
 
 void realloc_network_species (net_t * network, int n_species);
@@ -155,7 +153,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                           &network->reactions[n].reaction_type,
                           &network->reactions[n].reaction_no) != 5)
                 {
-                  input_error (chem_file1, n + 1);
+                  network_file_error (chem_file1, n + 1);
                 }
               break;
             }
@@ -215,7 +213,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                     }
                   else
                     {
-                      input_error (chem_file1, n + 1);
+                      network_file_error (chem_file1, n + 1);
                       break;
                     }
                 }
@@ -381,4 +379,21 @@ free_network (net_t * network)
 {
   free (network->reactions);
   free (network->species_names);
+}
+
+/**
+ * @brief Display an error while reading input
+ *
+ * Display an error message and exit of an error is encountered while
+ * reading the input file.
+ *
+ * @param input_file file from wich the error is from
+ * @param line_number line number where the error occured
+ */
+void
+network_file_error (const char *chem_file, int line_number)
+{
+  fprintf (stderr, "astrochem: error: incorrect network file in %s line %i.\n",
+           chem_file, line_number);
+  exit (1);
 }
