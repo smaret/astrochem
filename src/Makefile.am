@@ -69,16 +69,21 @@ endif
 
 install-exec-hook:
 	mv $(DESTDIR)$(bindir)/chmconvert $(DESTDIR)$(bindir)/chmconvert.tmp
+	sed -i 's/sys.path.append.*//g'  $(DESTDIR)$(bindir)/chmconvert.tmp
 	sed -i 's/libastrochemtools/astrochem.libastrochemtools/g'  $(DESTDIR)$(bindir)/chmconvert.tmp
 	sed -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/chmconvert.tmp > $(DESTDIR)$(bindir)/chmconvert
 	chmod a+x $(DESTDIR)$(bindir)/chmconvert
 	rm -f $(DESTDIR)$(bindir)/chmconvert.tmp
 if HAVE_PYMOD_BIGGLES
 	mv $(DESTDIR)$(bindir)/plabun $(DESTDIR)$(bindir)/plabun.tmp
+	sed -i 's/sys.path.append.*//g'  $(DESTDIR)$(bindir)/plabun.tmp
+	sed -i 's/libastrochemtools/astrochem.libastrochemtools/g'  $(DESTDIR)$(bindir)/plabun.tmp
 	sed -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/plabun.tmp > $(DESTDIR)$(bindir)/plabun
 	chmod a+x $(DESTDIR)$(bindir)/plabun
 	rm -f $(DESTDIR)$(bindir)/plabun.tmp
 	mv $(DESTDIR)$(bindir)/plroute $(DESTDIR)$(bindir)/plroute.tmp
+	sed -i 's/sys.path.append.*//g'  $(DESTDIR)$(bindir)/plroute.tmp
+	sed -i 's/libastrochemtools/astrochem.libastrochemtools/g'  $(DESTDIR)$(bindir)/plroute.tmp
 	sed -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/plroute.tmp > $(DESTDIR)$(bindir)/plroute
 	chmod a+x $(DESTDIR)$(bindir)/plroute
 	rm -f $(DESTDIR)$(bindir)/plroute.tmp

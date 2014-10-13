@@ -202,10 +202,16 @@ main (int argc, char *argv[])
   // Create ts and species datasets
   tsDataset = H5Dcreate(fid, "TimeSteps", datatype, tsDataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   speciesDataset = H5Dcreate(fid, "Species", speciesType, speciesDataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  double* convTs = (double*) malloc( sizeof(double)* source_mdl.ts.n_time_steps );
+  for( i=0; i< source_mdl.ts.n_time_steps; i++ )
+  {
+    convTs[i] = source_mdl.ts.time_steps[i] / CONST_MKSA_YEAR;
+  }
 
-  H5Dwrite( tsDataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, source_mdl.ts.time_steps );
+  H5Dwrite( tsDataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, convTs );
   H5Dwrite( speciesDataset, speciesType, H5S_ALL, H5S_ALL, H5P_DEFAULT, speciesName );
 
+  free( convTs );
   H5Dclose( tsDataset );
   H5Dclose( speciesDataset );
   H5Tclose( speciesType );

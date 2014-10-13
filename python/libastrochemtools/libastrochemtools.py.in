@@ -1,7 +1,7 @@
 #  libastrochemtools.py - Python utility library for astrochem
 #
 #  Copyright (c) 2006-2014 Sebastien Maret
-# 
+#
 #  This file is part of Astrochem.
 #
 #  Astrochem is free software: you can redistribute it and/or modify
@@ -13,7 +13,7 @@
 #  WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 #  General Public License for more details.
-# 
+#
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -25,7 +25,7 @@ PACKAGE_VERSION = "@PACKAGE_VERSION@"
 class reaction:
     """
     Chemical reaction class.
-    
+
     """
 
     def __init__(self, reactants, products, alpha, beta, gamma, rtype, rnumber):
@@ -48,7 +48,7 @@ class reaction:
         self.gamma = gamma
         self.type = rtype
         self.number = rnumber
-    
+
     def __repr__(self):
         """
         Returns the string representation of a reaction
@@ -79,7 +79,7 @@ class reaction:
 
         if not(isinstance(other, reaction)):
             raise ValueError, "Argument should be a network instance"
-        
+
         if len(self.reactants) != len(other.reactants) or len(self.products) != len(other.products):
             return False
 
@@ -106,7 +106,7 @@ class reaction:
         for s in self.products:
             tex_r += _totex_species(s) + " + "
         tex_r = tex_r[0:-3] + "$"
-        
+
         return tex_r
 
 class network_reader:
@@ -123,12 +123,12 @@ class network_reader:
         l  -- A list of reactions
 
         """
-        
+
         for r in l:
             if isinstance(r, reaction):
                 continue
             raise ValueError, "Argument should be a list of network instances"
-    
+
         self.data = l
 
     def __repr__(self):
@@ -180,17 +180,17 @@ class network_reader:
                 try:
                     react = line.rsplit(None, 5)[0]
                     rconsts = line.rsplit(None, 5)[1:]
-                    
+
                     reactants = map(lambda x: x.strip(), react.split("->")[0].split(" + "))
                     products = map(lambda x: x.strip(), react.split("->")[1].split(" + "))
-                    
+
                     alpha = float(rconsts[0])
                     beta = float(rconsts[1])
                     gamma = float(rconsts[2])
                     rtype = int(rconsts[3])
                     rnumber = int(rconsts[4])
                 except:
-                    raise Exception, "incorrect input on line %i" % linenumber                    
+                    raise Exception, "incorrect input on line %i" % linenumber
 
                 react = reaction(reactants, products, alpha, beta, gamma,
                                  rtype, rnumber)
@@ -420,7 +420,7 @@ class network_reader:
     def tofile(self, f, renumber = False):
         """
         Write network in a file.
-        
+
         Arguments:
         f        -- Network file handle
         renumber -- Renumber reactions (default False)
@@ -440,7 +440,7 @@ class network_reader:
         # lenght of the largest species name, the lenght of the
         # largest reaction types, and the lenght of the largest
         # reaction number.
-        
+
         max_reactants = 0
         max_products = 0
         max_species_lenght = 0
@@ -466,7 +466,7 @@ class network_reader:
 
         # Now that we have defined the format, write each reaction in
         # that format.
-        
+
         for react in self.data:
 
             for i in range(max_reactants + 1):
@@ -476,7 +476,7 @@ class network_reader:
                     string += " + " + species_format % react.reactants[i]
                 else:
                     string += "   " + species_format % ""
-                    
+
             for i in range(max_products + 1):
                 if i == 0:
                     string += " -> " + species_format % react.products[i]
@@ -484,9 +484,9 @@ class network_reader:
                     string += " + " + species_format % react.products[i]
                 else:
                     string += "   " + species_format % ""
-                    
+
             string += ("   %9.2e %9.2e %9.2e " + type_format + " " + number_format + "\n") \
-                % (react.alpha, react.beta, react.gamma, react.type, 
+                % (react.alpha, react.beta, react.gamma, react.type,
                    react.number)
             f.write(string)
 
@@ -519,7 +519,7 @@ class network_reader:
         """
 
         import copy
-        
+
         dups = []
         reacts = copy.copy(self.data)
         while reacts:
@@ -550,7 +550,128 @@ class network_reader:
                 return react
         raise ValueError("no reaction with number %i." % number)
 
-def readabun(filename):
+def readfilesattrs( filename ):
+    """
+    Print available spcies from an hdf5 output file and return it in a array
+
+    Arguments:
+    filename    -- name of the output file
+
+    Returns:
+    species -- array of species
+
+    """
+    import h5py
+    f = h5py.File( filename, "r")
+    if "chem_file" in f.attrs:
+        chemfile = f.attrs.get("chem_file")
+    else:
+        raise IOError("%s file doest not contain \"chem_file\" attribute" % filename )
+    if "source_file" in f.attrs:
+        sourcefile = f.attrs.get("source_file")
+    else:
+        raise IOError("%s file doest not contain \"source_file\" attribute" % filename )
+
+    return chemfile, sourcefile
+
+def listspecies( filename ):
+    """
+    Print available spcies from an hdf5 output file and return it in a array
+
+    Arguments:
+    filename    -- name of the output file
+
+    Returns:
+    species -- array of species
+
+    """
+    import h5py
+    f = h5py.File( filename, "r")
+    if "Species" in f:
+        s_d = f.get("Species")
+        s = s_d[...]
+    else:
+        raise IOError("%s file doest not contain \"Species\" dataset" % filename )
+    print s;
+    return s;
+
+def readabun( filename, specie ):
+    """
+    Read abundances from an hdf5 output file and return arrays of time and abundances
+
+    Arguments:
+    filename    -- name of the output file
+    species    -- name of the species
+
+    Returns:
+    t, a -- array of time values and abundances
+
+    """
+    import h5py
+    f = h5py.File( filename, "r")
+    if "TimeSteps" in f:
+        t_d = f.get("TimeSteps")
+        t = t_d[...]
+    else:
+        raise IOError("%s file doest not contain \"TimeSteps\" dataset" % filename )
+    if "Species" in f:
+        s_d = f.get("Species")
+        s = s_d[...]
+    else:
+        raise IOError("%s file doest not contain \"Species\" dataset" % filename )
+    if specie in s:
+        specie_index = s.tolist().index(specie)
+    else:
+        raise ValueError("%s file doest not contain %s specie" % ( filename, specie ) )
+    if "Abundances" in f:
+        a_d = f.get("Abundances")
+        a = a_d[:,:,specie_index]
+    else:
+        raise IOError("%s file doest not contain \"Abundances\" dataset" % filename )
+    return t,a.transpose()
+
+def readrout(filename, specie):
+    """
+    Read a rout from a hdf5 output file and return arrays of time, shell number,
+    formation/destruction rates
+
+    """
+    import h5py
+    f = h5py.File( filename, "r")
+    if "TimeSteps" in f:
+        t_d = f.get("TimeSteps")
+        t = t_d[...]
+    else:
+        raise IOError("%s file doest not contain \"TimeSteps\" dataset" % filename )
+    if "Species" in f:
+        s_d = f.get("Species")
+        s = s_d[...]
+    else:
+        raise IOError("%s file doest not contain \"Species\" dataset" % filename )
+    if specie in s:
+        specie_index = s.tolist().index(specie)
+    else:
+        raise ValueError("%s file doest not contain specie %s" % (filename, specie) )
+    if "Routes" in f:
+        g = f.get("Routes")
+    else:
+        raise IOError("%s file doest not contain \"Routes\" group" % filename )
+    routeDatasetName = "route_" + specie
+    if routeDatasetName in g:
+        r_d = g.get( routeDatasetName )
+    else:
+        raise IOError("%s file doest not contain %s dataset", filename, routeDatasetName )
+    formation_reac = r_d[:,:,specie_index,:]['formation_rate']['reaction_number']
+    formation_rate = r_d[:,:,specie_index,:]['formation_rate']['reaction_rate']
+    destruction_reac = r_d[:,:,specie_index,:]['destruction_rate']['reaction_number']
+    destruction_rate = r_d[:,:,specie_index,:]['destruction_rate']['reaction_rate']
+
+    shell = numpy.empty( r_d.len() )
+    for i in range(  r_d.len() ):
+        shell[i] = i
+    return t, shell, formation_reac, formation_rate, destruction_reac, destruction_rate
+
+def readabunlegacy(filename):
     """
     Read an abund file and return arrays of time and abundances
 
@@ -561,7 +682,7 @@ def readabun(filename):
     time, abund -- array of time values and abundances
 
     """
- 
+
     f = open(filename)
 
     # Skip comments and cell number
@@ -576,7 +697,7 @@ def readabun(filename):
     # Construct a list of the elements of the array
     a = []
     for line in lines:
-        newline = []        
+        newline = []
         for elem in string.split(line):
 	    elem = string.atof(elem)
             newline.append(elem)
@@ -590,7 +711,7 @@ def readabun(filename):
 
     return time, abund
 
-def readrout(filename):
+def readroutlegacy(filename):
     """
     Read a rout file and return arrays of time, cell number,
     formation/destruction rates
@@ -610,7 +731,7 @@ def readrout(filename):
     # Construct a list of the elements of the array
     a = []
     for line in lines:
-        newline = []        
+        newline = []
         for elem in string.split(line):
 	    elem = string.atof(elem)
             newline.append(elem)
@@ -644,15 +765,15 @@ def readrout(filename):
 def _totex_species(spec):
     """
     Returns a species in TeX format
-    
+
     Arguments:
     spec --- species string
-    
+
     """
-    
+
     if spec in ["cosmic-ray", "uv-photon"]:
         return spec
-    
+
     tex_s = ""
     for char in spec:
         if char == '(' or char == ')':
@@ -663,5 +784,5 @@ def _totex_species(spec):
             tex_s = tex_s + "_{" + char + "}"
         else:
             tex_s = tex_s + char
-            
+
     return tex_s

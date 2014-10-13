@@ -20,12 +20,13 @@
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
+sys.path.append("@abs_top_srcdir@/python/libastrochemtools") #This line (first containing sys.path.append) will be removed at instalation.
 sys.path.append("@pythondir@")
 import os.path
 import getopt
 import biggles
 from numpy import *
-from astrochem.libastrochemtools import readabun, _totex_species
+from libastrochemtools import readabun,readabunlegacy, _totex_species, listspecies
 
 PACKAGE_VERSION = "@PACKAGE_VERSION@"
 PACKAGE_BUGREPORT = "@PACKAGE_BUGREPORT@"
@@ -36,7 +37,7 @@ def usage():
 
     """
 
-    print """Usage: plabun [options] file1 [file2...]
+    print """Usage: plabun [options] file specie1 [specie2...]
 
 Plot abundances vs. time
 
@@ -48,6 +49,7 @@ Options:
    -c, --cell=index         Set the cell number (default 0)
    -x, --xrange=xmin,xmax   Set the x axis range
    -y, --yrange=ymin,ymax   Set the y axis range
+   -l, --legacy             To be able to read old output file (.abun)
 
 See the plabun(1) man page for more information"""
     print "Report bugs to <%s>." % PACKAGE_BUGREPORT
@@ -73,10 +75,10 @@ def main():
 
     # Parse options and arguments
     try:
-	opts, args = getopt.getopt(sys.argv[1:], "hVo:c:s:x:y:",
+	opts, args = getopt.getopt(sys.argv[1:], "hVo:c:s:x:y:l",
 				   ["help", "version", "output=",
                                     "cell=", "shell=", "xrange=",
-                                    "yrange="])
+                                    "yrange=", "legacy"])
     except getopt.GetoptError:
 	usage()
 	sys.exit(1)
@@ -86,6 +88,7 @@ def main():
     xrange = None
     yrange = None
     model = None
+    legacy = False
 
     for opt, arg in opts:
 	if opt in ("-h", "--help") :
@@ -118,6 +121,8 @@ def main():
                 sys.exit(1)
         if opt in ("-m", "--model"):
             model = arg
+        if opt in ("-l", "--legacy"):
+            legacy = True
 
     if len(args) == 0:
 	usage()
@@ -130,14 +135,27 @@ def main():
         if len(args) == 0:
             usage()
             sys.exit(1)
+
     elif args[0] == "av":
         sys.stderr.write("plabun: error: av command is deprecated.\n")
         sys.exit()
 
-    filenames = args[0:]
-    if len(filenames) > 6:
-        sys.stderr.write("plabun: warning: at most 6 species can be plotted, ignoring others.\n")
-        filenames = filenames[0:5]
+    if legacy:
+        filenames = args[0:]
+        if len(filenames) > 6:
+            sys.stderr.write("plabun: warning: at most 6 species can be plotted, ignoring others.\n")
+            filenames = filenames[0:5]
+    else:
+        filename = args[0]
+        species = args[1:]
+        if len(species) == 0:
+            print "Available species in this file are:"
+            listspecies( filename )
+            sys.exit(1)
+        if len(species) > 6:
+            sys.stderr.write("plabun: warning: at most 6 species can be plotted, ignoring others.\n")
+            species = species[0:5]
+
 
     p = biggles.FramedPlot()
     p.title = "Abundances"
@@ -156,45 +174,81 @@ def main():
 
     # Plot the abundances in each file
 
-    for filename in filenames:
+    if legacy:
+        for filename in filenames:
 
-        # Read the abundance file
-        try:
-            time, abund = readabun(filename)
-        except IOError:
-            sys.stderr.write("plabun: error: can't open %s.\n" % filename)
-            sys.exit(1)
-        except ValueError:
-            sys.stderr.write("plabun: error: can't read %s.\n" % filename)
-            sys.exit(1)
+            # Read the abundance file
+            try:
+                time, abund = readabunlegacy(filename)
+            except IOError:
+                sys.stderr.write("plabun: error: can't open %s.\n" % filename)
+                sys.exit(1)
+            except ValueError:
+                sys.stderr.write("plabun: error: can't read %s.\n" % filename)
+                sys.exit(1)
 
-        # Get species name from the filename
-        spec = os.path.splitext(os.path.basename(filename))[0]
+            # Get species name from the filename
+            spec = os.path.splitext(os.path.basename(filename))[0]
 
-        # Pick-up values that correspond to the given time index
-        try:
-            abund = abund[:, c]
-        except IndexError:
-            sys.stderr.write("plabun: error: cell index is out of bounds.\n")
-            sys.exit(1)            
+            # Pick-up values that correspond to the given time index
+            try:
+                abund = abund[:, s]
+            except IndexError:
+                sys.stderr.write("plabun: error: shell index is out of bounds.\n")
+                sys.exit(1)
 
-        # Drop zeros and negative values
-        index = abund > 0
-        time = time[index]
-        abund = abund[index]
+            # Drop zeros and negative values
+            index = abund > 0
+            time = time[index]
+            abund = abund[index]
 
-        # Check that time and abund contain at least two points
-        if len(time) < 2:
-            sys.stderr.write("plabun: warning: %s contains less than two non-zero abundances.\n" % filename)
-            continue
+            # Check that time and abund contain at least two points
+            if len(time) < 2:
+                sys.stderr.write("plabun: warning: %s contains less than two non-zero abundances.\n" % filename)
+                continue
 
-        linecolor = linecolor_stack.pop(0)
-        linecolor_stack.append(linecolor)
-        cu = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
-        cu.label = "$" + _totex_species(spec) + "$"
-        curves.append(cu)
-        p.add(cu)
-    
+            linecolor = linecolor_stack.pop(0)
+            linecolor_stack.append(linecolor)
+            c = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
+            c.label = "$" + _totex_species(spec) + "$"
+            curves.append(c)
+            p.add(c)
+    else:
+        for specie in species:
+            # Read the abundance file
+            try:
+                time, abund = readabun(filename,specie)
+            except IOError as e:
+                sys.stderr.write("plroute: error: can't open %s. Error : %s\n" % (filename, e) )
+                sys.exit(1)
+            except ValueError as e:
+                sys.stderr.write("plroute: error: can't read %s. Error : %s\n" % (filename, e) )
+                sys.exit(1)
+
+            # Pick-up values that correspond to the given time index
+            try:
+                abund = abund[:, cell]
+            except IndexError:
+                sys.stderr.write("plabun: error: cell index is out of bounds.\n")
+                sys.exit(1)
+
+            # Drop zeros and negative values
+            index = abund > 0
+            time = time[index]
+            abund = abund[index]
+
+            # Check that time and abund contain at least two points
+            if len(time) < 2:
+                sys.stderr.write("plabun: warning: %s contains less than two non-zero abundances.\n" % filename)
+                continue
+
+            linecolor = linecolor_stack.pop(0)
+            linecolor_stack.append(linecolor)
+            cu = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
+            cu.label = "$" + _totex_species(specie) + "$"
+            curves.append(cu)
+            p.add(cu)
+
     # Draw the plot key
     p.add(biggles.PlotKey(.1, .90, curves))
 
