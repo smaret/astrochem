@@ -131,7 +131,7 @@ main (int argc, char *argv[])
 
 
   hsize_t     dimsf[ ROUTE_DATASET_RANK ]={  source_mdl.n_cells, source_mdl.ts.n_time_steps, input_params.output.n_output_species, N_OUTPUT_ROUTES };
-  fid = H5Fcreate( "output.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT); //TODO Fix name
+  fid = H5Fcreate( "astrochem_output.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT); 
   dataspace = H5Screate_simple( ABUNDANCE_DATASET_RANK, dimsf, NULL);
 
   // Add Atributes
