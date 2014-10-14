@@ -129,7 +129,6 @@ main (int argc, char *argv[])
   hid_t       fid, datatype, dataspace, dataset, tsDataset, tsDataspace,  speciesDataset, speciesDataspace, speciesType;
   datatype = H5Tcopy(H5T_NATIVE_DOUBLE);
 
-
   hsize_t     dimsf[ ROUTE_DATASET_RANK ]={  source_mdl.n_cells, source_mdl.ts.n_time_steps, input_params.output.n_output_species, N_OUTPUT_ROUTES };
   fid = H5Fcreate( "astrochem_output.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT); 
   dataspace = H5Screate_simple( ABUNDANCE_DATASET_RANK, dimsf, NULL);
@@ -157,39 +156,40 @@ main (int argc, char *argv[])
   // Create dataset
   dataset = H5Dcreate(fid, "Abundances", datatype, dataspace, H5P_DEFAULT, prop_id, H5P_DEFAULT);
 
-
-  // Create route dataspace
-  hid_t dataspaceRoute = H5Screate_simple( ROUTE_DATASET_RANK, dimsf, NULL);
-
-  // Create route datatype
-  hid_t r_t_datatype = H5Tcreate (H5T_COMPOUND, sizeof(r_t));
-  H5Tinsert( r_t_datatype, "reaction_number", HOFFSET(r_t, reaction_no ), H5T_NATIVE_INT);
-  H5Tinsert( r_t_datatype, "reaction_rate", HOFFSET(r_t, rate), H5T_NATIVE_DOUBLE);
-
-  hid_t route_t_datatype = H5Tcreate (H5T_COMPOUND, sizeof(rout_t));
-  H5Tinsert( route_t_datatype, "formation_rate", HOFFSET(rout_t, formation ), r_t_datatype );
-  H5Tinsert( route_t_datatype, "destruction_rate", HOFFSET(rout_t, destruction ), r_t_datatype );
-
-  // Define route chunk property
-  hid_t route_prop_id = H5Pcreate(H5P_DATASET_CREATE);
-  H5Pset_chunk( route_prop_id, ROUTE_DATASET_RANK, chunk_dims);
-
-
-  // Create each named route dataset
-  hid_t routeDatasets[ input_params.output.n_output_species ];
-  hid_t routeGroup = H5Gcreate( fid, "Routes", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
   int i;
-  char routeName[6] = "route_";
-  char tempName[ MAX_CHAR_SPECIES + sizeof( routeName ) ];
-  char speciesName [ input_params.output.n_output_species ][ MAX_CHAR_SPECIES ];
-  for( i = 0; i < input_params.output.n_output_species ; i++ )
+  hid_t dataspaceRoute, route_t_datatype, r_t_datatype, route_prop_id, routeGroup;
+  hid_t routeDatasets[ input_params.output.n_output_species ];
+  if (input_params.output.trace_routes)
     {
-      strcpy( tempName, routeName );
-      strcat( tempName, network.species_names[input_params.output.output_species_idx[i]] );
-      strcpy( speciesName[i], network.species_names[input_params.output.output_species_idx[i]] );
-      routeDatasets[i] = H5Dcreate( routeGroup, tempName, route_t_datatype, dataspaceRoute, H5P_DEFAULT, route_prop_id, H5P_DEFAULT);
-    }
 
+      // Create route dataspace
+      dataspaceRoute = H5Screate_simple( ROUTE_DATASET_RANK, dimsf, NULL);
+
+      // Create route datatype
+      r_t_datatype = H5Tcreate (H5T_COMPOUND, sizeof(r_t));
+      H5Tinsert( r_t_datatype, "reaction_number", HOFFSET(r_t, reaction_no ), H5T_NATIVE_INT);
+      H5Tinsert( r_t_datatype, "reaction_rate", HOFFSET(r_t, rate), H5T_NATIVE_DOUBLE);
+
+      route_t_datatype = H5Tcreate (H5T_COMPOUND, sizeof(rout_t));
+      H5Tinsert( route_t_datatype, "formation_rate", HOFFSET(rout_t, formation ), r_t_datatype );
+      H5Tinsert( route_t_datatype, "destruction_rate", HOFFSET(rout_t, destruction ), r_t_datatype );
+
+      // Define route chunk property
+      route_prop_id = H5Pcreate(H5P_DATASET_CREATE);
+      H5Pset_chunk( route_prop_id, ROUTE_DATASET_RANK, chunk_dims);
+
+
+      // Create each named route dataset
+      routeGroup = H5Gcreate( fid, "Routes", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+      char routeName[6] = "route_";
+      char tempName[ MAX_CHAR_SPECIES + sizeof( routeName ) ];
+      for( i = 0; i < input_params.output.n_output_species ; i++ )
+        {
+          strcpy( tempName, routeName );
+          strcat( tempName, network.species_names[input_params.output.output_species_idx[i]] );
+          routeDatasets[i] = H5Dcreate( routeGroup, tempName, route_t_datatype, dataspaceRoute, H5P_DEFAULT, route_prop_id, H5P_DEFAULT);
+        }
+    }
   // Timesteps and species
   hsize_t n_ts = source_mdl.ts.n_time_steps;
   hsize_t n_species =  input_params.output.n_output_species ;
@@ -204,11 +204,19 @@ main (int argc, char *argv[])
   speciesDataset = H5Dcreate(fid, "Species", speciesType, speciesDataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   double* convTs = (double*) malloc( sizeof(double)* source_mdl.ts.n_time_steps );
   for( i=0; i< source_mdl.ts.n_time_steps; i++ )
-  {
-    convTs[i] = source_mdl.ts.time_steps[i] / CONST_MKSA_YEAR;
-  }
+    {
+      convTs[i] = source_mdl.ts.time_steps[i] / CONST_MKSA_YEAR;
+    }
 
   H5Dwrite( tsDataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, convTs );
+
+
+  char speciesName [ input_params.output.n_output_species ][ MAX_CHAR_SPECIES ];
+  for( i = 0; i < input_params.output.n_output_species ; i++ )
+    {
+      strcpy( speciesName[i], network.species_names[input_params.output.output_species_idx[i]] );
+    }
+
   H5Dwrite( speciesDataset, speciesType, H5S_ALL, H5S_ALL, H5P_DEFAULT, speciesName );
 
   free( convTs );
@@ -249,15 +257,20 @@ main (int argc, char *argv[])
   /*
    * Close/release hdf5 resources.
    */
-  for( i = 0; i <  input_params.output.n_output_species ; i++ )
+  if (input_params.output.trace_routes)
     {
-      H5Dclose(routeDatasets[i] );
-    }
-  H5Sclose(dataspaceRoute);
-  H5Pclose(route_prop_id);
-  H5Tclose(r_t_datatype);
-  H5Tclose(route_t_datatype);
 
+
+      for( i = 0; i <  input_params.output.n_output_species ; i++ )
+        {
+          H5Dclose(routeDatasets[i] );
+        }
+      H5Sclose(dataspaceRoute);
+      H5Gclose(routeGroup);
+      H5Pclose(route_prop_id);
+      H5Tclose(r_t_datatype);
+      H5Tclose(route_t_datatype);
+    }
   H5Dclose(dataset);
   H5Pclose(prop_id);
   H5Sclose(dataspace);
@@ -365,14 +378,16 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
   hid_t fileDataspace = H5Scopy(dataspace);
   hsize_t     count[3]={  1, 1,  input_params->output.n_output_species };
 
-  // Create the route memory dataspace, selecting all output routes
   hsize_t routeSize[2] = { input_params->output.n_output_species, N_OUTPUT_ROUTES };
-  hid_t routeMemDataspace = H5Screate_simple(2, routeSize, NULL);
-
-  // Create the route file dataspace, and prepare selection of a chunk of the file
   hsize_t     routeCount[4]={  1, 1,  input_params->output.n_output_species, N_OUTPUT_ROUTES };
-  hid_t routeFileDataspace = H5Scopy(routeDataspace);
-
+  hid_t routeFileDataspace, routeMemDataspace;
+  if (input_params->output.trace_routes)
+    {
+      // Create the route memory dataspace, selecting all output routes
+      routeMemDataspace = H5Screate_simple(2, routeSize, NULL);
+      // Create the route file dataspace, and prepare selection of a chunk of the file
+      routeFileDataspace = H5Scopy(routeDataspace);
+    }
 
   // Initializing abundance
 #if 0 //Ultra complicated code
@@ -620,22 +635,22 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
                     }
                 }
 #ifdef HAVE_OPENMP
-          omp_set_lock(&lock);
+              omp_set_lock(&lock);
 #endif
-          // Selecting a chunk of the file
-          hsize_t     routeStart[4]={  cell_index, i, 0, 0 };
-          H5Sselect_hyperslab( routeFileDataspace, H5S_SELECT_SET, routeStart, NULL, routeCount , NULL );
+              // Selecting a chunk of the file
+              hsize_t     routeStart[4]={  cell_index, i, 0, 0 };
+              H5Sselect_hyperslab( routeFileDataspace, H5S_SELECT_SET, routeStart, NULL, routeCount , NULL );
 
-          int spec_idx;
-          for( spec_idx = 0; spec_idx < input_params->output.n_output_species; spec_idx++ )
-            {
-              // Writing in each route datasets
-              H5Dwrite( routeDatasets[ spec_idx ], routeDatatype, routeMemDataspace, routeFileDataspace, H5P_DEFAULT,
-                        routes );
-            }
+              int spec_idx;
+              for( spec_idx = 0; spec_idx < input_params->output.n_output_species; spec_idx++ )
+                {
+                  // Writing in each route datasets
+                  H5Dwrite( routeDatasets[ spec_idx ], routeDatatype, routeMemDataspace, routeFileDataspace, H5P_DEFAULT,
+                            routes );
+                }
 
 #ifdef HAVE_OPENMP
-          omp_unset_lock(&lock);
+              omp_unset_lock(&lock);
 #endif
             }
         }
@@ -644,8 +659,11 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
   // Cleaning up hdf5
   H5Sclose(memDataspace);
   H5Sclose(fileDataspace);
-  H5Sclose(routeMemDataspace);
-  H5Sclose(routeFileDataspace);
+  if (input_params->output.trace_routes)
+    {
+      H5Sclose(routeMemDataspace);
+      H5Sclose(routeFileDataspace);
+    }
 
   // Free
   free( output_abundances );
