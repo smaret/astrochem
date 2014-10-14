@@ -17,6 +17,12 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+.. moduleauthor:: Sebastien Maret
+
+
+"""
+
 import string
 import numpy
 
@@ -26,21 +32,26 @@ class reaction:
     """
     Chemical reaction class.
 
+    :param reactants: list of reactants
+    :type reactants: string map
+    :param products: list of products
+    :type products: string map
+    :param alpha: reaction constant
+    :type  alpha: float
+    :param beta: reaction constant
+    :type  beta: float
+    :param gamma: reaction constant
+    :type  gamme: float
+    :param rtype: reaction type
+    :type rtype: int
+    :param rnumber: reaction number
+    :type rnumber: int
     """
 
     def __init__(self, reactants, products, alpha, beta, gamma, rtype, rnumber):
         """
         Creates a chemical reaction
-
-        Arguments:
-        reactants          -- list of reactants
-        products           -- list of products
-        alpha, beta, gamma -- reaction constants
-        rtype              -- reaction type
-        rnumber            -- reaction number
-
         """
-
         self.reactants = reactants
         self.products = products
         self.alpha = alpha
@@ -97,6 +108,8 @@ class reaction:
         """
         Returns a reaction in TeX format
 
+        :returns: tex formated reaction string
+
         """
 
         tex_r = "$"
@@ -113,23 +126,22 @@ class network_reader:
     """
     Chemical network reader class
 
+    :param reactions: list of reactions
+    :type reactions: :class:`.reaction` list
     """
 
-    def __init__(self, l):
+    def __init__(self, reactions ):
         """
         Creates a network reader object
 
-        Arguments:
-        l  -- A list of reactions
-
         """
 
-        for r in l:
+        for r in reactions:
             if isinstance(r, reaction):
                 continue
             raise ValueError, "Argument should be a list of network instances"
 
-        self.data = l
+        self.data = reactions
 
     def __repr__(self):
         """
@@ -153,9 +165,11 @@ class network_reader:
         creates a network object. Supported format are chm, osu and
         kida.
 
-        Arguments:
-        f          -- Network file handle
-        fileformat -- Network file format ("chm", "osu" or "kida")
+        :param f: Network file handle
+        :type f: :class:`.file`
+        :param fileformat: Network file format ("chm", "osu" or "kida")
+        :type fileformat: string
+        :returns: :class:`.network_reader`
 
         """
 
@@ -421,9 +435,10 @@ class network_reader:
         """
         Write network in a file.
 
-        Arguments:
-        f        -- Network file handle
-        renumber -- Renumber reactions (default False)
+        :param f: Network file handle
+        :type f: `.file`
+        :param renumber: Renumber reactions (default False)
+        :type renumber: bool
 
         """
 
@@ -494,6 +509,8 @@ class network_reader:
         """
         Find reactions with the same reaction number
 
+        :returns: list of duplicated reaction_numbers
+
         """
 
         react_numbers = []
@@ -515,6 +532,10 @@ class network_reader:
     def duplicate_reactions(self, verbose = False):
         """
         Find duplicate reactions
+
+        :param verbose: verbose if True, quiet if False
+        :type verbose: bool
+        :returns: list of reaction_numbers of duplicated reactions
 
         """
 
@@ -540,11 +561,11 @@ class network_reader:
         """
         Returns the reaction with a given number
 
-        Arguments:
-        number -- the reaction number
+        :param number: the reaction number
+        :type number: int
+        :returns: :class:`.reaction`
 
         """
-
         for react in self.data:
             if react.number == number:
                 return react
@@ -552,13 +573,11 @@ class network_reader:
 
 def readfilesattrs( filename ):
     """
-    Print available spcies from an hdf5 output file and return it in a array
+    Read chem_file and source_file attributes from an hdf5 output file
 
-    Arguments:
-    filename    -- name of the output file
-
-    Returns:
-    species -- array of species
+    :param filename: path to output file
+    :type filename: string
+    :returns: chemfile, sourcefile
 
     """
     import h5py
@@ -576,13 +595,11 @@ def readfilesattrs( filename ):
 
 def listspecies( filename ):
     """
-    Print available spcies from an hdf5 output file and return it in a array
+    Print available species from an hdf5 output file and return it in a array
 
-    Arguments:
-    filename    -- name of the output file
-
-    Returns:
-    species -- array of species
+    :param filename: path to output file
+    :type filename: string
+    :returns: species string list
 
     """
     import h5py
@@ -597,14 +614,13 @@ def listspecies( filename ):
 
 def readabun( filename, specie ):
     """
-    Read abundances from an hdf5 output file and return arrays of time and abundances
+    Read abundances for a specific specie from an hdf5 output file and return arrays of time and abundances
 
-    Arguments:
-    filename    -- name of the output file
-    species    -- name of the species
-
-    Returns:
-    t, a -- array of time values and abundances
+    :param filename: path to the output file
+    :type filename: string
+    :param specie: name of specie to read abundance of
+    :type specie: string
+    :returns: timesteps array, abundances array
 
     """
     import h5py
@@ -632,8 +648,13 @@ def readabun( filename, specie ):
 
 def readrout(filename, specie):
     """
-    Read a rout from a hdf5 output file and return arrays of time, shell number,
-    formation/destruction rates
+    Read a rout from a hdf5 output file and return arrays of time, shell number, formation/destruction rates
+
+    :param filename: path to the output file
+    :type filename: string
+    :param specie: name of specie to read route of
+    :type specie: string
+    :returns: timesteps array, shells array, formation_reac array, formation_rate array, destruction_read array, destruction_rate array
 
     """
     import h5py
@@ -675,11 +696,9 @@ def readabunlegacy(filename):
     """
     Read an abund file and return arrays of time and abundances
 
-    Arguments:
-    filename    -- name of the abundance file
-
-    Returns:
-    time, abund -- array of time values and abundances
+    :param filename: path to the abund file
+    :type filename: string
+    :returns: timesteps array, abundances array
 
     """
 
@@ -715,6 +734,12 @@ def readroutlegacy(filename):
     """
     Read a rout file and return arrays of time, cell number,
     formation/destruction rates
+
+    :param filename: path to the output file
+    :type filename: string
+    :param specie: name of specie to read route of
+    :type specie: string
+    :returns: timesteps array, shells array, formation_reac array, formation_rate array, destruction_read array, destruction_rate array
 
     """
 
@@ -767,7 +792,9 @@ def _totex_species(spec):
     Returns a species in TeX format
 
     Arguments:
-    spec --- species string
+    :param spec: species
+    :type spec: string
+    :returns: tex formated species string
 
     """
 
