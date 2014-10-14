@@ -166,7 +166,9 @@ AC_CONFIG_FILES([Makefile
 		 doc/plroute.1
 		 doc/chmconvert.1
 		 doc/examples/Makefile
+		 doc/examples/input.ini
 		 doc/examples/dynamic/Makefile
+		 doc/examples/dynamic/input.ini
          doc/doxygen/astrochem.dox
          doc/doxygen/Makefile
          doc/sphinx/Makefile
