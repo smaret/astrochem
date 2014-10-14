@@ -35,15 +35,11 @@
 #include "network.h"
 
 typedef enum
-<<<<<<< HEAD
-{ R_STATIC = 0, R_DYNAMIC = 1, R_TIMES = 2 } SOURCE_READ_MODE;
-=======
 {
   R_STATIC = 0,  /**< Static Reading Mode, only cells >*/
   R_DYNAMIC = 1, /**< Dynamic Cells Reading Mode >*/
   R_TIMES = 2    /**< Dynamic Time Steps Reading Mode >*/
 } SOURCE_READ_MODE;
->>>>>>> 4b2dcae... Correcting the way output abundances are read and proffchecking against
 
 void alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps);
 
@@ -290,15 +286,10 @@ read_input (const char *input_file, inp_t * input_params,
                         }
                       if ( duplicated )
                         {
-                              output_specie = strtok ( NULL, delimiter);
-                              continue;
+                          output_specie = strtok ( NULL, delimiter);
+                          continue;
                         }
-<<<<<<< HEAD
-                      input_params->output.output_species_idx[j] =
-                        species_idx;
-=======
                       input_params->output.output_species_idx[j] = species_idx;
->>>>>>> 4b2dcae... Correcting the way output abundances are read and proffchecking against
                       j++;
                       output_specie = strtok ( NULL, delimiter);
                     }
@@ -647,13 +638,6 @@ free_mdl (mdl_t * source_mdl)
   free (source_mdl->ts.time_steps);
 }
 
-<<<<<<< HEAD
-/*
-   Get the number of non commented line in a section
-   in a file beggining by [section] and ending with
-   [other_section] or eof.
-   */
-=======
 /**
  * @brief Get the number of non commented line in a section
  * Get the number of non commented line in a section
@@ -664,7 +648,6 @@ free_mdl (mdl_t * source_mdl)
  * @param section name of section to get number of line from
  * @return number of line
  */
->>>>>>> 4b2dcae... Correcting the way output abundances are read and proffchecking against
 int
 get_nb_active_line_section (const char *file, const char *section)
 {
@@ -711,35 +694,6 @@ get_nb_active_line_section (const char *file, const char *section)
   return line_number;
 }
 
-<<<<<<< HEAD
-/*
-   Get the number of non-commented line in a file
-   */
-int
-get_nb_active_line (const char *file)
-{
-  FILE *f;
-  char line[MAX_LINE];
-  int line_number = 0;
-  f = fopen (file, "r");
-  if (!f)
-    {
-      fprintf (stderr, "astrochem: error: can't open %s.\n", file);
-      exit (1);
-    }
-  while (fgets (line, MAX_LINE, f) != NULL)
-    {
-      if (line[0] != '#')
-        {
-          line_number++;
-        }
-    }
-  fclose (f);
-  return line_number;
-}
-=======
-
->>>>>>> 4b2dcae... Correcting the way output abundances are read and proffchecking against
 
 /*
    Read only chem_file and network_file from a input.ini file
@@ -795,4 +749,34 @@ read_input_file_names (const char *input_file, files_t * files, int verbose)
         }
     }
   fclose (f);
+}
+
+/**
+ * @brief Get the number of non commented line in a file
+ *
+ * @param file file to get number of line from
+ * @return number of line
+ */
+
+int
+get_nb_active_line (const char *file)
+{
+  FILE *f;
+  char line[MAX_LINE];
+  int line_number = 0;
+  f = fopen (file, "r");
+  if (!f)
+    {
+      fprintf (stderr, "astrochem: error: can't open %s.\n", file);
+      exit (1);
+    }
+  while (fgets (line, MAX_LINE, f) != NULL)
+    {
+      if (line[0] != '#')
+        {
+          line_number++;
+        }
+    }
+  fclose (f);
+  return line_number;
 }

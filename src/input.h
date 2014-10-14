@@ -47,4 +47,6 @@ void read_source (const char *source_file, mdl_t * source_mdl,
 
 void free_mdl (mdl_t * source_mdl);
 
+int get_nb_active_line (const char *file);
+
 #endif // _INPUT_H_

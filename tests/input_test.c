@@ -93,7 +93,7 @@ main (void)
   fprintf (f, "# Output\n");
   fprintf (f, "[output]\n");
   fprintf (f, "time_steps = 64\n");
-  fprintf (f, "abundances = CO,C(+),C,e(-),OH,H3O(+),H,H2,HCO(+),CO(+),C4H,HCO(+),CH(+),CH\n");
+  fprintf (f, "abundances = CO,C(+),C,e(-),OH,H3O(+),H,H2,HCO(+),CO(+),C4H,CH(+),CH\n");
   fprintf (f, "trace_routes = 1\n");
   fclose (f);
 
@@ -130,7 +130,7 @@ main (void)
       (input_params.abundances.initial_abundances[3].abundance == 1.76e-4) &&
       (strcmp (network.species_names[input_params.abundances.initial_abundances[4].species_idx], "C(+)") == 0) &&
       (input_params.abundances.initial_abundances[4].abundance == 7.30e-5) &&
-      (input_params.output.n_output_species == 14) &&
+      (input_params.output.n_output_species == 13) &&
       (strcmp (network.species_names[input_params.output.output_species_idx[0]], "CO") == 0) &&
       (strcmp (network.species_names[input_params.output.output_species_idx[1]], "C(+)") == 0) &&
       (strcmp (network.species_names[input_params.output.output_species_idx[2]], "C") == 0) &&

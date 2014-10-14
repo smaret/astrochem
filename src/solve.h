@@ -31,6 +31,5 @@ int get_abundance_idx (const res_t * results, int cell_idx, int ts_idx,
 int get_route_idx (const res_t * results, int cell_idx, int ts_idx,
                    int abund_idx, int route_idx);
 
-int get_nb_active_line (const char *file);
 
 #endif // _SOLVE_H_
