@@ -63,6 +63,7 @@ AC_PYTHON_MODULE(numpy)
 if test $HAVE_PYMOD_NUMPY = "no"; then
    AC_MSG_ERROR(Could not find Python module Numpy.)
 fi
+
 AC_PYTHON_MODULE(biggles, )
 if test $HAVE_PYMOD_BIGGLES = "no"; then
    AC_MSG_WARN(Could not find Python module Biggles.)
@@ -141,7 +142,7 @@ AM_CONDITIONAL([HAVE_SPHINXBUILD], [test  "x$SPHINXBUILD" != "x" ])
 #check for breathe
 AC_PYTHON_MODULE(breathe, )
 if test $HAVE_PYMOD_BREATHE = "no"; then
-   AC_MSG_WARN(Cannot find breathe, which is required to build c api documentation in sphinx.  It will not be built.)
+   AC_MSG_WARN(Cannot find python module breathe which is required to build c api documentation in sphinx.  It will not be built.)
 fi
 AM_CONDITIONAL([HAVE_PYMOD_BREATHE], [test $HAVE_PYMOD_BREATHE = "yes"])
 
@@ -149,6 +150,12 @@ AM_CONDITIONAL([HAVE_PYMOD_BREATHE], [test $HAVE_PYMOD_BREATHE = "yes"])
 AX_LIB_HDF5()
 if test "$with_hdf5" = "no"; then
     AC_MSG_ERROR([Unable to find HDF5, cannot compile astrochem.])
+fi
+
+#check for breathe
+AC_PYTHON_MODULE(h5py, )
+if test $HAVE_PYMOD_H5PY = "no"; then
+   AC_MSG_WARN(Cannot find python module h5py which is required to use python astrochem tools output file readers. They will not be usable.)
 fi
 
 AC_CONFIG_FILES([Makefile
@@ -201,4 +208,5 @@ Python api:         ${HAVE_CYTHON}
 Doxygen:            ${HAVE_DOXYGEN}
 Sphinx Build:       ${HAVE_SPHINXBUILD}
 Breathe:            ${HAVE_PYMOD_BREATHE}
+h5py Reader:        ${HAVE_PYMOD_H5PY}
 ============================================="
