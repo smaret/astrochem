@@ -52,7 +52,7 @@ e(-)    = 7.32e-5
 # Output
 [output]
 time_steps = 32
-abundances = CO,C(+),C,e(-),OH,H3O(+),H,H2,HCO(+),CO(+),C4H,HCO(+),CH(+),CH
+abundances = CO,C(+),C,e(-),OH,H3O(+),H,H2,HCO(+),CO(+),C4H,CH(+),CH
 trace_routes = 0
 """
 
