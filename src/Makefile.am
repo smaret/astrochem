@@ -74,6 +74,7 @@ install-exec-hook:
 	sed -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/chmconvert.tmp > $(DESTDIR)$(bindir)/chmconvert
 	chmod a+x $(DESTDIR)$(bindir)/chmconvert
 	rm -f $(DESTDIR)$(bindir)/chmconvert.tmp
+	rm -f $(DESTDIR)$(bindir)/chmconvert.tmp2
 if HAVE_PYMOD_BIGGLES
 	mv $(DESTDIR)$(bindir)/plabun $(DESTDIR)$(bindir)/plabun.tmp
 	sed -i 's/sys.path.append.*//g'  $(DESTDIR)$(bindir)/plabun.tmp
