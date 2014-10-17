@@ -19,9 +19,9 @@
 
 AM_CFLAGS = -Wall
 
-TESTS = input_test source_test source_dyn_test network_test rate_test abundances_test solver_test python_lib_test python_tools_test
+TESTS = input_test source_test source_dyn_test network_test rate_test abundances_test solver_test python_lib_test python_tools_test astrochem_test
 
-check_PROGRAMS = input_test source_test source_dyn_test network_test rate_test abundances_test solver_test python_lib_test python_tools_test
+check_PROGRAMS = input_test source_test source_dyn_test network_test rate_test abundances_test solver_test python_lib_test python_tools_test astrochem_test
 
 input_test_SOURCES = input_test.c
 input_test_LDADD = $(top_builddir)/src/input.o $(top_builddir)/src/libastrochem.la
