@@ -75,16 +75,25 @@ read_input (const char *input_file, inp_t * input_params,
     }
 
   int n_output_species = 0;
+  bool all_species = false;
   int n_initial_abundances =
     get_nb_active_line_section (input_file, "abundances");
   while (fgets (line, MAX_LINE, f) != NULL)
     {
-      if (strncmp (line, "abundances", 10) == 0)
+      if (strncmp (line, "abundances = ", 13) == 0)
         {
-          char *localStr = &line[9];
+          char *localStr = &line[12];
           while (localStr != NULL)
             {
               localStr++;
+
+              //Checking for all species
+              if( strncmp( localStr,"ALL", 3 ) == 0 )
+                {
+                  all_species = true;
+                  n_output_species = network->n_species;
+                  break;
+                }
               localStr = strchr (localStr, ',');
               n_output_species++;
             }
@@ -249,56 +258,68 @@ read_input (const char *input_file, inp_t * input_params,
                 /* Loop over the species (separated by a comma), and
                    copy them in the ouput_species array */
                 {
-                  const char delimiter[] = ",";
-                  char *output_specie;
-                  output_specie = strtok (value, delimiter);
-                  while( output_specie != NULL )
+                  if( all_species )
                     {
-                      if (j >= input_params->output.n_output_species)
+                      //In case of all species , copy all specie idxs
+                      int idx;
+                      for( idx = 0; idx < network->n_species; idx++ )
                         {
-                          fprintf (stderr,
-                                   "astrochem: error: the number of species in output exceeds %i, incoherent input file.\n",
-                                   input_params->output.n_output_species);
-                          break;
+                           input_params->output.output_species_idx[idx] = idx;
                         }
-                      int species_idx = find_species (output_specie, network);
-                      if (species_idx < 0)
+                    }
+                  else
+                    {
+                      const char delimiter[] = ",";
+                      char *output_specie;
+                      output_specie = strtok (value, delimiter);
+                      while( output_specie != NULL )
                         {
-                          fprintf (stderr,
-                                   "astrochem: warning: %s abundance requested, "
-                                   "but is not in the network.\n", output_specie);
-                          input_params->output.n_output_species--;
-                          output_specie = strtok ( NULL, delimiter);
-                          continue;
-                        }
-                      int k;
-                      bool duplicated = false;
-                      for( k=0; k<j; k++ )
-                        {
-                          if( input_params->output.output_species_idx[k] == species_idx )
+                          if (j >= input_params->output.n_output_species)
                             {
                               fprintf (stderr,
-                                       "astrochem: error: duplicated output species in input file : %s.\n", output_specie );
-                              input_params->output.n_output_species--;
-                              duplicated = true;
+                                       "astrochem: error: the number of species in output exceeds %i, incoherent input file.\n",
+                                       input_params->output.n_output_species);
                               break;
                             }
-                        }
-                      if ( duplicated )
-                        {
+                          int species_idx = find_species (output_specie, network);
+                          if (species_idx < 0)
+                            {
+                              fprintf (stderr,
+                                       "astrochem: warning: %s abundance requested, "
+                                       "but is not in the network.\n", output_specie);
+                              input_params->output.n_output_species--;
+                              output_specie = strtok ( NULL, delimiter);
+                              continue;
+                            }
+                          int k;
+                          bool duplicated = false;
+                          for( k=0; k<j; k++ )
+                            {
+                              if( input_params->output.output_species_idx[k] == species_idx )
+                                {
+                                  fprintf (stderr,
+                                           "astrochem: error: duplicated output species in input file : %s.\n", output_specie );
+                                  input_params->output.n_output_species--;
+                                  duplicated = true;
+                                  break;
+                                }
+                            }
+                          if ( duplicated )
+                            {
+                              output_specie = strtok ( NULL, delimiter);
+                              continue;
+                            }
+                          input_params->output.output_species_idx[j] = species_idx;
+                          j++;
                           output_specie = strtok ( NULL, delimiter);
-                          continue;
                         }
-                      input_params->output.output_species_idx[j] = species_idx;
-                      j++;
-                      output_specie = strtok ( NULL, delimiter);
-                    }
-                  if( j < input_params->output.n_output_species )
-                    {
-                      fprintf (stderr,
-                               "astrochem: error: the number of species in output inferior to %i, incoherent input file.\n",
-                               input_params->output.n_output_species);
-                      input_params->output.n_output_species = j-1;
+                      if( j < input_params->output.n_output_species )
+                        {
+                          fprintf (stderr,
+                                   "astrochem: error: the number of species in output inferior to %i, incoherent input file.\n",
+                                   input_params->output.n_output_species);
+                          input_params->output.n_output_species = j-1;
+                        }
                     }
                 }
               else if (strcmp (parameter, "trace_routes") == 0)

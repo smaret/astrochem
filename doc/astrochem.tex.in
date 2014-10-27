@@ -639,8 +639,9 @@ expressed in years. The \verb=[abundance]= section sets the initial
 abundances; abundances that are not specified are set to zero. The
 last section (\verb=[output]=) sets parameters relative to the output
 of the code. \verb=abundances= set the name of the species for which
-we want to create output files containing the abundances as a function
-of time. \verb=trace_route= is an optional parameter that allow to
+we want to create output containing the abundances as a function
+of time. \verb=ALL= can be used instead so all species are available in output.
+\verb=trace_route= is an optional parameter that allow to
 trace the various formation and destruction routes of these species.
 
 In addition to the input file, we need to provide a file describing
@@ -689,50 +690,11 @@ Writing formation/destruction in output files... done.
 %
 \end{verbatim}
 
-Astrochem produces two types of files: the \verb=.abun= files that
-contain the abundance of a given species as a function of time and --
-if the \verb=trace_route= parameter is set to 1 -- the \verb=.rout=
-files that contain the main formation and destruction routes of a
-given specie.
-
-With the input file above, Astrochem creates the following abundances
-files: \verb=H3(+).abun=, \verb=CO.abun=, \verb=e.abun= and
-\verb=HCO(+).abun=. Note that each file contains the abundance of a
-single specie. The first lines of the \verb=HCO(+).abun= file looks
-like this:
-
-\begin{verbatim}
-# HCO(+) abundance computed by astrochem
-# time [yr] / cell number
-#
-                 0
-1.00e-06  0.00e+00
-2.63e-06  0.00e+00
-6.90e-06  0.00e+00
-1.81e-05  6.30e-20
-4.76e-05  4.28e-19
-1.25e-04  2.91e-18
-3.28e-04  1.97e-17
-8.62e-04  1.29e-16
-2.26e-03  7.74e-16
-5.95e-03  3.84e-15
-1.56e-02  1.33e-14
-4.10e-02  2.82e-14
-1.08e-01  3.57e-14
-2.83e-01  4.02e-14
-7.43e-01  5.04e-14
-1.95e+00  7.00e-14
-5.12e+00  9.52e-14
-(...)
-\end{verbatim}
-
-\noindent
-The first three lines are comments. The third one lists the cell
-indexes. The following lines gives the abundances as a function of
-time for each cell; the first column indicates the time in year, and
-the following ones the abundances, with respect to H nuclei, in each
-cell. In our simple example, there is only one cell, so the file has
-only two columns, one for the time, and one for the cell number.
+Astrochem produces one hdf5 output file \verb=astrochem_output.h5=
+containing different datasets. A list a output species names,
+a list of time steps, a matrix of abundances, and if the
+\verb=trace_route= parameter is set to 1, a group of matrices
+containing the formation and destruction routes.
 
 \subsection{Plotting abundances}
 \label{sec:plotting-abundances}
@@ -744,18 +706,18 @@ cell. For example, the following command plots the CO, H$_{3}^{+}$,
 e$^{-}$ and HCO$^{+}$ abundances:
 
 \begin{verbatim}
-% plabun --xrange=1,1e7 --yrange=1e-12,1e-4 CO.abun H3\(+\).abun
-e.abun HCO\(+\).abun
+% plabun --xrange=1,1e7 --yrange=1e-12,1e-4 astrochem_output.h5 CO
+H3(+) e(-) HCO
 \end{verbatim}
 
 In the example above, we have set the x-axis range from 1 to 10$^{7}$
 yr and y-axis range from $10^{-12}$ to $10^{-4}$ with the
 \verb=--xrange= and \verb=--yrange= options, respectively. Note that
-parenthesis in files names such as \verb=H3(+).abun= needs to be
-preceded by an anti-slash (\verb=\=) because they have a special
-meaning for Unix shells. The command above produces the plot shown on
+specie name containing special character are handled smoothly by the program.
+The command above produces the plot shown on
 Fig.~\ref{fig:example-abundances}. Plabun has a number or other
-options; see \verb=man plabun= for a complete list.
+options, including a legacy mode to read old output format \verb=.abun=;
+see \verb=man plabun= for a complete list.
 
 \begin{figure}
   \begin{center}
@@ -776,24 +738,24 @@ or are rather uncertain. This also allows to understand how the
 various species of a chemical network are linked together.
 
 As already mentioned, if one turns on the \verb=trace_route= option
-in the input file, Astrochem creates some additional files containing
-the main formation and destruction routes of the species listed with
-\verb=output= option. Of course these routes may change with time;
+in the input file, Astrochem creates some datasets in it's ouput file
+containing the main formation and destruction routes of the species
+listed with \verb=output= option. Of course these routes may change
+with time;
 therefore Astrochem saves the sixteen most important formation routes
 as well as the sixteen most important destruction routes at each time
 step and position.
 
-Although the \verb=.rout= files are text files, they are -- unlike
-the \verb=.abun= files -- not easy to read directly. However a command
-allows to plot the main formation and destruction rate of a given
+A command allows to plot the main formation and destruction rate of a given
 species as a function of time or position\footnote{Plotting the main
   formation/destruction routes as a function of position is not
   implemented yet.}. For example, one can plot the main formation and
 destruction routes of HCO$^{+}$ with the following command (see
-\verb=man plroute= for a complete list of commands and options):
+\verb=man plroute= for a complete list of commands and options,
+including a legacy mode allowing to read old  \verb=.rout= format ):
 
 \begin{verbatim}
-% plroute --chmfile=osu2009.chm HCO\(+\).rout
+% plroute astrochem_output.h5 HCO(+)
 \end{verbatim}
 
 \begin{figure}
@@ -818,10 +780,8 @@ channels\footnote{The formation and destruction reactions are ordered
   formation/destruction of the species.}, together with the total
 formation rate. Conversely, the right panel shows the destruction rate
 of the same species through the six most important destruction
-channels as well as the total destruction rate. The \verb=--chmfile=
-option followed by the name of the network used in the computation
-makes Plabun to print the reactions explicitly instead of printing
-their numbers. On the left panel, we see that for $t > 10^{5}$~yr, the
+channels as well as the total destruction rate.
+On the left panel, we see that for $t > 10^{5}$~yr, the
 formation of HCO$^{+}$ is dominated by the reaction of CO with
 H$_{3}^{+}$. On the other hand, at any time in the simulation the
 destruction of HCO$^{+}$ is dominated by the dissociative
