@@ -57,7 +57,7 @@ typedef struct
 
 static int f (realtype t, N_Vector y, N_Vector ydot, void *params);
 
-static int jacobian (int N, realtype t, N_Vector y, N_Vector fy,
+static int jacobian (long int N, realtype t, N_Vector y, N_Vector fy,
                      DlsMat J, void *params, N_Vector tmp1,
                      N_Vector tmp2, N_Vector tmp3);
 
@@ -172,7 +172,7 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
  */
 
 static int
-jacobian (int N __attribute__ ((unused)),
+jacobian (long int N __attribute__ ((unused)),
           realtype t __attribute__ ((unused)), N_Vector y,
           N_Vector fy __attribute__ ((unused)),
           DlsMat J, void *params,
