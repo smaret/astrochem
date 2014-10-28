@@ -19,7 +19,7 @@
 
 AM_CFLAGS = -DPKGDATADIR=\"$(pkgdatadir)\"
 
-AM_CFLAGS += ${OPENMP_CFLAGS} -Wall
+AM_CFLAGS += ${OPENMP_CFLAGS}
 
 bin_PROGRAMS = astrochem chmconvert
 
