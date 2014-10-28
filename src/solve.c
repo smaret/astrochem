@@ -494,6 +494,7 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
       exit (1);
     }
 
+  CVDlsDenseJacFn jacobian_function = &jacobian;
   if ((CVodeInit (cvode_mem, f, 0.0, y) != CV_SUCCESS)
       ||
       (CVodeSStolerances
@@ -504,7 +505,7 @@ solve (int cell_index, const inp_t * input_params, SOURCE_MODE mode,
 #else
       || ((CVDense (cvode_mem, network->n_species) != CV_SUCCESS))
 #endif
-      || ((CVDlsSetDenseJacFn (cvode_mem, jacobian) != CV_SUCCESS))
+      || ((CVDlsSetDenseJacFn (cvode_mem, jacobian_function) != CV_SUCCESS))
       || (CVodeSetUserData (cvode_mem, &params) != CV_SUCCESS))
     {
       fprintf (stderr, "astrochem: %s:%d: solver initialization failed.\n",
