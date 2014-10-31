@@ -64,6 +64,7 @@ Print the relative contribution of each route.
 Use legacy reading mode, allowing to read .abun file
 .It Cm -c Ar file , Cm --chmfile= Ar file
 Specify the chemical network file. Deprecated, used only in legacy mode.
+.El
 
 
 .\"
@@ -83,4 +84,5 @@ extent permitted by law.
 .Sh "SEE ALSO"
 .Xr astrochem 1 ","
 .Xr plabun 1 ","
+.Xr converttolegacy 1 ","
 .Xr chmconvert 1

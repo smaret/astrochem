@@ -21,16 +21,15 @@
 .\"
 .Dd @RELEASE_DATE@
 .Os
-.Dt PLABUN 1
+.Dt CONVERTTOLEGACY 1
 .Sh NAME
-.Nm plabun
-.Nd plot abundances computed by astrochem using hdf5 output file
+.Nm converttolegacy
+.Nd convert an specie from hdf5 astrochem output file to old legacy output format .abun and .rout
 .Sh SYNOPSIS
 .Nm
 .Op Ar option
 .Ar file.h5
 .Ar specie1
-.Op Ar specie2 ...
 .\"
 .\" Description
 .\"
@@ -38,9 +37,9 @@
 .Nm
 is a 
 .Xr python 1
-script to plot the abundances computed by
+script to convert a specie from hdf5
 .Xr astrochem 1
-vs. time
+output file to old legacy output format .abun and .rout
 .\"
 .\" Options
 .\"
@@ -49,17 +48,7 @@ vs. time
 .It Cm -h, --help
 Display help text.
 .It Cm -V, --version
-Display plabun version information.
-.It Cm -o Ar file , Cm --output= Ar file
-Create a PostScript file.
-.It Cm -c Ar cell-number , Cm --cell= Ar cell-number
-Set the cell number. Default is 0.
-.It Cm -x Ar xmin,xmax , Cm --xrange= Ar xmin,xmax
-Set the x axis range
-.It Cm -y Ar ymin,ymax , Cm --yrange= Ar ymin,ymax
-Set the y axis range
-.It Cm -l, --legacy
-Use legacy reading mode, allowing to read .abun file
+Display converttolegacy version information.
 .El
 
 .\"
@@ -79,5 +68,5 @@ extent permitted by law.
 .Sh "SEE ALSO"
 .Xr astrochem 1 ","
 .Xr plroute 1 ","
-.Xr converttolegacy 1 ","
+.Xr plabun 1 ","
 .Xr chmconvert 1

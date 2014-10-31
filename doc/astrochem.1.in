@@ -70,4 +70,5 @@ extent permitted by law.
 .Sh "SEE ALSO"
 .Xr plabun 1 ","
 .Xr plroute 1 ","
+.Xr converttolegacy 1 ","
 .Xr chmconvert 1

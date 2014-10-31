@@ -27,7 +27,7 @@ libastrochem_la_SOURCES = network.c rates.c solve.c input.c
 libastrochem_la_LDFLAGS = -version-info 0:0:0
 include_HEADERS = libastrochem.h
 
-bin_PROGRAMS = astrochem apiuser chmconvert
+bin_PROGRAMS = astrochem apiuser chmconvert converttolegacy
 
 astrochem_SOURCES = astrochem.c 
 astrochem_CFLAGS = ${HDF5_CFLAGS}
@@ -40,12 +40,17 @@ apiuser_LDADD = -lastrochem
 
 
 chmconvert_SOURCES = chmconvert.py
-
 chmconvert$(EXEEXT): chmconvert.py
 	cp $? $@
 	chmod a+x $@
 
-CLEANFILES = chmconvert.py
+converttolegacy_SOURCES = converttolegacy.py
+converttolegacy$(EXEEXT): converttolegacy.py
+	cp $? $@
+	chmod a+x $@
+
+
+CLEANFILES = chmconvert.py  converttolegacy.py
 
 if HAVE_PYMOD_BIGGLES
 
@@ -74,7 +79,11 @@ install-exec-hook:
 	sed -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/chmconvert.tmp > $(DESTDIR)$(bindir)/chmconvert
 	chmod a+x $(DESTDIR)$(bindir)/chmconvert
 	rm -f $(DESTDIR)$(bindir)/chmconvert.tmp
-	rm -f $(DESTDIR)$(bindir)/chmconvert.tmp2
+	sed -i.tmp '0,/sys.path.append.*/{//d;}'  $(DESTDIR)$(bindir)/converttolegacy
+	sed -i.tmp 's/libastrochemtools/astrochem.libastrochemtools/g'  $(DESTDIR)$(bindir)/converttolegacy
+	sed -i.tmp 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/converttolegacy
+	chmod a+x $(DESTDIR)$(bindir)/converttolegacy
+	rm -f $(DESTDIR)$(bindir)/converttolegacy.tmp
 if HAVE_PYMOD_BIGGLES
 	mv $(DESTDIR)$(bindir)/plabun $(DESTDIR)$(bindir)/plabun.tmp
 	sed -i 's/sys.path.append.*//g'  $(DESTDIR)$(bindir)/plabun.tmp

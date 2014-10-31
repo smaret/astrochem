@@ -692,6 +692,87 @@ def readrout(filename, specie):
         shell[i] = i
     return t, shell, formation_reac, formation_rate, destruction_reac, destruction_rate
 
+def converttolegacy( filename, specie ):
+    """
+    Convert a hdf5 output file specific species to .abun and .rout legacy format.
+
+    :param filename: path to the output file
+    :type filename: string
+    :param specie: name of specie to read abundance and route of
+    :type specie: string
+    """
+    import h5py
+    f = h5py.File( filename, "r")
+    if "Species" in f:
+        s_d = f.get("Species")
+        s = s_d[...]
+    else:
+        raise IOError("%s file doest not contain \"Species\" dataset" % filename )
+    if specie in s:
+        specie_index = s.tolist().index(specie)
+    else:
+        raise ValueError("%s file doest not contain specie %s" % (filename, specie) )
+
+    if "TimeSteps" in f:
+        t_d = f.get("TimeSteps")
+        t = t_d[...]
+    else:
+        raise IOError("%s file doest not contain \"TimeSteps\" dataset" % filename )
+
+    if "Abundances" in f:
+        a_d = f.get("Abundances")
+        a = a_d[:,:,specie_index]
+    else:
+        raise IOError("%s file doest not contain \"Abundances\" dataset" % filename )
+
+    abunfile = open(specie+".abun","w");
+    abunfile.write("# "+specie+" abundance computed by astrochem\n")
+    abunfile.write("# time [yr] / shell number\n")
+    abunfile.write("#\n")
+
+    abunfile.write("             ")
+    for shell in range( 0, a.shape[0] ):
+        abunfile.write("{:>13d} ".format(shell) )
+    abunfile.write("\n")
+
+    for t_idx in range( 0, t.shape[0] ):
+        abunfile.write(  "{:.2e}  ".format( t[t_idx] ) )
+        for a_val in  a[:,t_idx]:
+            abunfile.write(  "{:.2e}  ".format( a_val ) )
+        abunfile.write("\n")
+    abunfile.close()
+
+    if "Routes" in f:
+        g = f.get("Routes")
+        routeDatasetName = "route_" + specie
+        if routeDatasetName in g:
+            r_d = g.get( routeDatasetName )
+        else:
+            raise IOError("%s file doest not contain %s dataset", filename, routeDatasetName )
+        formation = r_d[:,:,specie_index,:]['formation_rate']
+        destruction = r_d[:,:,specie_index,:]['destruction_rate']
+
+        routfile = open(specie+".rout","w");
+        routfile.write("# Main "+specie+" formation/destruction routes computed by astrochem\n")
+        routfile.write("# shell number  time [yr]  reaction number 1  reaction rate 1 [cm-3/s]... \n")
+        routfile.write("#\n")
+
+        for shell in range( 0, a.shape[0] ):
+            for t_idx in range( 0, t.shape[0] ):
+                routfile.write("   {:d} ".format(shell) )
+                routfile.write(  "  {:.2e}".format( t[t_idx] ) )
+                for r_val in  formation[shell,t_idx,:]:
+                    routfile.write(  "  {:>4d}".format( r_val[0] ) )
+                    routfile.write(  "  {:.2e}".format( r_val[1] ) )
+                routfile.write("\n")
+                routfile.write("   {:d} ".format(shell) )
+                routfile.write(  "  {:.2e}".format( t[t_idx] ) )
+                for r_val in  destruction[shell,t_idx,:]:
+                    routfile.write(  "  {:>4d}".format( r_val[0] ) )
+                    routfile.write(  " {:.2e}".format( -r_val[1] ) )
+                routfile.write("\n")
+        routfile.close()
+
 def readabunlegacy(filename):
     """
     Read an abund file and return arrays of time and abundances

@@ -160,11 +160,14 @@ fi
 
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
-		 doc/astrochem.tex
-		 doc/astrochem.1
-		 doc/plabun.1
-		 doc/plroute.1
-		 doc/chmconvert.1
+		 doc/latex/astrochem.tex
+		 doc/latex/Makefile
+		 doc/man/Makefile
+		 doc/man/astrochem.1
+		 doc/man/plabun.1
+		 doc/man/plroute.1
+		 doc/man/chmconvert.1
+		 doc/man/converttolegacy.1
 		 doc/examples/Makefile
 		 doc/examples/input.ini
 		 doc/examples/dynamic/Makefile
@@ -177,6 +180,7 @@ AC_CONFIG_FILES([Makefile
 		 src/chmconvert.py
 		 src/plabun.py
 		 src/plroute.py
+		 src/converttolegacy.py
 		 networks/Makefile
          python/Makefile
 		 python/libastrochemtools/libastrochemtools.py

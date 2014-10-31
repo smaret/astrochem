@@ -75,4 +75,5 @@ extent permitted by law.
 .Sh "SEE ALSO"
 .Xr astrochem 1 ","
 .Xr plabun 1 ","
+.Xr converttolegacy 1 ","
 .Xr plroute 1

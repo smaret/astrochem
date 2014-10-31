@@ -1,0 +1,98 @@
+#!@PYTHON@
+#
+#  converttolegacy - Plot the abundances computed by Astrochem
+#
+#  Copyright (c) 2006-2014 Sebastien Maret
+# 
+#  This file is part of Astrochem.
+#
+#  Astrochem is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published
+#  by the Free Software Foundation, either version 3 of the License,
+#  or (at your option) any later version.
+#
+#  Astrochem is distributed in the hope that it will be useful, but
+#  WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
+
+import sys
+sys.path.append("@abs_top_srcdir@/python/libastrochemtools") #This line (first containing sys.path.append) will be removed at instalation.
+sys.path.append("@pythondir@")
+import getopt
+from libastrochemtools import converttolegacy, listspecies
+
+PACKAGE_VERSION = "@PACKAGE_VERSION@"
+PACKAGE_BUGREPORT = "@PACKAGE_BUGREPORT@"
+
+def usage():
+    """
+    Display usage
+
+    """
+
+    print """Usage: converttolegacy [options] file [ specie ]
+
+Convert hdf5 output file to legacy .abun and .rout file, if no specie provided, display available specie in file
+
+Options:
+   -h, --help               Display this help
+   -V, --version            Display converttolegacy version information
+
+See the converttolegacy(1) man page for more information"""
+    print "Report bugs to <%s>." % PACKAGE_BUGREPORT
+
+def version():
+    """
+    Display version number
+
+    """
+
+    print "This is converttolegacy, version %s" % PACKAGE_VERSION
+    print """Copyright (c) 2006-2014 Sebastien Maret
+
+This is free software. You may redistribute copies of it under the terms
+of the GNU General Public License. There is NO WARRANTY, to the extent
+permitted by law."""
+
+def main():
+    """
+    Convert hdf5 output file to legacy .abun and .rout file
+
+    """
+
+    # Parse options and arguments
+    try:
+	opts, args = getopt.getopt(sys.argv[1:], "hV",
+				   ["help", "version"])
+    except getopt.GetoptError:
+	usage()
+	sys.exit(1)
+
+    for opt, arg in opts:
+	if opt in ("-h", "--help") :
+	    usage()
+	    sys.exit()
+	if opt in ("-V", "--version") :
+	    version()
+	    sys.exit()
+
+    if len(args) == 0:
+	usage()
+	sys.exit(1)
+
+    # Ignore commands, for backward compatibility
+
+    filename = args[0]
+    species = args[1]
+    if len(species) == 0:
+        print "Available species in this file are:"
+        listspecies( filename )
+        sys.exit(1)
+
+    converttolegacy( filename, species )
+
+main()
