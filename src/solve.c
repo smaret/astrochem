@@ -98,7 +98,9 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
              product of the reactants needs to be divided by the H
              abundance. */
 
-          y_product *= NV_Ith_S (y, reactions[i].reactant1);
+
+
+          y_product *= NV_Ith_S (y, reactions[i].reactants[0]);
           y_product *= reac_rates[i];
         }
       else if (reactions[i].reaction_type == 23)
@@ -116,42 +118,35 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
                                 chi, cosmic,
                                 grain_size,
                                 grain_abundance,
-                                NV_Ith_S (y, reactions[i].reactant1) / nh);
+                                NV_Ith_S (y, reactions[i].reactants[0]) / nh);
           y_product = reac_rates[i];
         }
       else
         {
           /* For other reactions, the production/destruction rate is
              the product of the reactants multiplied by the reaction rate. */
-
-          if (reactions[i].reactant1 != -1)
-            y_product *= NV_Ith_S (y, reactions[i].reactant1);
-          if (reactions[i].reactant2 != -1)
-            y_product *= NV_Ith_S (y, reactions[i].reactant2);
-          if (reactions[i].reactant3 != -1)
-            y_product *= NV_Ith_S (y, reactions[i].reactant3);
+          int r;
+          for( r = 0; r < NB_REACTANTS; r++ )
+            {
+              if (reactions[i].reactants[r] != -1)
+                y_product *= NV_Ith_S (y, reactions[i].reactants[r]);
+            }
           y_product *= reac_rates[i];
         }
-
       /* Add a production term for each product of the reaction. */
-
-      if (reactions[i].product1 != -1)
-        NV_Ith_S (ydot, reactions[i].product1) += y_product;
-      if (reactions[i].product2 != -1)
-        NV_Ith_S (ydot, reactions[i].product2) += y_product;
-      if (reactions[i].product3 != -1)
-        NV_Ith_S (ydot, reactions[i].product3) += y_product;
-      if (reactions[i].product4 != -1)
-        NV_Ith_S (ydot, reactions[i].product4) += y_product;
-
-      /* Add a destruction term for each reactant of the reaction. */
-
-      if (reactions[i].reactant1 != -1)
-        NV_Ith_S (ydot, reactions[i].reactant1) -= y_product;
-      if (reactions[i].reactant2 != -1)
-        NV_Ith_S (ydot, reactions[i].reactant2) -= y_product;
-      if (reactions[i].reactant3 != -1)
-        NV_Ith_S (ydot, reactions[i].reactant3) -= y_product;
+      int p;
+      for( p = 0 ; p < NB_PRODUCTS; p++ )
+        {
+          if (reactions[i].products[p] != -1)
+            NV_Ith_S (ydot, reactions[i].products[p]) += y_product;
+        }
+      /* Add a destruction term for each reactants of the reaction. */
+      int r;
+      for( r = 0; r < NB_REACTANTS; r++ )
+        {
+          if (reactions[i].reactants[r] != -1)
+            NV_Ith_S (ydot, reactions[i].reactants[r]) -= y_product;
+        }
     }
 
   return (0);
@@ -206,9 +201,9 @@ jacobian (long int N __attribute__ ((unused)),
         {
           /* H2 formation on grains */
 
-          DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant1) -=
+          DENSE_ELEM (J, reactions[i].reactants[0], reactions[i].reactants[0]) -=
            2 * reac_rates[i];
-          DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant1) +=
+          DENSE_ELEM (J, reactions[i].products[0], reactions[i].reactants[0]) +=
            reac_rates[i];
         }
       else if (reactions[i].reaction_type == 23)
@@ -218,149 +213,52 @@ jacobian (long int N __attribute__ ((unused)),
           double jac_elem;
 
           jac_elem =
-            (chi * DRAINE_STANDARD_ISRF_FUV * exp (-2 * av) * reactions[i].alpha) /
-            (GRAIN_SITES_PER_CM2 * reactions[i].gamma) *
-            exp (-NV_Ith_S (y, reactions[i].reactant1) /
-                 (GRAIN_SITES_PER_CM2 * M_PI * pow (grain_size, 2) *
-                  grain_abundance * nh * reactions[i].gamma));
+           (chi * DRAINE_STANDARD_ISRF_FUV * exp (-2 * av) * reactions[i].alpha) /
+           (GRAIN_SITES_PER_CM2 * reactions[i].gamma) *
+           exp (-NV_Ith_S (y, reactions[i].reactants[0]) /
+                (GRAIN_SITES_PER_CM2 * M_PI * pow (grain_size, 2) *
+                 grain_abundance * nh * reactions[i].gamma));
 
-          DENSE_ELEM (J, reactions[i].reactant1, reactions[i].reactant1) -=
+          DENSE_ELEM (J, reactions[i].reactants[0], reactions[i].reactants[0]) -=
            jac_elem;
-          DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant1) +=
+          DENSE_ELEM (J, reactions[i].products[0], reactions[i].reactants[0]) +=
            jac_elem;
         }
       else
         {
           /* Other reactions */
-
-          if ((reactions[i].reactant1 != -1) &&
-              (reactions[i].reactant2 == -1) &&
-              (reactions[i].reactant3 == -1))
+          int r, r2, p;
+          int local_nb_reactants = NB_REACTANTS;
+          for( r = 0; r < NB_REACTANTS; r++ )
             {
-              DENSE_ELEM (J, reactions[i].reactant1,
-                          reactions[i].reactant1) -= reac_rates[i];
-              DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant1) +=
-               reac_rates[i];
-              if (reactions[i].product2 != -1)
-                DENSE_ELEM (J, reactions[i].product2,
-                            reactions[i].reactant1) += reac_rates[i];
-              if (reactions[i].product3 != -1)
-                DENSE_ELEM (J, reactions[i].product3,
-                            reactions[i].reactant1) += reac_rates[i];
-              if (reactions[i].product4 != -1)
-                DENSE_ELEM (J, reactions[i].product4,
-                            reactions[i].reactant1) += reac_rates[i];
+              if( reactions[i].reactants[r] == -1 )
+                {
+                  local_nb_reactants = r;
+                  break;
+                }
             }
-
-          if ((reactions[i].reactant1 != -1) &&
-              (reactions[i].reactant2 != -1) &&
-              (reactions[i].reactant3 == -1))
+          for( r = 0; r < local_nb_reactants; r++ )
             {
-              y_product =
-               reac_rates[i] * NV_Ith_S (y, reactions[i].reactant2);
+              y_product =  reac_rates[i];
+              for( r2 = 0; r2 < local_nb_reactants; r2++ )
+                {
+                  if ( r != r2 )
+                    {
+                      y_product *=  NV_Ith_S (y, reactions[i].reactants[ r2 ]);
+                    }
+                }
 
-              DENSE_ELEM (J, reactions[i].reactant1,
-                          reactions[i].reactant1) -= y_product;
-              DENSE_ELEM (J, reactions[i].reactant2,
-                          reactions[i].reactant1) -= y_product;
-              DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant1) +=
-               y_product;
-              if (reactions[i].product2 != -1)
-                DENSE_ELEM (J, reactions[i].product2,
-                            reactions[i].reactant1) += y_product;
-              if (reactions[i].product3 != -1)
-                DENSE_ELEM (J, reactions[i].product3,
-                            reactions[i].reactant1) += y_product;
-              if (reactions[i].product4 != -1)
-                DENSE_ELEM (J, reactions[i].product4,
-                            reactions[i].reactant1) += y_product;
-
-              y_product =
-               reac_rates[i] * NV_Ith_S (y, reactions[i].reactant1);
-
-              DENSE_ELEM (J, reactions[i].reactant1,
-                          reactions[i].reactant2) -= y_product;
-              DENSE_ELEM (J, reactions[i].reactant2,
-                          reactions[i].reactant2) -= y_product;
-              DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant2) +=
-               y_product;
-              if (reactions[i].product2 != -1)
-                DENSE_ELEM (J, reactions[i].product2,
-                            reactions[i].reactant2) += y_product;
-              if (reactions[i].product3 != -1)
-                DENSE_ELEM (J, reactions[i].product3,
-                            reactions[i].reactant2) += y_product;
-              if (reactions[i].product4 != -1)
-                DENSE_ELEM (J, reactions[i].product4,
-                            reactions[i].reactant2) += y_product;
-            }
-
-          if ((reactions[i].reactant1 != -1) &&
-              (reactions[i].reactant2 != -1) &&
-              (reactions[i].reactant3 != -1))
-            {
-              y_product = reac_rates[i] * NV_Ith_S (y, reactions[i].reactant2)
-               * NV_Ith_S (y, reactions[i].reactant3);
-
-              DENSE_ELEM (J, reactions[i].reactant1,
-                          reactions[i].reactant1) -= y_product;
-              DENSE_ELEM (J, reactions[i].reactant2,
-                          reactions[i].reactant1) -= y_product;
-              DENSE_ELEM (J, reactions[i].reactant3,
-                          reactions[i].reactant1) -= y_product;
-              DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant1) +=
-               y_product;
-              if (reactions[i].product2 != -1)
-                DENSE_ELEM (J, reactions[i].product2,
-                            reactions[i].reactant1) += y_product;
-              if (reactions[i].product3 != -1)
-                DENSE_ELEM (J, reactions[i].product3,
-                            reactions[i].reactant1) += y_product;
-              if (reactions[i].product4 != -1)
-                DENSE_ELEM (J, reactions[i].product4,
-                            reactions[i].reactant1) += y_product;
-
-              y_product = reac_rates[i] * NV_Ith_S (y, reactions[i].reactant1)
-               * NV_Ith_S (y, reactions[i].reactant3);
-
-              DENSE_ELEM (J, reactions[i].reactant1,
-                          reactions[i].reactant2) -= y_product;
-              DENSE_ELEM (J, reactions[i].reactant2,
-                          reactions[i].reactant2) -= y_product;
-              DENSE_ELEM (J, reactions[i].reactant3,
-                          reactions[i].reactant2) -= y_product;
-              DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant2) +=
-               y_product;
-              if (reactions[i].product2 != -1)
-                DENSE_ELEM (J, reactions[i].product2,
-                            reactions[i].reactant2) += y_product;
-              if (reactions[i].product3 != -1)
-                DENSE_ELEM (J, reactions[i].product3,
-                            reactions[i].reactant2) += y_product;
-              if (reactions[i].product4 != -1)
-                DENSE_ELEM (J, reactions[i].product4,
-                            reactions[i].reactant2) += y_product;
-
-              y_product = reac_rates[i] * NV_Ith_S (y, reactions[i].reactant1)
-               * NV_Ith_S (y, reactions[i].reactant2);
-
-              DENSE_ELEM (J, reactions[i].reactant1,
-                          reactions[i].reactant3) -= y_product;
-              DENSE_ELEM (J, reactions[i].reactant2,
-                          reactions[i].reactant3) -= y_product;
-              DENSE_ELEM (J, reactions[i].reactant3,
-                          reactions[i].reactant3) -= y_product;
-              DENSE_ELEM (J, reactions[i].product1, reactions[i].reactant3) +=
-               y_product;
-              if (reactions[i].product2 != -1)
-                DENSE_ELEM (J, reactions[i].product2,
-                            reactions[i].reactant3) += y_product;
-              if (reactions[i].product3 != -1)
-                DENSE_ELEM (J, reactions[i].product3,
-                            reactions[i].reactant3) += y_product;
-              if (reactions[i].product4 != -1)
-                DENSE_ELEM (J, reactions[i].product4,
-                            reactions[i].reactant3) += y_product;
+              for( r2 = 0; r2 < local_nb_reactants; r2++ )
+                {
+                  DENSE_ELEM (J, reactions[i].reactants[r2], reactions[i].reactants[r]) -= y_product;
+                }
+              for( p = 0; p < NB_PRODUCTS; p++ )
+                {
+                  if(  reactions[i].products[p] != -1 )
+                    {
+                      DENSE_ELEM (J, reactions[i].products[p], reactions[i].reactants[r]) += y_product;
+                    }
+                }
             }
         }
     }

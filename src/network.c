@@ -17,7 +17,7 @@
 
    You should have received a copy of the GNU General Public License
    along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
- */
+   */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -44,8 +44,8 @@ read_network (const char *chem_file, net_t * network, const int verbose)
   FILE *f;
   char line[MAX_LINE];
 
-/*   Find the input file. We first look in the current directory, and
-     then in the PKGDATADIR directory. Exit if we can't find it. */
+  /*   Find the input file. We first look in the current directory, and
+       then in the PKGDATADIR directory. Exit if we can't find it. */
 
   char chem_file1[MAX_LINE];
   strcpy (chem_file1, chem_file);
@@ -111,7 +111,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
       char *localLine = line;
       char *localLine2 = strchr (line, ' ');
       char str[MAX_CHAR_SPECIES];
-      int mode = 1;
+      unsigned int mode = 0;
       int ending = 0;
 
       /* Read the reactants, products, and reaction parameters. one after another */
@@ -123,7 +123,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
               // We read a "->" time to read products
               localLine = localLine2 + 1;
               localLine2 = strchr (localLine, ' ');
-              mode = 4;
+              mode = 3;
               ending = 0;
               continue;
             }
@@ -169,46 +169,14 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                 {
                   /* Add the species in list
                      Find the correct place for this species in the reactions */
-                  if (mode == 1)
+                  if ( mode < NB_REACTANTS )
                     {
-                      network->reactions[n].reactant1 =
-                        add_species (str, network);
+                      network->reactions[n].reactants[ mode ] = add_species (str, network);
                       mode++;
                     }
-                  else if (mode == 2)
+                  else if ( mode < NB_REACTANTS + NB_PRODUCTS )
                     {
-                      network->reactions[n].reactant2 =
-                        add_species (str, network);
-                      mode++;
-                    }
-                  else if (mode == 3)
-                    {
-                      network->reactions[n].reactant3 =
-                        add_species (str, network);
-                      mode++;
-                    }
-                  else if (mode == 4)
-                    {
-                      network->reactions[n].product1 =
-                        add_species (str, network);
-                      mode++;
-                    }
-                  else if (mode == 5)
-                    {
-                      network->reactions[n].product2 =
-                        add_species (str, network);
-                      mode++;
-                    }
-                  else if (mode == 6)
-                    {
-                      network->reactions[n].product3 =
-                        add_species (str, network);
-                      mode++;
-                    }
-                  else if (mode == 7)
-                    {
-                      network->reactions[n].product4 =
-                        add_species (str, network);
+                      network->reactions[n].products[ mode - NB_REACTANTS ] =  add_species (str, network);
                       mode++;
                     }
                   else
@@ -333,16 +301,17 @@ alloc_network (net_t * network, int n_species, int n_reactions)
                "array allocation failed.\n");
       exit (1);
     }
-  int i;
+  int i,j;
   for (i = 0; i < n_reactions; i++)
     {
-      network->reactions[i].reactant1 = -1;
-      network->reactions[i].reactant2 = -1;
-      network->reactions[i].reactant3 = -1;
-      network->reactions[i].product1 = -1;
-      network->reactions[i].product2 = -1;
-      network->reactions[i].product3 = -1;
-      network->reactions[i].product4 = -1;
+      for( j = 0; j < NB_REACTANTS; j++ )
+        {
+          network->reactions[i].reactants[j] = -1;
+        }
+      for( j = 0; j < NB_PRODUCTS; j++ )
+        {
+          network->reactions[i].products[j] = -1;
+        }
     }
 }
 

@@ -519,14 +519,17 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
                          structure, we add the current reaction
                          number and rate to that structure. */
 
-                      if ((network->reactions[k].product1 ==
-                           input_params->output.output_species_idx[j])
-                          || (network->reactions[k].product2 ==
-                              input_params->output.output_species_idx[j])
-                          || (network->reactions[k].product3 ==
-                              input_params->output.output_species_idx[j])
-                          || (network->reactions[k].product4 ==
-                              input_params->output.output_species_idx[j]))
+                      bool specie_in_products = false;
+                      int p;
+                      for( p = 0; p < NB_PRODUCTS; p++ )
+                        {
+                          if( network->reactions[k].products[p] ==  input_params->output.output_species_idx[j])
+                            {
+                              specie_in_products = true;
+                              break;
+                            }
+                        }
+                      if( specie_in_products )
                         {
                           r_t formation_route;
                           double min_rate;
@@ -535,7 +538,7 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
                             {
                               formation_route.rate = astrochem_mem.params.reac_rates[k];
                               formation_route.rate *=
-                               NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant1);
+                               NV_Ith_S (astrochem_mem.y, network->reactions[k].reactants[0]);
                             }
                           else if (network->reactions[k].reaction_type == 23)
                             {
@@ -544,14 +547,15 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
                           else
                             {
                               formation_route.rate = astrochem_mem.params.reac_rates[k];
-                              formation_route.rate *=
-                               NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant1);
-                              if (network->reactions[k].reactant2 != -1)
-                                formation_route.rate *=
-                                 NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant2);
-                              if (network->reactions[k].reactant3 != -1)
-                                formation_route.rate *=
-                                 NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant3);
+                              int r;
+                              for( r = 0; r < NB_REACTANTS; r++ )
+                                {
+                                  if( network->reactions[k].reactants[r] != -1 )
+                                    {
+                                      formation_route.rate *=
+                                       NV_Ith_S (astrochem_mem.y, network->reactions[k].reactants[r]);
+                                    }
+                                }
                             }
                           formation_route.reaction_no =
                            network->reactions[k].reaction_no;
@@ -576,13 +580,17 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
 
                       /* If the species is reactant of the reaction
                          then compute the destruction rate. */
-
-                      if ((network->reactions[k].reactant1 ==
-                           input_params->output.output_species_idx[j])
-                          || (network->reactions[k].reactant2 ==
-                              input_params->output.output_species_idx[j])
-                          || (network->reactions[k].reactant3 ==
-                              input_params->output.output_species_idx[j]))
+                      bool species_in_reactants = false;
+                      int r;
+                      for ( r = 0; r < NB_REACTANTS; r++ )
+                        {
+                          if ( network->reactions[k].reactants[r] == input_params->output.output_species_idx[j])
+                            {
+                              species_in_reactants = true;
+                              break;
+                            }
+                        }
+                      if( species_in_reactants )
                         {
                           r_t destruction_route;
                           double min_rate;
@@ -592,7 +600,7 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
                             {
                               destruction_route.rate = astrochem_mem.params.reac_rates[k];
                               destruction_route.rate *=
-                               NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant1);
+                               NV_Ith_S (astrochem_mem.y, network->reactions[k].reactants[0]);
                             }
                           else if (network->reactions[k].reaction_type == 23)
                             {
@@ -601,15 +609,14 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
                           else
                             {
                               destruction_route.rate = astrochem_mem.params.reac_rates[k];
-                              if (network->reactions[k].reactant1 != -1)
-                                destruction_route.rate *=
-                                 NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant1);
-                              if (network->reactions[k].reactant2 != -1)
-                                destruction_route.rate *=
-                                 NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant2);
-                              if (network->reactions[k].reactant3 != -1)
-                                destruction_route.rate *=
-                                 NV_Ith_S (astrochem_mem.y, network->reactions[k].reactant3);
+                              for ( r = 0; r < NB_REACTANTS; r++ )
+                                {
+                                  if (network->reactions[k].reactants[r] != -1)
+                                    {
+                                      destruction_route.rate *=
+                                       NV_Ith_S (astrochem_mem.y, network->reactions[k].reactants[r]);
+                                    }
+                                }
                             }
                           destruction_route.reaction_no =
                            network->reactions[k].reaction_no;

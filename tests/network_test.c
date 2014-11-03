@@ -64,19 +64,19 @@ main (void)
   /* Read it */
 
   read_network(chem_file, &network, verbose);
- network.reactions[0].reactant2 =  find_species("H", &network);
+ network.reactions[0].reactants[1] =  find_species("H", &network);
   /* Check that the values are correct */
   if ((network.n_reactions == 18) &&
       (network.n_species == 25) &&
 
       /* Reaction #1 */
-      (network.reactions[0].reactant1 == find_species("H", &network)) &&
-      (network.reactions[0].reactant2 ==  find_species("H", &network)) &&
-      (network.reactions[0].reactant3 == -1) &&
-      (network.reactions[0].product1 ==  find_species("H2", &network)) &&
-      (network.reactions[0].product2 == -1) &&
-      (network.reactions[0].product3 == -1) &&
-      (network.reactions[0].product4 == -1) &&
+      (network.reactions[0].reactants[0] == find_species("H", &network)) &&
+      (network.reactions[0].reactants[1] ==  find_species("H", &network)) &&
+      (network.reactions[0].reactants[2] == -1) &&
+      (network.reactions[0].products[0] ==  find_species("H2", &network)) &&
+      (network.reactions[0].products[1] == -1) &&
+      (network.reactions[0].products[2] == -1) &&
+      (network.reactions[0].products[3] == -1) &&
       (network.reactions[0].alpha == 4.95e-17) &&
       (network.reactions[0].beta == .5) &&
       (network.reactions[0].gamma == 0) &&
@@ -84,13 +84,13 @@ main (void)
       (network.reactions[0].reaction_no == 1) &&
 
       /* Reaction #176 */
-      (network.reactions[4].reactant1 == find_species("CH5N", &network)) &&
-      (network.reactions[4].reactant2 == -1) &&
-      (network.reactions[4].reactant3 == -1) &&
-      (network.reactions[4].product1 ==  find_species("HCN", &network)) &&
-      (network.reactions[4].product2 ==  find_species("H2", &network)) &&
-      (network.reactions[4].product3 ==  find_species("H", &network)) &&
-      (network.reactions[4].product4 ==  find_species("H", &network) )&&
+      (network.reactions[4].reactants[0] == find_species("CH5N", &network)) &&
+      (network.reactions[4].reactants[1] == -1) &&
+      (network.reactions[4].reactants[2] == -1) &&
+      (network.reactions[4].products[0] ==  find_species("HCN", &network)) &&
+      (network.reactions[4].products[1] ==  find_species("H2", &network)) &&
+      (network.reactions[4].products[2] ==  find_species("H", &network)) &&
+      (network.reactions[4].products[3] ==  find_species("H", &network) )&&
       (network.reactions[4].alpha == 1.41e3) &&
       (network.reactions[4].beta == 0) &&
       (network.reactions[4].gamma == 0) &&
@@ -98,13 +98,13 @@ main (void)
       (network.reactions[4].reaction_no == 176) &&
 
       /* Reaction #4227 */
-      (network.reactions[14].reactant1 == find_species("C(+)", &network) )&&
-      (network.reactions[14].reactant2 == find_species("e(-)", &network) )&&
-      (network.reactions[14].reactant3 == -1) &&
-      (network.reactions[14].product1 == find_species("C", &network) )&&
-      (network.reactions[14].product2 == -1) &&
-      (network.reactions[14].product3 == -1) &&
-      (network.reactions[14].product4 == -1) &&
+      (network.reactions[14].reactants[0] == find_species("C(+)", &network) )&&
+      (network.reactions[14].reactants[1] == find_species("e(-)", &network) )&&
+      (network.reactions[14].reactants[2] == -1) &&
+      (network.reactions[14].products[0] == find_species("C", &network) )&&
+      (network.reactions[14].products[1] == -1) &&
+      (network.reactions[14].products[2] == -1) &&
+      (network.reactions[14].products[3] == -1) &&
       (network.reactions[14].alpha == 4.40e-12) &&
       (network.reactions[14].beta == -.61) &&
       (network.reactions[14].gamma == 0) &&
