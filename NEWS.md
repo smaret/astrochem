@@ -12,6 +12,8 @@ astrochem-0.6 (Not released yet)
   of clarity. These data structures are dynamically allocated, so
   there is no limit on the numbers of shells or reactions anymore.
 
+* Implement time-dependent sources (closes feature request #20)
+
 astrochem-0.5 (October 15, 2012)
 --------------------------------
 
