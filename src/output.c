@@ -32,7 +32,7 @@
 #define MAX_CHAR_FILENAME 64
 
 void
-output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
+output (int n_cells, const inp_t * input_params, const mdl_t * source_mdl,
         const net_t * network, const res_t * results, int verbose)
 {
   FILE *f;
@@ -69,16 +69,16 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
 #ifdef OUTPUT_TIME_COLUMN
 
       /* Write the abundances as in a function of time in different
-         columns, with a line for each shell. This is a good way to
-         write data if we have a lot of shells. However, it is
+         columns, with a line for each cell. This is a good way to
+         write data if we have a lot of cells. However, it is
          difficult to read if the source has only one (or a few)
-         shells */
+         cells */
 
       /* Write the header. */
 
       fprintf (f, "# %s abundance computed by astrochem\n",
                input_params->output.output_species[i]);
-      fprintf (f, "# shell number / time [yr]\n");
+      fprintf (f, "# cell number / time [yr]\n");
       fprintf (f, "#\n");
 
       /* Write the time */
@@ -88,9 +88,9 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
         fprintf (f, "  %8.2e", source_mdl->time_steps[j] / CONST_MKSA_YEAR);
       fprintf (f, "\n");
 
-      /* Write the abundance as a function of time for each shell. */
+      /* Write the abundance as a function of time for each cell. */
 
-      for (k = 0; k < n_shells; k++)
+      for (k = 0; k < n_cells; k++)
         {
           fprintf (f, "%3d", k);
           for (j = 0; j < time_steps; j++)
@@ -101,31 +101,31 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
 #else
 
       /* Write abundances as a function of time in different lines,
-         with a column for each shell. This is better if we have only
-         one (or a few) shells. */
+         with a column for each cell. This is better if we have only
+         one (or a few) cells. */
 
       /* Write the header. */
 
       fprintf (f, "# %s abundance computed by astrochem\n",
                network->species_names[input_params->output.
                                       output_species_idx[i]]);
-      fprintf (f, "# time [yr] / shell number\n");
+      fprintf (f, "# time [yr] / cell number\n");
       fprintf (f, "#\n");
 
-      /* Write the shell number */
+      /* Write the cell number */
 
       fprintf (f, "        ");
-      for (k = 0; k < n_shells; k++)
+      for (k = 0; k < n_cells; k++)
         fprintf (f, "  %8d", k);
       fprintf (f, "\n");
 
-      /* Write the abundance as a function of time for each shell. */
+      /* Write the abundance as a function of time for each cell. */
 
       for (j = 0; j < source_mdl->ts.n_time_steps; j++)
         {
           fprintf (f, "%8.2e",
                    source_mdl->ts.time_steps[j] / CONST_MKSA_YEAR);
-          for (k = 0; k < n_shells; k++)
+          for (k = 0; k < n_cells; k++)
             fprintf (f, "  %8.2e",
                      results->abundances[get_abundance_idx
                                          (results, k, j, i)]);
@@ -172,7 +172,7 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
             }
 
           /* Write the main formation routes as a function of time
-             and for each shell. For each formation/destruction
+             and for each cell. For each formation/destruction
              route, we write the reaction number and the reaction
              rate. */
 
@@ -183,12 +183,12 @@ output (int n_shells, const inp_t * input_params, const mdl_t * source_mdl,
                    network->species_names[input_params->output.
                                           output_species_idx[i]]);
           fprintf (f,
-                   "# shell number  time [yr]  reaction number 1  reaction rate 1 [cm-3/s]... \n");
+                   "# cell number  time [yr]  reaction number 1  reaction rate 1 [cm-3/s]... \n");
           fprintf (f, "#\n");
 
           /* Write the formation/destruction routes */
 
-          for (k = 0; k < n_shells; k++)
+          for (k = 0; k < n_cells; k++)
             {
               for (j = 0; j < source_mdl->ts.n_time_steps; j++)
                 {
