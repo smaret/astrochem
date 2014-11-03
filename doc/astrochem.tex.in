@@ -264,9 +264,8 @@ the ionization or dissociation rate may be written as:
 
 \noindent
 where $A_{v}$ is the visual extinction in magnitude, and $\chi$ is the
-external UV flux in Habing units \citep{Habing68}. In other words,
-$\chi = 1$ corresponds to a ``standard'' interstellar radiation field
-(ISRF).
+external UV flux in units of the standard Draine interstellar
+radiation field \citep{Draine78}.
 
 This formulation implicitly assumes that the external radiation field
 has the same spectral shape than the the ISRF. In addition the
@@ -519,14 +518,15 @@ The photo-desorption rate of CO is for example
 
 with:
 \begin{equation}
-  k = \chi \, G_{0} \, \mathrm{exp} \left( -2 A_{v} \right)
+  k = \chi \, I_\mathrm{ISRF,FUV} \, \mathrm{exp} \left( -2 A_{v} \right)
   \, \pi r_{d}^{2} \, n_{d} \, Y_\mathrm{PD}
   \label{eq:photo-desorption}
 \end{equation}
 
 \noindent
-Here $G_{0}$ is the average UV ISRF \citep[assumed to be
-10$^{8}$~photons~cm$^{-2}$~s$^{-1}$;][]{Habing68}, and $Y_\mathrm{PD}$
+Here $I_\mathrm{ISRF,FUV}$ is the standard interstellar radiation
+field in the FUV \citep[assumed to be $1.7 \times
+10^{8}$~photons~cm$^{-2}$~s$^{-1}$;][]{Draine78}, and $Y_\mathrm{PD}$
 is the photo-desorption yield, i.e. the number of molecules ejected
 per incident photon. The latter is given by:
 
@@ -630,8 +630,8 @@ brackets. Lines starting with \verb=#= are comments. The first section
 (\verb=[files]=) indicates the name of the file describing our source
 (\verb=source=), and the chemical network to use (\verb=chem=). The
 following section (\verb=[phys]=) sets the physical parameters of the
-source. Here we set the interstellar radiation field (\verb=chi=) to
-1.0 (in Habing units), and the cosmic ionization rate (\verb=cosmic=)
+source. Here we set the UV radiation field in Draine units
+(\verb=chi=) to 1.0, and the cosmic ionization rate (\verb=cosmic=)
 to $1.3 \times 10^{-17} s^{-1}$. The solver parameters are set in
 following section (\verb=[solver]=). \verb=ti= and \verb=tf= are the
 initial and final time for the calculation respectively. Both are
@@ -875,8 +875,8 @@ are:
 
 \begin{itemize}
 
-\item \verb=chi=: The external radiation field, expressed in
-  \citet{Habing68} units. This corresponds to $\chi$ in
+\item \verb=chi=: The external UV radiation field, expressed in
+  \citet{Draine78} units. This corresponds to $\chi$ in
   Eq.~(\ref{eq:photo-ionization}) and Eq.~(\ref{eq:photo-desorption}).
 
 \item \verb=cosmic=: The cosmic ray ionization rate of molecular
