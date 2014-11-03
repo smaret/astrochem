@@ -564,7 +564,7 @@ def readabun(filename):
  
     f = open(filename)
 
-    # Skip comments and shell number
+    # Skip comments and cell number
     f.readline()
     f.readline()
     f.readline()
@@ -592,7 +592,7 @@ def readabun(filename):
 
 def readrout(filename):
     """
-    Read a rout file and return arrays of time, shell number,
+    Read a rout file and return arrays of time, cell number,
     formation/destruction rates
 
     """
@@ -619,27 +619,27 @@ def readrout(filename):
     # Create an array from the list
     a = numpy.array(a)
 
-    # Extract shell number, time, formation/destruction reactions and
+    # Extract cell number, time, formation/destruction reactions and
     # rates.
-    shell = numpy.array(a[::2,0], dtype = int)
+    cell = numpy.array(a[::2,0], dtype = int)
     time = a[::2,1]
     formation_reac = numpy.array(a[0::2,2::2], dtype = int)
     formation_rate = a[0::2,3::2]
     destruction_reac = numpy.array(a[1::2,2::2], dtype = int)
     destruction_rate = a[1::2,3::2]
 
-    shell = numpy.unique(shell)
-    nshell = len(numpy.unique(shell))
+    cell = numpy.unique(cell)
+    ncell = len(numpy.unique(cell))
     time = numpy.unique(time)
     ntime = len(numpy.unique(time))
 
     # Reshape formation/destruction reactions and rates arrays 
-    formation_reac = numpy.reshape(formation_reac, (nshell, ntime, -1))
-    formation_rate = numpy.reshape(formation_rate, (nshell, ntime, -1))
-    destruction_reac = numpy.reshape(destruction_reac, (nshell, ntime, -1))
-    destruction_rate = numpy.reshape(destruction_rate, (nshell, ntime, -1))
+    formation_reac = numpy.reshape(formation_reac, (ncell, ntime, -1))
+    formation_rate = numpy.reshape(formation_rate, (ncell, ntime, -1))
+    destruction_reac = numpy.reshape(destruction_reac, (ncell, ntime, -1))
+    destruction_rate = numpy.reshape(destruction_rate, (ncell, ntime, -1))
 
-    return time, shell, formation_reac, formation_rate, destruction_reac, destruction_rate
+    return time, cell, formation_reac, formation_rate, destruction_reac, destruction_rate
 
 def _totex_species(spec):
     """
