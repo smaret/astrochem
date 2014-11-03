@@ -650,20 +650,20 @@ section~\ref{sec:source-file}):
 
 \begin{verbatim}
 # Source model file example
-# shell number, Av [mag], nH [cm^-3], Tgas [K], Tdust [K]
+# cell number, Av [mag], nH [cm^-3], Tgas [K], Tdust [K]
 #
 0	20.0	1e+04	10.0	10.0
 \end{verbatim}
 
 As for the input file, lines that starts with a \verb=#= are
-comments. The file contains one line for each \emph{shell} of our
+comments. The file contains one line for each \emph{cell} of our
 source. In this simple example, our source is isodense and isothermal,
-and therefore there is only one shell in the our source file. A more
+and therefore there is only one cell in the our source file. A more
 realistic source with a temperature and density gradient would be
-sampled in more shells.
+sampled in more cells.
 
-Each line corresponding to a shell has five columns. The first column
-is the index of the shell, the second one is the visual extinction
+Each line corresponding to a cell has five columns. The first column
+is the index of the cell, the second one is the visual extinction
 $A_{v}$ (in magnitudes), the third one is the number density (in
 cm$^{-3}$). and the fourth and the fifth are the gas and dust
 temperature respectively (in Kelvins).  Note that we have adopted a
@@ -682,8 +682,8 @@ Reading input from input.ini.
 Reading source model from source.mdl.
 Reading reactions network from osu2009.chm... done.
 Found 6046 reactions involving 468 species.
-Computing abundances in shell 0...
-Done with shell 0.
+Computing abundances in cell 0...
+Done with cell 0.
 Writing abundances in output files... done.
 Writing formation/destruction in output files... done.
 %
@@ -703,7 +703,7 @@ like this:
 
 \begin{verbatim}
 # HCO(+) abundance computed by astrochem
-# time [yr] / shell number
+# time [yr] / cell number
 #
                  0
 1.00e-06  0.00e+00
@@ -727,12 +727,12 @@ like this:
 \end{verbatim}
 
 \noindent
-The first three lines are comments. The third one lists the shell
+The first three lines are comments. The third one lists the cell
 indexes. The following lines gives the abundances as a function of
-time for each shell; the first column indicates the time in year, and
+time for each cell; the first column indicates the time in year, and
 the following ones the abundances, with respect to H nuclei, in each
-shell. In our simple example, there is only one shell, so the file has
-only two columns, one for the time, and one for the shell number.
+cell. In our simple example, there is only one cell, so the file has
+only two columns, one for the time, and one for the cell number.
 
 \subsection{Plotting abundances}
 \label{sec:plotting-abundances}
@@ -740,7 +740,7 @@ only two columns, one for the time, and one for the shell number.
 Astrochem comes with a program that make plots of the abundances
 computed by Astrochem. The program, named Plabun, allows to plot the
 abundances of one or several species as of function of time in a given
-shell. For example, the following command plots the CO, H$_{3}^{+}$,
+cell. For example, the following command plots the CO, H$_{3}^{+}$,
 e$^{-}$ and HCO$^{+}$ abundances:
 
 \begin{verbatim}
@@ -968,7 +968,7 @@ the computation. These parameters are:
   \verb=trace_route= is set to 1, Astrochem will create a file
   containing the formation/destruction rate and reaction number of the
   16 most important formation/destruction reaction for each specie, as
-  a function of time and position (i.e. shell number). As for
+  a function of time and position (i.e. cell number). As for
   abundance files, file names for formation and destruction routes are
   formed with the species name possibly followed by a suffix (see
   below) and the \verb=.rout= file extension.
@@ -978,44 +978,53 @@ the computation. These parameters are:
 \subsection{Source file}
 \label{sec:source-file}
 
-Astrochem reads the physical parameters (density, temperature) of the
-astronomical source in a source file. Although the source may have in
-principle any dimension, Astrochem is, for the moment, only designed
-to study 1D spherical sources in an external radiation field (such as
-a dense cloud or a prestellar core in the ISRF). Future versions will
-allow to study 2D sources with axisymmetrical geometries, such as
-protoplanetary disks.
+Astrochem reads the physical parameters (density, temperature, visual
+extinction) of the astronomical source in a source file. This file can
+be of two formats, depending on whether the source physical parameters
+vary as a function of time or not.
 
-In order to construct a source model file, one needs to sample the
-astronomical source in a number of spherical shells at different
-source radius. What constitutes a good sampling depends on the
-source. Often density profiles of astronomical sources are well
-described by a power laws, so it is usually a good idea to sample the
-source in a number of logarithmically spaced shells. Of course, the
-larger number of shells, the longer computational time. However,
-Astrochem may be run in parallel on multi-cores computer in order to
-reduce computational time (see section~\ref{sec:runn-astr-parall}).
+\subsubsection{Time-independent physical parameters}
 
-Each line of the file corresponds to a different shell, while each
+This type of source file is used to describe astronomical source in
+which the physical parameters do not change with time, or change on
+timescales longer than the chemical timescales. Although the source
+may have in principle any dimension, Astrochem is, for the moment,
+designed to study 1D spherical sources in an external radiation field
+only (such as a dense cloud or a prestellar core in the ISRF). Future
+versions will allow to study 2D sources with axisymmetrical
+geometries, such as protoplanetary disks.
+
+In order to construct a time-independent source model file, one needs
+to sample the astronomical source in a number of spherical cells (or
+shells) at different source radius. What constitutes a good sampling
+depends on the source. Often density profiles of astronomical sources
+are well described by a power laws, so it is usually a good idea to
+sample the source in a number of logarithmically spaced cells. Of
+course, the larger number of cells, the longer computational
+time. However, Astrochem may be run in parallel on multi-core
+computers in order to reduce the computational time (see
+section~\ref{sec:runn-astr-parall}).
+
+Each line of the file corresponds to a different cell, while each
 column corresponds to a different parameter. These parameters are,
 from the leftmost to the rightmost columns:
 
 \begin{enumerate}
 
-\item The shell index. This is an integer that is used to identify
-  each shell. The first index should be 0. Other indexes in the file
-  should be in increasing order. All shells should have a different
+\item The cell index. This is an integer that is used to identify
+  each cell. The first index should be 0. Other indexes in the file
+  should be in increasing order. All cells should have a different
   index.
 
-\item The visual extinction in the shell, expressed in magnitudes.
+\item The visual extinction in the cell, expressed in magnitudes.
 
-\item The H nuclei density in the shell, expressed in cm$^{-3}$.
+\item The H nuclei density in the cell, expressed in cm$^{-3}$.
 
-\item The gas temperature in the shell, expressed in K.
+\item The gas temperature in the cell, expressed in K.
 
-\item The dust temperature in the shell, expressed in K.
+\item The dust temperature in the cell, expressed in K.
 
-\item The radius corresponding to the shell, expressed in astronomical
+\item The radius corresponding to the cell, expressed in astronomical
   units (AU). This optional parameter is used for bookkeeping only;
   Astrochem ignores it.
 
@@ -1025,6 +1034,99 @@ from the leftmost to the rightmost columns:
 Columns may be separated by any number of white spaces or
 tabs. Comments may written in the source file; comment lines must
 start with a \verb=#= sign.
+
+\subsubsection{Time-dependent physical parameters}
+
+This type of source file is used to describe an astronomical source in
+which the physical parameters vary as a function of time, for example
+a protostar that undergoes gravitational collapse. In this case, the
+physical parameters (density, temperature), may come from theoretical
+prescriptions or from numerical simulations.
+
+In order to construct this kind of model, one need to sample the
+source in a number of different cells that follow the dynamical
+evolution of the object as a function of time. These could correspond
+to the \emph{smooth particles} from a SPH simulation, or the
+\emph{buoy particles} from an adaptive mesh refinement (AMR)
+(magneto-)hydrodynamical simulation. The source needs to be properly
+sampled both spatially and temporally. Indeed, Astrochem assumes that
+the physical parameters in each cell remain constant within each time
+step\footnote{This dynamical time step is different from the chemical
+  time step. The later is adjusted internally by Astrochem to ensure a
+  sufficient precision on the computed abundances. The former is
+  provided by the user.}. Therefore this time step should be
+sufficiently small so that the physical parameters do not vary
+significantly between two time steps.
+
+Time-dependent source models have two sections, which are separated by
+keywords in brackets. The first one contains the times, expressed in
+years, and starts with the \verb=[times]= keyword.
+
+\begin{verbatim}
+# Source model file example for a time-dependant source structure
+[times]
+     0     1.00e-06
+     1     1.27e-06
+     2     1.60e-06
+     3     2.03e-06
+     4     2.57e-06
+(...)
+   126     7.90e+06
+   127     1.00e+07
+\end{verbatim}
+
+\noindent
+The number on the first column is the time index, which must start at
+0. The second column contains the time, expressed in years.  In this
+example, the time on the first line is $10^{-6}$ years. This
+corresponds to the time at the end of the computation of the first
+time step; in other words, the time step \verb=#0= is between $t = 0$
+and $t = 10^{-6}$ years. Likewise, the time step \verb=#127= is
+between $7.9 \times 10^{6}$ and $10^{7}$ years, at which time the
+computation ends.
+
+The second part of the file contains the physical parameters of each
+cell at each time step. This section must start with the
+\verb=[cells]= keyword, followed by the physical properties of the
+first cell.
+
+\begin{verbatim}
+# cell number, time index, Av [mag], nH [cm^-3], Tgas [K], Tdust [K]
+[cells]
+     0        0    20.00     1.00e+04    10.00    10.00
+     0        1    20.00     1.04e+04    10.00    10.00
+     0        2    20.00     1.08e+04    10.00    10.00
+(...)
+     0      127    20.00     1.00e+06    10.00    10.00
+     1        0    20.00     1.00e+05    10.00    10.00
+(...)
+     1      127    20.00     1.00e+07    10.00    10.00
+\end{verbatim}
+
+The columns in this section are:
+
+\begin{enumerate}
+  \item The cell index, starting at 0.
+  \item The time index.
+  \item The visual extinction in the cell, expressed in magnitudes.
+  \item The hydrogen density, in cm$^{-3}$.
+  \item The gas temperature, in Kelvins.
+  \item The dust temperature, in Kelvins.
+\end{enumerate}
+
+\noindent
+Each line correspond to a different time step.  In this example, the
+first cell (\verb=#0=) has a density of $10^4$~cm$^{-3}$ and a
+temperature of 10~K during the first time step (\verb=#0=),
+i.e. between $t = 0$ and $t = 10^{-6}$ years. During the last time
+step (\verb=#127=), this cell has a density of $10^6$~cm$^{-3}$ and a
+temperature of 10~K.
+
+Any number of cells may be given in the file. The physical parameters
+of the second cell (\verb=#1=), directly follows that of the first
+one. For example, the second cell (\verb=#1=) has a density of
+$10^4$~cm$^{-3}$ and a temperature of 10~K during the same time step
+(\verb=#0=). Note that all cells must have the same time steps.
 
 \section{Chemical networks}
 \label{sec:chemical-networks}
@@ -1189,7 +1291,7 @@ type of the reaction. Table~\label{tab:rate-const-meaning} gives
 physical meaning of these for each reaction type, as well as the
 equation that is used to computed the rate. Because reaction rates
 generally do not vary with time, Astrochem computes them only once for
-each shell. The only exception is the rate of UV photo-desorption
+each cell. The only exception is the rate of UV photo-desorption
 reactions, that depends on the ice thickness; therefore the rate for
 these reactions is computed for each solver internal time step.
 
@@ -1251,10 +1353,10 @@ automatically generated from the OSU files using this tool.
 \label{sec:runn-astr-parall}
 
 Astrochem may be run in parallel for sources containing more than one
-shell. In this kind of source, if diffusion and advection are
-neglected, each shell is independent from others: abundances in a
-given shell are not affected by abundances in other shells. Therefore
-abundances may be computed in several shells simultaneously.
+cell. In this kind of source, if diffusion and advection are
+neglected, each cell is independent from others: abundances in a
+given cell are not affected by abundances in other cells. Therefore
+abundances may be computed in several cells simultaneously.
 
 Parallelism in Astrochem is implemented using the OpenMP
 standard\footnote{For more information on OpenMP, see
@@ -1263,9 +1365,9 @@ directives that allows a program to be run in parallel on a
 shared-memory parallel computer, such as a multi-core and/or multi-CPU
 machine. Astrochem forks in several threads that are run
 simultaneously on several cores and/or CPUs. Each thread corresponds
-to a computation in a different shell. When run in parallel, Astrochem
+to a computation in a different cell. When run in parallel, Astrochem
 execution time scales almost linearly with the inverse of the number
-of cores or CPUs. For example, for a 64 shells source, Astrochem
+of cores or CPUs. For example, for a 64 cells source, Astrochem
 should run almost eight times faster on a quad-core dual-CPU
 (i.e. eight cores in total) than on single-core single-CPU computer.
 
@@ -1292,8 +1394,8 @@ export OMP_NUM_THREADS=8
 \end{verbatim}
 
 \noindent
-It is also a good idea to sample the source in a number of shell that
-is a multiple of the number of threads (e.g. 64 shells for 8 threads)
+It is also a good idea to sample the source in a number of cell that
+is a multiple of the number of threads (e.g. 64 cells for 8 threads)
 so that all cores 100\% of the time during the computation.
 
 \bibliography{astrochem.bib}
