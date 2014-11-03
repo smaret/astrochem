@@ -46,7 +46,7 @@ Options:
    -V, --version            Display plroute version information
    -o, --output             Create a postscript file
 
-   -s, --shell=index        Set the shell index. Default is 0.
+   -c, --cell=index         Set the cell index. Default is 0.
    -x, --xrange=xmin,xmax   Set the x axis range
    -y, --yrange=ymin,ymax   Set the y axis range
    -c, --chmfile=file       Specify chemical network file
@@ -117,16 +117,16 @@ def main():
 
     # Parse options and arguments
     try:
-	opts, args = getopt.getopt(sys.argv[1:], "hVo:s:x:y:c:p",
+	opts, args = getopt.getopt(sys.argv[1:], "hVo:c:s:x:y:m:p",
 				   ["help", "version", "output=",
-                                    "shell=", "xrange=", "yrange=",
-                                    "chmfile=", "percent"])
+                                    "cell=", "shell=", "xrange=",
+                                    "yrange=", "chmfile=", "percent"])
     except getopt.GetoptError:
 	usage()
 	sys.exit(1)
 
     output = None
-    s =  0
+    c =  0
     xrange = None
     yrange = None
     chmfile = None
@@ -141,11 +141,13 @@ def main():
 	    sys.exit()
 	if opt in ("-o", "--output"):
 	    output = arg
-	if opt in ("-s", "--shell"):
+	if opt in ("-c", "--cell") or opt in ("-s", "--shell"):
+            if opt in ("-s", "--shell"):
+                sys.stderr.write("plabun: warning: --shell option is deprecated, use --cell instead.\n")
             try:
-                s = int(arg)
+                c = int(arg)
             except:
-                sys.stderr.write("plroute: error: invalid shell index.\n")
+                sys.stderr.write("plroute: error: invalid cell index.\n")
                 sys.exit(1)
         if opt in ("-x", "--xrange"):
             try:
@@ -159,7 +161,7 @@ def main():
             except:
                 sys.stderr.write("plroute: error: invalid y axis range.\n")
                 sys.exit(1)
-        if opt in ("-c", "--chmfile"):
+        if opt in ("-m", "--chmfile"):
             chmfile = arg
         if opt in ("-p", "--percent"):
             percent = True
@@ -204,11 +206,11 @@ def main():
     # Stack for line colors
     linecolor_stack = ["red", "blue", "green", "yellow", "orange", "cyan"]
     
-    # Plot formation/destruction rates as a function of time or shell
+    # Plot formation/destruction rates as a function of time or cell
     # number for the main formation/destruction routes
 
     try:
-        time, shell, formation_reac, formation_rate, destruction_reac, \
+        time, cell, formation_reac, formation_rate, destruction_reac, \
             destruction_rate = readrout(filename)
     except IOError:
         sys.stderr.write("plroute: error: can't open %s.\n" % filename)
@@ -220,18 +222,18 @@ def main():
     p1.xtitle = p2.xtitle = "Time (yr)"
     p1.xlog = p2.xlog = 1
 
-    # Check that the shell index is valid
+    # Check that the cell index is valid
     try:
-        temp = formation_reac[s, 0, 0]
+        temp = formation_reac[c, 0, 0]
     except IndexError:
-        sys.stderr.write("plroute: error: shell index is out of bounds.\n")
+        sys.stderr.write("plroute: error: cell index is out of bounds.\n")
         sys.exit(1)
 
     # Create arrays containing the destruction/formation routes at
-    # each time step and in each shell
+    # each time step and in each cell
 
-    f_reac = unique(formation_reac[s, :, :])
-    d_reac = unique(destruction_reac[s, :, :])
+    f_reac = unique(formation_reac[c, :, :])
+    d_reac = unique(destruction_reac[c, :, :])
     f_reac = f_reac[f_reac.nonzero()]
     d_reac = d_reac[d_reac.nonzero()]
     f_rate = zeros(len(f_reac) * len(time), dtype=float)
@@ -241,15 +243,15 @@ def main():
 
     for i in range(len(time)):
         for j in range(len(f_reac)):
-            index = where(formation_reac[s, i, :] == f_reac[j])[0]
+            index = where(formation_reac[c, i, :] == f_reac[j])[0]
             if len(index) > 0:
-                f_rate[j, i] = formation_rate[s, i, index[0]]
+                f_rate[j, i] = formation_rate[c, i, index[0]]
             else:
                 f_rate[j, i] = 0.
         for j in range(len(d_reac)):
-            index = where(destruction_reac[s, i, :] == d_reac[j])[0]
+            index = where(destruction_reac[c, i, :] == d_reac[j])[0]
             if len(index) > 0:
-                d_rate[j, i] = destruction_rate[s, i, index[0]]
+                d_rate[j, i] = destruction_rate[c, i, index[0]]
             else:
                 d_rate[j, i] = 0.
 
