@@ -135,8 +135,8 @@ rate (double alpha, double beta, double gamm, int reaction_type,
                                            * pow (grain_size, 2)
                                            * grain_abundance * nh);
         double Ypd = alpha * (1 - exp (-x / gamm));
-        k = chi * AVERAGE_UV_IRSF * exp (-2 * av) * M_PI * pow (grain_size, 2)
-          * grain_abundance * nh * Ypd;
+        k = chi * DRAINE_STANDARD_ISRF_FUV * exp (-2 * av) * M_PI
+		* pow (grain_size, 2) * grain_abundance * nh * Ypd;
         break;
       }
 

@@ -50,7 +50,7 @@
 #define FRACTION_TIME_GRAIN_70K 3.16e-19
 #define GAS_DUST_NUMBER_RATIO 7.57e+11
 #define GRAIN_SITES_PER_CM2 3.00e+15    /* cm-2 */
-#define AVERAGE_UV_IRSF 1e8     /* photons cm-2 */
+#define DRAINE_STANDARD_ISRF_FUV 1.7e8  /* photons cm-2 */
 
 /* Data structures */
 

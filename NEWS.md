@@ -14,6 +14,9 @@ astrochem-0.6 (Not released yet)
 
 * Implement time-dependent sources (closes feature request #20)
 
+* Fixed the radiation field for photodesorption reactions, which was
+  computed in Habing units instead of Draine units (closes issue #19)
+
 astrochem-0.5 (October 15, 2012)
 --------------------------------
 

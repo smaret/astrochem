@@ -228,7 +228,7 @@ jacobian (long int N __attribute__ ((unused)),
           double jac_elem;
 
           jac_elem =
-            (chi * AVERAGE_UV_IRSF * exp (-2 * av) * reactions[i].alpha) /
+            (chi * DRAINE_STANDARD_ISRF_FUV * exp (-2 * av) * reactions[i].alpha) /
             (GRAIN_SITES_PER_CM2 * reactions[i].gamma) *
             exp (-NV_Ith_S (y, reactions[i].reactant1) /
                  (GRAIN_SITES_PER_CM2 * M_PI * pow (grain_size, 2) *
