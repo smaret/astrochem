@@ -45,7 +45,7 @@ Options:
    -V, --version            Display plabun version information
    -o, --output=file        Create a postscript file
 
-   -s, --shell=index        Set the shell number (default 0)
+   -c, --cell=index         Set the cell number (default 0)
    -x, --xrange=xmin,xmax   Set the x axis range
    -y, --yrange=ymin,ymax   Set the y axis range
    
@@ -73,15 +73,16 @@ def main():
 
     # Parse options and arguments
     try:
-	opts, args = getopt.getopt(sys.argv[1:], "hVo:s:x:y:",
+	opts, args = getopt.getopt(sys.argv[1:], "hVo:c:s:x:y:",
 				   ["help", "version", "output=",
-                                    "shell=", "xrange=", "yrange="])
+                                    "cell=", "shell=", "xrange=",
+                                    "yrange="])
     except getopt.GetoptError:
 	usage()
 	sys.exit(1)
 
     output = None
-    s =  0
+    c =  0
     xrange = None
     yrange = None
     model = None
@@ -95,11 +96,13 @@ def main():
 	    sys.exit()
 	if opt in ("-o", "--output"):
 	    output = arg
-	if opt in ("-s", "--shell"):
+	if opt in ("-c", "--cell") or opt in ("-s", "--shell"):
+            if opt in ("-s", "--shell"):
+                sys.stderr.write("plabun: warning: --shell option is deprecated, use --cell instead.\n")
             try:
-                s = int(arg)
+                c = int(arg)
             except:
-                sys.stderr.write("plabun: error: invalid shell index.\n")
+                sys.stderr.write("plabun: error: invalid cell index.\n")
                 sys.exit(1)
         if opt in ("-x", "--xrange"):
             try:
@@ -170,9 +173,9 @@ def main():
 
         # Pick-up values that correspond to the given time index
         try:
-            abund = abund[:, s]
+            abund = abund[:, c]
         except IndexError:
-            sys.stderr.write("plabun: error: shell index is out of bounds.\n")
+            sys.stderr.write("plabun: error: cell index is out of bounds.\n")
             sys.exit(1)            
 
         # Drop zeros and negative values
@@ -187,10 +190,10 @@ def main():
 
         linecolor = linecolor_stack.pop(0)
         linecolor_stack.append(linecolor)
-        c = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
-        c.label = "$" + _totex_species(spec) + "$"
-        curves.append(c)
-        p.add(c)
+        cu = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
+        cu.label = "$" + _totex_species(spec) + "$"
+        curves.append(cu)
+        p.add(cu)
     
     # Draw the plot key
     p.add(biggles.PlotKey(.1, .90, curves))

@@ -50,10 +50,10 @@ vs. time
 Display help text.
 .It Cm -V, --version
 Display plabun version information.
-.It Cm -o Ar file , Cm --output=Ar file
+.It Cm -o Ar file , Cm --output= Ar file
 Create a PostScript file.
-.It Cm -s Ar shell-number , Cm --shell= Ar shell-number
-Set the shell number. Default is 0.
+.It Cm -c Ar cell-number , Cm --cell= Ar cell-number
+Set the cell number. Default is 0.
 .It Cm -x Ar xmin,xmax , Cm --xrange= Ar xmin,xmax
 Set the x axis range
 .It Cm -y Ar ymin,ymax , Cm --yrange= Ar ymin,ymax
