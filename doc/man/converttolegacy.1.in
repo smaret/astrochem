@@ -29,7 +29,7 @@
 .Nm
 .Op Ar option
 .Ar file.h5
-.Ar specie1
+.Ar specie/ALL
 .\"
 .\" Description
 .\"

@@ -34,7 +34,7 @@ def usage():
 
     """
 
-    print """Usage: converttolegacy [options] file [ specie ]
+    print """Usage: converttolegacy [options] file specie/ALL
 
 Convert hdf5 output file to legacy .abun and .rout file, if no specie provided, display available specie in file
 
