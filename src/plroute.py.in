@@ -188,7 +188,12 @@ def main():
     else:
         if len(args) == 1:
             print "Available species in this file are:"
-            listspecies( args[0] )
+            try:
+                listspecies( args[0] )
+            except IOError as e:
+                sys.stderr.write("converttolegacy: error: can't open %s. Error : %s\n" % (filename, e) )
+            except ValueError as e:
+                sys.stderr.write("converttolegacy: error: can't read %s. Error : %s\n" % (filename, e) )
             sys.exit(1)
         else:
             if len(args) != 2:

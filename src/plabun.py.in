@@ -150,7 +150,12 @@ def main():
         species = args[1:]
         if len(species) == 0:
             print "Available species in this file are:"
-            listspecies( filename )
+            try:
+                listspecies( filename )
+            except IOError as e:
+                sys.stderr.write("converttolegacy: error: can't open %s. Error : %s\n" % (filename, e) )
+            except ValueError as e:
+                sys.stderr.write("converttolegacy: error: can't read %s. Error : %s\n" % (filename, e) )
             sys.exit(1)
         if len(species) > 6:
             sys.stderr.write("plabun: warning: at most 6 species can be plotted, ignoring others.\n")
