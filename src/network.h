@@ -25,7 +25,9 @@
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
 
+int add_species (char *new_species, net_t * network);
 
+void realloc_network_species (net_t * network, int n_species);
 
 void alloc_network (net_t * network, int n_species, int n_reactions);
 

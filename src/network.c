@@ -30,14 +30,19 @@
 #include "libastrochem.h"
 #include "network.h"
 
-int add_species (char *new_species, net_t * network);
 
-void realloc_network_species (net_t * network, int n_species);
-
-/* Allocate the network structure. We get the number of reactions
-   from the number of lines in the network file. For the number of
-   species, we assume a number equal to the number of reactions
-   divided by 10, and we reallocate the array if needed. */
+/**
+ * @brief Allocate the network structure.
+ *
+ * Allocate the network structure. We get the number of reactions
+ * from the number of lines in the network file. For the number of
+ * species, we assume a number equal to the number of reactions
+ * divided by 10, and we reallocate the array if needed.
+ *
+ * @param chem_file chem file to use
+ * @param network network to fill
+ * @param verbose quiet if 0, verbose if 1
+ */
 void
 read_network (const char *chem_file, net_t * network, const int verbose)
 {
@@ -108,89 +113,147 @@ read_network (const char *chem_file, net_t * network, const int verbose)
           exit (1);
         }
 
-      char *localLine = line;
-      char *localLine2 = strchr (line, ' ');
-      char str[MAX_CHAR_SPECIES];
-      unsigned int mode = 0;
-      int ending = 0;
+      char *tmpLine = line;
 
-      /* Read the reactants, products, and reaction parameters. one after another */
-      while (localLine != NULL)
+      // Separating reaction line ( reactants ) -> ( products params )
+      char* reaction_arrow = strchr( tmpLine, '>' );
+      *(reaction_arrow-2) = '\0';
+      char* reactants = tmpLine;
+      char* products = reaction_arrow+1;
+
+      // Parsing reactants
+      char* specie_str_end;
+      char specie[MAX_CHAR_SPECIES];
+      int nreactants = 0;
+      while( true )
         {
-          // Analyse current char
-          if (localLine[0] == '-')
+          // Dropping all space at the beggining
+          while( reactants[0] == ' ' )
             {
-              // We read a "->" time to read products
-              localLine = localLine2 + 1;
-              localLine2 = strchr (localLine, ' ');
-              mode = MAX_REACTANTS;
-              ending = 0;
-              continue;
+              reactants++;
             }
-          else if (localLine[0] == '+')
+
+          // If we touch the end of string, no more reactants
+          if(  reactants[0] == '\0' )
             {
-              // We read a "+", let's read another species
-              localLine = localLine2 + 1;
-              localLine2 = strchr (localLine, ' ');
-              ending = 0;
-              continue;
-            }
-          else if (localLine[0] == ' ')
-            {
-              // We read a " ", lets read another char
-              localLine = localLine2 + 1;
-              localLine2 = strchr (localLine, ' ');
-              continue;
-            }
-          // Last part of the line
-          else if (ending == 1)
-            {
-              //No more species to read, let's read the ending of reactions.
-              if (sscanf (localLine, "%lf %lf %lf %d %d",
-                          &network->reactions[n].alpha,
-                          &network->reactions[n].beta,
-                          &network->reactions[n].gamma,
-                          &network->reactions[n].reaction_type,
-                          &network->reactions[n].reaction_no) != 5)
-                {
-                  network_file_error (chem_file1, n + 1);
-                }
               break;
             }
+
+          // Look for next space in string, between these is a specie
+          specie_str_end = strchr( reactants, ' ' );
+
+          // if no space found, search for end of string
+          if( specie_str_end == NULL )
+            {
+              specie_str_end = strchr( reactants, '\0' );
+            }
+
+          // Coubnt the number of char of this specie
+          int specie_nchar =  specie_str_end-reactants;
+
+          // If there is only one char '+', drop it and look for next specie
+          if( specie_nchar==1 && reactants[0] == '+' )
+            {
+              reactants++;
+              continue;
+            }
+
+          // Check the number of reactants
+          if( nreactants == MAX_REACTANTS )
+            {
+              fprintf (stderr,
+                       "astrochem: error: number of reactant %i, is greater than %i,"
+                       "file %s may be corrupt.\n", nreactants+1, MAX_REACTANTS ,
+                       chem_file1);
+              exit (1);
+            }
+
+          // Copy the specie in a string, null terminated
+          strncpy( specie, reactants, specie_nchar );
+          specie[specie_nchar] = '\0';
+
+          // Add specie in network and in reaction
+          network->reactions[n].reactants[ nreactants ] =  add_species (specie, network);
+
+          // Increment the number of reactants
+          nreactants++;
+
+          // Jump to the char after the specie, to look for next specie
+          reactants+=specie_nchar;
+        }
+
+      // Parsing products
+      int nproducts = 0;
+      bool specie_ready = true;
+      while( true )
+        {
+          // Drop all whitespace at the beginning of the string
+          while( products[0] == ' ' )
+            {
+              products++;
+            }
+          // Look for next space after species, with products there is ALWAYS a space, because it contains also reaction params after
+          specie_str_end = strchr( products, ' ' );
+
+          // Count the number of char of this specie
+          int specie_nchar =  specie_str_end-products;
+
+          // If there is only one char '+', drop it and be ready for next specie
+          if( specie_nchar==1 && products[0] == '+' )
+            {
+              products++;
+              specie_ready = true;
+              continue;
+            }
+
+          // Only if we are ready for a specie
+          if( specie_ready )
+            {
+              // Check number of products
+              if( nproducts == MAX_PRODUCTS )
+                {
+                  fprintf (stderr,
+                           "astrochem: error: number of product %i, is greater than %i,"
+                           "file %s may be corrupt.\n", nproducts+1, MAX_PRODUCTS ,
+                           chem_file1);
+                  exit (1);
+                }
+
+              // Copy specie , null terminated
+              strncpy( specie, products, specie_nchar );
+              specie[specie_nchar] = '\0';
+
+              // Add specie in network and reaction
+              network->reactions[n].products[ nproducts ] =  add_species (specie, network);
+
+              // Increment number of products
+              nproducts++;
+
+              // Jump to the char after the specie to look for next specie
+              products+=specie_nchar;
+
+              // But before adding a specie, we must find a '+' to be ready for a specie
+              specie_ready = false;
+            }
+
+          // We just found a character wich was not a '+' and we are not ready for a specie, end of products
           else
             {
-              // Yet another specie to add
-              strncpy (str, localLine, localLine2 - localLine);
-              str[localLine2 - localLine] = '\0';
-              //Some species are not to read
-              if ((strcmp (str, "cosmic-ray") != 0) &&
-                  (strcmp (str, "uv-photon") != 0) &&
-                  (strcmp (str, "photon") != 0))
-                {
-                  /* Add the species in list
-                     Find the correct place for this species in the reactions */
-                  if ( mode < MAX_REACTANTS )
-                    {
-                      network->reactions[n].reactants[ mode ] = add_species (str, network);
-                      mode++;
-                    }
-                  else if ( mode < MAX_REACTANTS + MAX_PRODUCTS )
-                    {
-                      network->reactions[n].products[ mode - MAX_REACTANTS ] =  add_species (str, network);
-                      mode++;
-                    }
-                  else
-                    {
-                      network_file_error (chem_file1, n + 1);
-                      break;
-                    }
-                }
-              // Move to next space
-              localLine = localLine2 + 1;
-              localLine2 = strchr (localLine, ' ');
-              ending = 1;
+              break;
             }
         }
+
+      // After the products, there is reaction params, wich need to be stored also
+      if (sscanf ( products, "%lf %lf %lf %d %d",
+                   &network->reactions[n].alpha,
+                   &network->reactions[n].beta,
+                   &network->reactions[n].gamma,
+                   &network->reactions[n].reaction_type,
+                   &network->reactions[n].reaction_no) != 5)
+        {
+          network_file_error (chem_file1, n + 1);
+        }
+      // Next reaction
       n++;
     }
   // Check number of reactions
@@ -214,13 +277,27 @@ read_network (const char *chem_file, net_t * network, const int verbose)
   fclose (f);
 }
 
-/*
-   Add a species in the network and return it's index
-   If already present, just return the index
-   */
+/**
+ * @brief Add a species in the network
+ *
+ * Add a species in the network and return it's index
+ * If already present, just return the index
+ *
+ * @param new_species name of new specie
+ * @param network network to add specie to
+ * @return index of added specie
+ */
 int
 add_species (char *new_species, net_t * network)
 {
+
+  if ((strcmp ( new_species, "cosmic-ray") == 0) ||
+      (strcmp ( new_species, "uv-photon") == 0) ||
+      (strcmp ( new_species, "photon") == 0))
+    {
+      return -1;
+    }
+
   int i;
   if (strcmp (new_species, "") == 0)
     return -1;
@@ -243,6 +320,7 @@ add_species (char *new_species, net_t * network)
       //Add species in network
       strcpy (network->species_names[i], new_species);
       (network->n_species)++;
+      printf("%s %i\n",  new_species, (network->n_species) );
     }
   else
     {
@@ -340,8 +418,9 @@ realloc_network_species (net_t * network, int n_species)
     }
 }
 
-/*
-   Free the network structure.
+/**
+ * @brief Free the network structure.
+ * @param network network to free
  */
 void
 free_network (net_t * network)
