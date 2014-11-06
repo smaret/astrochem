@@ -122,134 +122,91 @@ read_network (const char *chem_file, net_t * network, const int verbose)
       char* products = reaction_arrow+1;
 
       // Parsing reactants
-      char* specie_str_end;
-      char specie[MAX_CHAR_SPECIES];
+      char* specie;
       int nreactants = 0;
-      while( true )
+
+      // First non-whitespace char
+      specie = strtok( reactants, " " );
+      while( specie != NULL )
         {
-          // Dropping all space at the beggining
-          while( reactants[0] == ' ' )
+          // Not a '+', it is a specie
+          if( strcmp( specie, "+" ) != 0 )
             {
-              reactants++;
+              // Check number of reactant
+              if( nreactants == MAX_REACTANTS )
+                {
+                  fprintf (stderr,
+                           "astrochem: error: number of reactant %i, is greater than %i,"
+                           "file %s may be corrupt.\n", nreactants+1, MAX_REACTANTS ,
+                           chem_file1);
+                  exit (1);
+                }
+
+              // Add specie in network and in reaction
+              network->reactions[n].reactants[ nreactants ] =  add_species (specie, network);
+
+              // Increment the number of reactants
+              nreactants++;
             }
-
-          // If we touch the end of string, no more reactants
-          if(  reactants[0] == '\0' )
-            {
-              break;
-            }
-
-          // Look for next space in string, between these is a specie
-          specie_str_end = strchr( reactants, ' ' );
-
-          // if no space found, search for end of string
-          if( specie_str_end == NULL )
-            {
-              specie_str_end = strchr( reactants, '\0' );
-            }
-
-          // Coubnt the number of char of this specie
-          int specie_nchar =  specie_str_end-reactants;
-
-          // If there is only one char '+', drop it and look for next specie
-          if( specie_nchar==1 && reactants[0] == '+' )
-            {
-              reactants++;
-              continue;
-            }
-
-          // Check the number of reactants
-          if( nreactants == MAX_REACTANTS )
-            {
-              fprintf (stderr,
-                       "astrochem: error: number of reactant %i, is greater than %i,"
-                       "file %s may be corrupt.\n", nreactants+1, MAX_REACTANTS ,
-                       chem_file1);
-              exit (1);
-            }
-
-          // Copy the specie in a string, null terminated
-          strncpy( specie, reactants, specie_nchar );
-          specie[specie_nchar] = '\0';
-
-          // Add specie in network and in reaction
-          network->reactions[n].reactants[ nreactants ] =  add_species (specie, network);
-
-          // Increment the number of reactants
-          nreactants++;
-
-          // Jump to the char after the specie, to look for next specie
-          reactants+=specie_nchar;
+          specie = strtok( NULL, " " );
         }
 
-      // Parsing products
       int nproducts = 0;
       bool specie_ready = true;
-      while( true )
+      // First non-whitespace char
+      specie = strtok( products, " " );
+      while( specie != NULL )
         {
-          // Drop all whitespace at the beginning of the string
-          while( products[0] == ' ' )
+          // Found a '+' , be ready for next specie
+          if( strcmp( specie, "+" ) == 0 )
             {
-              products++;
-            }
-          // Look for next space after species, with products there is ALWAYS a space, because it contains also reaction params after
-          specie_str_end = strchr( products, ' ' );
-
-          // Count the number of char of this specie
-          int specie_nchar =  specie_str_end-products;
-
-          // If there is only one char '+', drop it and be ready for next specie
-          if( specie_nchar==1 && products[0] == '+' )
-            {
-              products++;
               specie_ready = true;
-              continue;
             }
-
-          // Only if we are ready for a specie
-          if( specie_ready )
+          // Found a specie
+          else if( specie_ready )
             {
+              specie_ready = false;
               // Check number of products
               if( nproducts == MAX_PRODUCTS )
                 {
                   fprintf (stderr,
-                           "astrochem: error: number of product %i, is greater than %i,"
+                           "astrochem: error: number of products %i, is greater than %i,"
                            "file %s may be corrupt.\n", nproducts+1, MAX_PRODUCTS ,
                            chem_file1);
                   exit (1);
                 }
 
-              // Copy specie , null terminated
-              strncpy( specie, products, specie_nchar );
-              specie[specie_nchar] = '\0';
-
-              // Add specie in network and reaction
+              // Add specie in network and in reaction
               network->reactions[n].products[ nproducts ] =  add_species (specie, network);
 
-              // Increment number of products
+              // Increment the number of reactants
               nproducts++;
-
-              // Jump to the char after the specie to look for next specie
-              products+=specie_nchar;
-
-              // But before adding a specie, we must find a '+' to be ready for a specie
-              specie_ready = false;
             }
-
-          // We just found a character wich was not a '+' and we are not ready for a specie, end of products
+          // Found a char, wich is not a '+', without being ready for a specie : end of products
           else
             {
               break;
             }
+          // Point to next non-whitespace char
+          specie = strtok( NULL, " " );
         }
 
       // After the products, there is reaction params, wich need to be stored also
-      if (sscanf ( products, "%lf %lf %lf %d %d",
-                   &network->reactions[n].alpha,
+
+      // Alpha has already been read as the last products
+      if (sscanf ( specie, "%lf",
+                   &network->reactions[n].alpha) != 1)
+        {
+          network_file_error (chem_file1, n + 1);
+        }
+
+      // The remaining params
+      char* params =  strtok( NULL, "" );
+      if (sscanf ( params, "%lf %lf %d %d",
                    &network->reactions[n].beta,
                    &network->reactions[n].gamma,
                    &network->reactions[n].reaction_type,
-                   &network->reactions[n].reaction_no) != 5)
+                   &network->reactions[n].reaction_no) != 4)
         {
           network_file_error (chem_file1, n + 1);
         }
