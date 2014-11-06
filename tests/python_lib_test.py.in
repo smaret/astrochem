@@ -23,7 +23,7 @@ import sys
 import numpy
 import unittest
 import math
-sys.path.append("@top_builddir@/python/libpyastrochem/.libs")
+sys.path.append("@abs_top_builddir@/python/libpyastrochem/.libs")
 import libpyastrochem as astrochem
 
 class TestSequenceFunctions(unittest.TestCase):

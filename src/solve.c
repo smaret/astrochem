@@ -482,7 +482,7 @@ int set_initial_abundances( const char** species, int n_initialized_species, con
     {
       for( j = 0 ; j < n_initialized_species ; j++ )
         {
-          if( strcmp( network->species_names[i] , species[j] ) == 0 )
+          if( strcmp( network->species[i].name , species[j] ) == 0 )
             {
               abundances[i] = initial_abundances[j];
             }

@@ -186,7 +186,7 @@ main (int argc, char *argv[])
       for( i = 0; i < input_params.output.n_output_species ; i++ )
         {
           strcpy( tempName, routeName );
-          strcat( tempName, network.species_names[input_params.output.output_species_idx[i]] );
+          strcat( tempName, network.species[input_params.output.output_species_idx[i]].name );
           routeDatasets[i] = H5Dcreate( routeGroup, tempName, route_t_datatype, dataspaceRoute, H5P_DEFAULT, route_prop_id, H5P_DEFAULT);
         }
     }
@@ -214,7 +214,7 @@ main (int argc, char *argv[])
   char speciesName [ input_params.output.n_output_species ][ MAX_CHAR_SPECIES ];
   for( i = 0; i < input_params.output.n_output_species ; i++ )
     {
-      strcpy( speciesName[i], network.species_names[input_params.output.output_species_idx[i]] );
+      strcpy( speciesName[i], network.species[input_params.output.output_species_idx[i]].name );
     }
 
   H5Dwrite( speciesDataset, speciesType, H5S_ALL, H5S_ALL, H5P_DEFAULT, speciesName );

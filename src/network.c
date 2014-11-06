@@ -31,6 +31,7 @@
 #include "network.h"
 
 
+
 /**
  * @brief Allocate the network structure.
  *
@@ -247,7 +248,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
 int
 add_species (char *new_species, net_t * network)
 {
-
+  // Not storing some elements
   if ((strcmp ( new_species, "cosmic-ray") == 0) ||
       (strcmp ( new_species, "uv-photon") == 0) ||
       (strcmp ( new_species, "photon") == 0))
@@ -255,13 +256,18 @@ add_species (char *new_species, net_t * network)
       return -1;
     }
 
-  int i;
+
+  // Check specie is not empty
   if (strcmp (new_species, "") == 0)
-    return -1;
+    {
+      fprintf (stderr, "astrochem: error: Adding empty specie\n", new_species );
+      return -1;
+    }
   //Look for the species, if it exists, return index
+  int i;
   for (i = 0; i < network->n_species; i++)
     {
-      if (strcmp (network->species_names[i], new_species) == 0)
+      if (strcmp (network->species[i].name, new_species) == 0)
         return i;
     }
   // Check species array size and reallocate if necessary
@@ -274,17 +280,121 @@ add_species (char *new_species, net_t * network)
   //Check length of species name
   if (strlen (new_species) < MAX_CHAR_SPECIES - 1)
     {
-      //Add species in network
-      strcpy (network->species_names[i], new_species);
-      (network->n_species)++;
-      printf("%s %i\n",  new_species, (network->n_species) );
+      // Initialize element
+      char element[ MAX_CHAR_ELEMENT ];
+      int element_idx = 0;
+      char* specie_pt = new_species;
+      int specie_mass = 0;
+      int specie_charge = 0;
+      int mass_multiplier = 1;
+
+      // Parse specie string
+      while( *specie_pt != '\0' )
+        {
+          // A-Z : new element, stack precedent element if any
+          if( *specie_pt >= 65 && *specie_pt <= 90 )
+            {
+              // If there is already a completed element
+              if( element_idx > 0 )
+                {
+                  // Null terminate it
+                  element[element_idx] = '\0';
+                  // Compute it's mass
+                  specie_mass += mass_multiplier * get_element_mass( element );
+                  // Reinitialize element
+                  element_idx = 0;
+                  mass_multiplier = 1;
+                }
+              // Store the char in element
+              element[ element_idx ] = *specie_pt;
+              // Next char
+              element_idx++;
+              specie_pt++;
+            }
+          // a-z element char part or electron (e)
+          else if( *specie_pt >= 97 && *specie_pt <= 122 )
+            {
+              // Check element is not too big
+              if( element_idx >= MAX_CHAR_ELEMENT-1 )
+                {
+                  fprintf (stderr, "astrochem: error: this specie: %s contain an element longer than MAX_CHAR_ELEMENT\n", new_species );
+                  return -1;
+                }
+              // Store the char in element
+              element[ element_idx ] = *specie_pt;
+              // Next char
+              element_idx++;
+              specie_pt++;
+            }
+          // 1->9 element multiplier
+          else if( *specie_pt >= 49 && *specie_pt <= 57 )
+            {
+              // check there is an element for this multiplier and there is not already a multiplier
+              if( element_idx == 0 || mass_multiplier != 1 )
+                {
+                  fprintf (stderr, "astrochem: error: this specie: %s is not correctly written\n", new_species );
+                  return -1;
+                }
+              // Store multiplier and position to next non numeric char
+              mass_multiplier = strtol( specie_pt, &specie_pt, 10 );
+            }
+          // (*) Charge
+          else if( *specie_pt == 40 && *(specie_pt+2) == 41 )
+            {
+              // jump to charge
+              specie_pt++;
+              switch( *specie_pt )
+                {
+                  // '+'
+                case(43):
+                  specie_charge = 1;
+                  break;
+                  // '-'
+                case(45):
+                  specie_charge = -1;
+                  break;
+                default:
+                  fprintf (stderr, "astrochem: error: this specie: %s is not correctly written\n", new_species );
+                  return -1;
+                  break;
+                }
+              break;
+            }
+          else
+            {
+              fprintf (stderr, "astrochem: error: this specie: %s is not correctly written\n", new_species );
+              return -1;
+            }
+
+        }
+      // Specie string have been parsed, but last element still have to be taken in account
+      if( element_idx > 0 )
+        {
+          // Null terminate element
+          element[element_idx] = '\0';
+          // Compute it's mass
+          specie_mass += mass_multiplier * get_element_mass( element );
+        }
+
+      // Check mass of specie is not null
+      if( specie_mass == 0 )
+        {
+          fprintf (stderr, "astrochem: error: Problam parsing this specie: %s \n", new_species );
+          return -1;
+        }
+
+      // Store specie name charge and mass in network
+      strcpy (network->species[i].name, new_species);
+      network->species[i].charge = specie_charge;
+      network->species[i].mass = specie_mass;
+      network->n_species++;
     }
   else
     {
       fprintf (stderr, "astrochem: error: the number of characters of some "
                "species of the chemical network file exceeds %i.\n",
                MAX_CHAR_SPECIES);
-      exit (1);
+      return -1;
     }
   return i;
 }
@@ -303,7 +413,7 @@ find_species (const species_name_t specie, const net_t * network)
     }
   for (i = 0; i < network->n_species; i++)
     {
-      if (strncmp (network->species_names[i], specie,
+      if (strncmp (network->species[i].name, specie,
                    sizeof (species_name_t)) == 0)
         {
           return i;
@@ -321,8 +431,8 @@ void
 alloc_network (net_t * network, int n_species, int n_reactions)
 {
   network->n_alloc_species = n_species;
-  if ((network->species_names =
-       malloc (sizeof (species_name_t) * n_species)) == NULL)
+  if ((network->species =
+       malloc (sizeof (species_t) * n_species)) == NULL)
     {
       fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__,
                "array allocation failed.\n");
@@ -365,9 +475,9 @@ realloc_network_species (net_t * network, int n_species)
       exit (1);
     }
   network->n_alloc_species = n_species;
-  if ((network->species_names =
-       realloc (network->species_names,
-                sizeof (species_name_t) * n_species)) == NULL)
+  if ((network->species =
+       realloc (network->species,
+                sizeof (species_t) * n_species)) == NULL)
     {
       fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__,
                "array allocation failed.\n");
@@ -383,7 +493,7 @@ void
 free_network (net_t * network)
 {
   free (network->reactions);
-  free (network->species_names);
+  free (network->species);
 }
 
 /**
@@ -401,4 +511,16 @@ network_file_error (const char *chem_file, int line_number)
   fprintf (stderr, "astrochem: error: incorrect network file in %s line %i.\n",
            chem_file, line_number);
   exit (1);
+}
+
+/**
+ * @brief get the mass of an element
+ * @param element element to get the mass of
+ * @todo TODO actually use a periodic table instead of returning 1!
+ * @return mess of elemen
+ */
+int
+get_element_mass( const char* element )
+{
+  return 1;
 }

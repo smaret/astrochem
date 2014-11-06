@@ -20,9 +20,14 @@ cdef extern from "../../src/libastrochem.h":
         double grain_size
         double grain_abundance
 
+    ctypedef struct species_t:
+        char * name
+        double mass
+        int charge
+
     ctypedef struct net_t:
         int n_species
-        char **species_names
+        species_t* species
 
     ctypedef struct cell_t:
         double av
@@ -239,6 +244,6 @@ cdef class Solver:
         cdef bytes py_string
         ret = {}
         for i in range( c_net.n_species ):
-            py_string =  c_net.species_names[i]
+            py_string =  c_net.species[i].name
             ret[py_string] = self.abundances[i]
         return ret

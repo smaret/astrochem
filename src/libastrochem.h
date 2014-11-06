@@ -45,7 +45,8 @@
 #define M_PI  3.14159265358979323846264338327950288
 #endif
 
-#define MAX_CHAR_SPECIES 32     /* Maximum number of characters in a specie name */
+#define MAX_CHAR_SPECIES 32     /*!< Maximum number of characters in a specie name */
+#define MAX_CHAR_ELEMENT 8      /*!< Maximum number of characters in a element name */
 
 #define CONST_MKSA_YEAR 3.1536e7
 #define CONST_CGSM_BOLTZMANN (1.3806503e-16)
@@ -133,13 +134,26 @@ typedef struct
   int reaction_no;   /*!< reaction number*/
 } react_t;
 
+/**
+ * @brief struct containint a specie, name, mass and charge
+ */
 typedef struct
 {
-  int n_species;
-  int n_alloc_species;
-  species_name_t *species_names;
-  int n_reactions;
-  react_t *reactions;
+  species_name_t name; /*!< Name of specie */
+  double mass;         /*!< Mass of specie */
+  int charge;          /*!< charge of specie */
+} species_t;
+
+/**
+ * @brief struct containing a network
+ */
+typedef struct
+{
+  int n_species; /*!< number of species */
+  int n_alloc_species; /*!< number of actully allocated species */
+  species_t *species; /*!< species array */
+  int n_reactions; /*!< number of reactions */
+  react_t *reactions; /*!< array of reactions */
 } net_t;
 
 /**

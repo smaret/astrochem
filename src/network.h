@@ -35,4 +35,6 @@ int find_species (const species_name_t specie, const net_t * network);
 
 void network_file_error (const char *chem_file, int line_number);
 
+int get_element_mass( const char* element );
+
 #endif // _NETWORK_H_
