@@ -521,7 +521,7 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
 
                       bool specie_in_products = false;
                       int p;
-                      for( p = 0; p < NB_PRODUCTS; p++ )
+                      for( p = 0; p < MAX_PRODUCTS; p++ )
                         {
                           if( network->reactions[k].products[p] ==  input_params->output.output_species_idx[j])
                             {
@@ -548,7 +548,7 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
                             {
                               formation_route.rate = astrochem_mem.params.reac_rates[k];
                               int r;
-                              for( r = 0; r < NB_REACTANTS; r++ )
+                              for( r = 0; r < MAX_REACTANTS; r++ )
                                 {
                                   if( network->reactions[k].reactants[r] != -1 )
                                     {
@@ -582,7 +582,7 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
                          then compute the destruction rate. */
                       bool species_in_reactants = false;
                       int r;
-                      for ( r = 0; r < NB_REACTANTS; r++ )
+                      for ( r = 0; r < MAX_REACTANTS; r++ )
                         {
                           if ( network->reactions[k].reactants[r] == input_params->output.output_species_idx[j])
                             {
@@ -609,7 +609,7 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
                           else
                             {
                               destruction_route.rate = astrochem_mem.params.reac_rates[k];
-                              for ( r = 0; r < NB_REACTANTS; r++ )
+                              for ( r = 0; r < MAX_REACTANTS; r++ )
                                 {
                                   if (network->reactions[k].reactants[r] != -1)
                                     {

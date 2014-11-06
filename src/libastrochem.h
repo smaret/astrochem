@@ -58,8 +58,8 @@
 #define GRAIN_SITES_PER_CM2 3.00e+15    /* cm-2 */
 #define DRAINE_STANDARD_ISRF_FUV 1.7e8  /* photons cm-2 */
 
-#define NB_REACTANTS 3
-#define NB_PRODUCTS 4
+#define MAX_REACTANTS 3
+#define MAX_PRODUCTS 4
 /* Data structures */
 
 typedef enum
@@ -124,8 +124,8 @@ typedef struct
 
 typedef struct
 {
-  int reactants[ NB_REACTANTS ];
-  int products[ NB_PRODUCTS ];
+  int reactants[ MAX_REACTANTS ];
+  int products[ MAX_PRODUCTS ];
   double alpha;  /*!< reaction alpha*/
   double beta;   /*!< reaction beta*/
   double gamma;  /*!< reaction gamma*/

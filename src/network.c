@@ -123,7 +123,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
               // We read a "->" time to read products
               localLine = localLine2 + 1;
               localLine2 = strchr (localLine, ' ');
-              mode = 3;
+              mode = MAX_REACTANTS;
               ending = 0;
               continue;
             }
@@ -169,14 +169,14 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                 {
                   /* Add the species in list
                      Find the correct place for this species in the reactions */
-                  if ( mode < NB_REACTANTS )
+                  if ( mode < MAX_REACTANTS )
                     {
                       network->reactions[n].reactants[ mode ] = add_species (str, network);
                       mode++;
                     }
-                  else if ( mode < NB_REACTANTS + NB_PRODUCTS )
+                  else if ( mode < MAX_REACTANTS + MAX_PRODUCTS )
                     {
-                      network->reactions[n].products[ mode - NB_REACTANTS ] =  add_species (str, network);
+                      network->reactions[n].products[ mode - MAX_REACTANTS ] =  add_species (str, network);
                       mode++;
                     }
                   else
@@ -304,11 +304,11 @@ alloc_network (net_t * network, int n_species, int n_reactions)
   int i,j;
   for (i = 0; i < n_reactions; i++)
     {
-      for( j = 0; j < NB_REACTANTS; j++ )
+      for( j = 0; j < MAX_REACTANTS; j++ )
         {
           network->reactions[i].reactants[j] = -1;
         }
-      for( j = 0; j < NB_PRODUCTS; j++ )
+      for( j = 0; j < MAX_PRODUCTS; j++ )
         {
           network->reactions[i].products[j] = -1;
         }

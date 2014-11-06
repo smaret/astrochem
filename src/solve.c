@@ -126,7 +126,7 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
           /* For other reactions, the production/destruction rate is
              the product of the reactants multiplied by the reaction rate. */
           int r;
-          for( r = 0; r < NB_REACTANTS; r++ )
+          for( r = 0; r < MAX_REACTANTS; r++ )
             {
               if (reactions[i].reactants[r] != -1)
                 y_product *= NV_Ith_S (y, reactions[i].reactants[r]);
@@ -135,14 +135,14 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
         }
       /* Add a production term for each product of the reaction. */
       int p;
-      for( p = 0 ; p < NB_PRODUCTS; p++ )
+      for( p = 0 ; p < MAX_PRODUCTS; p++ )
         {
           if (reactions[i].products[p] != -1)
             NV_Ith_S (ydot, reactions[i].products[p]) += y_product;
         }
       /* Add a destruction term for each reactants of the reaction. */
       int r;
-      for( r = 0; r < NB_REACTANTS; r++ )
+      for( r = 0; r < MAX_REACTANTS; r++ )
         {
           if (reactions[i].reactants[r] != -1)
             NV_Ith_S (ydot, reactions[i].reactants[r]) -= y_product;
@@ -228,19 +228,19 @@ jacobian (long int N __attribute__ ((unused)),
         {
           /* Other reactions */
           int r, r2, p;
-          int local_nb_reactants = NB_REACTANTS;
-          for( r = 0; r < NB_REACTANTS; r++ )
+          int nreactants = MAX_REACTANTS;
+          for( r = 0; r < MAX_REACTANTS; r++ )
             {
               if( reactions[i].reactants[r] == -1 )
                 {
-                  local_nb_reactants = r;
+                  nreactants = r;
                   break;
                 }
             }
-          for( r = 0; r < local_nb_reactants; r++ )
+          for( r = 0; r < nreactants; r++ )
             {
               y_product =  reac_rates[i];
-              for( r2 = 0; r2 < local_nb_reactants; r2++ )
+              for( r2 = 0; r2 < nreactants; r2++ )
                 {
                   if ( r != r2 )
                     {
@@ -248,11 +248,11 @@ jacobian (long int N __attribute__ ((unused)),
                     }
                 }
 
-              for( r2 = 0; r2 < local_nb_reactants; r2++ )
+              for( r2 = 0; r2 < nreactants; r2++ )
                 {
                   DENSE_ELEM (J, reactions[i].reactants[r2], reactions[i].reactants[r]) -= y_product;
                 }
-              for( p = 0; p < NB_PRODUCTS; p++ )
+              for( p = 0; p < MAX_PRODUCTS; p++ )
                 {
                   if(  reactions[i].products[p] != -1 )
                     {
