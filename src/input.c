@@ -28,6 +28,7 @@
 #include <string.h>
 #include <errno.h>
 #include <math.h>
+#include <float.h>
 
 #include "libastrochem.h"
 #include "input.h"
@@ -264,7 +265,7 @@ read_input (const char *input_file, inp_t * input_params,
                       int idx;
                       for( idx = 0; idx < network->n_species; idx++ )
                         {
-                           input_params->output.output_species_idx[idx] = idx;
+                          input_params->output.output_species_idx[idx] = idx;
                         }
                     }
                   else
@@ -377,6 +378,18 @@ read_input (const char *input_file, inp_t * input_params,
                "astrochem: warning: incorrect tf value specified in %s."
                "Assuming default value.\n", input_file);
       input_params->solver.tf = TF_DEFAULT;
+    }
+
+  // Check input abundances are neutral
+  double gas_charge = 0;
+  for( i = 0; i < input_params->abundances.n_initial_abundances; i++ )
+    {
+      gas_charge+= input_params->abundances.initial_abundances[i].abundance *
+       network->species[ input_params->abundances.initial_abundances[i].species_idx ].charge;
+    }
+  if( gas_charge > DBL_EPSILON || gas_charge < -DBL_EPSILON )
+    {
+      fprintf (stderr, "astrochem: warning: gas charge is not neutral, charge = %e\n" ,gas_charge);
     }
 }
 

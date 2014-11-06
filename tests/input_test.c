@@ -88,7 +88,7 @@ main (void)
   fprintf (f, "Mg(+)   = 7.00e-9\n");
   fprintf (f, "P(+)    = 3.00e-9\n");
   fprintf (f, "Cl(+)   = 4.00e-9\n");
-  fprintf (f, "e(-)    = 7.32e-5\n");
+  fprintf (f, "e(-)    = 7.3179e-5\n");
   fprintf (f, "grain   = 1.32e-12\n");
   fprintf (f, "# Output\n");
   fprintf (f, "[output]\n");
