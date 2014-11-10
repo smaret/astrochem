@@ -32,6 +32,11 @@
 
 
 
+int add_species (char *new_species, net_t * network);
+int alloc_network (net_t * network, int n_species, int n_reactions);
+int realloc_network_species (net_t * network, int n_species);
+int get_element_mass( const char* element );
+
 /**
  * @brief Allocate the network structure.
  *
@@ -43,8 +48,9 @@
  * @param chem_file chem file to use
  * @param network network to fill
  * @param verbose quiet if 0, verbose if 1
+ * @return EXIT_SUCCESS if sucessfull
  */
-void
+int
 read_network (const char *chem_file, net_t * network, const int verbose)
 {
   FILE *f;
@@ -67,18 +73,23 @@ read_network (const char *chem_file, net_t * network, const int verbose)
       if (!f)
         {
           fprintf (stderr, "aaastrochem: error: can't find %s.\n", chem_file);
-          exit (1);
+          return EXIT_FAILURE;
         }
     }
   fclose (f);
 
   // Get the number of reaction and estimates number of species to alloc
   int n_reactions = get_nb_active_line (chem_file1);
+  if( n_reactions == -1 )
+    {
+      fprintf (stdout, "done1.\n");
+      return EXIT_FAILURE;
+    }
   if (n_reactions == 0)
     {
       fprintf (stderr,
                "astrochem: error: the number of reactions is zero.\n");
-      exit (1);
+      return EXIT_FAILURE;
     }
   int n_alloc_species = n_reactions / 10;
   if (n_alloc_species == 0)
@@ -87,7 +98,12 @@ read_network (const char *chem_file, net_t * network, const int verbose)
     }
 
   //Allocate network dynamic array
-  alloc_network (network, n_alloc_species, n_reactions);
+  if( alloc_network (network, n_alloc_species, n_reactions) != EXIT_SUCCESS )
+    {
+      fprintf (stdout, "done22.\n");
+      return EXIT_FAILURE;
+    }
+
   network->n_species = 0;
   if (verbose >= 1)
     {
@@ -111,7 +127,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                    "astrochem: error: incorect number of reactions exceed %i,"
                    "file %s may be corrupt.\n", network->n_reactions,
                    chem_file);
-          exit (1);
+          return EXIT_FAILURE;
         }
 
       char *tmpLine = line;
@@ -140,14 +156,25 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                            "astrochem: error: number of reactant %i, is greater than %i,"
                            "file %s may be corrupt.\n", nreactants+1, MAX_REACTANTS ,
                            chem_file1);
-                  exit (1);
+                  return EXIT_FAILURE;
                 }
 
               // Add specie in network and in reaction
-              network->reactions[n].reactants[ nreactants ] =  add_species (specie, network);
+              // Not storing some elements
+              if ((strcmp ( specie, "cosmic-ray") != 0) &&
+                  (strcmp ( specie, "uv-photon") != 0) &&
+                  (strcmp ( specie, "photon") != 0))
+                {
+                  network->reactions[n].reactants[ nreactants ] =  add_species (specie, network);
+                  if( network->reactions[n].reactants[ nreactants ] == -1 )
+                    {
+                      fprintf (stdout, "done3.\n");
+                      return EXIT_FAILURE;
+                    }
 
-              // Increment the number of reactants
-              nreactants++;
+                  // Increment the number of reactants
+                  nreactants++;
+                }
             }
           specie = strtok( NULL, " " );
         }
@@ -174,14 +201,26 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                            "astrochem: error: number of products %i, is greater than %i,"
                            "file %s may be corrupt.\n", nproducts+1, MAX_PRODUCTS ,
                            chem_file1);
-                  exit (1);
+                  return EXIT_FAILURE;
                 }
 
               // Add specie in network and in reaction
-              network->reactions[n].products[ nproducts ] =  add_species (specie, network);
+              // Not storing some elements
+              if ((strcmp ( specie, "cosmic-ray") != 0) &&
+                  (strcmp ( specie, "uv-photon") != 0) &&
+                  (strcmp ( specie, "photon") != 0))
+                {
 
-              // Increment the number of reactants
-              nproducts++;
+                  network->reactions[n].products[ nproducts ] =  add_species (specie, network);
+                  if( network->reactions[n].products[ nproducts ] == -1 )
+                    {
+                      fprintf (stdout, "done4.\n");
+                      return EXIT_FAILURE;
+                    }
+
+                  // Increment the number of reactants
+                  nproducts++;
+                }
             }
           // Found a char, wich is not a '+', without being ready for a specie : end of products
           else
@@ -198,7 +237,9 @@ read_network (const char *chem_file, net_t * network, const int verbose)
       if (sscanf ( specie, "%lf",
                    &network->reactions[n].alpha) != 1)
         {
-          network_file_error (chem_file1, n + 1);
+          fprintf (stderr, "astrochem: error: incorrect network file in %s line %i.\n",
+                   chem_file1, n+1 );
+          return EXIT_FAILURE;
         }
 
       // The remaining params
@@ -209,7 +250,9 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                    &network->reactions[n].reaction_type,
                    &network->reactions[n].reaction_no) != 4)
         {
-          network_file_error (chem_file1, n + 1);
+          fprintf (stderr, "astrochem: error: incorrect network file in %s line %i.\n",
+                   chem_file1, n+1 );
+          return EXIT_FAILURE;
         }
       // Next reaction
       n++;
@@ -221,10 +264,14 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                "astrochem: error: incorect number of reactions %i, different from %i,"
                "file %s may be corrupt.\n", n, network->n_reactions,
                chem_file1);
-      exit (1);
+      return EXIT_FAILURE;
     }
   /* Free non used memory space */
-  realloc_network_species (network, network->n_species);
+  if( realloc_network_species (network, network->n_species) != EXIT_SUCCESS )
+    {
+      fprintf (stdout, "done5.\n");
+      return EXIT_FAILURE;
+    }
   if (verbose >= 1)
     {
       fprintf (stdout, "done.\n");
@@ -233,6 +280,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
     }
   /* Close the file. */
   fclose (f);
+  return EXIT_SUCCESS;
 }
 
 /**
@@ -243,20 +291,11 @@ read_network (const char *chem_file, net_t * network, const int verbose)
  *
  * @param new_species name of new specie
  * @param network network to add specie to
- * @return index of added specie
+ * @return index of added specie or -1 in case of failure
  */
 int
 add_species (char *new_species, net_t * network)
 {
-  // Not storing some elements
-  if ((strcmp ( new_species, "cosmic-ray") == 0) ||
-      (strcmp ( new_species, "uv-photon") == 0) ||
-      (strcmp ( new_species, "photon") == 0))
-    {
-      return -1;
-    }
-
-
   // Check specie is not empty
   if (strcmp (new_species, "") == 0)
     {
@@ -275,7 +314,10 @@ add_species (char *new_species, net_t * network)
   while (i >= network->n_alloc_species)
     {
       int new_alloc_size = network->n_alloc_species * 2;
-      realloc_network_species (network, new_alloc_size);
+      if( realloc_network_species (network, new_alloc_size) != EXIT_SUCCESS )
+        {
+          return EXIT_FAILURE;
+        }
     }
   //Check length of species name
   if (strlen (new_species) < MAX_CHAR_SPECIES - 1)
@@ -399,8 +441,11 @@ add_species (char *new_species, net_t * network)
   return i;
 }
 
-/*
-   Look up the index of a given species in the species array.
+/**
+ * @brief Look up the index of a given species in the species array.
+ * @param specie specie name to find
+ * @param network network to search for specie
+ * @return index of specie, -1 if specie name is empty, -2 if specie does not exist.
  */
 int
 find_species (const species_name_t specie, const net_t * network)
@@ -424,10 +469,14 @@ find_species (const species_name_t specie, const net_t * network)
   return -2;
 }
 
-/*
-   Alloc the network structure.
+/**
+ * @brief Alloc the network structure.
+ * @param network network to allocate
+ * @param n_species number of species
+ * @param n_reactions numer of reactions
+ * @return EXIT_SUCCESS if sucessfull
  */
-void
+int
 alloc_network (net_t * network, int n_species, int n_reactions)
 {
   network->n_alloc_species = n_species;
@@ -436,7 +485,7 @@ alloc_network (net_t * network, int n_species, int n_reactions)
     {
       fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__,
                "array allocation failed.\n");
-      exit (1);
+      return EXIT_FAILURE;
     }
 
   network->n_reactions = n_reactions;
@@ -444,7 +493,7 @@ alloc_network (net_t * network, int n_species, int n_reactions)
     {
       fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__,
                "array allocation failed.\n");
-      exit (1);
+      return EXIT_FAILURE;
     }
   int i,j;
   for (i = 0; i < n_reactions; i++)
@@ -458,12 +507,16 @@ alloc_network (net_t * network, int n_species, int n_reactions)
           network->reactions[i].products[j] = -1;
         }
     }
+  return EXIT_SUCCESS;
 }
 
-/*
-   Reallocate species array, without overwriting existing species
-   */
-void
+/**
+ * @brief Reallocate species array, without overwriting existing species
+ * @param network network to reallocate specie in
+ * @param n_species new nimber of species
+ * @return EXIT_SUCCESS if sucessfull
+ */
+int
 realloc_network_species (net_t * network, int n_species)
 {
   if (n_species < network->n_species)
@@ -472,7 +525,7 @@ realloc_network_species (net_t * network, int n_species)
                "astrochem: %s:%d: cannot realloc over existing species : "
                "n_species : %i, new_size: %i\n", __FILE__, __LINE__,
                network->n_species, n_species);
-      exit (1);
+      return EXIT_FAILURE;
     }
   network->n_alloc_species = n_species;
   if ((network->species =
@@ -481,8 +534,9 @@ realloc_network_species (net_t * network, int n_species)
     {
       fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__,
                "array allocation failed.\n");
-      exit (1);
+      return EXIT_FAILURE;
     }
+  return EXIT_SUCCESS;
 }
 
 /**
@@ -494,23 +548,6 @@ free_network (net_t * network)
 {
   free (network->reactions);
   free (network->species);
-}
-
-/**
- * @brief Display an error while reading input
- *
- * Display an error message and exit of an error is encountered while
- * reading the input file.
- *
- * @param input_file file from wich the error is from
- * @param line_number line number where the error occured
- */
-void
-network_file_error (const char *chem_file, int line_number)
-{
-  fprintf (stderr, "astrochem: error: incorrect network file in %s line %i.\n",
-           chem_file, line_number);
-  exit (1);
 }
 
 /**

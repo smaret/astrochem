@@ -205,8 +205,7 @@ int solve( astrochem_mem_t* astrochem_mem, const net_t* network,
 void solver_close( astrochem_mem_t* astrochem_mem );
 
 
-
-void read_network (const char *chem_file, net_t * network, const int verbose);
+int read_network (const char *chem_file, net_t * network, const int verbose);
 
 void free_network (net_t * network);
 

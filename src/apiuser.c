@@ -61,11 +61,11 @@ main (int argc, char *argv[])
             {
             case 'h':
               usage ();
-              exit (0);
+              return EXIT_SUCCESS;
               break;
             case 'V':
               version ();
-              exit (0);
+              return EXIT_SUCCESS;
               break;
             case 'v':
               verbose = 2;
@@ -75,7 +75,7 @@ main (int argc, char *argv[])
               break;
             default:
               usage ();
-              exit (1);
+              return EXIT_FAILURE;
             }
         };
       argc -= optind;
@@ -83,13 +83,16 @@ main (int argc, char *argv[])
       if (argc != 0)
         {
           usage ();
-          return 1;
+          return EXIT_FAILURE;
         }
     }
 
   char *chem_file = "../networks/osu2009.chm";
   net_t network;
-  read_network(chem_file, &network, verbose );
+  if( read_network(chem_file, &network, verbose ) != EXIT_SUCCESS )
+    {
+           return EXIT_FAILURE;
+    }
 
   phys_t phys;
   phys.cosmic = 1e-17;
@@ -138,7 +141,7 @@ main (int argc, char *argv[])
   solver_close( &astrochem_mem );
   free_abundances( abundances );
   free_network (&network);
-  return (EXIT_SUCCESS);
+  return EXIT_SUCCESS;
 }
 
 /*

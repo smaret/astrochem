@@ -27,22 +27,19 @@
 
 #include "astrochem.h"
 
-void read_input (const char *input_file, inp_t * input_params,
+int read_input (const char *input_file, inp_t * input_params,
                  const net_t * network, int verbose);
 
-void read_input_file_names (const char *input_file, files_t * files,
+int read_input_file_names (const char *input_file, files_t * files,
                             int verbose);
 
 void free_input (inp_t * input_params);
 
 
-void alloc_input (inp_t * input_params, int n_initial_abundances,
+int alloc_input (inp_t * input_params, int n_initial_abundances,
                   int n_output_abundances);
 
-
-void input_error (const char *input_f, int line_number);
-
-void read_source (const char *source_file, mdl_t * source_mdl,
+int read_source (const char *source_file, mdl_t * source_mdl,
                   const inp_t * input_params, const int verbose);
 
 void free_mdl (mdl_t * source_mdl);

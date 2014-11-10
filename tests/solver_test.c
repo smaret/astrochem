@@ -41,7 +41,10 @@ main (void)
   fclose (f);
 
   /* Read them */
-  read_network ("network.chm", &network, verbose);
+  if( read_network ("network.chm", &network, verbose) )
+    {
+      return EXIT_FAILURE;
+    }
 
   phys_t phys;
   phys.cosmic = COSMIC_DEFAULT;
@@ -72,19 +75,20 @@ main (void)
 
   astrochem_mem_t astrochem_mem;
 
-  if( solver_init( &cell, &network, &phys, abundances , density, abs_err, rel_err, &astrochem_mem ) != 0 )
+  if( solver_init( &cell, &network, &phys, abundances , density, abs_err, rel_err, &astrochem_mem ) != EXIT_SUCCESS )
     {
       return EXIT_FAILURE;
-    }
+   }
   int i;
   double time = 0;
   for( i = 0; i < 1000 ; i++ )
     {
 
       time+= 10;
-      solve( &astrochem_mem, &network, abundances, time, NULL,verbose);
-
-
+      if( solve( &astrochem_mem, &network, abundances, time, NULL,verbose) != EXIT_SUCCESS )
+        {
+          return EXIT_FAILURE;
+        }
       double x_abundance;
       double y_abundance;
       double x_abs_err;
@@ -125,6 +129,5 @@ main (void)
   solver_close( &astrochem_mem );
   free_abundances( abundances );
   free_network (&network);
-
   return EXIT_SUCCESS;
 }

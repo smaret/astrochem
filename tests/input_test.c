@@ -98,17 +98,24 @@ main (void)
   fclose (f);
 
  /* Read the input file */
-  read_input_file_names ("input.ini", &input_params.files, verbose);
+  if( read_input_file_names ("input.ini", &input_params.files, verbose) != EXIT_SUCCESS )
+    {
+      return EXIT_FAILURE;
+    }
   
   /* Read the chemical network file */
-  read_network (input_params.files.chem_file, &network, verbose);
+  if( read_network (input_params.files.chem_file, &network, verbose) != EXIT_SUCCESS )
+    {
+      return EXIT_FAILURE;
+    }
    
   /* Read the input file */
-  read_input ("input.ini", &input_params, &network , verbose);
- 
+  if( read_input ("input.ini", &input_params, &network , verbose) != EXIT_SUCCESS )
+    {
+      return EXIT_FAILURE;
+    }
   
   /* Check that the values are correct */
-    
   if ((strcmp (input_params.files.source_file, "source.mdl") == 0) &&
       (strcmp (input_params.files.chem_file, "network.chm") == 0) &&
       (input_params.phys.chi == CHI_DEFAULT) &&

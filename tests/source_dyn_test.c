@@ -88,7 +88,10 @@ main (void)
 
   /* Read it */
 
-  read_source ("./source_dyn.mdl", &source_mdl, &fake, verbose);
+  if( read_source ("./source_dyn.mdl", &source_mdl, &fake, verbose) != EXIT_SUCCESS )
+    {
+      return EXIT_FAILURE;
+    }
   /* Check that the values are correct */
   if ((source_mdl.n_cells == 3) &&
       (source_mdl.ts.n_time_steps == 11) &&

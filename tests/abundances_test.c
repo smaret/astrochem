@@ -56,13 +56,19 @@ main (void)
     fclose (f);
 
     /* Read it */
-    read_network ("network.chm", &network, verbose);
+    if( read_network ("network.chm", &network, verbose) != EXIT_SUCCESS )
+      {
+        return EXIT_FAILURE;
+      }
 
     const char* species[]  = {"CH", "HCO(+)", "e(-)"};
     const double initial_abundances[] = {1e-4, 1e-9, 1e-3};
 
     double *abundances = NULL;
-    alloc_abundances( &network, &abundances ); // Allocate the abundances array; it contains all species.
+    if( alloc_abundances( &network, &abundances ) != EXIT_SUCCESS ) // Allocate the abundances array; it contains all species.
+      {
+        return EXIT_FAILURE;
+      }
     if( abundances == NULL )
     {
         return EXIT_FAILURE;
@@ -89,5 +95,7 @@ main (void)
     {
         return EXIT_FAILURE;
     }
+    free_abundances( abundances );
+    free_network( &network );
     return EXIT_SUCCESS;
 }

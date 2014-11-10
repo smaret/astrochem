@@ -62,8 +62,10 @@ main (void)
   strncpy (chem_file, "network.chm", sizeof (chem_file) - 1);
 
   /* Read it */
-
-  read_network(chem_file, &network, verbose);
+  if( read_network(chem_file, &network, verbose) != EXIT_SUCCESS )
+    {
+      return EXIT_FAILURE;
+    }
  network.reactions[0].reactants[1] =  find_species("H", &network);
   /* Check that the values are correct */
   if ((network.n_reactions == 18) &&

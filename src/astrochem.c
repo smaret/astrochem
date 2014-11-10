@@ -85,11 +85,11 @@ main (int argc, char *argv[])
             {
             case 'h':
               usage ();
-              exit (0);
+              return EXIT_SUCCESS;
               break;
             case 'V':
               version ();
-              exit (0);
+              return EXIT_SUCCESS;
               break;
             case 'v':
               verbose = 2;
@@ -99,7 +99,7 @@ main (int argc, char *argv[])
               break;
             default:
               usage ();
-              exit (1);
+              return EXIT_FAILURE;
             }
         };
       argc -= optind;
@@ -107,23 +107,35 @@ main (int argc, char *argv[])
       if (argc != 1)
         {
           usage ();
-          exit (1);
+          return EXIT_FAILURE;
         }
       input_file = argv[0];
     }
 
   /* Read the input file */
-  read_input_file_names (input_file, &input_params.files, verbose);
+  if( read_input_file_names (input_file, &input_params.files, verbose) != EXIT_SUCCESS )
+    {
+      return EXIT_FAILURE;
+    }
 
   /* Read the chemical network file */
-  read_network (input_params.files.chem_file, &network, verbose);
+  if( read_network (input_params.files.chem_file, &network, verbose) != EXIT_SUCCESS )
+    {
+      return EXIT_FAILURE;
+    }
 
   /* Read the input file */
-  read_input (input_file, &input_params, &network, verbose);
+  if( read_input (input_file, &input_params, &network, verbose) != EXIT_SUCCESS )
+    {
+      return EXIT_FAILURE;
+    }
 
   /* Read the source model file */
-  read_source (input_params.files.source_file, &source_mdl, &input_params,
-               verbose);
+  if( read_source (input_params.files.source_file, &source_mdl, &input_params,
+               verbose) != EXIT_SUCCESS )
+    {
+      return EXIT_FAILURE;
+    }
 
   // Hdf5 files, datatype and dataspace
   hid_t       fid, datatype, dataspace, dataset, tsDataset, tsDataspace,  speciesDataset, speciesDataspace, speciesType;
@@ -241,8 +253,11 @@ main (int argc, char *argv[])
           if (verbose >= 1)
             fprintf (stdout, "Computing abundances in cell %d...\n",
                      cell_index);
-          full_solve ( fid, dataset, routeDatasets, dataspace, dataspaceRoute, datatype, route_t_datatype, cell_index, &input_params, source_mdl.mode,
-                       &source_mdl.cell[cell_index], &network, &source_mdl.ts, verbose);
+          if( full_solve ( fid, dataset, routeDatasets, dataspace, dataspaceRoute, datatype, route_t_datatype, cell_index, &input_params, source_mdl.mode,
+                       &source_mdl.cell[cell_index], &network, &source_mdl.ts, verbose) != EXIT_SUCCESS )
+            {
+              return EXIT_FAILURE;
+            }
           if (verbose >= 1)
             fprintf (stdout, "Done with cell %d.\n", cell_index);
         }
@@ -340,7 +355,7 @@ version (void)
  * @param network network to use for solving
  * @param ts time steps to solve on
  * @param verbose quit if 0, verbose if 1
- * @return 0 if sucessfull
+ * @return EXIT_SUCCESS if sucessfull
  * @todo Remove complicated code ? TODO
  */
 int
@@ -358,7 +373,7 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
     {
       fprintf (stderr, "astrochem: %s:%d: routes allocation failed.\n",
                __FILE__, __LINE__);
-      exit (1);
+      return EXIT_SUCCESS;
     }
 
   double* output_abundances = NULL;
@@ -367,7 +382,7 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
     {
       fprintf (stderr, "astrochem: %s:%d: array allocation failed.\n",
                __FILE__, __LINE__);
-      return -1;
+      return EXIT_FAILURE;
     }
 
   // Create the memory dataspace, selecting all output abundances
@@ -434,8 +449,11 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
   cell_unik.nh = cell->nh[0];
   cell_unik.tgas = cell->tgas[0];
   cell_unik.tdust = cell->tdust[0];
-  solver_init( &cell_unik, network, &input_params->phys, abundances, min_nh, input_params->solver.abs_err,  input_params->solver.rel_err, &astrochem_mem );
-
+  if( solver_init( &cell_unik, network, &input_params->phys, abundances, min_nh, input_params->solver.abs_err,  input_params->solver.rel_err, &astrochem_mem ) != EXIT_SUCCESS )
+    {
+      return EXIT_FAILURE;
+    }
+  else
     {
       int i, j;
 
@@ -451,11 +469,17 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
               cell_unik.tgas = cell->tgas[i];
               cell_unik.tdust = cell->tdust[i];
 
-              solve( &astrochem_mem, network, abundances,  ts->time_steps[i], &cell_unik, verbose );
+              if( solve( &astrochem_mem, network, abundances,  ts->time_steps[i], &cell_unik, verbose ) != EXIT_SUCCESS )
+                {
+                  return EXIT_FAILURE;
+                }
             }
           else
             {
-              solve( &astrochem_mem, network, abundances,  ts->time_steps[i], NULL, verbose );
+              if( solve( &astrochem_mem, network, abundances,  ts->time_steps[i], NULL, verbose ) != EXIT_SUCCESS )
+                {
+                  return EXIT_FAILURE;
+                }
             }
 
 
@@ -677,5 +701,5 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
   free( routes );
   free_abundances( abundances );
   solver_close( &astrochem_mem );
-  return (0);
+  return EXIT_SUCCESS;
 }
