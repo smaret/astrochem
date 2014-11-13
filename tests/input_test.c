@@ -48,7 +48,7 @@ main (void)
   fprintf (f, "C(-)         + NO                          -> CN(-)        + O                                             1.00e-09  0.00e+00  0.00e+00  3 3151\n");
   fprintf (f, "C(+)         + H                           -> CH(+)                                                        1.70e-17  0.00e+00  0.00e+00  4 3162\n");
   fprintf (f, "C(-)         + C                           -> C2           + e(-)                                          5.00e-10  0.00e+00  0.00e+00  5 3243\n");
-  fprintf (f, "O            + CH                          -> HCO(+)       + e(-)                                          2.00e-11  4.40e-01  0.00e+00  6 3289\n");
+  fprintf (f, "-17-O            + CH                          -> HCO(+)       + e(-)                                          2.00e-11  4.40e-01  0.00e+00  6 3289\n");
   fprintf (f, "C            + CH                          -> C2           + H                                             6.59e-11  0.00e+00  0.00e+00  7 3290\n");
   fprintf (f, "C            + C                           -> CO           + photon                                        1.00e-17  0.00e+00  0.00e+00  8 3672\n");
   fprintf (f, "C2(+)        + e(-)                        -> Si(+)            + C                                             8.84e-08 -5.00e-01  0.00e+00  9 3688\n");
@@ -93,7 +93,7 @@ main (void)
   fprintf (f, "# Output\n");
   fprintf (f, "[output]\n");
   fprintf (f, "time_steps = 64\n");
-  fprintf (f, "abundances = CO,C(+),C,e(-),OH,H3O(+),H,H2,HCO(+),CO(+),C4H,CH(+),CH\n");
+  fprintf (f, "abundances = CO,C(+),C,e(-),OH,H3O(+),H,H2,HCO(+),CO(+),C4H,CH(+),CH,-17-O\n");
   fprintf (f, "trace_routes = 1\n");
   fclose (f);
 
@@ -137,7 +137,7 @@ main (void)
       (input_params.abundances.initial_abundances[3].abundance == 1.76e-4) &&
       (strcmp (network.species[input_params.abundances.initial_abundances[4].species_idx].name, "C(+)") == 0) &&
       (input_params.abundances.initial_abundances[4].abundance == 7.30e-5) &&
-      (input_params.output.n_output_species == 13) &&
+      (input_params.output.n_output_species == 14) &&
       (strcmp (network.species[input_params.output.output_species_idx[0]].name, "CO") == 0) &&
       (strcmp (network.species[input_params.output.output_species_idx[1]].name, "C(+)") == 0) &&
       (strcmp (network.species[input_params.output.output_species_idx[2]].name, "C") == 0) &&

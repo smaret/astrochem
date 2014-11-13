@@ -56,7 +56,7 @@ main (void)
   fprintf (f, "C(+)         + e(-)                        -> C            + photon                                        4.40e-12 -6.10e-01  0.00e+00 10 4227\n");
   fprintf (f, "C(+)         + C(-)                        -> C            + C                                             2.30e-07 -5.00e-01  0.00e+00 11 4243\n");
   fprintf (f, "C            + e(-)                        -> C(-)                                                         3.00e-15  0.00e+00  0.00e+00 12 4279\n");
-  fprintf (f, "C            + uv-photon                   -> C(+)         + e(-)                                          2.16e-10  0.00e+00  2.61e+00 13 4283\n");
+  fprintf (f, "-29-Si       + uv-photon                   -> C(+)         + e(-)                                          2.16e-10  0.00e+00  2.61e+00 13 4283\n");
   fclose (f);
 
   strncpy (chem_file, "network.chm", sizeof (chem_file) - 1);
@@ -69,7 +69,7 @@ main (void)
  network.reactions[0].reactants[1] =  find_species("H", &network);
   /* Check that the values are correct */
   if ((network.n_reactions == 18) &&
-      (network.n_species == 25) &&
+      (network.n_species == 26) &&
 
       /* Reaction #1 */
       (network.reactions[0].reactants[0] == find_species("H", &network)) &&

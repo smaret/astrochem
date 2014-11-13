@@ -46,7 +46,6 @@
 #endif
 
 #define MAX_CHAR_SPECIES 32     /*!< Maximum number of characters in a specie name */
-#define MAX_CHAR_ELEMENT 8      /*!< Maximum number of characters in a element name */
 
 #define CONST_MKSA_YEAR 3.1536e7
 #define CONST_CGSM_BOLTZMANN (1.3806503e-16)

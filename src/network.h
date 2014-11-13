@@ -25,6 +25,30 @@
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
 
+#define MAX_CHAR_ELEMENT 8               /*!< Maximum number of characters in a element name */
+#define ELECTRON_MASS    9.10938291e-31  /*!< Mass of an electron in Kg */
+#define UMA              1.660538921e-27 /*!< Atomic mass unity in Kg */
+
+/**
+ * @brief type for element name
+ */
+typedef char elem_name_t[MAX_CHAR_ELEMENT];
+
+/**
+ * @brief struct containint a chemical element name and associated mass
+ */
+typedef struct
+{
+  elem_name_t name; /*!< Name of element */
+  int mass;      /*!< Mass of element */
+} elem_t;
+
+
 int find_species (const species_name_t specie, const net_t * network);
+int add_species (char *new_species, net_t * network);
+int alloc_network (net_t * network, int n_species, int n_reactions);
+int realloc_network_species (net_t * network, int n_species);
+bool get_species_mass_and_charge( char* species, double* mass, int* charge );
+int get_element_mass( const char* element );
 
 #endif // _NETWORK_H_
