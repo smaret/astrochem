@@ -21,7 +21,7 @@
 
 import sys
 import unittest
-sys.path.append("@top_builddir@/python/libastrochemtools")
+sys.path.append("@abs_top_builddir@/python/libastrochemtools")
 import libastrochemtools as tools
 
 class TestSequenceFunctions(unittest.TestCase):
