@@ -97,9 +97,6 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
           /* The formation of H2 is a first order reaction, so the
              product of the reactants needs to be divided by the H
              abundance. */
-
-
-
           y_product *= NV_Ith_S (y, reactions[i].reactants[0]);
           y_product *= reac_rates[i];
         }

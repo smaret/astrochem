@@ -40,7 +40,7 @@ typedef char elem_name_t[MAX_CHAR_ELEMENT];
 typedef struct
 {
   elem_name_t name; /*!< Name of element */
-  int mass;      /*!< Mass of element */
+  int mass;         /*!< Mass of element in uma*/
 } elem_t;
 
 

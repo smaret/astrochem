@@ -1,8 +1,8 @@
-/* 
+/*
    input_test.c - Test the read_input() function
-   
+
    Copyright (c) 2006-2014 Sebastien Maret
-   
+
    This file is part of Astrochem.
 
    Astrochem is free software: you can redistribute it and/or modify
@@ -69,6 +69,7 @@ main (void)
   fprintf (f, "# Physical paramaters\n");
   fprintf (f, "[phys]\n");
   fprintf (f, "cosmic = 1.3e-17\n");
+  fprintf (f, "grain_gas_mass_ratio = 9917.130961134915\n");
   fprintf (f, "# Solver parameters\n");
   fprintf (f, "[solver]\n");
   fprintf (f, "ti = 1e-6\n");
@@ -89,7 +90,6 @@ main (void)
   fprintf (f, "P(+)    = 3.00e-9\n");
   fprintf (f, "Cl(+)   = 4.00e-9\n");
   fprintf (f, "e(-)    = 7.3179e-5\n");
-  fprintf (f, "grain   = 1.32e-12\n");
   fprintf (f, "# Output\n");
   fprintf (f, "[output]\n");
   fprintf (f, "time_steps = 64\n");
@@ -102,31 +102,32 @@ main (void)
     {
       return EXIT_FAILURE;
     }
-  
+
   /* Read the chemical network file */
   if( read_network (input_params.files.chem_file, &network, verbose) != EXIT_SUCCESS )
     {
       return EXIT_FAILURE;
     }
-   
+
   /* Read the input file */
   if( read_input ("input.ini", &input_params, &network , verbose) != EXIT_SUCCESS )
     {
       return EXIT_FAILURE;
     }
-  
   /* Check that the values are correct */
   if ((strcmp (input_params.files.source_file, "source.mdl") == 0) &&
       (strcmp (input_params.files.chem_file, "network.chm") == 0) &&
       (input_params.phys.chi == CHI_DEFAULT) &&
-      (input_params.phys.cosmic == 1.3e-17) && 
-      (input_params.phys.grain_abundance == 1.32e-12) && 
+      (input_params.phys.cosmic == 1.3e-17) &&
+      (input_params.phys.grain_gas_mass_ratio == 9917.130961134915 ) &&
+      (input_params.phys.grain_abundance - 1.32e-12 > -DBL_EPSILON ) &&
+      (input_params.phys.grain_abundance - 1.32e-12 < DBL_EPSILON ) &&
       (input_params.solver.ti == 1e-6 * CONST_MKSA_YEAR) &&
-      (input_params.solver.tf == 1e9 * CONST_MKSA_YEAR) && 
-      (input_params.solver.abs_err == ABS_ERR_DEFAULT) && 
-      (input_params.solver.rel_err == 1e-6) && 
+      (input_params.solver.tf == 1e9 * CONST_MKSA_YEAR) &&
+      (input_params.solver.abs_err == ABS_ERR_DEFAULT) &&
+      (input_params.solver.rel_err == 1e-6) &&
       (input_params.output.time_steps == 64) &&
-      (input_params.abundances.n_initial_abundances == 14) &&
+      (input_params.abundances.n_initial_abundances == 13) &&
       (strcmp (network.species[input_params.abundances.initial_abundances[0].species_idx].name, "H2") == 0) &&
       (input_params.abundances.initial_abundances[0].abundance == 0.5) &&
       (strcmp (network.species[input_params.abundances.initial_abundances[1].species_idx].name, "He") == 0) &&

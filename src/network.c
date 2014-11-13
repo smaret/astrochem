@@ -51,7 +51,7 @@ static const elem_t elems[] = {
     {"P",31},
     {"Cl",35},
     {"Fe",56},
-    {"grain",1},
+    {"grain",0},
     {"X",1},
     {"Y",1}
 };
@@ -510,7 +510,7 @@ bool get_species_mass_and_charge( char* species, double* mass, int* charge )
           // -XX-X
           if( *specie_pt == 45 )
             {
-              // Search for char after the specific mass
+              // Search for char after the specific mass -XX-
               char* element_maj_char = strchr( specie_pt+1, ('-' ) )+1;
 
               // Count the number of char to copy
@@ -600,13 +600,6 @@ bool get_species_mass_and_charge( char* species, double* mass, int* charge )
           return false;
         }
       specie_mass_uma += mass_multiplier * element_mass;
-    }
-
-  // Check mass of specie is not null
-  if( specie_mass_uma == 0 )
-    {
-      fprintf (stderr, "astrochem: error: Problam parsing this specie: %s \n", species );
-      return false;
     }
   *mass = specie_mass_uma * UMA;
   return true;

@@ -28,18 +28,19 @@
 #include <nvector/nvector_serial.h>
 #include <string.h>
 
-#define MAX_LINE 512            /* Maximum number of characters in each input file
-                                   line */
-#define CHI_DEFAULT 1
-#define COSMIC_DEFAULT 1.3e-17
-#define GRAIN_SIZE_DEFAULT 1e-5 /* Grain radius, in cm */
-#define TI_DEFAULT 1e-6
-#define TF_DEFAULT 1e7
-#define ABS_ERR_DEFAULT 1e-20
-#define REL_ERR_DEFAULT 1e-3
-#define TIME_STEPS_DEFAULT 32
-#define TRACE_ROUTES_DEFAULT 0
-#define N_OUTPUT_ROUTES 16
+#define MAX_LINE 512      /*!< Maximum number of characters in each input file line */
+#define CHI_DEFAULT 1     /*!< Default chi value */
+#define COSMIC_DEFAULT 1.3e-17  /*!< Default cosmic value */
+#define GRAIN_SIZE_DEFAULT 1e-5 /*!< Default Grain radius, in cm */
+#define GRAIN_GAS_MASS_RATIO_DEFAULT 0 /*!< Default Grain mass ratio */
+#define GRAIN_MASS_DENSITY_DEFAULT 3000 /*!< Default Grain mass density, Olivine grains, kg/m3  */
+#define TI_DEFAULT 1e-6  /*!< Default initial time */
+#define TF_DEFAULT 1e7   /*!< Default final time */
+#define ABS_ERR_DEFAULT 1e-20   /*!< Default absolute error */
+#define REL_ERR_DEFAULT 1e-3    /*!< Default relative error */
+#define TIME_STEPS_DEFAULT 32   /*!< Default number of times steps */
+#define TRACE_ROUTES_DEFAULT 0  /*!< Deactivate route tracing by default */
+#define N_OUTPUT_ROUTES 16      /*!< Defaults number of output routes */
 
 #ifndef M_PI
 #define M_PI  3.14159265358979323846264338327950288
@@ -47,9 +48,10 @@
 
 #define MAX_CHAR_SPECIES 32     /*!< Maximum number of characters in a specie name */
 
-#define CONST_MKSA_YEAR 3.1536e7
-#define CONST_CGSM_BOLTZMANN (1.3806503e-16)
-#define CONST_CGSM_MASS_PROTON (1.67262158e-24)
+#define CONST_MKSA_YEAR 3.1536e7                /*!< Number of seconds in a year */
+#define CONST_CGSM_BOLTZMANN (1.3806503e-16)    /*!< Boltzmann constant */
+#define CONST_CGSM_MASS_PROTON (1.67262158e-24) /*!< Proton Mass */
+#define MASS_PROTON       1.672621777e-27       /*!< Proton Mass */
 
 #define MIN_ABUNDANCE 1e-20     /* Minimum abundance to write in output files */
 
@@ -79,10 +81,12 @@ typedef struct
 
 typedef struct
 {
-  double chi;
-  double cosmic;
-  double grain_size;
-  double grain_abundance;
+  double chi;               /*!< chi */
+  double cosmic;            /*!< cosmic */
+  double grain_size;        /*!< grain size */
+  double grain_abundance;   /*!< grain abundances */
+  double grain_gas_mass_ratio;  /*!< grain mass ratio */
+  double grain_mass_density; /*!< grain mass density, kg/m3  */
 } phys_t;
 
 typedef struct

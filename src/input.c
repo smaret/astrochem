@@ -134,6 +134,8 @@ read_input (const char *input_file, inp_t * input_params,
   input_params->phys.cosmic = COSMIC_DEFAULT;
   input_params->phys.grain_size = GRAIN_SIZE_DEFAULT;
   input_params->phys.grain_abundance = 0;
+  input_params->phys.grain_mass_density = GRAIN_MASS_DENSITY_DEFAULT;
+  input_params->phys.grain_gas_mass_ratio = GRAIN_GAS_MASS_RATIO_DEFAULT;
   input_params->solver.ti = TI_DEFAULT;
   input_params->solver.tf = TF_DEFAULT;
   input_params->solver.abs_err = ABS_ERR_DEFAULT;
@@ -180,6 +182,11 @@ read_input (const char *input_file, inp_t * input_params,
                 input_params->phys.cosmic = atof (value);
               else if (strcmp (parameter, "grain_size") == 0)
                 input_params->phys.grain_size = atof (value) * 1e-4;    /* microns -> cm */
+              else if (strcmp (parameter, "grain_gas_mass_ratio") == 0)
+                input_params->phys.grain_gas_mass_ratio = atof (value);
+              else if (strcmp (parameter, "grain_mass_density") == 0)
+                input_params->phys.grain_mass_density = atof (value);
+
               else
                 {
                   fprintf (stderr, "astrochem: error: incorrect input in %s line %i.\n",
@@ -273,6 +280,7 @@ read_input (const char *input_file, inp_t * input_params,
                   return EXIT_FAILURE;
                 }
             }
+
 
           /* Output */
 
@@ -384,6 +392,35 @@ read_input (const char *input_file, inp_t * input_params,
   /* Close the file */
 
   fclose (f);
+
+  // Compute grain mass and grain abundance
+  if( input_params->phys.grain_abundance != 0 )
+    {
+      fprintf (stderr,
+               "astrochem: warning: use of a input grain abundance is deprecated, yet still supported."
+               "Please use grain_gas_mass_ratio and grain_mass_density parameters.\n");
+    }
+  else
+    {
+      double grain_mass = (4./3. * M_PI * pow( input_params->phys.grain_size, 3) * input_params->phys.grain_mass_density);
+      input_params->phys.grain_abundance = input_params->phys.grain_gas_mass_ratio * MASS_PROTON / grain_mass;
+      int g, gm, gp;
+      g = find_species ("grain", network);
+      gm = find_species ("grain(-)", network);
+      gp = find_species ("grain(+)", network);
+      if( g != -1 )
+        {
+          network->species[g].mass = grain_mass;
+        }
+      if( gm != -1 )
+        {
+          network->species[gm].mass = grain_mass;
+        }
+      if( gp != -1 )
+        {
+          network->species[gm].mass = grain_mass;
+        }
+    }
 
   /* Check that the source file name and the chemical file name were specified
      in the input file. Also check that other parameters have acceptable
