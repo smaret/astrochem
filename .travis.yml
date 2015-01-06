@@ -1,4 +1,6 @@
 language: c
-before_install: sudo apt-get update
+before_install:
+- sudo add-apt-repository "deb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse" -y  
+- sudo apt-get update
 install: sudo apt-get install gfortran libsundials-serial-dev liblapack-dev libhdf5-serial-dev hdf5-tools python-numpy texlive
 script: ./bootstrap && ./configure CC=gcc FC=gfortran && make && make check && make pdf
