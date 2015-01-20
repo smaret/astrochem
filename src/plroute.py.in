@@ -191,9 +191,9 @@ def main():
             try:
                 listspecies( args[0] )
             except IOError as e:
-                sys.stderr.write("converttolegacy: error: can't open %s. Error : %s\n" % (filename, e) )
+                sys.stderr.write("plroute: error: can't open %s. Error : %s\n" % (filename, e) )
             except ValueError as e:
-                sys.stderr.write("converttolegacy: error: can't read %s. Error : %s\n" % (filename, e) )
+                sys.stderr.write("plroute: error: can't read %s. Error : %s\n" % (filename, e) )
             sys.exit(1)
         else:
             if len(args) != 2:
