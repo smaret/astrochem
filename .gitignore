@@ -44,12 +44,14 @@ doc/examples/dynamic/input.ini
 doc/latex/astrochem.tex
 doc/man/astrochem.1
 doc/man/chmconvert.1
+doc/man/converttolegacy.1
 doc/man/plabun.1
 doc/man/plroute.1
 doc/sphinx/source/conf.py
 lib/libastrochem.py
 python/libastrochemtools/libastrochemtools.py
 src/chmconvert.py
+src/converttolegacy.py
 src/plabun.py
 src/plroute.py
 tests/astrochem_test.py
@@ -76,14 +78,20 @@ doc/sphinx/build
 src/apiuser
 src/astrochem
 src/chmconvert
+src/converttolegacy
 src/plabun
 src/plroute
+tests/abundances_test
+tests/astrochem_test
 tests/benchmark
 tests/input_test
 tests/network_test
+tests/python_lib_test
+tests/python_tools_test
 tests/rate_test
-tests/solve_test
+tests/solver_test
 tests/source_test
+tests/source_dyn_test
 
 # Ignore Python compiled files
 *.pyc
@@ -96,10 +104,12 @@ doc/examples/*.h5
 doc/examples/dynamic/*.h5
 
 # Test input and result files
-tests/input.ini
-tests/network.chm
-tests/source.mdl
+tests/*.ini
+tests/*.chm
+tests/*.mdl
 tests/*.h5
+tests/*.log
+tests/*.trs
 
 # Network files created by chmconvert
 networks/*.chm
