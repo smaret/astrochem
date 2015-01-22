@@ -52,7 +52,7 @@ Options:
    -y, --yrange=ymin,ymax   Set the y axis range
    -p, --percent            Print the relative contribution of each route
    -l, --legacy             To be able to read old output format file (.rout)
-   -c, --chmfile=file       Specify chemical network file ( deprecated, used only in legacy mode )
+   -m, --chmfile=file       Specify chemical network file (deprecated, used only in legacy mode)
 
 See the plroute(1) man page for more information"""
     print "Report bugs to <%s>." % PACKAGE_BUGREPORT
@@ -386,7 +386,7 @@ def main():
 
         # Check that the shell index is valid
         try:
-            temp = formation_reac[s, 0, 0]
+            temp = formation_reac[c, 0, 0]
         except IndexError:
             sys.stderr.write("plroute: error: shell index is out of bounds.\n")
             sys.exit(1)
@@ -394,8 +394,8 @@ def main():
         # Create arrays containing the destruction/formation routes at
         # each time step and in each shell
 
-        f_reac = unique(formation_reac[s, :, :])
-        d_reac = unique(destruction_reac[s, :, :])
+        f_reac = unique(formation_reac[c, :, :])
+        d_reac = unique(destruction_reac[c, :, :])
         f_reac = f_reac[f_reac.nonzero()]
         d_reac = d_reac[d_reac.nonzero()]
         f_rate = zeros(len(f_reac) * len(time), dtype=float)
@@ -405,15 +405,15 @@ def main():
 
         for i in range(len(time)):
             for j in range(len(f_reac)):
-                index = where(formation_reac[s, i, :] == f_reac[j])[0]
+                index = where(formation_reac[c, i, :] == f_reac[j])[0]
                 if len(index) > 0:
-                    f_rate[j, i] = formation_rate[s, i, index[0]]
+                    f_rate[j, i] = formation_rate[c, i, index[0]]
                 else:
                     f_rate[j, i] = 0.
             for j in range(len(d_reac)):
-                index = where(destruction_reac[s, i, :] == d_reac[j])[0]
+                index = where(destruction_reac[c, i, :] == d_reac[j])[0]
                 if len(index) > 0:
-                    d_rate[j, i] = destruction_rate[s, i, index[0]]
+                    d_rate[j, i] = destruction_rate[c, i, index[0]]
                 else:
                     d_rate[j, i] = 0.
 

@@ -197,7 +197,7 @@ def main():
 
             # Pick-up values that correspond to the given time index
             try:
-                abund = abund[:, s]
+                abund = abund[:, c]
             except IndexError:
                 sys.stderr.write("plabun: error: shell index is out of bounds.\n")
                 sys.exit(1)
@@ -214,10 +214,10 @@ def main():
 
             linecolor = linecolor_stack.pop(0)
             linecolor_stack.append(linecolor)
-            c = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
-            c.label = "$" + _totex_species(spec) + "$"
-            curves.append(c)
-            p.add(c)
+            cu = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
+            cu.label = "$" + _totex_species(spec) + "$"
+            curves.append(cu)
+            p.add(cu)
     else:
         for specie in species:
             # Read the abundance file
@@ -232,7 +232,7 @@ def main():
 
             # Pick-up values that correspond to the given time index
             try:
-                abund = abund[:, cell]
+                abund = abund[:, c]
             except IndexError:
                 sys.stderr.write("plabun: error: cell index is out of bounds.\n")
                 sys.exit(1)
