@@ -36,10 +36,6 @@ AC_PROG_F77
 AC_F77_WRAPPERS
 AM_PATH_PYTHON([2.4],, AC_MSG_ERROR(Could not find Python >=2.4. Please set PYTHON to Python interpreter path.))
 AX_PYTHON_DEVEL([])
-AC_CHECK_PROGS(PDFLATEX, pdflatex, no)
-AC_CHECK_PROGS(BIBTEX, bibtex, no)
-AM_CONDITIONAL(HAVE_PDFLATEX, test $PDFLATEX != no)
-AM_CONDITIONAL(HAVE_BIBTEX, test $BIBTEX != no)
 
 # Checks for libraries.
 AC_CHECK_LIB(m, main)
@@ -160,8 +156,7 @@ fi
 
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
-		 doc/latex/astrochem.tex
-		 doc/latex/Makefile
+		 doc/usermanual/Makefile
 		 doc/man/Makefile
 		 doc/man/astrochem.1
 		 doc/man/plabun.1
@@ -172,10 +167,10 @@ AC_CONFIG_FILES([Makefile
 		 doc/examples/input.ini
 		 doc/examples/dynamic/Makefile
 		 doc/examples/dynamic/input.ini
-         doc/doxygen/astrochem.dox
-         doc/doxygen/Makefile
-         doc/sphinx/Makefile
-         doc/sphinx/source/conf.py
+         doc/c_api/astrochem.dox
+         doc/c_api/Makefile
+         doc/python_api/Makefile
+         doc/python_api/source/conf.py
          src/Makefile
 		 src/chmconvert.py
 		 src/plabun.py
