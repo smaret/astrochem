@@ -59,5 +59,5 @@ More information
 For more information on Astrochem and its development, please see the
 [project page on GitHub.](http://github.com/smaret/astrochem)
 
-[![Build Status](https://travis-ci.org/smaret/astrochem.svg?branch=dev)]
+[![Build Status](https://travis-ci.org/smaret/astrochem.svg?branch=master)]
 (https://travis-ci.org/smaret/astrochem)
