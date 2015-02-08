@@ -120,10 +120,10 @@ Gas-phase reactions
 Most gas-phase reactions have rates that can be described by an Ahrrenus
 law:
 
-.. math::
+.. math:: k = \alpha  \left( \frac{T}{300} \right)^\beta  \mathrm{exp}
+	  \left( -\frac{\gamma}{T} \right)
+   :label: ahrrenus   
 
-   k = \alpha  \left( \frac{T}{300} \right)^\beta  \mathrm{exp} \left(
-       -\frac{\gamma}{T} \right)
 
 where :math:`T` is the gas temperature, and :math:`\alpha`,
 :math:`\beta` and :math:`\gamma` are the rate constants. Usually
@@ -157,9 +157,8 @@ other molecules or atoms.  Astrochem assumes that the rate for these
 (either direct of indirect) cosmic-ray ionization reactions scale with
 the :math:`\mathrm{H_{2}}` ionization rate :math:`\zeta`, such as:
 
-.. math::
-
-   k = \alpha  \, \zeta
+.. math:: k = \alpha  \, \zeta
+   :label: cr-ionization
 
 The value of :math:`\zeta` is read from the input file (see
 :ref:`sec-input-file`). Typical values are comprised between
@@ -174,9 +173,8 @@ UV photons from nearby stars may also dissociate and ionize molecules
 and atoms. For sources with a plane-parallel or spherical symmetry, the
 ionization or dissociation rate may be written as:
 
-.. math::
-
-   k = \alpha \, \mathrm{exp} \left( -\gamma A_{v} \right) \, \chi
+.. math:: k = \alpha \, \mathrm{exp} \left( -\gamma A_{v} \right) \, \chi
+   :label: photo-ionization
 
 where :math:`A_{v}` is the visual extinction in magnitude, and
 :math:`\chi` is the external UV flux in units of the standard Draine
@@ -206,15 +204,12 @@ We assume that each H atom that strikes a grain forms :math:`\mathrm{H_{2}}`
 with a given efficiency. Under this assumption, the formation rate of :math:`\mathrm{H_{2}}`
 on the grains is given by:
 
-.. math::
-
-   \frac{\mathrm{d} {n(\mathrm{H_{2}})}}{\mathrm{d} t} = k \, {n(\mathrm{H})}
+.. math:: \frac{\mathrm{d} {n(\mathrm{H_{2}})}}{\mathrm{d} t} = k \, {n(\mathrm{H})}
 
 with:
 
-.. math::
-
-   k = \alpha  \left( \frac{T}{300} \right)^\beta
+.. math:: k = \alpha  \left( \frac{T}{300} \right)^\beta
+   :label: h2-formation
 
 The value of :math:`k` may be estimated by assuming that the
 efficiency of the process is close to 1 (i.e. that each atom
@@ -230,8 +225,6 @@ because of the numerous uncertainties associated with the formation of
 :math:`\mathrm{H_{2}}`, in Astrochem the rate is not computed in this
 fashion.  Instead we use the :math:`\alpha` and :math:`\beta` values
 from the network file, and compute it with the equation above.
-
-.. FixMe: the reference to tab-react-type-numb does not work
 
 It is important to note that although the formation of :math:`\mathrm{H_{2}}` is
 a two body reaction – if we forget about the grain that only works as
@@ -271,9 +264,8 @@ while the recombination rate of :math:`\mathrm{C^{+}}` is:
 Both :math:`k_{1}` and :math:`k_{2}` are computed from the following
 expression:
 
-.. math::
-
-   k = \alpha \left( \frac{T}{300} \right)^\beta \, \frac{n_\mathrm{H}}{n_\mathrm{d}}
+.. math:: k = \alpha \left( \frac{T}{300} \right)^\beta \, \frac{n_\mathrm{H}}{n_\mathrm{d}}
+   :label: electron-attach
 
 where :math:`n_\mathrm{H}` is the total hydrogen nuclei density [3]_
 and :math:`n_\mathrm{d}` is the total (neutral + charged) grain
@@ -300,21 +292,16 @@ Molecules may accrete on dust grains and freeze-out (a process often
 called depletion). The formation rate of e.g. ices CO on the grains
 through this process is given by:
 
-.. math::
-
-   \frac{\mathrm{d}{n(\mathrm{CO_{ice}})}}{\mathrm{d}t} = k \, {n(\mathrm{CO})}
+.. math:: \frac{\mathrm{d}{n(\mathrm{CO_{ice}})}}{\mathrm{d}t} = k \, {n(\mathrm{CO})}
 
 with:
 
-.. math::
-
-   k = S \, \pi r_{d}^2 \, v_{th} \, n_{d}
+.. math:: k = S \, \pi r_{d}^2 \, v_{th} \, n_{d}
+   :label: depletion
 
 and:
 
-.. math::
-
-   v_{th} = \left( \frac{8 k_{B} T_{d}}{\pi m} \right)^{1/2}
+.. math:: v_{th} = \left( \frac{8 k_{B} T_{d}}{\pi m} \right)^{1/2}
 
 Here :math:`S` is a sticking probability (comprised between 0 and 1),
 :math:`r_{d}` is the grain radius, :math:`v_{th}` is the thermal
@@ -336,13 +323,14 @@ Once frozen on the dust grains, molecules may evaporate through thermal
 or non-thermal processes. The formation rate of gaseous CO by CO ices
 thermal evaporation is:
 
-.. math:: \frac{\mathrm{d}{n(\mathrm{CO})}}{\mathrm{d}t} = k \, {n(\mathrm{CO_{ice}})}
+.. math::
+
+   \frac{\mathrm{d}{n(\mathrm{CO})}}{\mathrm{d}t} = k \, {n(\mathrm{CO_{ice}})}
 
 where :math:`k` is given by the Polanyi-Wigner equation:
 
-.. math::
-
-   k = \nu_{0} \, \mathrm{exp} \left( - \frac{E_{B}}{T_{d}} \right)
+.. math:: k = \nu_{0} \, \mathrm{exp} \left( - \frac{E_{B}}{T_{d}} \right)
+   :label: thermal-desorption
 
 with:
 
@@ -389,16 +377,13 @@ grains, heavy cosmic-ray ions are assumed to impulsively heat the
 grains to a peak temperature of 70 K, at which most of the desorption
 occurs. The rate is then similar to that of thermal desorption:
 
-.. math::
-
-   k = f \, \nu_{0} \, \mathrm{exp} \left( -\frac{E_{B}}{70} \right)
+.. math:: k = f \, \nu_{0} \, \mathrm{exp} \left( -\frac{E_{B}}{70} \right)
+   :label: cr-desorption
 
 where :math:`f` is the fraction of the time spent by a grain in the
 vicinity of 70 K between two cosmic-ray heating events, assumed to be
 :math:`3.16 \times 10^{-19}` `(Hasegawa and Herbst ,1993)
 <http://adsabs.harvard.edu/abs/1993MNRAS.263..589H>`_.
-
-.. Fixme: the reference to tab-rate-const-meaning does not work
 
 Alternatively, the cosmic-ray desorption rate of any specie can be
 given explicitly in the network file. This allows for the use of the
@@ -431,10 +416,9 @@ The photo-desorption rate of CO is for example
 
 with:
 
-.. math::
-
-   k = \chi \, I_\mathrm{ISRF,FUV} \, \mathrm{exp} \left( -2 A_{v}
-   \right) \, \pi r_{d}^{2} \, n_{d} \, Y_\mathrm{PD}
+.. math:: k = \chi \, I_\mathrm{ISRF,FUV} \, \mathrm{exp} \left( -2 A_{v} \right) \,
+	  \pi r_{d}^{2} \, n_{d} \, Y_\mathrm{PD}
+   :label: photo-desorption
 
 Here :math:`I_\mathrm{ISRF,FUV}` is the standard interstellar
 radiation field in the FUV (assumed to be :math:`\mathrm{1.7 \times
@@ -1157,31 +1141,29 @@ UV photo-desorption reactions, that depends on the ice thickness;
 therefore the rate for these reactions is computed for each solver
 internal time step.
 
-.. FixMe: add references to rate equations (if possible...)
-
 .. _tab-rate-const-meaning:
 
 .. table:: Physical meaning of the rate constants used in chemical networks
 
-   +-------------+------------------+------------------------+----------------+
-   | Type number | a                | b                      | c              |
-   +=============+==================+========================+================+
-   |          -1 | :math:`\alpha`   | :math:`\beta`          | \-             |
-   +-------------+------------------+------------------------+----------------+
-   |           0 | :math:`\alpha`   | :math:`\beta`          | \-             |
-   +-------------+------------------+------------------------+----------------+
-   |        2-12 | :math:`\alpha`   | :math:`\beta`          | :math:`\gamma` |
-   +-------------+------------------+------------------------+----------------+
-   |          13 | :math:`\alpha`   | \-                     | \-             |
-   +-------------+------------------+------------------------+----------------+
-   |          20 | :math:`S`        | :math:`m/m_\mathrm{H}` | \-             |
-   +-------------+------------------+------------------------+----------------+
-   |          21 | \-               | :math:`m/m_\mathrm{H}` | :math:`E_{b}`  |
-   +-------------+------------------+------------------------+----------------+
-   |          22 | :math:`k` [10]_  | :math:`m/m_\mathrm{H}` | :math:`E_{b}`  |
-   +-------------+------------------+------------------------+----------------+
-   |          23 | :math:`Y_{0}`    | \-                     | :math:`l`      |
-   +-------------+------------------+------------------------+----------------+
+   +-------------+--------------------------+------------------+------------------------+----------------+
+   | Type number | Equation                 | a                | b                      | c              |
+   +=============+==========================+==================+========================+================+
+   |          -1 | :eq:`h2-formation`       | :math:`\alpha`   | :math:`\beta`          | \-             |
+   +-------------+--------------------------+------------------+------------------------+----------------+
+   |           0 | :eq:`cr-ionization`      | :math:`\alpha`   | :math:`\beta`          | \-             |
+   +-------------+--------------------------+------------------+------------------------+----------------+
+   |        2-12 | :eq:`ahrrenus`           | :math:`\alpha`   | :math:`\beta`          | :math:`\gamma` |
+   +-------------+--------------------------+------------------+------------------------+----------------+
+   |          13 | :eq:`photo-ionization`   | :math:`\alpha`   | \-                     | \-             |
+   +-------------+--------------------------+------------------+------------------------+----------------+
+   |          20 | :eq:`depletion`          | :math:`S`        | :math:`m/m_\mathrm{H}` | \-             |
+   +-------------+--------------------------+------------------+------------------------+----------------+
+   |          21 | :eq:`thermal-desorption` | \-               | :math:`m/m_\mathrm{H}` | :math:`E_{b}`  |
+   +-------------+--------------------------+------------------+------------------------+----------------+
+   |          22 | :eq:`cr-desorption`      | :math:`k` [10]_  | :math:`m/m_\mathrm{H}` | :math:`E_{b}`  |
+   +-------------+--------------------------+------------------+------------------------+----------------+
+   |          23 | :eq:`photo-desorption`   | :math:`Y_{0}`    | \-                     | :math:`l`      |
+   +-------------+--------------------------+------------------+------------------------+----------------+
 
 Convert networks to Astrochem format
 ------------------------------------
