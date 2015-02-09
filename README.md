@@ -36,9 +36,9 @@ straightforward. Instructions can be found in the
 Documentation
 -------------
 
-Astrochem comes with a comprehensive documentation manual. The LaTeX
-source of the manual can be found in the [doc/](./doc/)
-directory. Each command also has a man page.
+Astrochem comes with a comprehensive
+[documentation](http://astrochem.readthedocs.org/). Each command also
+has a man page.
 
 Reporting bugs
 --------------
@@ -61,3 +61,5 @@ For more information on Astrochem and its development, please see the
 
 [![Build Status](https://travis-ci.org/smaret/astrochem.svg?branch=master)]
 (https://travis-ci.org/smaret/astrochem)
+[![Documentation Status](https://readthedocs.org/projects/astrochem/badge/?version=rtd)]
+(https://readthedocs.org/projects/astrochem/?badge=rtd)

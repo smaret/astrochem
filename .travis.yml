@@ -2,5 +2,5 @@ language: c
 before_install:
 - sudo add-apt-repository "deb mirror://mirrors.ubuntu.com/mirrors.txt trusty main restricted universe multiverse" -y  
 - sudo apt-get update
-install: sudo apt-get install cython gfortran libhdf5-7=1.8.11-5ubuntu7 libhdf5-serial-dev=1.8.11-5ubuntu7 liblapack-dev libsundials-serial-dev python-h5py python-numpy texlive
-script: ./bootstrap && ./configure CC=gcc FC=gfortran && make && make check && make pdf
+install: sudo apt-get install cython gfortran libhdf5-7=1.8.11-5ubuntu7 libhdf5-serial-dev=1.8.11-5ubuntu7 liblapack-dev libsundials-serial-dev python-h5py python-numpy
+script: ./bootstrap && ./configure CC=gcc FC=gfortran && make && make check

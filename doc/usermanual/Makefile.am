@@ -17,23 +17,4 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
-EXTRA_DIST = astrochem.tex astrochem.bib fig1.pdf fig2.pdf
-
-if HAVE_PDFLATEX
-if HAVE_BIBTEX
-
-SUFFIXES = .pdf .tex
-
-pdf: astrochem.pdf
-
-astrochem.pdf: astrochem.tex astrochem.bib fig1.pdf fig2.pdf
-	$(PDFLATEX) astrochem.tex
-	$(BIBTEX) astrochem.aux
-	$(PDFLATEX) astrochem.tex
-	$(PDFLATEX) astrochem.tex
-
-CLEANFILES = astrochem.tex astrochem.aux astrochem.log astrochem.bbl	\
-	astrochem.blg astrochem.pdf astrochem.1 plabun.1 plroute.1	\
-	chmconvert.1
-endif
-endif
+EXTRA_DIST = usermanual.rst fig1.pdf fig2.pdf
