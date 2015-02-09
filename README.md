@@ -61,5 +61,5 @@ For more information on Astrochem and its development, please see the
 
 [![Build Status](https://travis-ci.org/smaret/astrochem.svg?branch=master)]
 (https://travis-ci.org/smaret/astrochem)
-[![Documentation Status](https://readthedocs.org/projects/astrochem/badge/?version=rtd)]
-(https://readthedocs.org/projects/astrochem/?badge=rtd)
+[![Documentation Status](https://readthedocs.org/projects/astrochem/badge/?version=latest)]
+(https://readthedocs.org/projects/astrochem/?badge=latest)
