@@ -7,3 +7,4 @@ Contents:
    :maxdepth: 2
 	      
    usermanual/usermanual
+   usermanual/c_api
