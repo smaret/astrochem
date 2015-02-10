@@ -729,6 +729,14 @@ specifies the physical parameters of the problem. These parameters are:
    The grain radius in microns (:math:`r_{d}`). The default value is
    0.1.
 
+``grain_gas_mass_ratio``
+   The grain-to-gas mass ratio. The default value is 0 (no grains).
+
+``grain_mass_density``
+   The grain mass density, expressed in :math:`\mathrm{kg \, m^{-3}}`.
+   The default value is :math:`3000 \, \mathrm{kg \, m^{-3}}`, which
+   corresponds to olivine grains.
+
 Solver parameters
 ~~~~~~~~~~~~~~~~~
 
@@ -767,9 +775,13 @@ This section specifies the initial abundances in the computation. Each
 line should contain a specie name followed by a equal sign and the
 initial abundance with respect to H nuclei. The initial abundances of
 species that are not listed in this section are assumed to be
-zero. Note that grains must be written as ``grain``, ``grain(-)`` or ``grain(+)``
-so that the total grain density :math:`n_{d}` is computed correctly
-(see :ref:`sec-depletion`).
+zero.
+
+.. note::
+
+   Starting from version 0.7, the grain abundance is computed from the
+   grain parameters (see :ref:`sec-physical-params`). Setting the
+   grain abundance explicitly in this section is deprecated.
 
 Output
 ~~~~~~
