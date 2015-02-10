@@ -16,17 +16,18 @@ To compile Astrochem you will need:
    You will need at least version 2.4.0 of the library installed on
    your computer.
 
-3. Python (version 2.4 or later, but earlier than version 3.0).
+3. The [HDF 5 (Hierarchical Data Format) library](http://www.hdfgroup.org/HDF5)
+   library.
 
-4. The [NumPy](http://numpy.scipy.org/) and
-   [Biggles](http://biggles.sourceforge.net/) Python modules.  Numpy
-   is mandatory, but Biggles is optional. However, the later is
-   required to use the plotting tools provided with Astrochem. Both
+4. Python (version 2.4 or later, but earlier than version 3.0).
+
+5. The [NumPy](http://numpy.scipy.org/),
+   [Biggles](http://biggles.sourceforge.net/) and
+   [H5py](http://www.h5py.org) Python modules.  Numpy is mandatory,
+   but Biggles and H5py are optional. However, Biggles and H5py are
+   required to use the plotting tools provided with Astrochem. All
    modules are present in major Linux distributions (Debian, Ubuntu,
    etc.)  and in Fink or MacPorts on Mac OSX.
-
-5. To compile the documentation, you will also need PDFLaTeX and
-   BibTeX.
  
 Basic Installation
 ------------------
