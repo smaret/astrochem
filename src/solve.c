@@ -46,14 +46,9 @@ static int jacobian (long int N, realtype t, N_Vector y, N_Vector fy,
                      DlsMat J, void *params, N_Vector tmp1,
                      N_Vector tmp2, N_Vector tmp3);
 
-/**
- * @brief fonction used in the ODE system.
- * @param t time
- * @param y output
- * @param ydot ydot
- * @param params user params
- * @return computed value
- */
+/*
+  Right-hand side function of the ODE system.
+*/
 
 static int
 f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
@@ -361,16 +356,10 @@ int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
   return 0;
 }
 
-/**
- * @brief Solve the ODE system
- * @param astrochem_mem dedicated memory
- * @param network network to solve the system with
- * @param[out] abundances  output abundances
- * @param time time to compute on
- * @param new_cell new cell to compute on
- * @param verbose quiet if 0, verbose if 1
- * @return 0 if successfull
+/*
+  Solve the ODE system
  */
+
 int solve( astrochem_mem_t* astrochem_mem, const net_t* network, double* abundances, double time , const cell_t* new_cell, int verbose )
 {
 

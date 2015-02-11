@@ -20,27 +20,19 @@
    along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
    */
 
-/* Various definitions and constants */
-
 #ifndef _NETWORK_H_
 #define _NETWORK_H_
 
-#define MAX_CHAR_ELEMENT 8               /*!< Maximum number of characters in a element name */
-#define ELECTRON_MASS    9.10938291e-31  /*!< Mass of an electron in Kg */
-#define UMA              1.660538921e-27 /*!< Atomic mass unity in Kg */
+#define MAX_CHAR_ELEMENT 8                /* Maximum number of characters in a element name */
+#define ELECTRON_MASS    9.10938291e-31   /* Mass of an electron in kg */
+#define UMA              1.660538921e-27  /* Atomic mass unity in kg */
 
-/**
- * @brief type for element name
- */
 typedef char elem_name_t[MAX_CHAR_ELEMENT];
 
-/**
- * @brief struct containint a chemical element name and associated mass
- */
 typedef struct
 {
-  elem_name_t name; /*!< Name of element */
-  int mass;         /*!< Mass of element in uma*/
+  elem_name_t name; /* Name of the element */
+  int mass;         /* Mass of the element in UMA */
 } elem_t;
 
 
