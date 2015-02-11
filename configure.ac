@@ -109,31 +109,30 @@ fi
 
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
-		 doc/usermanual/Makefile
+		 doc/examples/Makefile
+		 doc/examples/input.ini
+		 doc/examples/dynamic/Makefile
+		 doc/examples/dynamic/input.ini
 		 doc/man/Makefile
 		 doc/man/astrochem.1
 		 doc/man/plabun.1
 		 doc/man/plroute.1
 		 doc/man/chmconvert.1
 		 doc/man/converttolegacy.1
-		 doc/examples/Makefile
-		 doc/examples/input.ini
-		 doc/examples/dynamic/Makefile
-		 doc/examples/dynamic/input.ini
-         src/Makefile
+         	 src/Makefile
 		 src/chmconvert.py
 		 src/plabun.py
 		 src/plroute.py
 		 src/converttolegacy.py
 		 networks/Makefile
-         python/Makefile
+         	 python/Makefile
 		 python/libastrochemtools/libastrochemtools.py
 		 python/libastrochemtools/Makefile
 		 python/libpyastrochem/Makefile
-         tests/astrochem_test.py
-         tests/python_lib_test.py
-         tests/python_tools_test.py
-         tests/benchmark.py
+         	 tests/astrochem_test.py
+         	 tests/python_lib_test.py
+         	 tests/python_tools_test.py
+         	 tests/benchmark.py
 		 tests/Makefile])
 
 AC_OUTPUT

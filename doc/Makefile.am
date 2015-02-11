@@ -17,5 +17,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = usermanual man examples
+SUBDIRS = examples man
+
 
