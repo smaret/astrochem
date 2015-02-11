@@ -38,7 +38,6 @@ test-driver
 .libs
 
 # The following files are also automatically generated from .in
-doc/doxygen/astrochem.dox
 doc/examples/input.ini
 doc/examples/dynamic/input.ini
 doc/latex/astrochem.tex
