@@ -57,6 +57,10 @@ Display astrochem version information.
 Write the converted network in
 .Ar file "."
 Default is the standard output.
+.It Cm -t Ar temperature , Cm --temperature Ar temperature
+Ignore reactions that are not valid at the given
+.Ar temperature "."
+Default is to include all reactions (no temperature check).
 .El
 .\"
 .\" Authors, copyright, and see also

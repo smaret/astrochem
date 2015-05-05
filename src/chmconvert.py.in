@@ -39,6 +39,7 @@ Options:
    -h, --help         Display this help
    -V, --version      Display chmconvert version information
    -o, --output       Write the edited network in a file
+   -t, --temperature  Ignore reactions that are not valid at the given temperature
 
 See chmconvert(1) man page for a complete list of commands and options.
 Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>."""
@@ -65,13 +66,14 @@ def main():
     # Parse options and check arguments. Display help message if
     # an unknown option is given.
     try:
-	opts, args = getopt.getopt(sys.argv[1:], "hVo:",
-				   ["help", "version", "output"])
+	opts, args = getopt.getopt(sys.argv[1:], "hVo:t:",
+				   ["help", "version", "output", "temperature"])
     except getopt.GetoptError:
 	usage()
 	sys.exit(1)
 
     output = None
+    temperature = None
     for opt, arg in opts:
 	if opt in ("-h", "--help"):
 	    usage()
@@ -81,6 +83,12 @@ def main():
 	    sys.exit()
 	if opt in ("-o", "--output"):
 	    output = arg
+        if opt in ("-t", "--temperature"):
+            try:
+                temperature = float(arg)
+            except:
+                usage()
+                sys.exit(1)
 
     # Check that we have a least a filename
     if len(args) == 1:
@@ -127,10 +135,21 @@ def main():
         sys.exit(1)
     filein.close()
 
+    # Ignore reactions that are not valid at the given temperature
+    if temperature:
+        valid_reactions = []
+        for r in net.data:
+            if ((r.trange[0] != None and temperature < r.trange[0]) or
+                (r.trange[1] != None and temperature > r.trange[1])):
+                continue
+            valid_reactions.append(r)
+        net = network_reader(valid_reactions)
+
     # If the network originates from KIDA, make sure that reaction
     # numbers are unique
     if fileformat == "kida":
         if net.duplicate_react_numbers():
+            print net.duplicate_react_numbers()
             sys.stderr.write("chmconvert: error: reaction numbers are not unique.\n")
             sys.exit(1)
 
