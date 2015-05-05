@@ -375,6 +375,7 @@ class network_reader:
 
             for line in f:
                 linenumber += 1
+                if line[0] == "!": continue
                 try:
                     reactant1 = line[0:10].strip()
                     reactant2 = line[11:21].strip()
@@ -392,9 +393,10 @@ class network_reader:
                     uncertainty_type = line[141:145]
                     rtype = int(line[146:148])
                     trange = float(line[149:155]), float(line[156:162])
-                    rnumber = int(line[163:168])
-                    rate_number = int(line[169:170])
-                    recommendation = int(line[171:173])
+                    formulae = int(line[163:165])
+                    rnumber = int(line[166:171])
+                    rate_number = int(line[171:173])
+                    recommendation = int(line[174:176])
                 except:
                     raise Exception, "incorrect input on line %i" % linenumber
 
