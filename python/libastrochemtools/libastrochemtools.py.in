@@ -46,9 +46,11 @@ class reaction:
     :type rtype: int
     :param rnumber: reaction number
     :type rnumber: int
+    :param trange: temperature range
+    :type rnumber: list of floats
     """
 
-    def __init__(self, reactants, products, alpha, beta, gamma, rtype, rnumber):
+    def __init__(self, reactants, products, alpha, beta, gamma, rtype, rnumber, trange = (None, None)):
         """
         Creates a chemical reaction
         """
@@ -59,6 +61,7 @@ class reaction:
         self.gamma = gamma
         self.type = rtype
         self.number = rnumber
+        self.trange = trange
 
     def __repr__(self):
         """
@@ -415,8 +418,11 @@ class network_reader:
                 else:
                     raise Exception, "unknown reaction type on line %i" % linenumber
 
+                if trange[0] == -9999: trange[0] == None
+                if trange[1] == 9999: trange[1] == None
+
                 react = reaction(reactants, products, alpha, beta, gamma,
-                                 rtype, rnumber)
+                                 rtype, rnumber, trange = trange)
 
                 net.append(react)
 
