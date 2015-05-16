@@ -71,14 +71,13 @@ rate (double alpha, double beta, double gamm, int reaction_type,
     case 10:
     case 11:
     case 12:
-    case 14:
       /* Ion-molecule reactions, charge exchange reactions (2), Negative
          ion - neutral species reactions (3), Radiative association (4),
          Associative ejection (5), Neutral + neutral -> ion + electron
          (6), Neutral-neutral chemical reactions (7), Neutral-neutral
          radiative association (8), Dissociative recombination (9),
          Radiative recombination (10), Positive ion - negative ion
-         recombination (11), Electron attachment (12), Others (14) */
+         recombination (11), Electron attachment (12) */
       k = alpha * pow (tgas / 300, beta) * exp (-gamm / tgas);
       break;
 
@@ -86,6 +85,17 @@ rate (double alpha, double beta, double gamm, int reaction_type,
       /* Photo-ionization, Photo-dissociation */
       k = chi * alpha * exp (-gamm * av);
       break;
+
+    case 14:
+       /* Ion-polar molecule reactions (type 1), from the KIDA database */
+       k = alpha * beta * (0.62 + 0.4767 * gamm * pow (300 / tgas, 0.5));
+       break;
+
+    case 15:
+       /* Ion-polar molecule reactions (type 2), from the KIDA database */
+       k = alpha * beta * (1 + 0.0967 * gamm * pow (300 / tgas, 0.5)
+			   + pow (gamm, 2) / 10.526 * 300 / tgas);
+       break;
 
     case 20:
       /* Depletion on the grains */
