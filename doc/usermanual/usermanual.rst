@@ -1008,12 +1008,20 @@ Networks provided with Astrochem
 
 The following networks are provided with Astrochem:
 
+``kida2014-10K.chm``
+   This network file contains the reactions and rates from the
+   `Kinetic Database for Astrochemistry (KIDA)
+   <http://kida.obs.u-bordeaux1.fr>`_. It correspond to the 2014
+   version of the database. Note that KIDA contains reactions rates
+   for various kinetic temperature ranges. This network version
+   contains reactions for a kinetic temperature around 10 K. It
+   includes xxx reactions and xxx species.
+
 ``osu2009.chm``
    This network file contains the reactions and rates from the Ohio
-   State University (OSU) astrochemistry database, that is maintained
-   by Eric Herbst. It corresponds to the January 2009 version of the
-   database. This network contains 6046 reactions and 468 species,
-   including anions.
+   State University (OSU) astrochemistry database. It corresponds to
+   the January 2009 version of the database. This network contains
+   6046 reactions and 468 species, including anions.
 
 ``osu2008.chm``
    This network file contains the September 2008 version of OSU
