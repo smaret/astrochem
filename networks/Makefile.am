@@ -21,7 +21,7 @@ CHMCONVERT = ../src/chmconvert
 
 EXTRA_DIST = osu2008.osu osu2009.osu
 
-nobase_dist_pkgdata_DATA = osu2008.chm osu2009.chm
+nobase_dist_pkgdata_DATA = osu2008.chm osu2009.chm kida2014-10K.chm
 
 osu2008.chm: osu2008.osu
 	${CHMCONVERT} -o $@ $?
@@ -29,5 +29,8 @@ osu2008.chm: osu2008.osu
 osu2009.chm: osu2009.osu
 	${CHMCONVERT} -o $@ $?
 
-CLEANFILES = osu2008.chm osu2009.chm
+kida2014-10K.chm: kida2014.kida
+	${CHMCONVERT} -t 10 -o $@ $?
+
+CLEANFILES = osu2008.chm osu2009.chm kida2014-10K.chm
 

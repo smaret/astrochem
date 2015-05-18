@@ -1,6 +1,6 @@
 #!@PYTHON@
 #
-#  chmconvert_local - Convert chemical networks into .chm format
+#  chmconvert - Convert chemical networks into .chm format
 #
 #  Copyright (c) 2006-2014 Sebastien Maret
 # 
@@ -33,14 +33,15 @@ def usage():
 
     """
 
-    print """Usage: chmconvert_local [option] [file]
+    print """Usage: chmconvert [option] [file]
 
 Options:
    -h, --help         Display this help
-   -V, --version      Display chmconvert_local version information
+   -V, --version      Display chmconvert version information
    -o, --output       Write the edited network in a file
+   -t, --temperature  Ignore reactions that are not valid at the given temperature
 
-See chmconvert_local(1) man page for a complete list of commands and options.
+See chmconvert(1) man page for a complete list of commands and options.
 Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>."""
 
 def version():
@@ -49,7 +50,7 @@ def version():
 
     """
 
-    print "This is chmconvert_local, version %s" % PACKAGE_VERSION
+    print "This is chmconvert, version %s" % PACKAGE_VERSION
     print """Copyright (c) 2006-2014 Sebastien Maret
 
 This is free software. You may redistribute copies of it under the terms
@@ -58,20 +59,21 @@ permitted by law."""
 
 def main():
     """
-    Main function for chmconvert_local
+    Main function for chmconvert
 
     """
 
     # Parse options and check arguments. Display help message if
     # an unknown option is given.
     try:
-	opts, args = getopt.getopt(sys.argv[1:], "hVo:",
-				   ["help", "version", "output"])
+	opts, args = getopt.getopt(sys.argv[1:], "hVo:t:",
+				   ["help", "version", "output", "temperature"])
     except getopt.GetoptError:
 	usage()
 	sys.exit(1)
 
     output = None
+    temperature = None
     for opt, arg in opts:
 	if opt in ("-h", "--help"):
 	    usage()
@@ -81,25 +83,31 @@ def main():
 	    sys.exit()
 	if opt in ("-o", "--output"):
 	    output = arg
+        if opt in ("-t", "--temperature"):
+            try:
+                temperature = float(arg)
+            except:
+                usage()
+                sys.exit(1)
 
     # Check that we have a least a filename
     if len(args) == 1:
         network_file = args[0]
     else:
-        sys.stderr.write("chmconvert_local: error: no file to convert.\n")
-        sys.stderr.write("Type \'chmconvert_local --help\' for more information.\n")
+        sys.stderr.write("chmconvert: error: no file to convert.\n")
+        sys.stderr.write("Type \'chmconvert --help\' for more information.\n")
         sys.exit(1)
 
     # Guess the format from the file extension
     if len(network_file.rsplit('.', 1)) == 2:
         network_file_base, network_file_ext = network_file.rsplit('.', 1)
     else:
-        sys.stderr.write("chmconvert_local: error: file has no extension.\n")
+        sys.stderr.write("chmconvert: error: file has no extension.\n")
         sys.exit(1)
     if network_file_ext in ["osu", "kida"]:
         fileformat = network_file_ext
     else:
-        sys.stderr.write("chmconvert_local: error: unknown network format \"%s\".\n"
+        sys.stderr.write("chmconvert: error: unknown network format \"%s\".\n"
                          % network_file_ext)
         sys.exit(1)
 
@@ -108,7 +116,7 @@ def main():
     try:
         filein = open(network_file)
     except:
-        sys.stderr.write("chmconvert_local: error: can't open %s.\n" % network_file)
+        sys.stderr.write("chmconvert: error: can't open %s.\n" % network_file)
         sys.exit(1)
     if not output:
         fileout = sys.stdout
@@ -116,22 +124,33 @@ def main():
         try:
             fileout = open(output, 'w')
         except:
-            sys.stderr.write("chmconvert_local: error: can't open %s.\n" % output)
+            sys.stderr.write("chmconvert: error: can't open %s.\n" % output)
             sys.exit(1)
 
     # Read the network file and convert it
     try:
         net = network_reader.fromfile(filein, fileformat = fileformat)
     except Exception, err:
-        sys.stderr.write("chmconvert_local: %s.\n" % err)
+        sys.stderr.write("chmconvert: %s.\n" % err)
         sys.exit(1)
     filein.close()
+
+    # Ignore reactions that are not valid at the given temperature
+    if temperature:
+        valid_reactions = []
+        for r in net.data:
+            if ((r.trange[0] != None and temperature < r.trange[0]) or
+                (r.trange[1] != None and temperature > r.trange[1])):
+                continue
+            valid_reactions.append(r)
+        net = network_reader(valid_reactions)
 
     # If the network originates from KIDA, make sure that reaction
     # numbers are unique
     if fileformat == "kida":
         if net.duplicate_react_numbers():
-            sys.stderr.write("chmconvert_local: error: reaction numbers are not unique.\n")
+            print net.duplicate_react_numbers()
+            sys.stderr.write("chmconvert: error: reaction numbers are not unique.\n")
             sys.exit(1)
 
     # Write the converted network to a file:

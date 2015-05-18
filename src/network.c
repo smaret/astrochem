@@ -485,6 +485,13 @@ bool get_species_mass_and_charge( char* species, double* mass, int* charge )
   *charge = 0;
   int mass_multiplier = 1;
 
+  // For isomers, skip the first characters that describe the
+  // arrangement of elements
+  if ((strncmp(species, "e-", 2) == 0) ||
+      (strncmp(species, "l-", 2) == 0) ||
+      (strncmp(species, "c-", 2) == 0))
+	  specie_pt += 2;
+
   // Parse specie string
   while( *specie_pt != '\0' )
     {
@@ -496,7 +503,7 @@ bool get_species_mass_and_charge( char* species, double* mass, int* charge )
             {
               // Null terminate it
               element[element_idx] = '\0';
-              // Compute it's mass
+              // Compute its mass
               int element_mass = get_element_mass( element );
               if( element_mass == -1 )
                 {

@@ -46,9 +46,11 @@ class reaction:
     :type rtype: int
     :param rnumber: reaction number
     :type rnumber: int
+    :param trange: temperature range
+    :type rnumber: list of floats
     """
 
-    def __init__(self, reactants, products, alpha, beta, gamma, rtype, rnumber):
+    def __init__(self, reactants, products, alpha, beta, gamma, rtype, rnumber, trange = (None, None)):
         """
         Creates a chemical reaction
         """
@@ -59,6 +61,7 @@ class reaction:
         self.gamma = gamma
         self.type = rtype
         self.number = rnumber
+        self.trange = trange
 
     def __repr__(self):
         """
@@ -375,6 +378,7 @@ class network_reader:
 
             for line in f:
                 linenumber += 1
+                if line[0] == "!": continue
                 try:
                     reactant1 = line[0:10].strip()
                     reactant2 = line[11:21].strip()
@@ -392,9 +396,10 @@ class network_reader:
                     uncertainty_type = line[141:145]
                     rtype = int(line[146:148])
                     trange = float(line[149:155]), float(line[156:162])
-                    rnumber = int(line[163:168])
-                    rate_number = int(line[169:170])
-                    recommendation = int(line[171:173])
+                    formulae = int(line[163:165])
+                    rnumber = int(line[166:171])
+                    rate_number = int(line[171:173])
+                    recommendation = int(line[174:176])
                 except:
                     raise Exception, "incorrect input on line %i" % linenumber
 
@@ -413,8 +418,11 @@ class network_reader:
                 else:
                     raise Exception, "unknown reaction type on line %i" % linenumber
 
+                if trange[0] == -9999: trange[0] == None
+                if trange[1] == 9999: trange[1] == None
+
                 react = reaction(reactants, products, alpha, beta, gamma,
-                                 rtype, rnumber)
+                                 rtype, rnumber, trange = trange)
 
                 net.append(react)
 
