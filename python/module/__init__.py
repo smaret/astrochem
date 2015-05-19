@@ -7,4 +7,4 @@ try:
     from libpyastrochem import _REL_ERR_DEFAULT
 except ImportError:
     print "python lib api not available, only tools have been loaded."
-import libastrochemtools as tools
+import tools

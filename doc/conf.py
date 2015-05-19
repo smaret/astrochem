@@ -30,10 +30,8 @@ sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
-
-# The libastrochemtools module has a .py.in suffix, so we need to import it explicitly
-libastrochemtools = imp.load_source('libastrochemtools', os.path.abspath('../python/libastrochemtools/libastrochemtools.py.in'))
+sys.path.insert(0, os.path.abspath('../python/'))
+import tools
 
 # -- General configuration ------------------------------------------------
 

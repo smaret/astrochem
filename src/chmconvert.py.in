@@ -1,6 +1,6 @@
 #!@PYTHON@
 #
-#  chmconvert_local - Convert chemical networks into .chm format
+#  chmconvert - Convert chemical networks into .chm format
 #
 #  Copyright (c) 2006-2014 Sebastien Maret
 # 
@@ -20,10 +20,13 @@
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-sys.path.append("@abs_top_srcdir@/python/libastrochemtools") #This line (first containing sys.path.append) will be removed at instalation.
+sys.path.append("@abs_top_srcdir@/python/") #This line (first containing sys.path.append) will be removed at instalation.
 sys.path.append("@pythondir@")
 import getopt
-from libastrochemtools import network_reader
+try:
+    from astrochem.tools import network_reader
+except ImportError:
+    from tools import network_reader
 
 PACKAGE_VERSION = "@PACKAGE_VERSION@"
 

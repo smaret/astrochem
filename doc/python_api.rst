@@ -2,5 +2,5 @@
 Astrochem Python API reference
 ==============================
 
-.. automodule:: libastrochemtools
+.. automodule:: tools
    :members:
