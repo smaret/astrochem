@@ -8,4 +8,4 @@ Contents:
 	      
    usermanual
    c_api
-   python_api
+   python_module

@@ -1387,8 +1387,16 @@ used by Astrochem:
     free_abundances (abundances);
     free_network (&network);
 
+.. _sec-calling-astrochem-from-python:
+
 From Python
 -----------
+
+.. note::
+
+   In this section, we give an example on how to run Astrochem from
+   Python. For a full description of Astrochem Python module, see
+   :doc:`Astrochem Python module <python_api>`.
 
 .. Fixme: explain how to change the density, temperature, etc. at each
    timestep
