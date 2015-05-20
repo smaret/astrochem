@@ -1,4 +1,4 @@
-#  libastrochemtools.py - Python utility library for astrochem
+#  tools.py - Python tools for astrochem
 #
 #  Copyright (c) 2006-2014 Sebastien Maret
 #
@@ -18,15 +18,12 @@
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-.. moduleauthor:: Sebastien Maret
-
+Various tools for Astrochem.
 
 """
 
 import string
 import numpy
-
-PACKAGE_VERSION = "@PACKAGE_VERSION@"
 
 class reaction:
     """

@@ -19,7 +19,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-pkgpyexec_PYTHON = __init__.py tools.py
+pkgpyexec_PYTHON = __init__.py tools.py wrapper.py
 SUBDIRS = libpyastrochem 
 
 EXTRA_DIST = README.md
