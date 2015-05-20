@@ -97,12 +97,11 @@ main (int argc, char *argv[])
   phys_t phys;
   phys.cosmic = 1e-17;
   phys.chi = 0;
-  phys.grain_size = GRAIN_SIZE_DEFAULT;
   phys.grain_abundance = 0;
 
   double abs_err, rel_err;
-  abs_err = ABS_ERR_DEFAULT;
-  rel_err = REL_ERR_DEFAULT;
+  abs_err = 1e-15;
+  rel_err = 1e-6;
 
   const char* species[]  = {"CO", "HCO(+)", "e(-)"};
   const double initial_abundances[] = {1e-4, 1e-9, 1e-9};

@@ -30,7 +30,7 @@
 #include <math.h>
 #include <float.h>
 
-#include "libastrochem.h"
+#include "astrochem.h"
 #include "input.h"
 
 #include "network.h"

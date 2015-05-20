@@ -2,7 +2,7 @@
    astrochem.h - Function prototypes, various constant and data
    structures for Astrochem.
 
-   Copyright (c) 2006-2013 Sebastien Maret
+   Copyright (c) 2006-2015 Sebastien Maret
 
    This file is part of Astrochem.
 
@@ -18,16 +18,52 @@
 
    You should have received a copy of the GNU General Public License
    along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
-   */
 
-/* Various definitions and constants */
+*/
+
 #ifndef _ASTROCHEM_H_
 #define _ASTROCHEM_H_
 
 #include <hdf5.h>
 #include "libastrochem.h"
 
-#define MAX_CHAR_FILENAME 64
+/* Various definitions and constants */
+
+#define MAX_CHAR_FILENAME 64            /* Maximum number of characters in file names */
+#define MAX_LINE 512                    /* Maximum number of characters in each input file line */
+#define CHI_DEFAULT 1                   /* Default chi value */
+#define COSMIC_DEFAULT 1.3e-17          /* Default cosmic value */
+#define GRAIN_SIZE_DEFAULT 1e-5         /* Default grain radius, in cm */
+#define GRAIN_GAS_MASS_RATIO_DEFAULT 0  /* Default grain mass ratio */
+#define GRAIN_MASS_DENSITY_DEFAULT 3000 /* Default grain mass density, Olivine grains, kg/m3  */
+#define TI_DEFAULT 1e-6                 /* Default initial time */
+#define TF_DEFAULT 1e7                  /* Default final time */
+#define ABS_ERR_DEFAULT 1e-20           /* Default absolute error */
+#define REL_ERR_DEFAULT 1e-3            /* Default relative error */
+#define TIME_STEPS_DEFAULT 32           /* Default number of times steps */
+#define TRACE_ROUTES_DEFAULT 0          /* Deactivate route tracing by default */
+#define N_OUTPUT_ROUTES 16              /* Defaults number of output routes */
+
+#ifndef M_PI
+#define M_PI  3.14159265358979323846264338327950288
+#endif
+
+#define CONST_MKSA_YEAR 3.1536e7                /* Number of seconds in a year */
+#define CONST_CGSM_BOLTZMANN (1.3806503e-16)    /* Boltzmann constant */
+#define CONST_CGSM_MASS_PROTON (1.67262158e-24) /* Proton Mass */
+#define MASS_PROTON       1.672621777e-27       /* Proton Mass */
+
+#define MIN_ABUNDANCE 1e-20   /* Minimum abundance to write in output files */
+
+#define FRACTION_TIME_GRAIN_70K 3.16e-19
+#define GAS_DUST_NUMBER_RATIO 7.57e+11
+#define GRAIN_SITES_PER_CM2 3.00e+15    /* cm-2 */
+#define DRAINE_STANDARD_ISRF_FUV 1.7e8  /* photons cm-2 */
+
+/* Data structures */
+
+typedef enum
+{ STATIC = 0, DYNAMIC = 1 } SOURCE_MODE;
 
 typedef struct
 {
@@ -81,9 +117,13 @@ typedef struct
   SOURCE_MODE mode;
 } mdl_t;
 
+/* Fonction prototypes */
 
 int full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid_t routeDataspace, hid_t datatype, hid_t routeDatatype,
                 int cell_index, const inp_t * input_params, SOURCE_MODE mode,
                 const cell_table_t * cell, const net_t * network, const time_steps_t * ts, int verbose);
 
+int get_nb_active_line (const char *file);
+
 #endif // _ASTROCHEM_H_
+

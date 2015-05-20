@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "libastrochem.h"
+#include "astrochem.h"
 
 double
 rate (double alpha, double beta, double gamm, int reaction_type,

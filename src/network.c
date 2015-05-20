@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libastrochem.h"
+#include "astrochem.h"
 #include "network.h"
 
 static const elem_t elems[] = {

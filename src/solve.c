@@ -36,8 +36,7 @@
 #include <cvode/cvode_dense.h>
 #endif
 
-#include "libastrochem.h"
-
+#include "astrochem.h"
 #include "rates.h"
 
 static int f (realtype t, N_Vector y, N_Vector ydot, void *params);
