@@ -2,12 +2,15 @@ from libc.stdlib cimport malloc, free
 from libc.string cimport strcmp
 from cpython.string cimport PyString_AsString
 
-cdef extern from "../../src/libastrochem.h":
+cdef extern from "../../src/astrochem.h":
+
     cdef double CHI_DEFAULT
     cdef double COSMIC_DEFAULT
     cdef double GRAIN_SIZE_DEFAULT
     cdef double ABS_ERR_DEFAULT
     cdef double REL_ERR_DEFAULT
+
+cdef extern from "../../src/libastrochem.h":
 
     ctypedef struct params_t:
         double nh

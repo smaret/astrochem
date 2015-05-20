@@ -1,7 +1,7 @@
 /* 
-   network.test.c - Test the read_network.) function
+   network_test.c - Test the read_network() function
    
-   Copyright (c) 2006-2014 Sebastien Maret
+   Copyright (c) 2006-2015 Sebastien Maret
    
    This file is part of Astrochem.
 
@@ -22,14 +22,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../src/libastrochem.h"
-#include "../src/network.h"
+#include "libastrochem.h"
+#include "network.h"
 
 int
 main (void)
 {
   FILE *f;
-  char chem_file[MAX_LINE];
+  char chem_file[] = "network.chm";
   net_t network;
   
   int verbose = 0;
@@ -59,15 +59,15 @@ main (void)
   fprintf (f, "-29-Si       + uv-photon                   -> C(+)         + e(-)                                          2.16e-10  0.00e+00  2.61e+00 13 4283\n");
   fclose (f);
 
-  strncpy (chem_file, "network.chm", sizeof (chem_file) - 1);
-
   /* Read it */
+
   if( read_network(chem_file, &network, verbose) != EXIT_SUCCESS )
     {
       return EXIT_FAILURE;
     }
- network.reactions[0].reactants[1] =  find_species("H", &network);
+
   /* Check that the values are correct */
+
   if ((network.n_reactions == 18) &&
       (network.n_species == 26) &&
 

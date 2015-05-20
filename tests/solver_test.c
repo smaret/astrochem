@@ -1,7 +1,7 @@
 /*
-   network_test.c - Test the solve() function
+   solve_test.c - Test the solve() function
 
-   Copyright (c) 2006-2013 Sebastien Maret
+   Copyright (c) 2006-2015 Sebastien Maret
 
    This file is part of Astrochem.
 
@@ -17,13 +17,13 @@
 
    You should have received a copy of the GNU General Public License
    along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
-   */
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include "../src/libastrochem.h"
+#include "libastrochem.h"
 
 int
 main (void)
@@ -47,9 +47,9 @@ main (void)
     }
 
   phys_t phys;
-  phys.cosmic = COSMIC_DEFAULT;
-  phys.chi = CHI_DEFAULT;
-  phys.grain_size = GRAIN_SIZE_DEFAULT;
+  phys.cosmic = 1.3e-17;
+  phys.chi = 1;
+  phys.grain_size = 1e-5;
   phys.grain_abundance = 0;
 
   double abs_err, rel_err;

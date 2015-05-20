@@ -1,7 +1,7 @@
 /*
-   network.test.c - Test the read_network.) function
+   abundances_test.c - Test the  set_initial_abundances() function
 
-   Copyright (c) 2006-2013 Sebastien Maret
+   Copyright (c) 2006-2015 Sebastien Maret
 
    This file is part of Astrochem.
 
@@ -22,9 +22,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../src/libastrochem.h"
+#include "libastrochem.h"
 
-    int
+int
 main (void)
 {
     FILE *f;
@@ -34,7 +34,7 @@ main (void)
 
     /* Create the network.chm file */
     f = fopen ("network.chm", "w");
-    fprintf (f, "# This network file was created by full_solve_test\n");
+    fprintf (f, "# This network file was created by abundances_test\n");
     fprintf (f, "H            + H                           -> H2                                                           4.95e-17  5.00e-01  0.00e+00  0    1\n");
     fprintf (f, "C(+)         + grain(-)                    -> C            + grain                                         4.90e-17  5.00e-01  0.00e+00  0    3\n");
     fprintf (f, "H3(+)        + grain(-)                    -> H2           + H            + grain                          1.00e-16  5.00e-01  0.00e+00  0   13\n");

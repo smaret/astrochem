@@ -22,8 +22,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include "../src/libastrochem.h"
-#include "../src/rates.h"
+#include "libastrochem.h"
+#include "rates.h"
 
 int equaltol (double value1, double value2, double reltol);
 

@@ -1,5 +1,5 @@
 /* 
-   source_test.c - Test the read_source() function
+   source_dyn_test.c - Test the read_source() function
 
    Copyright (c) 2006-2014 Sebastien Maret
 
@@ -17,14 +17,14 @@
 
    You should have received a copy of the GNU General Public License
    along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../src/input.h"
+#include "input.h"
 
-  int
+int
 main (void)
 {
   FILE *f;

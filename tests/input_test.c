@@ -22,8 +22,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../src/input.h"
-#include "../src/libastrochem.h"
+#include "libastrochem.h"
+#include "input.h"
 
 int
 main (void)

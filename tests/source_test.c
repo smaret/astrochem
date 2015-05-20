@@ -1,7 +1,7 @@
 /* 
    source_test.c - Test the read_source() function
    
-   Copyright (c) 2006-2014 Sebastien Maret
+   Copyright (c) 2006-2015 Sebastien Maret
    
    This file is part of Astrochem.
 
@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../src/input.h"
+#include "input.h"
 
 int
 main (void)
