@@ -29,7 +29,6 @@ int
 main (void)
 {
   FILE *f;
-  int cell_index;
   net_t network;
   int verbose = 0;
 
