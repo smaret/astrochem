@@ -94,6 +94,26 @@ typedef struct
 
 typedef struct
 {
+  int species_idx;
+  double abundance;
+} abund_t;
+
+typedef struct
+{
+  abund_t *initial_abundances;
+  int n_initial_abundances;
+} abundances_t;
+
+typedef struct
+{
+  double ti;
+  double tf;
+  double abs_err;
+  double rel_err;
+} solver_t;
+
+typedef struct
+{
   files_t files;
   phys_t phys;
   solver_t solver;
@@ -108,6 +128,12 @@ typedef struct
   double *tgas;
   double *tdust;
 } cell_table_t;
+
+typedef struct
+{
+  double *time_steps;
+  int n_time_steps;
+} time_steps_t;
 
 typedef struct
 {

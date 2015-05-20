@@ -38,12 +38,6 @@ typedef char species_name_t[MAX_CHAR_SPECIES];
 
 typedef struct
 {
-  int species_idx;
-  double abundance;
-} abund_t;
-
-typedef struct
-{
   double chi;
   double cosmic;
   double grain_size;
@@ -54,31 +48,11 @@ typedef struct
 
 typedef struct
 {
-  double ti;
-  double tf;
-  double abs_err;
-  double rel_err;
-} solver_t;
-
-typedef struct
-{
-  abund_t *initial_abundances;
-  int n_initial_abundances;
-} abundances_t;
-
-typedef struct
-{
   double av;
   double nh;
   double tgas;
   double tdust;
 } cell_t;
-
-typedef struct
-{
-  double *time_steps;
-  int n_time_steps;
-} time_steps_t;
 
 typedef struct
 {
@@ -135,21 +109,22 @@ typedef struct
 
 /* Fonction prototypes */
 
-int alloc_abundances( const net_t* network, double** abundances );
+int alloc_abundances (const net_t* network, double** abundances);
 
-void free_abundances( double* abundances );
+void free_abundances (double* abundances);
 
-int set_initial_abundances( const char** species, int n_initialized_abundances,
-                            const double* initial_abundances, const net_t* network, double* abundances );
+int set_initial_abundances (const char** species, int n_initialized_abundances,
+                            const double* initial_abundances, const net_t* network,
+			    double* abundances );
 
-int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
+int solver_init (const cell_t* cell, const net_t* network, const phys_t* phys,
                  const double* abundances , double density, double abs_err, double rel_err,
-                 astrochem_mem_t* astrochem_mem );
+                 astrochem_mem_t* astrochem_mem);
 
-int solve( astrochem_mem_t* astrochem_mem, const net_t* network,
-           double* abundances, double time , const cell_t* new_cell, int verbose );
+int solve (astrochem_mem_t* astrochem_mem, const net_t* network,
+           double* abundances, double time , const cell_t* new_cell, int verbose);
 
-void solver_close( astrochem_mem_t* astrochem_mem );
+void solver_close (astrochem_mem_t* astrochem_mem);
 
 int read_network (const char *chem_file, net_t * network, const int verbose);
 
