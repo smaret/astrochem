@@ -1197,6 +1197,52 @@ provided with Astrochem (``osu2008.chm`` and ``osu2009.chm``;
 see :ref:`sec-chemical-networks`) are automatically generated from the OSU
 files using this tool.
 
+Output files
+============
+
+.. note::
+
+   Starting from version 0.7, the abundances are the
+   formation/destruction routes are stored in a single binary
+   file. This file can be converted into the legacy formats (``.abun``
+   and ``.rout`` for the abundances and routes, respectively) using
+   the ``converttolegacy`` utility.
+
+Astrochem results are stored in binary a file named
+``astrochem_output.h5``. The file format is based on `HDF5
+<http://www.hdfgroup.org/HDF5/>`_, a hierarchical data format that
+allows to store large datasets efficiently. The data can be easily
+accessed from Python using the :doc:`Astrochem Python module
+<python_module>`. For example, the CO abundance as a function of time
+from the output file can be read as follows:
+
+.. code-block:: python
+
+   >>> from astrochem import tools
+   >>> species = tools.listspecies("astrochem_output.h5") # species in the file
+   ['H3(+)' 'e(-)' 'C(+)' 'CO' 'HCO(+)']
+   >>> time, abun = tools.readabun("astrochem_output.h5", 'CO')
+   >>> print time
+   [  1.00000000e-06   2.62636353e-06   6.89778538e-06   1.81160919e-05
+      4.75794431e-05   1.24960914e-04   3.28192787e-04   8.61953566e-04
+      2.26380341e-03   5.94557071e-03   1.56152301e-02   4.10112707e-02
+      1.07710506e-01   2.82886943e-01   7.42963951e-01   1.95129342e+00
+      5.12480588e+00   1.34596032e+01   3.53498111e+01   9.28414545e+01
+      2.43835410e+02   6.40400427e+02   1.68192432e+03   4.41734470e+03
+      1.16015530e+04   3.04698957e+04   8.00250228e+04   2.10174801e+05
+      5.51995432e+05   1.44974067e+06   3.80754602e+06   1.00000000e+07]
+   >>> print abun[:,0] # print the CO abundance in the first cell
+   [  0.00000000e+00   0.00000000e+00   0.00000000e+00   0.00000000e+00
+      0.00000000e+00   0.00000000e+00   1.53148001e-19   2.69657101e-18
+      4.50311276e-17   6.70402913e-16   8.05604252e-15   6.97572674e-14
+      4.15800484e-13   2.15041377e-12   1.20634392e-11   7.31990562e-11
+      4.48849346e-10   2.59982365e-09   1.35763909e-08   6.55299735e-08
+      2.93246622e-07   1.03837261e-06   2.52591748e-06   4.25450305e-06
+      6.71696964e-06   1.26719213e-05   2.79093860e-05   5.76522869e-05
+      7.08298745e-05   7.27426681e-05   7.27526266e-05   7.27520464e-05]
+
+The formation/destruction routes may also be accessed from Python.
+
 .. _sec-runn-astr-parall:
 
 Running Astrochem in parallel
@@ -1396,7 +1442,7 @@ From Python
 
    In this section, we give an example on how to run Astrochem from
    Python. For a full description of Astrochem Python module, see
-   :doc:`Astrochem Python module <python_api>`.
+   :doc:`Astrochem Python module <python_module>`.
 
 .. Fixme: explain how to change the density, temperature, etc. at each
    timestep
