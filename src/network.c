@@ -86,7 +86,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
       f = fopen (chem_file1, "r");
       if (!f)
         {
-          fprintf (stderr, "aaastrochem: error: can't find %s.\n", chem_file);
+          fprintf (stderr, "astrochem: error: can't find %s.\n", chem_file);
           return EXIT_FAILURE;
         }
     }
