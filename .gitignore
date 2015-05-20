@@ -40,11 +40,11 @@ test-driver
 # The following files are also automatically generated from .in
 doc/examples/input.ini
 doc/examples/dynamic/input.ini
-doc/astrochem.1
-doc/chmconvert.1
-doc/converttolegacy.1
-doc/plabun.1
-doc/plroute.1
+doc/man/astrochem.1
+doc/man/chmconvert.1
+doc/man/converttolegacy.1
+doc/man/plabun.1
+doc/man/plroute.1
 lib/libastrochem.py
 python/libastrochemtools/libastrochemtools.py
 src/chmconvert.py
