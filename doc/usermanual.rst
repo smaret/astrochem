@@ -1402,19 +1402,19 @@ From Python
    timestep
 
 Calling Astrochem from Python is simpler than from C. First, one need
-to import the ``astrochem`` and ``numpy``  modules:
+to import the ``astrochem.wrapper`` and ``numpy``  modules:
 
 .. code-block:: python
 
-    import astrochem
+    from astrochem.wrapper import *
     import numpy
 
 The input physical parameters (see :ref:`sec-physical-params`) are set
-using the ``Phys`` object:
+using the ``phys`` object:
 
 .. code-block:: python
 
-    p = astrochem.Phys()
+    p = phys()
     p.cosmic = 1e-17
     p.chi = 0
 
@@ -1427,7 +1427,7 @@ default value. Initial abundances are set with a dictionary.
 
 Obviously, the species in the dictionnary must be present in the
 network. The density, visual extinction and temperature of the source
-are set with the ``Cell`` object:
+are set with the ``cell`` object:
 
 .. code-block:: python
 
@@ -1435,16 +1435,16 @@ are set with the ``Cell`` object:
     av = 20
     tgas = 10
     tdust = 10
-    c = astrochem.Cell(av , density, tgas,  tdust)
+    c = cell(av , density, tgas,  tdust)
 
 The next step is to initialize the solver:
 
 .. code-block:: python
 
     verbose = 0
-    abs_err = astrochem._ABS_ERR_DEFAULT # use default value
-    rel_err = astrochem._REL_ERR_DEFAULT
-    s = astrochem.Solver(c,  "network.chm", p , abs_err, rel_err, initial_abundances, density, verbose)
+    abs_err = 1e-15
+    rel_err = 1e-6
+    s = solver(c,  "network.chm", p , abs_err, rel_err, initial_abundances, density, verbose)
 
 Then actual computation can be done by *advancing time,*, which is
 typically done within a loop:
