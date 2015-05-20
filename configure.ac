@@ -126,8 +126,6 @@ AC_CONFIG_FILES([Makefile
 		 src/converttolegacy.py
 		 networks/Makefile
          	 python/Makefile
-		 python/libastrochemtools/libastrochemtools.py
-		 python/libastrochemtools/Makefile
 		 python/libpyastrochem/Makefile
          	 tests/astrochem_test.py
          	 tests/python_lib_test.py
