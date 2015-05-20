@@ -18,15 +18,6 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
    */
 
-/**
- * @file astrochem.c
- * @author Sebastion Maret
- * @date 28 August 2014
- * @brief File containing main function of astrochem program,
- * wich compute abundances and route for a specific chemical network and model
- */
-
-
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -345,19 +336,6 @@ version (void)
   fprintf (stdout, "permitted by law.\n");
 }
 
-/**
- * @brief Solve the ODE system.
- * Solve the ODE system with fully provided parameters. It initialize and close the solver itself
- * @param cell_index index of cell to compute on
- * @param input_params input params
- * @param mode source mode
- * @param cell cell to compute on
- * @param network network to use for solving
- * @param ts time steps to solve on
- * @param verbose quit if 0, verbose if 1
- * @return EXIT_SUCCESS if sucessfull
- * @todo Remove complicated code ? TODO
- */
 int
 full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid_t routeDataspace, hid_t datatype, hid_t routeDatatype, int cell_index, const inp_t * input_params, SOURCE_MODE mode,
             const cell_table_t * cell, const net_t * network, const time_steps_t * ts,

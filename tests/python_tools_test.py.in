@@ -21,8 +21,8 @@
 
 import sys
 import unittest
-sys.path.append("@abs_top_builddir@/python/libastrochemtools")
-import libastrochemtools as tools
+sys.path.append("@abs_top_builddir@/python/")
+import tools
 
 class TestSequenceFunctions(unittest.TestCase):
 

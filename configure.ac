@@ -95,60 +95,13 @@ AC_MSG_WARN([[Cannot find cython, which is required to build libpyastrochem bind
 fi
 AM_CONDITIONAL([HAVE_CYTHON], [test  "x$CYTHON" != "x" ])
 
-#check for doxygen
-if test -z $DOXYGEN; then
-    AC_PATH_PROG( DOXYGEN, doxygen )
-else
-    AC_MSG_CHECKING([provided doxygen path $DOXYGEN is correct])
-    AS_IF($DOXYGEN -v > /dev/null 2>&1, , DOXYGEN="")
-    if test -z $DOXYGEN; then
-        AC_MSG_RESULT([ no ])
-    else
-        AC_MSG_RESULT([ yes ])
-    fi
-fi
-
-HAVE_DOXYGEN="yes"
-if test -z $DOXYGEN; then
-HAVE_DOXYGEN="no"
-AC_MSG_WARN([[Cannot find doxygen, which is required to build c api documentation.  It will not be built.]])
-fi
-AM_CONDITIONAL([HAVE_DOXYGEN], [test  "x$DOXYGEN" != "x" ])
-
-#check for sphinx
-if test -z $SPHINXBUILD; then
-    AC_PATH_PROG( SPHINXBUILD, sphinx-build )
-else
-    AC_MSG_CHECKING([provided sphinxbuild path $SPHINXBUILD is correct])
-    AS_IF($SPHINXBUILD --version > /dev/null 2>&1, , SPHINXBUILD="")
-    if test -z $SPHINXBUILD; then
-        AC_MSG_RESULT([ no ])
-    else
-        AC_MSG_RESULT([ yes ])
-    fi
-fi
-
-HAVE_SPHINXBUILD="yes"
-if test -z $SPHINXBUILD; then
-HAVE_SPHINXBUILD="no"
-AC_MSG_WARN([[Cannot find sphinxbuild, which is required to build python api documentation.  It will not be built.]])
-fi
-AM_CONDITIONAL([HAVE_SPHINXBUILD], [test  "x$SPHINXBUILD" != "x" ])
-
-#check for breathe
-AC_PYTHON_MODULE(breathe, )
-if test $HAVE_PYMOD_BREATHE = "no"; then
-   AC_MSG_WARN(Cannot find python module breathe which is required to build c api documentation in sphinx.  It will not be built.)
-fi
-AM_CONDITIONAL([HAVE_PYMOD_BREATHE], [test $HAVE_PYMOD_BREATHE = "yes"])
-
 #check for hdf5
 AX_LIB_HDF5()
 if test "$with_hdf5" = "no"; then
     AC_MSG_ERROR([Unable to find HDF5, cannot compile astrochem.])
 fi
 
-#check for breathe
+#check for h5py
 AC_PYTHON_MODULE(h5py, )
 if test $HAVE_PYMOD_H5PY = "no"; then
    AC_MSG_WARN(Cannot find python module h5py which is required to use python astrochem tools output file readers. They will not be usable.)
@@ -156,35 +109,28 @@ fi
 
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
-		 doc/usermanual/Makefile
+		 doc/examples/Makefile
+		 doc/examples/input.ini
+		 doc/examples/dynamic/Makefile
+		 doc/examples/dynamic/input.ini
 		 doc/man/Makefile
 		 doc/man/astrochem.1
 		 doc/man/plabun.1
 		 doc/man/plroute.1
 		 doc/man/chmconvert.1
 		 doc/man/converttolegacy.1
-		 doc/examples/Makefile
-		 doc/examples/input.ini
-		 doc/examples/dynamic/Makefile
-		 doc/examples/dynamic/input.ini
-         doc/c_api/astrochem.dox
-         doc/c_api/Makefile
-         doc/python_api/Makefile
-         doc/python_api/source/conf.py
-         src/Makefile
+         	 src/Makefile
 		 src/chmconvert.py
 		 src/plabun.py
 		 src/plroute.py
 		 src/converttolegacy.py
 		 networks/Makefile
-         python/Makefile
-		 python/libastrochemtools/libastrochemtools.py
-		 python/libastrochemtools/Makefile
+         	 python/Makefile
 		 python/libpyastrochem/Makefile
-         tests/astrochem_test.py
-         tests/python_lib_test.py
-         tests/python_tools_test.py
-         tests/benchmark.py
+         	 tests/astrochem_test.py
+         	 tests/python_lib_test.py
+         	 tests/python_tools_test.py
+         	 tests/benchmark.py
 		 tests/Makefile])
 
 AC_OUTPUT
@@ -205,9 +151,6 @@ fi
 echo "Python interpreter: ${PYTHON}
 Python version:     ${PYTHON_VERSION}
 Biggles module:     ${HAVE_PYMOD_BIGGLES}
-Python api:         ${HAVE_CYTHON}
-Doxygen:            ${HAVE_DOXYGEN}
-Sphinx Build:       ${HAVE_SPHINXBUILD}
-Breathe:            ${HAVE_PYMOD_BREATHE}
-h5py Reader:        ${HAVE_PYMOD_H5PY}
+H5py module:        ${HAVE_PYMOD_H5PY}
+Python API:         ${HAVE_CYTHON}
 ============================================="

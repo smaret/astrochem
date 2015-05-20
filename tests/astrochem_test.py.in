@@ -25,8 +25,8 @@ import numpy
 import unittest
 import math
 
-sys.path.append("@abs_top_srcdir@/python/libastrochemtools")
-import libastrochemtools as tools
+sys.path.append("@abs_top_srcdir@/python/")
+import tools
 
 input_ini = """[files]
 source = source.mdl

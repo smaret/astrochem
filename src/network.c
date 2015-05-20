@@ -57,19 +57,13 @@ static const elem_t elems[] = {
 };
 
 
-/**
- * @brief Allocate the network structure.
- *
- * Allocate the network structure. We get the number of reactions
- * from the number of lines in the network file. For the number of
- * species, we assume a number equal to the number of reactions
- * divided by 10, and we reallocate the array if needed.
- *
- * @param chem_file chem file to use
- * @param network network to fill
- * @param verbose quiet if 0, verbose if 1
- * @return EXIT_SUCCESS if sucessfull
- */
+/*
+  Allocate the network structure. We get the number of reactions from
+  the number of lines in the network file. For the number of species,
+  we assume a number equal to the number of reactions divided by 10,
+  and we reallocate the array if needed.
+*/
+
 int
 read_network (const char *chem_file, net_t * network, const int verbose)
 {
@@ -92,7 +86,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
       f = fopen (chem_file1, "r");
       if (!f)
         {
-          fprintf (stderr, "aaastrochem: error: can't find %s.\n", chem_file);
+          fprintf (stderr, "astrochem: error: can't find %s.\n", chem_file);
           return EXIT_FAILURE;
         }
     }
@@ -297,16 +291,10 @@ read_network (const char *chem_file, net_t * network, const int verbose)
   return EXIT_SUCCESS;
 }
 
-/**
- * @brief Add a species in the network
- *
- * Add a species in the network and return it's index
- * If already present, just return the index
- *
- * @param new_species name of new specie
- * @param network network to add specie to
- * @return index of added specie or -1 in case of failure
- */
+/*
+  Add a species in the network
+*/
+
 int
 add_species (char *new_species, net_t * network)
 {
@@ -344,12 +332,10 @@ add_species (char *new_species, net_t * network)
   return i;
 }
 
-/**
- * @brief Look up the index of a given species in the species array.
- * @param specie specie name to find
- * @param network network to search for specie
- * @return index of specie, -1 if specie name is empty, -2 if specie does not exist.
- */
+/*
+   Look up the index of a given species in the species array.
+*/
+
 int
 find_species (const species_name_t specie, const net_t * network)
 {
@@ -372,13 +358,10 @@ find_species (const species_name_t specie, const net_t * network)
   return -2;
 }
 
-/**
- * @brief Alloc the network structure.
- * @param network network to allocate
- * @param n_species number of species
- * @param n_reactions numer of reactions
- * @return EXIT_SUCCESS if sucessfull
- */
+/*
+  Allocate the network structure.
+*/
+
 int
 alloc_network (net_t * network, int n_species, int n_reactions)
 {
@@ -413,12 +396,10 @@ alloc_network (net_t * network, int n_species, int n_reactions)
   return EXIT_SUCCESS;
 }
 
-/**
- * @brief Reallocate species array, without overwriting existing species
- * @param network network to reallocate specie in
- * @param n_species new nimber of species
- * @return EXIT_SUCCESS if sucessfull
- */
+/*
+  Reallocate species array, without overwriting existing species
+*/
+
 int
 realloc_network_species (net_t * network, int n_species)
 {
@@ -442,10 +423,10 @@ realloc_network_species (net_t * network, int n_species)
   return EXIT_SUCCESS;
 }
 
-/**
- * @brief Free the network structure.
- * @param network network to free
- */
+/*
+  Free the network structure.
+*/
+
 void
 free_network (net_t * network)
 {
@@ -453,13 +434,10 @@ free_network (net_t * network)
   free (network->species);
 }
 
-/**
- * @brief Get the mass and charge of a species
- * @param species string of species to parse
- * @param[out] mass mass of the species in Kg
- * @param[out] charge charge of the species
- * @return  EXIT_SUCCESS if sucessfull
- */
+/*
+  Get the mass and charge of a species
+*/
+
 bool get_species_mass_and_charge( char* species, double* mass, int* charge )
 {
   if( strcmp( species, "e(-)" ) == 0 )
@@ -604,11 +582,11 @@ bool get_species_mass_and_charge( char* species, double* mass, int* charge )
   *mass = specie_mass_uma * UMA;
   return true;
 }
-/**
- * @brief get the mass of an element
- * @param element element to get the mass of
- * @return mass of element or -1 if not found
- */
+
+/*
+  Get the mass of an element
+*/
+
 int
 get_element_mass( const char* element )
 {

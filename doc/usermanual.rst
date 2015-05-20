@@ -1257,12 +1257,20 @@ functions that are part of the API are included in a dynamic library,
 against which other codes may be linked. Both the C and Python
 languages are supported.
 
+.. _sec-calling-astrochem-from-c:
+
 From C
 ------
 
-A typical call of Astrochem library from a C code can be decomposed in
-several steps. First, one must select a chemical network file, which is
-done as follows:
+.. note::
+   
+   In this section, we give an example on how to call the Astrochem
+   library from a C code. For a full description of the API, see
+   :doc:`Astrochem C API reference <c_api>`.
+
+A typical call of Astrochem library can be decomposed in several
+steps. First, one must select a chemical network file, which is done
+as follows:
 
 .. code-block:: c
 
@@ -1273,14 +1281,15 @@ done as follows:
     net_t network;
     read_network (chem_file, &network, verbose);
 
-This creates a network structure of type ``net_t``\  [12]_. In
-principle, one should check the return code of the ``read_network ()``
-function to make sure that no error occured while reading the network
-file. This is not done in this example for a sake of clarity.
+This creates a network structure of type :c:type:`net_t`. In
+principle, one should check the return code of the
+:c:func:`read_network` function to make sure that no error occurred
+while reading the network file. This is not done in this example for a
+sake of clarity.
 
-The second step is to set the physical parameters of the model. This is
-done by defining a structure of type ``phys_t``, and by setting the
-different elements of this structure:
+The second step is to set the physical parameters of the model. This
+is done by defining a structure of type :c:type:`phys_t`, and by
+setting the different elements of this structure:
 
 .. code-block:: c
 
@@ -1334,8 +1343,9 @@ relative error:
 
     solver_init (&cell, &network, &phys, abundances , density, abs_err, rel_err, &astrochem_mem );
 
-The ``astrochem_mem`` variable is a structure that contains the various
-parameters and work arrays of the solver.
+The ``astrochem_mem`` variable is a structure of type
+:c:type:`astrochem_mem_t` that contains the various parameters and
+work arrays of the solver.
 
 The sixth step is to call the solver to *advance time,* i.e. to compute
 the abundances up to a given time:
@@ -1346,11 +1356,11 @@ the abundances up to a given time:
     time += 1e-6;
     solve (&astrochem_mem, &network, abundances, time, verbose);
 
-The ``solve()`` function updates the abundance array; after a
-successfull call, the array contains the abundances of all species at a
-given time. The choice of the time step is left to the user. It should
-be sufficiently small so that the physical properties of the cell do not
-change much, and can approximated as being constant.
+The :c:func:`solve` function updates the abundance array; after a
+successful call, the array contains the abundances of all species at
+a given time. The choice of the time step is left to the user. It
+should be sufficiently small so that the physical properties of the
+cell do not change much, and can approximated as being constant.
 
 This step is repeated an number of times, until the dynamical simulation
 finishes. Between two calls, the cell properties needs to be updated
@@ -1377,26 +1387,34 @@ used by Astrochem:
     free_abundances (abundances);
     free_network (&network);
 
+.. _sec-calling-astrochem-from-python:
+
 From Python
 -----------
+
+.. note::
+
+   In this section, we give an example on how to run Astrochem from
+   Python. For a full description of Astrochem Python module, see
+   :doc:`Astrochem Python module <python_api>`.
 
 .. Fixme: explain how to change the density, temperature, etc. at each
    timestep
 
 Calling Astrochem from Python is simpler than from C. First, one need
-to import the ``astrochem`` and ``numpy``  modules:
+to import the ``astrochem.wrapper`` and ``numpy``  modules:
 
 .. code-block:: python
 
-    import astrochem
+    from astrochem.wrapper import *
     import numpy
 
 The input physical parameters (see :ref:`sec-physical-params`) are set
-using the ``Phys`` object:
+using the ``phys`` object:
 
 .. code-block:: python
 
-    p = astrochem.Phys()
+    p = phys()
     p.cosmic = 1e-17
     p.chi = 0
 
@@ -1409,7 +1427,7 @@ default value. Initial abundances are set with a dictionary.
 
 Obviously, the species in the dictionnary must be present in the
 network. The density, visual extinction and temperature of the source
-are set with the ``Cell`` object:
+are set with the ``cell`` object:
 
 .. code-block:: python
 
@@ -1417,16 +1435,16 @@ are set with the ``Cell`` object:
     av = 20
     tgas = 10
     tdust = 10
-    c = astrochem.Cell(av , density, tgas,  tdust)
+    c = cell(av , density, tgas,  tdust)
 
 The next step is to initialize the solver:
 
 .. code-block:: python
 
     verbose = 0
-    abs_err = astrochem._ABS_ERR_DEFAULT # use default value
-    rel_err = astrochem._REL_ERR_DEFAULT
-    s = astrochem.Solver(c,  "network.chm", p , abs_err, rel_err, initial_abundances, density, verbose)
+    abs_err = 1e-15
+    rel_err = 1e-6
+    s = solver(c,  "network.chm", p , abs_err, rel_err, initial_abundances, density, verbose)
 
 Then actual computation can be done by *advancing time,*, which is
 typically done within a loop:
@@ -1548,7 +1566,3 @@ problems or items listed on GitHub.
    Most compilers (including GCC, starting from version 4.2) support
    OpenMP.
 
-.. [12]
-   For a full description of the datatype and functions defined in the
-   API, please see the Doxygen documentation in the ``doc/doxygen``
-   directory of Astrochem source code.

@@ -17,5 +17,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = usermanual man examples c_api python_api
+SUBDIRS = examples man
+
 

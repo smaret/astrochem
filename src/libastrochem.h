@@ -28,32 +28,32 @@
 #include <nvector/nvector_serial.h>
 #include <string.h>
 
-#define MAX_LINE 512      /*!< Maximum number of characters in each input file line */
-#define CHI_DEFAULT 1     /*!< Default chi value */
-#define COSMIC_DEFAULT 1.3e-17  /*!< Default cosmic value */
-#define GRAIN_SIZE_DEFAULT 1e-5 /*!< Default Grain radius, in cm */
-#define GRAIN_GAS_MASS_RATIO_DEFAULT 0 /*!< Default Grain mass ratio */
-#define GRAIN_MASS_DENSITY_DEFAULT 3000 /*!< Default Grain mass density, Olivine grains, kg/m3  */
-#define TI_DEFAULT 1e-6  /*!< Default initial time */
-#define TF_DEFAULT 1e7   /*!< Default final time */
-#define ABS_ERR_DEFAULT 1e-20   /*!< Default absolute error */
-#define REL_ERR_DEFAULT 1e-3    /*!< Default relative error */
-#define TIME_STEPS_DEFAULT 32   /*!< Default number of times steps */
-#define TRACE_ROUTES_DEFAULT 0  /*!< Deactivate route tracing by default */
-#define N_OUTPUT_ROUTES 16      /*!< Defaults number of output routes */
+#define MAX_LINE 512                    /* Maximum number of characters in each input file line */
+#define CHI_DEFAULT 1                   /* Default chi value */
+#define COSMIC_DEFAULT 1.3e-17          /* Default cosmic value */
+#define GRAIN_SIZE_DEFAULT 1e-5         /* Default grain radius, in cm */
+#define GRAIN_GAS_MASS_RATIO_DEFAULT 0  /* Default grain mass ratio */
+#define GRAIN_MASS_DENSITY_DEFAULT 3000 /* Default grain mass density, Olivine grains, kg/m3  */
+#define TI_DEFAULT 1e-6                 /* Default initial time */
+#define TF_DEFAULT 1e7                  /* Default final time */
+#define ABS_ERR_DEFAULT 1e-20           /* Default absolute error */
+#define REL_ERR_DEFAULT 1e-3            /* Default relative error */
+#define TIME_STEPS_DEFAULT 32           /* Default number of times steps */
+#define TRACE_ROUTES_DEFAULT 0          /* Deactivate route tracing by default */
+#define N_OUTPUT_ROUTES 16              /* Defaults number of output routes */
 
 #ifndef M_PI
 #define M_PI  3.14159265358979323846264338327950288
 #endif
 
-#define MAX_CHAR_SPECIES 32     /*!< Maximum number of characters in a specie name */
+#define MAX_CHAR_SPECIES 32   /* Maximum number of characters in a specie name */
 
-#define CONST_MKSA_YEAR 3.1536e7                /*!< Number of seconds in a year */
-#define CONST_CGSM_BOLTZMANN (1.3806503e-16)    /*!< Boltzmann constant */
-#define CONST_CGSM_MASS_PROTON (1.67262158e-24) /*!< Proton Mass */
-#define MASS_PROTON       1.672621777e-27       /*!< Proton Mass */
+#define CONST_MKSA_YEAR 3.1536e7                /* Number of seconds in a year */
+#define CONST_CGSM_BOLTZMANN (1.3806503e-16)    /* Boltzmann constant */
+#define CONST_CGSM_MASS_PROTON (1.67262158e-24) /* Proton Mass */
+#define MASS_PROTON       1.672621777e-27       /* Proton Mass */
 
-#define MIN_ABUNDANCE 1e-20     /* Minimum abundance to write in output files */
+#define MIN_ABUNDANCE 1e-20   /* Minimum abundance to write in output files */
 
 #define FRACTION_TIME_GRAIN_70K 3.16e-19
 #define GAS_DUST_NUMBER_RATIO 7.57e+11
@@ -62,6 +62,7 @@
 
 #define MAX_REACTANTS 3
 #define MAX_PRODUCTS 4
+
 /* Data structures */
 
 typedef enum
@@ -75,18 +76,14 @@ typedef struct
   double abundance;
 } abund_t;
 
-/**
- * @brief struct containing physics parameters
- */
-
 typedef struct
 {
-  double chi;               /*!< chi */
-  double cosmic;            /*!< cosmic */
-  double grain_size;        /*!< grain size */
-  double grain_abundance;   /*!< grain abundances */
-  double grain_gas_mass_ratio;  /*!< grain mass ratio */
-  double grain_mass_density; /*!< grain mass density, kg/m3  */
+  double chi;
+  double cosmic;
+  double grain_size;
+  double grain_abundance;
+  double grain_gas_mass_ratio;
+  double grain_mass_density;
 } phys_t;
 
 typedef struct
@@ -103,65 +100,47 @@ typedef struct
   int n_initial_abundances;
 } abundances_t;
 
-/**
- * @brief struct containing cell parameters
- */
 typedef struct
 {
-  double av;    /*!< av */
-  double nh;    /*!< density */
-  double tgas;  /*!< gas temperature */
-  double tdust; /*!< dust temperature */
+  double av;
+  double nh;
+  double tgas;
+  double tdust;
 } cell_t;
 
-
-/**
- * @brief struct containing array of time steps
- */
 typedef struct
 {
   double *time_steps;
   int n_time_steps;
 } time_steps_t;
 
-
-
 typedef struct
 {
   int reactants[ MAX_REACTANTS ];
   int products[ MAX_PRODUCTS ];
-  double alpha;  /*!< reaction alpha*/
-  double beta;   /*!< reaction beta*/
-  double gamma;  /*!< reaction gamma*/
-  int reaction_type; /*!< reaction type*/
-  int reaction_no;   /*!< reaction number*/
+  double alpha;
+  double beta;
+  double gamma;
+  int reaction_type;
+  int reaction_no;
 } react_t;
 
-/**
- * @brief struct containint a specie, name, mass and charge
- */
 typedef struct
 {
-  species_name_t name; /*!< Name of specie */
-  double mass;         /*!< Mass of specie */
-  int charge;          /*!< charge of specie */
+  species_name_t name;
+  double mass;
+  int charge;
 } species_t;
 
-/**
- * @brief struct containing a network
- */
 typedef struct
 {
-  int n_species; /*!< number of species */
-  int n_alloc_species; /*!< number of actully allocated species */
-  species_t *species; /*!< species array */
-  int n_reactions; /*!< number of reactions */
-  react_t *reactions; /*!< array of reactions */
+  int n_species;
+  int n_alloc_species;
+  species_t *species;
+  int n_reactions;
+  react_t *reactions;
 } net_t;
 
-/**
- * @brief bool enum
- */
 typedef enum { false, true } bool;
 
 typedef struct

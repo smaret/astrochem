@@ -29,79 +29,56 @@
 
 #define MAX_CHAR_FILENAME 64
 
-/**
- * @brief struct containing a rates of a reaction
- */
 typedef struct
 {
-  int reaction_no; /*!< number of concerned reaction */
-  double rate;     /*!< rate value */
+  int reaction_no;
+  double rate;
 } r_t;
 
-/**
- * @brief struct containing a route
- */
 typedef struct
 {
-  r_t destruction; /*!< rate of destruction */
-  r_t formation;   /*!< rate of formation */
+  r_t destruction;
+  r_t formation;
 } rout_t;
 
-
-/**
- * @brief struct containing output parameters
- */
 typedef struct
 {
-  int *output_species_idx; /*!< array of output species idx */
-  int n_output_species;    /*!< number of output species */
-  int time_steps;          /*!< time steps used */
-  int trace_routes;        /*!< If routes have been traced */
-  char suffix[MAX_LINE];   /*!< Suffix to sue in output files */
+  int *output_species_idx;
+  int n_output_species;
+  int time_steps;
+  int trace_routes;
+  char suffix[MAX_LINE];
 } output_t;
 
-/**
- * @brief struct containing file names of chem file and source file
- */
 typedef struct
 {
-  char chem_file[MAX_LINE]; /*!< Path to chem file */
-  char source_file[MAX_LINE]; /*!< Path to source file */
+  char chem_file[MAX_LINE];
+  char source_file[MAX_LINE];
 } files_t;
 
-/**
- * @brief struct containing input parametrs
- */
 typedef struct
 {
-  files_t files;    /*!< Input files */
-  phys_t phys;      /*!< Physics parameters */
-  solver_t solver;  /*!< Solver parameters */
-  abundances_t abundances; /*!< abundances */
-  output_t output; /*!< Output parameters */
+  files_t files;
+  phys_t phys;
+  solver_t solver;
+  abundances_t abundances;
+  output_t output;
 } inp_t;
 
-
-/**
- * @brief struct containing cell parameters
- */
 typedef struct
 {
-  double *av;    /*!< av */
-  double *nh;    /*!< density */
-  double *tgas;  /*!< gas temperature */
-  double *tdust; /*!< dust temperature */
+  double *av;
+  double *nh;
+  double *tgas;
+  double *tdust;
 } cell_table_t;
 
-/**
- * @brief struct containing a source model
- */
 typedef struct
 {
-  cell_table_t *cell;    /*!< Array of cells */
-  time_steps_t ts; /*!< Time steps */
-  int n_cells;     /*!< Number of cells */
-  SOURCE_MODE mode; /*!< Source mode */
+  cell_table_t *cell;
+  time_steps_t ts;
+  int n_cells;
+  SOURCE_MODE mode;
 } mdl_t;
 
 

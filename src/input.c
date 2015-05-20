@@ -46,19 +46,12 @@ int alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps);
 
 int get_nb_active_line_section (const char *file, const char *section);
 
-/**
- * @brief Read the input file
- *
- * Read the input file containing the parameters needed by the code:
- * name of the chemistry network and source file names, physical
- * parameters, solver parameters, and initial abundances.
- *
- * @param input_file path to input file
- * @param[out] input_params output input params from input file
- * @param network network to use to find species
- * @param verbose 0 means quiet, 1 means verbose
- * @return EXIT_SUCCESS if sucessfull
- */
+/*
+  Read the input file containing the parameters needed by the code:
+  name of the chemistry network and source file names, physical
+  parameters, solver parameters, and initial abundances.
+*/
+
 int
 read_input (const char *input_file, inp_t * input_params,
             const net_t * network, int verbose)
@@ -469,15 +462,10 @@ read_input (const char *input_file, inp_t * input_params,
   return EXIT_SUCCESS;
 }
 
-/**
- * @brief Read the file containing the source model.
- *
- * @param source_file file to read source model from
- * @param[out] source_mdl struct to fill using source_file
- * @param input_params input params to use while reading source model
- * @param verbose 0 means quiet, 1 means verbose
- * @return EXIT_SUCCESS if sucessfull
- */
+/*
+  Read the file containing the source model.
+*/
+
 int
 read_source (const char *source_file, mdl_t * source_mdl,
              const inp_t * input_params, const int verbose)
@@ -662,14 +650,10 @@ read_source (const char *source_file, mdl_t * source_mdl,
   return EXIT_SUCCESS;
 }
 
-/**
- * @brief Alloc the input structure.
- *
- * @param input_params input_params to allocate
- * @param n_initial_abundances number of initial abundances
- * @param n_output_abundances number of output abundances
- * @return EXIT_SUCCESS if sucessfull
- */
+/*
+  Allocate the structure containing the input parameters
+*/
+
 int
 alloc_input (inp_t * input_params, int n_initial_abundances,
              int n_output_abundances)
@@ -703,14 +687,10 @@ free_input (inp_t * input_params)
   free (input_params->abundances.initial_abundances);
 }
 
-/**
- * @brief Allocate the model structure
- *
- * @param source_mdl source model struct to allocate
- * @param n_cells number of cells
- * @param n_time_steps number of time steps
- * @return EXIT_SUCCESS if sucessfull
- */
+/*
+  Allocate the structure containing the source model
+*/
+
 int
 alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps)
 {
@@ -760,8 +740,9 @@ alloc_mdl (mdl_t * source_mdl, int n_cells, int n_time_steps)
 }
 
 /*
-   Fre the model structure
- */
+   Free the source model structure
+*/
+
 void
 free_mdl (mdl_t * source_mdl)
 {
@@ -771,16 +752,10 @@ free_mdl (mdl_t * source_mdl)
   free (source_mdl->ts.time_steps);
 }
 
-/**
- * @brief Get the number of non commented line in a section
- * Get the number of non commented line in a section
- * in a file beggining by [section] and ending with
- * [other_section] or eof.
- *
- * @param file file to get number of line from
- * @param section name of section to get number of line from
- * @return number of line or -1 if unsuccessfull;
- */
+/*
+  Get the number of non commented line in a section of an input file
+*/
+
 int
 get_nb_active_line_section (const char *file, const char *section)
 {
@@ -827,15 +802,10 @@ get_nb_active_line_section (const char *file, const char *section)
   return line_number;
 }
 
+/*
+  Read the source model and network filenames from an input file
+*/
 
-
-/**
- * @brief Read only chem_file and network_file from a input.ini file
- * @param input_file fiel to read files name from
- * @param[out] files struct containing name of files from input file
- * @param verbose 0 means quiet, 1 means verbose
- * @return EXIT_SUCCESS if sucessfull
- */
 int
 read_input_file_names (const char *input_file, files_t * files, int verbose)
 {
@@ -894,12 +864,9 @@ read_input_file_names (const char *input_file, files_t * files, int verbose)
   return EXIT_SUCCESS;
 }
 
-/**
- * @brief Get the number of non commented line in a file
- *
- * @param file file to get number of line from
- * @return number of line or -1 in case of failure;
- */
+/*
+  Get the number of non commented lines in a file 
+*/
 
 int
 get_nb_active_line (const char *file)
