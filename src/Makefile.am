@@ -1,6 +1,6 @@
 #  Makefile.am - Automake file for Astrochem
 #
-#  Copyright (c) 2006-2014 Sebastien Maret
+#  Copyright (c) 2006-2015 Sebastien Maret
 #
 #  This file is part of Astrochem.
 #
@@ -27,17 +27,13 @@ libastrochem_la_SOURCES = network.c rates.c solve.c input.c
 libastrochem_la_LDFLAGS = -version-info 0:0:0
 include_HEADERS = libastrochem.h
 
-bin_PROGRAMS = astrochem apiuser chmconvert converttolegacy
+bin_PROGRAMS = astrochem chmconvert converttolegacy
 
 astrochem_SOURCES = astrochem.c 
 astrochem_CFLAGS = ${HDF5_CFLAGS}
 astrochem_CPPFLAGS = ${HDF5_CPPFLAGS}
 astrochem_LDFLAGS = ${HDF5_LDFLAGS}
 astrochem_LDADD = -lastrochem ${HDF5_LIBS}
-
-apiuser_SOURCES = apiuser.c
-apiuser_LDADD = -lastrochem
-
 
 chmconvert_SOURCES = chmconvert.py
 chmconvert$(EXEEXT): chmconvert.py
