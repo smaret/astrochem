@@ -15,7 +15,7 @@ Astrochem from Python <sec-calling-astrochem-from-python>`
 Tools (``astrochem.tools``)
 ---------------------------
 
-.. automodule:: astrochem.tools
+.. automodule:: tools
    :members:
 
 .. _sec-python-astrochem-wrapper:
@@ -23,5 +23,5 @@ Tools (``astrochem.tools``)
 Wrapper (``astrochem.wrapper``)
 -------------------------------
 
-.. automodule:: astrochem.wrapper
+.. automodule:: wrapper
    :members:
