@@ -56,9 +56,21 @@ python_tools_test$(EXEEXT): python_tools_test.py
 	cp $? $@
 	chmod a+x $@
 
-benchmark: benchmark.py
+benchmark_bin: benchmark.py
 	cp $? $@
 	chmod a+x $@
-	./benchmark
 
-CLEANFILES = input.ini source.mdl source_dyn.mdl network.chm *.abun
+benchmark: benchmark_bin
+	./benchmark_bin
+
+benchmark_openmp_bin: benchmark_openmp.py
+	cp $? $@
+	chmod a+x $@
+
+benchmark_openmp: benchmark_openmp_bin
+	./benchmark_openmp_bin
+
+CLEANFILES = astrochem_test.py python_lib_test.py			\
+	python_tools_test.py benchmark.py benchmark_bin			\
+	benchmark_openmp.py benchmark_openmp_bin input.ini source.mdl	\
+	source_dyn.mdl network.chm *.h5

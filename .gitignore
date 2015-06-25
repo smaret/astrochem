@@ -53,6 +53,9 @@ src/plabun.py
 src/plroute.py
 tests/astrochem_test.py
 tests/benchmark.py
+tests/benchmark_bin
+tests/benchmark_openmp.py
+tests/benchmark_openmp_bin
 tests/python_lib_test.py
 tests/python_tools_test.py
 

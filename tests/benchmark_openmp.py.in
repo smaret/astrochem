@@ -1,0 +1,114 @@
+#!@PYTHON@
+#
+#  benchmark-openmp - Parallel benckmark for Astrochem
+#
+#  Copyright (c) 2006-2015 Sebastien Maret
+#
+#  This file is part of Astrochem.
+#
+#  Astrochem is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published
+#  by the Free Software Foundation, either version 3 of the License,
+#  or (at your option) any later version.
+#
+#  Astrochem is distributed in the hope that it will be useful, but
+#  WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#  General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
+
+from subprocess import *
+import os
+
+input_ini = """[files]
+source = source.mdl
+chem = /Users/smaret/Models/astrochem/networks/osu2009.chm
+# Physical paramaters
+[phys]
+chi = 1.0
+cosmic = 1.3e-17
+# Solver parameters
+[solver]
+ti = 1e-6
+tf = 1e7
+abs_err = 1e-20
+rel_err = 1e-6
+# Initial abundances
+[abundances]
+H2      = 0.5
+He      = 0.14
+N       = 2.14e-5
+O       = 1.76e-4
+C(+)    = 7.30e-5
+S(+)    = 8.00e-8
+Si(+)   = 8.00e-8
+Fe(+)   = 3.00e-9
+Na(+)   = 2.00e-9
+Mg(+)   = 7.00e-9
+P(+)    = 3.00e-9
+Cl(+)   = 4.00e-9
+e(-)    = 7.3179e-5
+# Output
+[output]
+time_steps = 32
+abundances = CO,C(+),C,e(-),OH,H3O(+),H,H2,HCO(+),CO(+),C4H,CH(+),CH
+trace_routes = 0
+"""
+
+source_mdl_hdr = """# Source model file example
+# shell number, Av [mag], n(H) [cm^-3], Tgas [K], Tdust [K]
+#
+"""
+
+source_mdl_cell = """0	20.0	1e+04	10.0	10.0
+"""
+
+def main():
+    """
+    Benchmark Astrochem
+
+    """
+
+    ncells = 16
+
+    # Create the input files
+
+    f = open("input.ini", 'w')
+    f.write(input_ini)
+    f.close()
+
+    f = open("source.mdl", 'w')
+    f.write(source_mdl_hdr)
+    for i in range(ncells):
+        f.write(source_mdl_cell)
+    f.close()
+
+    # Run Astrochem serially
+    # We need to start time as a subprocess in a shell, because we need to set the OMP_NUM_THREADS environment variables.
+    env = {}
+    env["OMP_NUM_THREADS"] = "1"
+    env["DYLD_LIBRARY_PATH"] = os.getenv("DYLD_LIBRARY_PATH") # why to we need this?
+    p = Popen("time -p /Users/smaret/Models/astrochem/src/astrochem -q input.ini", env = env, shell = True, stderr = PIPE)
+    output = p.communicate()[1]
+    real_s, user_s, sys_s = list(map(float, output.split()[1::2]))
+    print("[run 1/2] real: %6.3fs user: %6.3fs  sys: %6.3fs" % (real_s, user_s, sys_s))
+
+    # Run Astrochem in parallel
+    env["OMP_NUM_THREADS"] = os.getenv("OMP_NUM_THREADS")
+    p = Popen("time -p /Users/smaret/Models/astrochem/src/astrochem -q input.ini", env = env, shell = True, stderr = PIPE)
+    output = p.communicate()[1]
+    real_p, user_p, sys_p = list(map(float, output.split()[1::2]))
+    print("[run 2/2] real: %6.3fs user: %6.3fs  sys: %6.3fs" % (real_p, user_p, sys_p))
+
+    speedup = real_s / real_p
+
+    print("===================================================")
+    print("Benchmark results:")
+    print("serial: %6.3fs   parallel: %6.3fs   speedup: x%.1f" % (real_s, real_p, speedup))
+    print("===================================================")
+
+if __name__ == "__main__":
+    main()
+
