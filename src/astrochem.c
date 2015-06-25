@@ -247,7 +247,7 @@ main (int argc, char *argv[])
           if( full_solve ( fid, dataset, routeDatasets, dataspace, dataspaceRoute, datatype, route_t_datatype, cell_index, &input_params, source_mdl.mode,
                        &source_mdl.cell[cell_index], &network, &source_mdl.ts, verbose) != EXIT_SUCCESS )
             {
-              return EXIT_FAILURE;
+	      exit (EXIT_FAILURE);
             }
           if (verbose >= 1)
             fprintf (stdout, "Done with cell %d.\n", cell_index);
