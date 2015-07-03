@@ -794,7 +794,7 @@ the computation. These parameters are:
 ``output``
    A list of species for which Astrochem creates an output file
    containing the abundance as a function of time and
-   position. Species names must be separated by a comma. The ``ALL``
+   position. Species names must be separated by a comma. The ``all``
    keyword may be used to have all species of the network in output.
 
 ``suffix``

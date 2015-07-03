@@ -94,7 +94,8 @@ read_input (const char *input_file, inp_t * input_params,
               localStr++;
 
               //Checking for all species
-              if( strncmp( localStr,"ALL", 3 ) == 0 )
+              if ((strncmp( localStr,"ALL", 3 ) == 0 ) ||
+		  (strncmp( localStr,"all", 3 ) == 0))
                 {
                   all_species = true;
                   n_output_species = network->n_species;
