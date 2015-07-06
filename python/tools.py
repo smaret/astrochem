@@ -694,7 +694,7 @@ def listspecies( filename ):
         s = s_d[...]
     else:
         raise IOError("%s file doest not contain \"Species\" dataset" % filename )
-    print s;
+
     return s;
 
 def readabun(filename, specie):
