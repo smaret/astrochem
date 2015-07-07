@@ -32,7 +32,7 @@ main (void)
   char chem_file[] = "network.chm";
   net_t network;
   
-  int verbose = 0;
+  int verbose = 1;
 
   /* Create the network.chm file */
 
@@ -56,7 +56,7 @@ main (void)
   fprintf (f, "C(+)         + e(-)                        -> C            + photon                                        4.40e-12 -6.10e-01  0.00e+00 10 4227\n");
   fprintf (f, "C(+)         + C(-)                        -> C            + C                                             2.30e-07 -5.00e-01  0.00e+00 11 4243\n");
   fprintf (f, "C            + e(-)                        -> C(-)                                                         3.00e-15  0.00e+00  0.00e+00 12 4279\n");
-  fprintf (f, "-29-Si       + uv-photon                   -> C(+)         + e(-)                                          2.16e-10  0.00e+00  2.61e+00 13 4283\n");
+  fprintf (f, "O            + -13-CH                      -> H-13-CO(+)   + e(-)                                          2.00e-11  4.40e-01  0.00e+00  6 3289\n");
   fprintf (f, "CO                                         -> CO(ice)                                                      1.00e+00  2.80e+01  0.00e+00 20 10044\n");
   fclose (f);
 
@@ -70,7 +70,7 @@ main (void)
   /* Check that the values are correct */
 
   if ((network.n_reactions == 19) &&
-      (network.n_species == 28) &&
+      (network.n_species == 29) &&
 
       /* Reaction #1 */
       (network.reactions[0].reactants[0] == find_species("H", &network)) &&
@@ -120,8 +120,11 @@ main (void)
       (network.species[find_species("C(+)", &network)].charge == 1.0) &&
       (abs(network.species[find_species("HCO(+)", &network)].mass / UMA - 29) <= 0.01) &&
       (network.species[find_species("HCO(+)", &network)].charge == 1.0) &&
+      (abs(network.species[find_species("H-13-CO(+)", &network)].mass / UMA - 30) <= 0.01) &&
+      (network.species[find_species("H-13-CO(+)", &network)].charge == 1.0) &&
       (abs(network.species[find_species("CH5N", &network)].mass / UMA - 31) <= 0.01) &&
-      (network.species[find_species("CH5N", &network)].charge == 0.0))
+      (network.species[find_species("CH5N", &network)].charge == 0.0) &&
+      (network.species[find_species("e(-)", &network)].charge == -1))
     {
       free_network (&network);
       return EXIT_SUCCESS;
