@@ -111,7 +111,16 @@ main (void)
       (network.reactions[14].beta == -.61) &&
       (network.reactions[14].gamma == 0) &&
       (network.reactions[14].reaction_type == 10) &&
-      (network.reactions[14].reaction_no == 4227))
+      (network.reactions[14].reaction_no == 4227)  &&
+
+      /* Mass and charge of a few species */
+
+      (abs(network.species[find_species("C(+)", &network)].mass / UMA - 12) <= 0.01) &&
+      (network.species[find_species("C(+)", &network)].charge == 1.0) &&
+      (abs(network.species[find_species("HCO(+)", &network)].mass / UMA - 29) <= 0.01) &&
+      (network.species[find_species("HCO(+)", &network)].charge == 1.0) &&
+      (abs(network.species[find_species("CH5N", &network)].mass / UMA - 31) <= 0.01) &&
+      (network.species[find_species("CH5N", &network)].charge == 0.0))
     {
       free_network (&network);
       return EXIT_SUCCESS;
