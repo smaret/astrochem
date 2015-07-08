@@ -149,14 +149,13 @@ def main():
         filename = args[0]
         species = args[1:]
         if len(species) == 0:
-            print "Available species in this file are:"
             try:
-                listspecies( filename )
-            except IOError as e:
-                sys.stderr.write("plabun: error: can't open %s. Error : %s\n" % (filename, e) )
-            except ValueError as e:
+                print "Available species in this file are:"
+                print listspecies( filename )
+                sys.exit(0)
+            except Exception as e:
                 sys.stderr.write("plabun: error: can't read %s. Error : %s\n" % (filename, e) )
-            sys.exit(1)
+                sys.exit(1)
         if len(species) > 6:
             sys.stderr.write("plabun: warning: at most 6 species can be plotted, ignoring others.\n")
             species = species[0:5]
