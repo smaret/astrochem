@@ -43,6 +43,7 @@
 #define TIME_STEPS_DEFAULT 32           /* Default number of times steps */
 #define TRACE_ROUTES_DEFAULT 0          /* Deactivate route tracing by default */
 #define N_OUTPUT_ROUTES 16              /* Defaults number of output routes */
+#define CVODE_MXSTEPS   1e6             /* Maximum number of time steps in CVODE */
 
 #ifndef M_PI
 #define M_PI  3.14159265358979323846264338327950288
