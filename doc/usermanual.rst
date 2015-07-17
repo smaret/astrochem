@@ -20,7 +20,7 @@ parallel on multi-cores and or multi-CPU computers. A variety of gas
 phase process are considered, as well as simple gas-grain
 interactions, such as freeze-out and desorption via several mechanisms
 (thermal desorption, cosmic-ray desorption and photo-desorption). The
-computed abundances are written in text files, and can be plotted in
+computed abundances are written a HDF5 file, and can be plotted in
 different ways with the tools provided with Astrochem. Chemical
 reactions and their rates are written in a format which is meant to be
 easy to read and to edit. A tool to convert chemical networks from the
