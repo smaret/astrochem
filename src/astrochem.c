@@ -410,6 +410,30 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
     {
       abundances[ input_params->abundances.initial_abundances[i].species_idx ] = input_params->abundances.initial_abundances[i].abundance;
     }
+    
+    // Add grain abundances
+    int g, gm, gp;
+    double gabs;
+    g = find_species ("grain", network);
+    gm = find_species ("grain(-)", network);
+    gp = find_species ("grain(+)", network);
+    
+    // Check if grain abundances have already been initialized one way or another
+    gabs=0.0;
+    if(g>=0) gabs += abundances[ g ];
+    if(gm>=0) gabs += abundances[ gm ];
+    if(gp>=0) gabs += abundances[ gp ];
+    
+    printf("Total grain abundance is %e\n",gabs);
+    printf("indices are %d, %d, %d\n",g,gm,gp);
+    if(gabs == 0.0) {
+    	// Grains have not been initialized
+    	// Check that grains are defined in our network, and if so, set the grain abundance
+    	if(g>=0)
+    		abundances[ g ] = input_params->phys.grain_abundance;
+    	
+    	printf("Have set grain abundance to %e\n",abundances[ g ]);
+    }
 #endif
 
 
