@@ -35,7 +35,7 @@
 #define COSMIC_DEFAULT 1.3e-17          /* Default cosmic value */
 #define GRAIN_SIZE_DEFAULT 1e-5         /* Default grain radius, in cm */
 #define GRAIN_GAS_MASS_RATIO_DEFAULT 0  /* Default grain mass ratio */
-#define GRAIN_MASS_DENSITY_DEFAULT 3000 /* Default grain mass density, Olivine grains, kg/m3  */
+#define GRAIN_MASS_DENSITY_DEFAULT 3    /* Default grain mass density, Olivine grains, g/cm3  */
 #define TI_DEFAULT 1e-6                 /* Default initial time */
 #define TF_DEFAULT 1e7                  /* Default final time */
 #define ABS_ERR_DEFAULT 1e-20           /* Default absolute error */

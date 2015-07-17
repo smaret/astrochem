@@ -179,7 +179,7 @@ read_input (const char *input_file, inp_t * input_params,
               else if (strcmp (parameter, "grain_gas_mass_ratio") == 0)
                 input_params->phys.grain_gas_mass_ratio = atof (value);
               else if (strcmp (parameter, "grain_mass_density") == 0)
-                input_params->phys.grain_mass_density = atof (value);
+                input_params->phys.grain_mass_density = atof (value) * 1e-3; /* kg/m^3-> g/cm^3 */
 
               else
                 {
@@ -397,7 +397,8 @@ read_input (const char *input_file, inp_t * input_params,
   else
     {
       double grain_mass = (4./3. * M_PI * pow( input_params->phys.grain_size, 3) * input_params->phys.grain_mass_density);
-      input_params->phys.grain_abundance = input_params->phys.grain_gas_mass_ratio * MASS_PROTON / grain_mass;
+      input_params->phys.grain_abundance = input_params->phys.grain_gas_mass_ratio * (CONST_CGSM_MASS_PROTON) / grain_mass;
+
       int g, gm, gp;
       g = find_species ("grain", network);
       gm = find_species ("grain(-)", network);
