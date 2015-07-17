@@ -131,13 +131,20 @@ rate (double alpha, double beta, double gamm, int reaction_type,
     case 23:
       /* Photo-desorption */
       {
-        double x = (ice_abundance * nh) / (GRAIN_SITES_PER_CM2 * M_PI
-                                           * pow (grain_size, 2)
-                                           * grain_abundance * nh);
-        double Ypd = alpha * (1 - exp (-x / gamm));
-        k = chi * DRAINE_STANDARD_ISRF_FUV * exp (-2 * av) * M_PI
-		* pow (grain_size, 2) * grain_abundance * nh * Ypd;
-        break;
+	if (grain_abundance != 0)
+	  {
+	    double x = (ice_abundance * nh) / (GRAIN_SITES_PER_CM2 * M_PI
+					       * pow (grain_size, 2)
+					       * grain_abundance * nh);
+	    double Ypd = alpha * (1 - exp (-x / gamm));
+	    k = chi * DRAINE_STANDARD_ISRF_FUV * exp (-2 * av) * M_PI
+	      * pow (grain_size, 2) * grain_abundance * nh * Ypd;
+	  }
+	else
+	  {
+	    k = 0;
+	  }
+	break;
       }
 
     default:

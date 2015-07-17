@@ -201,19 +201,22 @@ jacobian (long int N __attribute__ ((unused)),
         {
           /* Photo-desorption */
 
-          double jac_elem;
+	  if (grain_abundance != 0)
+	    {
+	      double jac_elem;
 
-          jac_elem =
-           (chi * DRAINE_STANDARD_ISRF_FUV * exp (-2 * av) * reactions[i].alpha) /
-           (GRAIN_SITES_PER_CM2 * reactions[i].gamma) *
-           exp (-NV_Ith_S (y, reactions[i].reactants[0]) /
-                (GRAIN_SITES_PER_CM2 * M_PI * pow (grain_size, 2) *
-                 grain_abundance * nh * reactions[i].gamma));
+	      jac_elem =
+		(chi * DRAINE_STANDARD_ISRF_FUV * exp (-2 * av) * reactions[i].alpha) /
+		(GRAIN_SITES_PER_CM2 * reactions[i].gamma) *
+		exp (-NV_Ith_S (y, reactions[i].reactants[0]) /
+		     (GRAIN_SITES_PER_CM2 * M_PI * pow (grain_size, 2) *
+		      grain_abundance * nh * reactions[i].gamma));
 
-          DENSE_ELEM (J, reactions[i].reactants[0], reactions[i].reactants[0]) -=
-           jac_elem;
-          DENSE_ELEM (J, reactions[i].products[0], reactions[i].reactants[0]) +=
-           jac_elem;
+	      DENSE_ELEM (J, reactions[i].reactants[0], reactions[i].reactants[0]) -=
+		jac_elem;
+	      DENSE_ELEM (J, reactions[i].products[0], reactions[i].reactants[0]) +=
+		jac_elem;
+	    }
         }
       else
         {
