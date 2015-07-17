@@ -424,15 +424,11 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
     if(gm>=0) gabs += abundances[ gm ];
     if(gp>=0) gabs += abundances[ gp ];
     
-    printf("Total grain abundance is %e\n",gabs);
-    printf("indices are %d, %d, %d\n",g,gm,gp);
     if(gabs == 0.0) {
     	// Grains have not been initialized
     	// Check that grains are defined in our network, and if so, set the grain abundance
     	if(g>=0)
     		abundances[ g ] = input_params->phys.grain_abundance;
-    	
-    	printf("Have set grain abundance to %e\n",abundances[ g ]);
     }
 #endif
 

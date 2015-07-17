@@ -415,10 +415,7 @@ read_input (const char *input_file, inp_t * input_params,
         {
           network->species[gm].mass = grain_mass;
         }
-        printf("Grain mass=%e, MASS_PROTON=%e, grain_mass_density=%e\n",grain_mass,MASS_PROTON, input_params->phys.grain_mass_density);
     }
-    
-    printf("Grain abundance set to %e\n",input_params->phys.grain_abundance);
 
   /* Check that the source file name and the chemical file name were specified
      in the input file. Also check that other parameters have acceptable
