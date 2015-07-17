@@ -362,9 +362,12 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
                __FILE__, __LINE__);
       return EXIT_FAILURE;
     }
+
 #ifdef HAVE_OPENMP
               omp_set_lock(&lock);
 #endif
+
+
   // Create the memory dataspace, selecting all output abundances
   hsize_t size = input_params->output.n_output_species;
   hid_t memDataspace = H5Screate_simple(1, &size, NULL);
@@ -383,9 +386,12 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
       // Create the route file dataspace, and prepare selection of a chunk of the file
       routeFileDataspace = H5Scopy(routeDataspace);
     }
+
 #ifdef HAVE_OPENMP
               omp_unset_lock(&lock);
 #endif
+
+
   // Initializing abundance
 #if 0 //Ultra complicated code
   const species_name_t* species = malloc( input_params->abundances.n_initial_abundances * sizeof(*species));
