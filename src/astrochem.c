@@ -693,6 +693,9 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
         }
 
     }
+#ifdef HAVE_OPENMP
+  omp_set_lock(&lock);
+#endif
   // Cleaning up hdf5
   H5Sclose(memDataspace);
   H5Sclose(fileDataspace);
@@ -701,7 +704,9 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
       H5Sclose(routeMemDataspace);
       H5Sclose(routeFileDataspace);
     }
-
+#ifdef HAVE_OPENMP
+  omp_unset_lock(&lock);
+#endif
   // Free
   free( output_abundances );
   free( routes );
