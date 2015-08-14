@@ -69,7 +69,7 @@ main (void)
   fprintf (f, "# Physical paramaters\n");
   fprintf (f, "[phys]\n");
   fprintf (f, "cosmic = 1.3e-17\n");
-  fprintf (f, "grain_gas_mass_ratio = 9917.130961134915\n");
+  fprintf (f, "grain_gas_mass_ratio = 0.01\n");
   fprintf (f, "# Solver parameters\n");
   fprintf (f, "[solver]\n");
   fprintf (f, "ti = 1e-6\n");
@@ -114,14 +114,14 @@ main (void)
     {
       return EXIT_FAILURE;
     }
+
   /* Check that the values are correct */
   if ((strcmp (input_params.files.source_file, "source.mdl") == 0) &&
       (strcmp (input_params.files.chem_file, "network.chm") == 0) &&
       (input_params.phys.chi == CHI_DEFAULT) &&
       (input_params.phys.cosmic == 1.3e-17) &&
-      (input_params.phys.grain_gas_mass_ratio == 9917.130961134915 ) &&
-      (input_params.phys.grain_abundance - 1.32e-12 > -DBL_EPSILON ) &&
-      (input_params.phys.grain_abundance - 1.32e-12 < DBL_EPSILON ) &&
+      (input_params.phys.grain_gas_mass_ratio == 0.01 ) &&
+      ((fabs(input_params.phys.grain_abundance - 1.331030e-12)) < DBL_EPSILON ) &&
       (input_params.solver.ti == 1e-6 * CONST_MKSA_YEAR) &&
       (input_params.solver.tf == 1e9 * CONST_MKSA_YEAR) &&
       (input_params.solver.abs_err == ABS_ERR_DEFAULT) &&
