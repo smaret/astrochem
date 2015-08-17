@@ -208,7 +208,7 @@ def main():
 
             # Check that time and abund contain at least two points
             if len(time) < 2:
-                sys.stderr.write("plabun: warning: %s contains less than two non-zero abundances.\n" % filename)
+                sys.stderr.write("plabun: warning: found less than two non-zero abundances for %s.\n" % spec)
                 continue
 
             linecolor = linecolor_stack.pop(0)
@@ -218,10 +218,10 @@ def main():
             curves.append(cu)
             p.add(cu)
     else:
-        for specie in species:
+        for spec in species:
             # Read the abundance file
             try:
-                time, abund = readabun(filename,specie)
+                time, abund = readabun(filename,spec)
             except IOError as e:
                 sys.stderr.write("plroute: error: can't open %s. Error : %s\n" % (filename, e) )
                 sys.exit(1)
@@ -243,13 +243,13 @@ def main():
 
             # Check that time and abund contain at least two points
             if len(time) < 2:
-                sys.stderr.write("plabun: warning: %s contains less than two non-zero abundances.\n" % filename)
+                sys.stderr.write("plabun: warning: found less than two non-zero abundances for %s.\n" % spec)
                 continue
 
             linecolor = linecolor_stack.pop(0)
             linecolor_stack.append(linecolor)
             cu = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
-            cu.label = "$" + _totex_species(specie) + "$"
+            cu.label = "$" + _totex_species(spec) + "$"
             curves.append(cu)
             p.add(cu)
 
