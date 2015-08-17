@@ -229,7 +229,7 @@ def main():
                 sys.stderr.write("plroute: error: can't read %s. Error : %s\n" % (filename, e) )
                 sys.exit(1)
 
-            # Pick-up values that correspond to the given time index
+            # Pick-up values that correspond to the given cell index
             try:
                 abund = abund[:, c]
             except IndexError:
