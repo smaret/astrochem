@@ -238,6 +238,16 @@ reaction that is considered in Astrochem.
 Electron attachment and ion recombination on grains
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. FixMe: add the release number here
+
+.. warning::
+
+   Starting from version 0.x, the electron attachement and ion
+   recombination on grains are computed in a different fashion (see
+   below). The new reaction type number for these reactions is
+   24.Networks used with previous versions of Astrochem need to be
+   updated accordingly.
+
 Electron may hit grains and charge them. Ions may then recombine on
 charged grains. For example, let us consider the following reactions:
 
@@ -264,24 +274,13 @@ while the recombination rate of :math:`\mathrm{C^{+}}` is:
 Both :math:`k_{1}` and :math:`k_{2}` are computed from the following
 expression:
 
-.. math:: k = \alpha \left( \frac{T}{300} \right)^\beta \, \frac{n_\mathrm{H}}{n_\mathrm{d}}
+.. math:: k = S \, \pi r_{d}^2 \, v_{th}
    :label: electron-attach
 
-where :math:`n_\mathrm{H}` is the total hydrogen nuclei density [3]_
-and :math:`n_\mathrm{d}` is the total (neutral + charged) grain
-density.  The :math:`\frac{n_\mathrm{H}}{n_\mathrm{d}}` ratio is
-assumed to be :math:`7.57 \times 10^{11}`, a value adequate for
-olivine grains of 0.1 \ :math:`\mathrm{\mu m}` and a gas-to-dust mass
-ratio of 100 [4]_
-
-:math:`k_{1}` may be estimated by assuming that each electron that
-hits a grain will attach to it. For 0.1 :math:`\mathrm{\mu m}`
-olivine grains and gas-to-dust mass ratio of 100, we obtain a value of
-:math:`\mathrm{\sim 10^{-3} \, cm^{-3} \, s^{-1}}` at 10 K. This
-process is extremely fast because electron have large thermal
-velocities (thanks to their small masses). In practice, in simulations
-free electrons almost immediately stick on the grains, so that grains
-become negatively charged very rapidly.
+where :math:`S` is a sticking coeefficient and :math:`v_\mathrm{th}`
+is the thermal velocity, given by Eq. :eq:`depletion`. For the
+recombination of cations on negativelity charged grains, the Coulomb
+attraction is neglected.
 
 .. _sec-depletion:
 
@@ -302,6 +301,7 @@ with:
 and:
 
 .. math:: v_{th} = \left( \frac{8 k_{B} T_{d}}{\pi m} \right)^{1/2}
+   :label: thermal-velocity
 
 Here :math:`S` is a sticking probability (comprised between 0 and 1),
 :math:`r_{d}` is the grain radius, :math:`v_{th}` is the thermal
@@ -1113,8 +1113,6 @@ example you may want to identify gas-phase reactions by numbers between
    +---------------+---------------------------------------------------------------+
    | Type number   | Reaction type                                                 |
    +===============+===============================================================+
-   | -1            | Electron attachment and ion recombination on grains           |
-   +---------------+---------------------------------------------------------------+
    | 0             | H\ :math:`_{2}` formation on grains                           |
    +---------------+---------------------------------------------------------------+
    | 1             | Cosmic-ray ionization or cosmic-ray induced photo-reactions   |
@@ -1151,6 +1149,8 @@ example you may want to identify gas-phase reactions by numbers between
    +---------------+---------------------------------------------------------------+
    | 23            | Photo-desorption                                              |
    +---------------+---------------------------------------------------------------+
+   | 24            | Electron attachment and ion recombination on grains           |
+   +---------------+---------------------------------------------------------------+
 
 Astrochem computes the rate of each reaction from the :math:`a`,
 :math:`b` and :math:`c` rate constants. The physical meaning of these
@@ -1170,9 +1170,9 @@ internal time step.
    +-------------+--------------------------+------------------+------------------------+----------------+
    | Type number | Equation                 | a                | b                      | c              |
    +=============+==========================+==================+========================+================+
-   |          -1 | :eq:`h2-formation`       | :math:`\alpha`   | :math:`\beta`          | \-             |
+   |           0 | :eq:`h2-formation`       | :math:`\alpha`   | :math:`\beta`          | \-             |
    +-------------+--------------------------+------------------+------------------------+----------------+
-   |           0 | :eq:`cr-ionization`      | :math:`\alpha`   | :math:`\beta`          | \-             |
+   |           1 | :eq:`cr-ionization`      | :math:`\alpha`   | :math:`\beta`          | \-             |
    +-------------+--------------------------+------------------+------------------------+----------------+
    |        2-12 | :eq:`ahrrenus`           | :math:`\alpha`   | :math:`\beta`          | :math:`\gamma` |
    +-------------+--------------------------+------------------+------------------------+----------------+
@@ -1185,6 +1185,8 @@ internal time step.
    |          22 | :eq:`cr-desorption`      | :math:`k` [10]_  | :math:`m/m_\mathrm{H}` | :math:`E_{b}`  |
    +-------------+--------------------------+------------------+------------------------+----------------+
    |          23 | :eq:`photo-desorption`   | :math:`Y_{0}`    | \-                     | :math:`l`      |
+   +-------------+--------------------------+------------------+------------------------+----------------+
+   |          24 | :eq:`electron-attach`    | :math:`S`        | :math:`m/m_\mathrm{H}` | \-             |
    +-------------+--------------------------+------------------+------------------------+----------------+
 
 Convert networks to Astrochem format

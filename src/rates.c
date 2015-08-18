@@ -147,6 +147,17 @@ rate (double alpha, double beta, double gamm, int reaction_type,
 	break;
       }
 
+    case 24:
+      /* Gas-grain interaction (excluding depletion and desorption),
+         Electron-grain recombination. */
+      {
+        double thermal_veloc = pow (8 * CONST_CGSM_BOLTZMANN * tgas
+                                    / (M_PI * beta * CONST_CGSM_MASS_PROTON),
+                                    0.5);
+        k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc;
+        break;
+      }
+
     default:
       fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__,
                "unknown reaction type.\n");
