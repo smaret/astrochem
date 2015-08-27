@@ -235,6 +235,8 @@ type number, 0 (see :ref:`tab-react-type-numb`). At present the
 formation of :math:`\mathrm{H_{2}}` on grains is the only grain surface
 reaction that is considered in Astrochem.
 
+.. _sec-grain-charge:
+
 Electron attachment and ion recombination on grains
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -244,12 +246,11 @@ Electron attachment and ion recombination on grains
 
    Starting from version 0.x, the electron attachement and ion
    recombination on grains are computed in a different fashion (see
-   below). The new reaction type number for these reactions is
-   24.Networks used with previous versions of Astrochem need to be
-   updated accordingly.
+   below). Networks used with previous versions of Astrochem need to
+   be updated accordingly.
 
-Electron may hit grains and charge them. Ions may then recombine on
-charged grains. For example, let us consider the following reactions:
+Electron can hit grains and charge them. Cations may also hit grains
+and recombine. For example, let us consider the following reactions:
 
 .. math::
    
@@ -259,28 +260,46 @@ charged grains. For example, let us consider the following reactions:
 
    \mathrm{C^{+}} + \mathrm{grain}^{-} \rightarrow \mathrm{C} + \mathrm{grain}
 
-The formation rate of charged grains writes as:
+The formation rate of negatively charged grains writes as:
 
 .. math::
 
    \frac{d {n(\mathrm{grain^{-}})}}{\mathrm{d}t} = k_{1} \, {n(\mathrm{grain})} \, {n(\mathrm{e^{-}})}
 
-while the recombination rate of :math:`\mathrm{C^{+}}` is:
+while the recombination rate of :math:`\mathrm{C^{+}}` on negatively
+charged grains is:
 
 .. math::
 
    \frac{d {n(\mathrm{C^{+}})}}{\mathrm{d}t} = - k_{2} \, {n(\mathrm{grain^{-}})} \, {n(\mathrm{C^{+}})}
 
-Both :math:`k_{1}` and :math:`k_{2}` are computed from the following
-expression:
+For neutral grains, the electron attachement rate :math:`k_{1}` is
+computed from the following expression:
 
-.. math:: k = S \, \pi r_{d}^2 \, v_{th}
+.. math:: k = S \, \pi r_{d}^2 \, v_{th} \, 1.39 \times \mathrm{exp} \left( -\frac{T}{20} \right)
    :label: electron-attach
 
-where :math:`S` is a sticking coeefficient and :math:`v_\mathrm{th}`
-is the thermal velocity, given by Eq. :eq:`depletion`. For the
-recombination of cations on negativelity charged grains, the Coulomb
-attraction is neglected.
+where :math:`S` is a sticking coefficient and :math:`v_\mathrm{th}`
+is the thermal velocity, given by Eq. :eq:`depletion`. For positively
+charged grains, the expression above is multiplied by a Coulombian
+factor:
+
+.. math:: C = 1 + \frac{1.671 \times 10^{-3}}{r_{d} \, T}
+   :label: coulomb-factor
+
+For neutral grains, the cation recombination rate :math:`k_{2}` is
+computed from the following expression:
+
+.. math:: k = \alpha \, \pi r_{d}^2 \, v_{th}
+   :label: cation-recomb
+
+where :math:`\alpha` is the (dimensionless) branching ratio for
+dissociative recombinations. For negatively charged grains the
+expression above is multiplied by :math:`C`.
+
+Note that Astrochem considers singly charged (either
+positively or negatively) charged grains only; multiply charged grains
+are neglected.
 
 .. _sec-depletion:
 
@@ -1139,7 +1158,13 @@ example you may want to identify gas-phase reactions by numbers between
    +---------------+---------------------------------------------------------------+
    | 23            | Photo-desorption                                              |
    +---------------+---------------------------------------------------------------+
-   | 24            | Electron attachment and ion recombination on grains           |
+   | 24            | Electron attachment on neutral grains                         |
+   +---------------+---------------------------------------------------------------+
+   | 25            | Electron attachment on positively charged grains              |
+   +---------------+---------------------------------------------------------------+
+   | 26            | Cation recombination on negatively charged grains             |
+   +---------------+---------------------------------------------------------------+
+   | 27            | Cation recombination on neutral grains                        |
    +---------------+---------------------------------------------------------------+
 
 Astrochem computes the rate of each reaction from the :math:`a`,
@@ -1157,27 +1182,33 @@ internal time step.
 
 .. table:: Physical meaning of the rate constants used in chemical networks
 
-   +-------------+--------------------------+------------------+------------------------+----------------+
-   | Type number | Equation                 | a                | b                      | c              |
-   +=============+==========================+==================+========================+================+
-   |           0 | :eq:`h2-formation`       | :math:`\alpha`   | :math:`\beta`          | \-             |
-   +-------------+--------------------------+------------------+------------------------+----------------+
-   |           1 | :eq:`cr-ionization`      | :math:`\alpha`   | :math:`\beta`          | \-             |
-   +-------------+--------------------------+------------------+------------------------+----------------+
-   |        2-12 | :eq:`ahrrenus`           | :math:`\alpha`   | :math:`\beta`          | :math:`\gamma` |
-   +-------------+--------------------------+------------------+------------------------+----------------+
-   |          13 | :eq:`photo-ionization`   | :math:`\alpha`   | \-                     | \-             |
-   +-------------+--------------------------+------------------+------------------------+----------------+
-   |          20 | :eq:`depletion`          | :math:`S`        | :math:`m/m_\mathrm{H}` | \-             |
-   +-------------+--------------------------+------------------+------------------------+----------------+
-   |          21 | :eq:`thermal-desorption` | \-               | :math:`m/m_\mathrm{H}` | :math:`E_{b}`  |
-   +-------------+--------------------------+------------------+------------------------+----------------+
-   |          22 | :eq:`cr-desorption`      | :math:`k` [10]_  | :math:`m/m_\mathrm{H}` | :math:`E_{b}`  |
-   +-------------+--------------------------+------------------+------------------------+----------------+
-   |          23 | :eq:`photo-desorption`   | :math:`Y_{0}`    | \-                     | :math:`l`      |
-   +-------------+--------------------------+------------------+------------------------+----------------+
-   |          24 | :eq:`electron-attach`    | :math:`S`        | :math:`m/m_\mathrm{H}` | \-             |
-   +-------------+--------------------------+------------------+------------------------+----------------+
+   +-------------+-----------------------------+------------------+------------------------+----------------+
+   | Type number | Equation                    | a                | b                      | c              |
+   +=============+=============================+==================+========================+================+
+   |           0 | :eq:`h2-formation`          | :math:`\alpha`   | :math:`\beta`          | \-             |
+   +-------------+-----------------------------+------------------+------------------------+----------------+
+   |           1 | :eq:`cr-ionization`         | :math:`\alpha`   | :math:`\beta`          | \-             |
+   +-------------+-----------------------------+------------------+------------------------+----------------+
+   |        2-12 | :eq:`ahrrenus`              | :math:`\alpha`   | :math:`\beta`          | :math:`\gamma` |
+   +-------------+-----------------------------+------------------+------------------------+----------------+
+   |          13 | :eq:`photo-ionization`      | :math:`\alpha`   | \-                     | \-             |
+   +-------------+-----------------------------+------------------+------------------------+----------------+
+   |          20 | :eq:`depletion`             | :math:`S`        | :math:`m/m_\mathrm{H}` | \-             |
+   +-------------+-----------------------------+------------------+------------------------+----------------+
+   |          21 | :eq:`thermal-desorption`    | \-               | :math:`m/m_\mathrm{H}` | :math:`E_{b}`  |
+   +-------------+-----------------------------+------------------+------------------------+----------------+
+   |          22 | :eq:`cr-desorption`         | :math:`k` [10]_  | :math:`m/m_\mathrm{H}` | :math:`E_{b}`  |
+   +-------------+-----------------------------+------------------+------------------------+----------------+
+   |          23 | :eq:`photo-desorption`      | :math:`Y_{0}`    | \-                     | :math:`l`      |
+   +-------------+-----------------------------+------------------+------------------------+----------------+
+   |          24 | :eq:`electron-attach`       | :math:`S`        | \-                     | \-             |
+   +-------------+-----------------------------+------------------+------------------------+----------------+
+   |          25 | :eq:`electron-attach` [11]_ | :math:`S`        | \-                     | \-             |
+   +-------------+-----------------------------+------------------+------------------------+----------------+
+   |          26 | :eq:`cation-recomb`         | :math:`S`        | :math:`m/m_\mathrm{H}` | \-             |
+   +-------------+-----------------------------+------------------+------------------------+----------------+
+   |          27 | :eq:`cation-recomb` [11]_   | :math:`S`        | :math:`m/m_\mathrm{H}` | \-             |
+   +-------------+-----------------------------+------------------+------------------------+----------------+
 
 Convert networks to Astrochem format
 ------------------------------------
@@ -1278,7 +1309,7 @@ information):
     ./configure --enable-openmp
 
 The configure script will attempt to detect if your compiler supports
-the OpenMP standard [11]_. Then one need to set the ``OMP_NUM_THREADS``
+the OpenMP standard [12]_. Then one need to set the ``OMP_NUM_THREADS``
 environment variable to the number of threads to be run in parallel. It
 is recommended to set this variable the number of cores on the machine
 (e.g. 8 for a eight core computer). With the bash shell, this is done as
@@ -1609,8 +1640,12 @@ problems or items listed on GitHub.
 .. [10]
    The cosmic-ray desorption rate may be computed in two different
    ways depending on the value of :math:`a` (see :ref:`sec-cr-desorption`).
- 
+
 .. [11]
+   For reactions with charged grains, the rate is multiplied by
+   the Coulombian factor :math:`C` (see :ref:`sec-grain-charge`).
+ 
+.. [12]
    Most compilers (including GCC, starting from version 4.2) support
    OpenMP.
 
