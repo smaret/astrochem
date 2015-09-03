@@ -119,8 +119,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
   network->n_species = 0;
   if (verbose >= 1)
     {
-      fprintf (stdout, "Reading reactions network from %s... ", chem_file1);
-      fflush (stdout);
+      fprintf (stdout, "Reading reactions network from %s...\n", chem_file1);
     }
 
 
