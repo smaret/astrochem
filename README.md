@@ -53,6 +53,13 @@ How to contribute
 Contributions to Astrochem are welcome. Please see the
 [CONTRIBUTING.md](./CONTRIBUTING.md/) file for instructions.
 
+Citing the code
+---------------
+
+If you use the code for your research, please cite
+[Maret & Bergin (2015)](http://adsabs.harvard.edu/abs/2015ascl.soft07010M)
+in your papers.
+
 More information
 ----------------
 
