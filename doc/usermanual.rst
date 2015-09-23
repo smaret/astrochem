@@ -274,18 +274,39 @@ charged grains is:
    \frac{d {n(\mathrm{C^{+}})}}{\mathrm{d}t} = - k_{2} \, {n(\mathrm{grain^{-}})} \, {n(\mathrm{C^{+}})}
 
 For neutral grains, the electron attachement rate :math:`k_{1}` is
-computed from the following expression:
+given by the following expression
+(`Semenov, Wiebe & Henning, 2004 <http://adsabs.harvard.edu/abs/2004A%26A...417...93S>`_)
 
-.. math:: k = \pi r_{d}^2 \, v_{th} \, 1.39 \times \mathrm{exp} \left( -\frac{T}{20} \right)
+.. math:: k = S \, \pi r_{d}^2 \, v_{th} 
    :label: electron-attach
 
-where :math:`v_\mathrm{th}` is the thermal velocity, given by
-Eq. :eq:`depletion`. For positively charged grains, the expression
-above is multiplied by a Coulombian factor:
+with:
 
-.. math:: C = 1 + \frac{1.671 \times 10^{-3}}{r_{d} \, T}
+.. math:: S = 1.329 \times \mathrm{exp} \left( -\frac{T_{d}}{20} \right)
+   :label: sticking-electron
+
+and:
+
+.. math:: v_{th} = \left( \frac{8 k_{B} T_{d}}{\pi m_{e}} \right)^{1/2}
+   :label: thermal-velocity-electron
+	   
+Here :math:`S` is the sticking coefficient (comprised between 0 and 1)
+of electrons on the grains, :math:`v_\mathrm{th}` is the thermal
+velocity of the electrons, :math:`T_{d}` is the grain temperature, and
+:math:`m_{e}` is the electron mass. Note that the sticking coefficient
+is assumed to decrease exponentially with the temperature, so that for
+:math:`T_{d} \lt 20`, it is close to 0.5, and is essentially 0 at
+higher dust temperatures.
+
+For charged grains, the expression above is multiplied by a factor
+correcting for the long-distance Coulomb attraction:
+
+.. math:: C_{ion} = 1 + \frac{e^{2}}{k_{B} \, r_{d} \, T}
    :label: coulomb-factor
 
+where :math:`e` is the electron charge (in statcoulombs), and
+:math:`r_{d}` is the grain radius.
+	   
 For neutral grains, the cation recombination rate :math:`k_{2}` is
 computed from the following expression:
 
@@ -294,11 +315,11 @@ computed from the following expression:
 
 where :math:`\alpha` is the (dimensionless) branching ratio for
 dissociative recombinations. For negatively charged grains the
-expression above is multiplied by :math:`C`.
+expression above is multiplied by :math:`C_{ion}`.
 
-Note that Astrochem considers singly charged (either
-positively or negatively) charged grains only; multiply charged grains
-are neglected.
+Note that Astrochem considers singly charged (either positively or
+negatively) charged grains only; multiply charged grains are
+neglected.
 
 .. _sec-depletion:
 
@@ -321,9 +342,8 @@ and:
 .. math:: v_{th} = \left( \frac{8 k_{B} T_{d}}{\pi m} \right)^{1/2}
    :label: thermal-velocity
 
-Here :math:`S` is a sticking probability (comprised between 0 and 1),
-:math:`r_{d}` is the grain radius, :math:`v_{th}` is the thermal
-velocity, :math:`n_{d}` is the total grain density (neutral + charged)
+Here :math:`S` is the sticking coefficient of the molecule on the
+grain, :math:`n_{d}` is the total grain density (neutral + charged)
 and :math:`m` is the mass of the accreting species `(Bergin et
 al., 1995) <http://adsabs.harvard.edu/abs/1995ApJ...441..222B>`_.
 
@@ -358,10 +378,9 @@ with:
 
 Here :math:`\nu_{0}` is the characteristic vibrational frequency of
 the desorbing species, :math:`E_{B}` is the binding energy of the
-desorbing species on the grain surface expressed in Kelvins,
-:math:`T_{d}` is the grain temperature and :math:`N_{S}` is the number
-of sites per unit surface assumed to be :math:`\mathrm{3 \times
-10^{15} \, cm^{-2}}` `(Hasegawa et al., 1992)
+desorbing species on the grain surface expressed in Kelvins and
+:math:`N_{S}` is the number of sites per unit surface assumed to be
+:math:`\mathrm{3 \times 10^{15} \, cm^{-2}}` `(Hasegawa et al., 1992)
 <http://adsabs.harvard.edu/abs/1992ApJS...82..167H>`_. The values of
 :math:`E_{b}` and :math:`m` are both read from the network file.
 
