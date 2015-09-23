@@ -276,13 +276,12 @@ charged grains is:
 For neutral grains, the electron attachement rate :math:`k_{1}` is
 computed from the following expression:
 
-.. math:: k = S \, \pi r_{d}^2 \, v_{th} \, 1.39 \times \mathrm{exp} \left( -\frac{T}{20} \right)
+.. math:: k = \pi r_{d}^2 \, v_{th} \, 1.39 \times \mathrm{exp} \left( -\frac{T}{20} \right)
    :label: electron-attach
 
-where :math:`S` is a sticking coefficient and :math:`v_\mathrm{th}`
-is the thermal velocity, given by Eq. :eq:`depletion`. For positively
-charged grains, the expression above is multiplied by a Coulombian
-factor:
+where :math:`v_\mathrm{th}` is the thermal velocity, given by
+Eq. :eq:`depletion`. For positively charged grains, the expression
+above is multiplied by a Coulombian factor:
 
 .. math:: C = 1 + \frac{1.671 \times 10^{-3}}{r_{d} \, T}
    :label: coulomb-factor
@@ -1211,9 +1210,9 @@ internal time step.
    +-------------+-----------------------------+------------------+------------------------+----------------+
    |          23 | :eq:`photo-desorption`      | :math:`Y_{0}`    | \-                     | :math:`l`      |
    +-------------+-----------------------------+------------------+------------------------+----------------+
-   |          24 | :eq:`electron-attach`       | :math:`S`        | \-                     | \-             |
+   |          24 | :eq:`electron-attach`       | \-               | \-                     | \-             |
    +-------------+-----------------------------+------------------+------------------------+----------------+
-   |          25 | :eq:`electron-attach` [11]_ | :math:`S`        | \-                     | \-             |
+   |          25 | :eq:`electron-attach` [11]_ | \-               | \-                     | \-             |
    +-------------+-----------------------------+------------------+------------------------+----------------+
    |          26 | :eq:`cation-recomb`         | :math:`S`        | :math:`m/m_\mathrm{H}` | \-             |
    +-------------+-----------------------------+------------------+------------------------+----------------+

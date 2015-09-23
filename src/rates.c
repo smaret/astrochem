@@ -158,7 +158,7 @@ rate (double alpha, double beta, double gamm, int reaction_type,
 	double thermal_veloc = pow (8 * CONST_CGSM_BOLTZMANN * tgas
                                     / (M_PI * CONST_CGSM_MASS_ELECTRON),
                                     0.5);
-        k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc * 1.3290
+        k = M_PI * pow (grain_size, 2) * thermal_veloc * 1.3290
 	  * exp (-tdust / 20);
 	break;
       }
@@ -170,7 +170,7 @@ rate (double alpha, double beta, double gamm, int reaction_type,
                                     / (M_PI * CONST_CGSM_MASS_ELECTRON),
                                     0.5);
 	double coulomb_factor = 1 + 1.671e-3 / grain_size / tgas;
-	k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc * 1.3290
+	k = M_PI * pow (grain_size, 2) * thermal_veloc * 1.3290
 	  * exp (-tdust / 20) * coulomb_factor;
 	break;
       }
