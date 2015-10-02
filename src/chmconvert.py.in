@@ -20,7 +20,7 @@
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-sys.path.append("@abs_top_srcdir@/python/") #This line (first containing sys.path.append) will be removed at instalation.
+sys.path.append("@abs_top_srcdir@/python/") # @REMOVE_INST@
 sys.path.append("@pythondir@")
 import getopt
 try:
