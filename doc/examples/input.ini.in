@@ -1,7 +1,7 @@
 [files]
 source = @abs_top_srcdir@/doc/examples/source.mdl
 chem = @abs_top_srcdir@/networks/osu2009.chm
-# Physical paramaters
+# Physical parameters
 [phys]
 chi = 1.0
 cosmic = 1.3e-17
