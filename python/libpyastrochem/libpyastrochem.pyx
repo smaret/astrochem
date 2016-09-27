@@ -41,7 +41,7 @@ cdef extern from "../../src/libastrochem.h":
     ctypedef struct astrochem_mem_t:
         params_t params
 
-    void read_network ( const char *chem_file, net_t* network, const int verbose)
+    int read_network (const char *chem_file, net_t* network, const int verbose)
     void free_network ( net_t* network)
     int alloc_abundances( const net_t* network, double** abundances )
     void free_abundances( double* abundances )
@@ -67,7 +67,8 @@ cdef class Network:
     """
     cdef net_t thisstruct
     def __cinit__( self, const char* chem_file, int verbose ):
-        read_network( chem_file, &self.thisstruct, verbose )
+        if read_network( chem_file, &self.thisstruct, verbose) != 0:
+            raise IOError
 
     def __dealloc__(self):
         free_network( &self.thisstruct )
