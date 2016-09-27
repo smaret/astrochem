@@ -1,6 +1,6 @@
 #  wrapper.py - Python wrapper for libpyastrochem
 #
-#  Copyright (c) 2006-2014 Sebastien Maret
+#  Copyright (c) 2006-2016 Sebastien Maret
 #
 #  This file is part of Astrochem.
 #
@@ -110,7 +110,7 @@ class phys:
         """
 
         self.data = libpyastrochem.Phys()
-        self.chi  = self.data.chi
+        self.chi = self.data.chi
         self.cosmic = self.data.cosmic
         self.grain_abundance = self.data.grain_abundance
         self.grain_size = self.data.grain_size
@@ -163,6 +163,12 @@ class solver:
             verbose if 1, quiet if 0.
 
         """
+
+        # Update the values of phys.data, in case phys values have changed
+        phys.data.chi = phys.chi
+        phys.data.cosmic = phys.cosmic
+        phys.data.grain_abundance = phys.grain_abundance
+        phys.data.grain_size = phys.grain_size
 
         self.data = libpyastrochem.Solver(cell.data, chem_file, phys.data, abs_err,
                                           rel_err, initial_abundances,
