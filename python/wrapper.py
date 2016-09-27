@@ -174,7 +174,7 @@ class solver:
                                           rel_err, initial_abundances,
                                           density, verbose)
 
-    def solve(self, time, new_cell):
+    def solve(self, time, new_cell=None):
         """
         Solve chemical reaction for a certain time
 
@@ -187,4 +187,7 @@ class solver:
 
         """
 
-        return self.data.solve(time, new_cell.data)
+        if new_cell:
+            return self.data.solve(time, new_cell.data)
+        else:
+            return self.data.solve(time, 0)
