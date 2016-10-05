@@ -142,10 +142,10 @@ main (int argc, char *argv[])
   H5Tset_size ( attrType, MAX_CHAR_FILENAME );
   H5Tset_strpad(attrType,H5T_STR_NULLTERM);
   hid_t attrNetwork = H5Acreate( fid, "chem_file", attrType, simpleDataspace, H5P_DEFAULT, H5P_DEFAULT);
-  H5Awrite( attrNetwork, attrType, realpath( input_params.files.chem_file, NULL ) );
+  H5Awrite( attrNetwork, attrType, input_params.files.chem_file);
   H5Aclose( attrNetwork );
   hid_t attrModel = H5Acreate( fid, "source_file", attrType, simpleDataspace, H5P_DEFAULT, H5P_DEFAULT);
-  H5Awrite( attrModel, attrType, realpath( input_params.files.source_file, NULL ) );
+  H5Awrite( attrModel, attrType, input_params.files.source_file);
   H5Aclose( attrModel );
 
   H5Tclose( attrType );
