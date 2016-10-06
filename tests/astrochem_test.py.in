@@ -1,8 +1,8 @@
 #!@PYTHON@
 #
-#  astrochem_test - Benckmark Astrochem
+#  astrochem_test - Test the Astrochem results
 #
-#  Copyright (c) 2006-2014 Sebastien Maret
+#  Copyright (c) 2006-2016 Sebastien Maret
 #
 #  This file is part of Astrochem.
 #
@@ -119,9 +119,6 @@ class TestSequenceFunctions(unittest.TestCase):
         numpy.testing.assert_almost_equal( b.tolist(), b_o )
         numpy.testing.assert_almost_equal( c.tolist(), c_o )
         numpy.testing.assert_almost_equal( d.tolist(), d_o )
-
-if __name__ == "__main__":
-    unittest.main()
 
 if __name__ == "__main__":
     unittest.main()

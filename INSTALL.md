@@ -21,13 +21,17 @@ To compile Astrochem you will need:
 
 4. Python (version 2.4 or later, but earlier than version 3.0).
 
-5. The [NumPy](http://numpy.scipy.org/),
-   [Biggles](http://biggles.sourceforge.net/) and
-   [H5py](http://www.h5py.org) Python modules.  Numpy is mandatory,
-   but Biggles and H5py are optional. However, Biggles and H5py are
-   required to use the plotting tools provided with Astrochem. All
-   modules are present in major Linux distributions (Debian, Ubuntu,
-   etc.)  and in Fink or MacPorts on Mac OSX.
+5. The
+   [NumPy](http://numpy.scipy.org/),
+   [Biggles](http://biggles.sourceforge.net/)
+   and [H5py](http://www.h5py.org) Python modules.  Numpy is
+   mandatory, but Biggles and H5py are optional. However, Biggles and
+   H5py are required to use the plotting tools provided with
+   Astrochem. Note that H5Py 2.6.0 has a bug which causes the
+   formation/destructions routes computed by Astrochem to be
+   incorrectly read; use H5Py 2.5.0 instead. All modules are present
+   in major Linux distributions (Debian, Ubuntu, etc.)  and in Fink or
+   MacPorts on Mac OSX.
  
 Basic Installation
 ------------------
