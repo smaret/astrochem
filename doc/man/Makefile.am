@@ -17,7 +17,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
-man_MANS = astrochem.1 plabun.1 plroute.1 chmconvert.1 converttolegacy.1
+man_MANS = astrochem.1 chmconvert.1 converttolegacy.1
+
+if HAVE_PYMOD_BIGGLES
+	man_MANS += plabun.1 plroute.1
+endif
 
 EXTRA_DIST = $(man_MANS)
 
