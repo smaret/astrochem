@@ -21,4 +21,4 @@ ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = src doc tests python networks
 
-EXTRA_DIST = README.md
+EXTRA_DIST = AUTHORS.md CONTRIBUTING.md COPYING.md INSTALL.md README.md
