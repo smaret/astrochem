@@ -65,13 +65,17 @@ CLEANFILES += plabun.py plroute.py
 endif
 
 install-exec-hook:
-	sed -i' ' -e '/@REMOVE_INST@/d' -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/chmconvert
+	sed -i.bak -e '/@REMOVE_INST@/d' -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/chmconvert
+	rm $(DESTDIR)$(bindir)/chmconvert.bak
 	chmod a+x $(DESTDIR)$(bindir)/chmconvert
-	sed -i' ' -e '/@REMOVE_INST@/d' -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/converttolegacy
+	sed -i.bak -e '/@REMOVE_INST@/d' -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/converttolegacy
+	rm $(DESTDIR)$(bindir)/converttolegacy.bak
 	chmod a+x $(DESTDIR)$(bindir)/converttolegacy
 if HAVE_PYMOD_BIGGLES
-	sed -i' ' -e '/@REMOVE_INST@/d' -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/plabun
+	sed -i.bak -e '/@REMOVE_INST@/d' -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/plabun
+	rm $(DESTDIR)$(bindir)/plabun.bak
 	chmod a+x $(DESTDIR)$(bindir)/plabun
-	sed -i' ' -e '/@REMOVE_INST@/d' -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/plroute
+	sed -i.bak -e '/@REMOVE_INST@/d' -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/plroute
+	rm $(DESTDIR)$(bindir)/plroute.bak
 	chmod a+x $(DESTDIR)$(bindir)/plroute
 endif
