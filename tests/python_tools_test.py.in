@@ -21,7 +21,7 @@
 
 import sys
 import unittest
-sys.path.append("@abs_top_builddir@/python/")
+sys.path.append("@abs_top_srcdir@/python/")
 import tools
 
 class TestSequenceFunctions(unittest.TestCase):

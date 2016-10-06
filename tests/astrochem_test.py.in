@@ -83,7 +83,7 @@ class TestSequenceFunctions(unittest.TestCase):
         f.write(source_mdl)
         f.close()
 
-        args = ['@abs_top_srcdir@/src/astrochem', './input.ini']
+        args = ['@abs_top_builddir@/src/astrochem', './input.ini']
         subprocess.call(args)
         filename =  "astrochem_output.h5"
         original_species = ["CO","C(+)","C","e(-)","OH","H3O(+)"];
