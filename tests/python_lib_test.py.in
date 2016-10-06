@@ -1,8 +1,6 @@
-#!@PYTHON@
+#  python_lib_test - Test the libastrochem.py module
 #
-#  libastrochem_test - Test the libastrochem.py module
-#
-#  Copyright (c) 2006-2012 Sebastien Maret
+#  Copyright (c) 2006-2016 Sebastien Maret
 #
 #  This file is part of Astrochem.
 #

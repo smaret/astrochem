@@ -48,8 +48,8 @@ astrochem_test$(EXEEXT): astrochem_test.py
 	cp $? $@
 	chmod a+x $@
 
-python_lib_test$(EXEEXT): python_lib_test.py
-	cp $? $@
+python_lib_test: python_lib_test.py
+	echo $(top_builddir)/libtool --mode=execute -dlopen $(top_builddir)/src/libastrochem.la @PYTHON@ python_lib_test.py >> $@
 	chmod a+x $@
 
 python_tools_test$(EXEEXT): python_tools_test.py
