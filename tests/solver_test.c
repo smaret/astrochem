@@ -1,7 +1,7 @@
 /*
    solve_test.c - Test the solve() function
 
-   Copyright (c) 2006-2015 Sebastien Maret
+   Copyright (c) 2006-2016 Sebastien Maret
 
    This file is part of Astrochem.
 

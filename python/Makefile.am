@@ -1,6 +1,6 @@
 #  Makefile.am - Automake file for Astrochem
 #
-#  Copyright (c) 2006-2014 Sebastien Maret
+#  Copyright (c) 2006-2016 Sebastien Maret
 # 
 #  This file is part of Astrochem.
 #
@@ -20,6 +20,5 @@
 ACLOCAL_AMFLAGS = -I m4
 
 pkgpyexec_PYTHON = __init__.py tools.py wrapper.py
-SUBDIRS = libpyastrochem 
+SUBDIRS = libpyastrochem
 
-EXTRA_DIST = README.md

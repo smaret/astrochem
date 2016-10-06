@@ -2,7 +2,7 @@
    libastrochem.h - Function prototypes, various constant and data
    structures for Astrochem library.
 
-   Copyright (c) 2006-2015 Sebastien Maret
+   Copyright (c) 2006-2016 Sebastien Maret
 
    This file is part of Astrochem.
 

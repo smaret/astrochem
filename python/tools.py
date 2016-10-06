@@ -1,6 +1,6 @@
 #  tools.py - Python tools for astrochem
 #
-#  Copyright (c) 2006-2014 Sebastien Maret
+#  Copyright (c) 2006-2016 Sebastien Maret
 #
 #  This file is part of Astrochem.
 #
