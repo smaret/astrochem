@@ -26,6 +26,8 @@ lib_LTLIBRARIES = libastrochem.la
 libastrochem_la_SOURCES = network.c rates.c solve.c input.c
 libastrochem_la_LDFLAGS = -version-info 0:0:0
 include_HEADERS = libastrochem.h
+noinst_HEADERS = astrochem.h input.h libastrochem.h network.h rates.h	\
+	solve.h
 
 bin_PROGRAMS = astrochem chmconvert converttolegacy
 
