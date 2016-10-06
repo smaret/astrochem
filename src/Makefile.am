@@ -29,7 +29,8 @@ include_HEADERS = libastrochem.h
 noinst_HEADERS = astrochem.h input.h libastrochem.h network.h rates.h	\
 	solve.h
 
-bin_PROGRAMS = astrochem chmconvert converttolegacy
+bin_PROGRAMS = astrochem
+bin_SCRIPTS = chmconvert converttolegacy
 
 astrochem_SOURCES = astrochem.c 
 astrochem_CFLAGS = ${HDF5_CFLAGS} ${AM_CFLAGS}
@@ -37,26 +38,19 @@ astrochem_CPPFLAGS = ${HDF5_CPPFLAGS} ${AM_CPPFLAGS}
 astrochem_LDFLAGS = ${HDF5_LDFLAGS} ${AM_LDFLAGS}
 astrochem_LDADD = -lastrochem ${HDF5_LIBS} ${AM_LDFLAGS}
 
-chmconvert_SOURCES = chmconvert.py
 chmconvert$(EXEEXT): chmconvert.py
 	cp $? $@
 	chmod a+x $@
 
-converttolegacy_SOURCES = converttolegacy.py
 converttolegacy$(EXEEXT): converttolegacy.py
 	cp $? $@
 	chmod a+x $@
 
-
-CLEANFILES = chmconvert.py  converttolegacy.py
+CLEANFILES = chmconvert chmconvert.py  converttolegacy converttolegacy.py
 
 if HAVE_PYMOD_BIGGLES
 
-bin_PROGRAMS += plabun plroute
-
-plabun_SOURCES = plabun.py
-
-plroute_SOURCES = plroute.py
+bin_SCRIPTS += plabun plroute
 
 plabun$(EXEEXT): plabun.py
 	cp $? $@
