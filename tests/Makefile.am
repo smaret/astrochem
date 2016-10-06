@@ -21,7 +21,9 @@ AM_CFLAGS = -Wall -I$(top_builddir)/src/
 
 TESTS = input_test source_test source_dyn_test network_test rate_test abundances_test solver_test python_lib_test python_tools_test astrochem_test
 
-check_PROGRAMS = input_test source_test source_dyn_test network_test rate_test abundances_test solver_test python_lib_test python_tools_test astrochem_test
+check_PROGRAMS = input_test source_test source_dyn_test network_test rate_test abundances_test solver_test
+
+check_SCRIPTS = python_lib_test python_tools_test astrochem_test
 
 input_test_SOURCES = input_test.c
 input_test_LDADD = $(top_builddir)/src/input.o $(top_builddir)/src/libastrochem.la
@@ -49,7 +51,7 @@ astrochem_test$(EXEEXT): astrochem_test.py
 	chmod a+x $@
 
 python_lib_test$(EXEXT): python_lib_test.py
-	echo $(top_builddir)/libtool --mode=execute -dlopen $(top_builddir)/src/libastrochem.la @PYTHON@ python_lib_test.py >> $@
+	echo $(top_builddir)/libtool --mode=execute -dlopen $(top_builddir)/src/libastrochem.la @PYTHON@ python_lib_test.py > $@
 	chmod a+x $@
 
 python_tools_test$(EXEEXT): python_tools_test.py
@@ -70,7 +72,8 @@ benchmark_openmp_bin: benchmark_openmp.py
 benchmark_openmp: benchmark_openmp_bin
 	./benchmark_openmp_bin
 
-CLEANFILES = astrochem_test.py python_lib_test.py			\
-	python_tools_test.py benchmark.py benchmark_bin			\
-	benchmark_openmp.py benchmark_openmp_bin input.ini source.mdl	\
-	source_dyn.mdl network.chm *.h5
+CLEANFILES = astrochem_test astrochem_test.py python_lib_test		\
+	python_lib_test.py python_tools_test python_tools_test.py	\
+	benchmark.py benchmark_bin benchmark_openmp.py			\
+	benchmark_openmp_bin input.ini source.mdl source_dyn.mdl	\
+	network.chm *.h5
