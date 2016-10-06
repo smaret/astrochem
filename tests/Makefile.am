@@ -1,6 +1,6 @@
 #  Makefile.am - Automake file for Astrochem
 #
-#  Copyright (c) 2006-2015 Sebastien Maret
+#  Copyright (c) 2006-2016 Sebastien Maret
 # 
 #  This file is part of Astrochem.
 #
@@ -48,7 +48,7 @@ astrochem_test$(EXEEXT): astrochem_test.py
 	cp $? $@
 	chmod a+x $@
 
-python_lib_test: python_lib_test.py
+python_lib_test$(EXEXT): python_lib_test.py
 	echo $(top_builddir)/libtool --mode=execute -dlopen $(top_builddir)/src/libastrochem.la @PYTHON@ python_lib_test.py >> $@
 	chmod a+x $@
 
