@@ -17,7 +17,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
-AM_CFLAGS = -Wall -I$(top_builddir)/src/
+AM_CFLAGS = -Wall -I$(top_srcdir)/src/
 
 TESTS = input_test source_test source_dyn_test network_test rate_test abundances_test solver_test python_lib_test python_tools_test astrochem_test
 
