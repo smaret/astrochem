@@ -74,9 +74,6 @@ it can be invoked with `make check` at the top level. If you run the
 tests and get some failures, please report
 [here](http://github.com/smaret/astrochem/issues?labels=Bug).
 
-The documentation manual can built by typing `make pdf` at the top
-level.
-
 Astrochem can be installed using the command:
 
 ```
