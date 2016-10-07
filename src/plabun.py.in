@@ -226,10 +226,10 @@ def main():
             try:
                 time, abund = readabun(filename,spec)
             except IOError as e:
-                sys.stderr.write("plroute: error: can't open %s. Error : %s\n" % (filename, e) )
+                sys.stderr.write("plabun: error: can't open %s. Error : %s\n" % (filename, e) )
                 sys.exit(1)
             except ValueError as e:
-                sys.stderr.write("plroute: error: can't read %s. Error : %s\n" % (filename, e) )
+                sys.stderr.write("plabun: error: can't read %s. Error : %s\n" % (filename, e) )
                 sys.exit(1)
 
             # Pick-up values that correspond to the given cell index
