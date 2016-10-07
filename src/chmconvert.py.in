@@ -29,6 +29,7 @@ except ImportError:
     from tools import network_reader
 
 PACKAGE_VERSION = "@PACKAGE_VERSION@"
+PACKAGE_BUGREPORT = "@PACKAGE_BUGREPORT@"
 
 def usage():
     """
@@ -43,8 +44,8 @@ Options:
    -V, --version      Display chmconvert version information
    -o, --output       Write the edited network in a file
 
-See chmconvert(1) man page for a complete list of commands and options.
-Report bugs to <sebastien.maret@obs.ujf-grenoble.fr>.""")
+See chmconvert(1) man page for a complete list of commands and options.""")
+    print("Report bugs to <%s>." % PACKAGE_BUGREPORT)
 
 def version():
     """
