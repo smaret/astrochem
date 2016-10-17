@@ -9,7 +9,9 @@ Pre-requisites
 
 To compile Astrochem you will need:
 
-1. An ANSI C-compiler (e.g. gcc, icc, etc.)
+1. An ANSI C-compiler (e.g. gcc, icc, etc.) and a FORTRAN compiler
+   (e.g. gfortran or ifort). The FORTRAN compiler is required only to
+   use the LAPACK library with SUNDIALS (see "Optional Features").
 
 2. The [SUNDIALS (SUite of Nonlinear and DIfferential/ALgebraic
    equation Solvers) library](http://computation.llnl.gov/casc/sundials/).
@@ -93,9 +95,10 @@ Optional features
 -----------------
 
 Astrochem can use the LAPACK library together with SUNDIALS, which
-results in better performance than when using SUNDIALS alone. The use
-of LAPACK in Astrochem can be turned on by specifying the
-`--with-lapack` option to `configure`, e.g.
+results in better performance than when using SUNDIALS alone. This
+requires a FORTRAN compiler, because the LAPACK library is written in
+that language. The use of LAPACK in Astrochem can be turned on by
+specifying the `--with-lapack` option to `configure`, e.g.
 
 ```
 ./configure --with-lapack
