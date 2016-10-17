@@ -34,6 +34,8 @@ To compile Astrochem you will need:
    incorrectly read; use H5Py 2.5.0 instead. All modules are present
    in major Linux distributions (Debian, Ubuntu, etc.)  and in Fink or
    MacPorts on Mac OSX.
+
+6. [Cython](http://cython.org). This is required only to use the Python API.
  
 Basic Installation
 ------------------
