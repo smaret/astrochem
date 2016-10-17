@@ -30,8 +30,10 @@ Installation
 ------------
 
 Astrochem installation follows a standard procedure and is fairly
-straightforward. Instructions can be found in the
-[INSTALL.md](./INSTALL.md) file.
+straightforward. Generic installation instructions can be found in
+the [INSTALL.md](./INSTALL.md) file. Additional platform-specific
+instructions can be found
+on [Astrochem's wiki](https://github.com/smaret/astrochem/wiki).
 
 Documentation
 -------------
