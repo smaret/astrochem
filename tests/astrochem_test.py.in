@@ -86,9 +86,9 @@ class TestSequenceFunctions(unittest.TestCase):
         args = ['@abs_top_builddir@/src/astrochem', './input.ini']
         subprocess.check_call(args)
         filename =  "astrochem_output.h5"
-        original_species = ["CO","C(+)","C","e(-)","OH","H3O(+)"];
+        original_species = ["CO","C(+)","C","e(-)","OH","H3O(+)"]
         abun = []
-        species = tools.listspecies( filename ).tolist();
+        species = tools.listspecies(filename);
 
         self.assertEqual( species, original_species )
 

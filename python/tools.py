@@ -674,8 +674,8 @@ def readfilesattrs(filename):
 
     return chemfile, sourcefile
 
-def listspecies( filename ):
-    """Print available species from an hdf5 output file and return it in a array
+def listspecies(filename):
+    """Returns a list of species that are available in an hdf5 file
 
     Parameters
     ----------
@@ -689,14 +689,14 @@ def listspecies( filename ):
 
     """
     import h5py
-    f = h5py.File( filename, "r")
+    f = h5py.File(filename, "r")
     if "Species" in f:
-        s_d = f.get("Species")
-        s = s_d[...]
+        s = f.get("Species").value.tolist()  # byte code string in Python 3k
+        s = list(map(lambda x: x.decode(), s))
     else:
-        raise IOError("%s file doest not contain \"Species\" dataset" % filename )
+        raise IOError("%s file doest not contain \"Species\" dataset" % filename)
 
-    return s;
+    return s
 
 def readabun(filename, specie):
     """Read abundances for a specific specie from an hdf5 output file and
@@ -725,14 +725,14 @@ def readabun(filename, specie):
     else:
         raise IOError("%s file doest not contain \"TimeSteps\" dataset" % filename )
     if "Species" in f:
-        s_d = f.get("Species")
-        s = s_d[...]
+        s = f.get("Species").value.tolist()  # byte code string in Python 3k
+        s = list(map(lambda x: x.decode(), s))
     else:
         raise IOError("%s file doest not contain \"Species\" dataset" % filename )
     if specie in s:
-        specie_index = s.tolist().index(specie)
+        specie_index = s.index(specie)
     else:
-        raise ValueError("%s file doest not contain %s specie" % ( filename, specie ) )
+       raise ValueError("%s file doest not contain %s specie" % ( filename, specie ) )
     if "Abundances" in f:
         a_d = f.get("Abundances")
         a = a_d[:,:,specie_index]
@@ -774,12 +774,12 @@ def readrout(filename, specie):
     else:
         raise IOError("%s file doest not contain \"TimeSteps\" dataset" % filename )
     if "Species" in f:
-        s_d = f.get("Species")
-        s = s_d[...]
+        s = f.get("Species").value.tolist()  # byte code string in Python 3k
+        s = list(map(lambda x: x.decode(), s))
     else:
         raise IOError("%s file doest not contain \"Species\" dataset" % filename )
     if specie in s:
-        specie_index = s.tolist().index(specie)
+        specie_index = s.index(specie)
     else:
         raise ValueError("%s file doest not contain specie %s" % (filename, specie) )
     if "Routes" in f:
