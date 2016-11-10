@@ -105,6 +105,7 @@ typedef struct
   N_Vector y;
   params_t params;
   double density;
+  double t;
 } astrochem_mem_t;
 
 /* Fonction prototypes */

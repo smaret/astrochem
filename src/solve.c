@@ -338,7 +338,8 @@ int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
       return -1;
     }
 
-  if ((CVodeInit ( astrochem_mem->cvode_mem, f, 0.0,  astrochem_mem->y ) != CV_SUCCESS)
+  astrochem_mem->t = 0.0;
+  if ((CVodeInit ( astrochem_mem->cvode_mem, f, astrochem_mem->t,  astrochem_mem->y ) != CV_SUCCESS)
       ||
       (CVodeSStolerances
        ( astrochem_mem->cvode_mem, rel_err,
@@ -365,6 +366,7 @@ int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
 
 int solve( astrochem_mem_t* astrochem_mem, const net_t* network, double* abundances, double time , const cell_t* new_cell, int verbose )
 {
+  realtype t; /* Current time */
 
   /* Computing new reac rate and abundance if cell parameter have evolved
      since last call */
@@ -397,11 +399,14 @@ int solve( astrochem_mem_t* astrochem_mem, const net_t* network, double* abundan
       astrochem_mem->params.av = new_cell->av;
       astrochem_mem->params.tgas = new_cell->tgas;
       astrochem_mem->params.tdust = new_cell->tdust;
+
+      /* Re-initialize the solver */
+      CVodeReInit (astrochem_mem->cvode_mem, astrochem_mem->t, astrochem_mem->y);
     }
 
-  realtype t = 0.0;
   CVode ( astrochem_mem->cvode_mem, (realtype) time, astrochem_mem->y, &t, CV_NORMAL);
-
+  astrochem_mem->t = time;
+    
   /* Print the cell number, time and time step after each call. */
 
   if (verbose >= 2)
