@@ -94,7 +94,6 @@ read_network (const char *chem_file, net_t * network, const int verbose)
 
   // Get the number of reaction and estimates number of species to alloc
   int n_reactions = get_nb_active_line (chem_file1);
-  fprintf(stdout, "n_reactions=%i\n", n_reactions);
   if( n_reactions == -1 )
     {
       return EXIT_FAILURE;
@@ -105,7 +104,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
                "astrochem: error: the number of reactions is zero.\n");
       return EXIT_FAILURE;
     }
-  int n_alloc_species = n_reactions / 10;
+  int n_alloc_species = n_reactions * (MAX_REACTANTS + MAX_PRODUCTS);
   if (n_alloc_species == 0)
     {
       n_alloc_species = 1;
