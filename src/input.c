@@ -884,7 +884,7 @@ get_nb_active_line (const char *file)
     }
   while (fgets (line, MAX_LINE, f) != NULL)
     {
-      if (line[0] != '#')
+      if (line[0] != '#' && line[0] != '\n')
         {
           line_number++;
         }

@@ -94,6 +94,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
 
   // Get the number of reaction and estimates number of species to alloc
   int n_reactions = get_nb_active_line (chem_file1);
+  fprintf(stdout, "n_reactions=%i\n", n_reactions);
   if( n_reactions == -1 )
     {
       return EXIT_FAILURE;
@@ -130,8 +131,8 @@ read_network (const char *chem_file, net_t * network, const int verbose)
   int n = 0;
   while (fgets (line, MAX_LINE, f) != NULL)
     {
-      if (line[0] == '#')
-        continue;               /* Skip comments. */
+      if (line[0] == '#' || line[0] == '\n')
+        continue; /* Skip comments and empty lines */
 
       if (n >= network->n_reactions)
         {
