@@ -60,7 +60,7 @@ class cell:
         self.av = self.data.av
         self.nh = self.data.nh
         self.tgas = self.data.tgas
-        self.tgas = self.data.tdust
+        self.tdust = self.data.tdust
 
 class network:
     """Network class.
