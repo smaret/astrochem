@@ -30,7 +30,7 @@
 
 #define MAX_CHAR_SPECIES 32   /* Maximum number of characters in a specie name */
 #define MAX_REACTANTS 3
-#define MAX_PRODUCTS 4
+#define MAX_PRODUCTS 5
 
 /* Data structures */
 

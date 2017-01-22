@@ -233,8 +233,7 @@ read_input (const char *input_file, inp_t * input_params,
                           if(  input_params->abundances.initial_abundances[k].species_idx == species_idx )
                             {
                               duplicated = true;
-                              fprintf (stderr,"astrochem: warning: duplicated initial abundances, keeping only the first"
-                                       "initial abundances of %s.\n", parameter);
+                              fprintf (stderr,"astrochem: warning: duplicated %s initial abundance, keeping the first one.\n", parameter);
                               break;
                             }
                         }
