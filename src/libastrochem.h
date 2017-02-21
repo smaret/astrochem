@@ -81,8 +81,6 @@ typedef struct
   react_t *reactions;
 } net_t;
 
-typedef enum { false, true } bool;
-
 typedef struct
 {
   double *reac_rates;

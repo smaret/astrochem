@@ -191,7 +191,7 @@ read_network (const char *chem_file, net_t * network, const int verbose)
         }
 
       int nproducts = 0;
-      bool specie_ready = true;
+      unsigned int specie_ready = 1;
       // First non-whitespace char
       specie = strtok( products, " " );
       while( specie != NULL )
@@ -199,12 +199,12 @@ read_network (const char *chem_file, net_t * network, const int verbose)
           // Found a '+' , be ready for next specie
           if( strcmp( specie, "+" ) == 0 )
             {
-              specie_ready = true;
+              specie_ready = 1;
             }
           // Found a specie
           else if( specie_ready )
             {
-              specie_ready = false;
+              specie_ready = 0;
               // Check number of products
               if( nproducts == MAX_PRODUCTS )
                 {
@@ -438,13 +438,13 @@ free_network (net_t * network)
   Get the mass and charge of a species
 */
 
-bool get_species_mass_and_charge( char* species, double* mass, int* charge )
+unsigned int get_species_mass_and_charge( char* species, double* mass, int* charge )
 {
   if( strcmp( species, "e(-)" ) == 0 )
     {
       *mass = ELECTRON_MASS;
       *charge = -1;
-      return true;
+      return 1;
     }
   //Check length of species name
   if (strlen (species) >= MAX_CHAR_SPECIES - 1)
@@ -452,7 +452,7 @@ bool get_species_mass_and_charge( char* species, double* mass, int* charge )
       fprintf (stderr, "astrochem: error: the number of characters of some "
                "species of the chemical network file exceeds %i.\n",
                MAX_CHAR_SPECIES);
-      return false;
+      return 0;
     }
 
   // Initialize element
@@ -478,7 +478,7 @@ bool get_species_mass_and_charge( char* species, double* mass, int* charge )
               int element_mass = get_element_mass( element );
               if( element_mass == -1 )
                 {
-                  return false;
+                  return 0;
                 }
               specie_mass_uma += mass_multiplier * element_mass;
               // Reinitialize element
@@ -518,7 +518,7 @@ bool get_species_mass_and_charge( char* species, double* mass, int* charge )
           if( element_idx >= MAX_CHAR_ELEMENT-1 )
             {
               fprintf (stderr, "astrochem: error: this specie: %s contain an element longer than MAX_CHAR_ELEMENT\n", species );
-              return false;
+              return 0;
             }
           // Store the char in element
           element[ element_idx ] = *specie_pt;
@@ -533,7 +533,7 @@ bool get_species_mass_and_charge( char* species, double* mass, int* charge )
           if( element_idx == 0 || mass_multiplier != 1 )
             {
               fprintf (stderr, "astrochem: error: this specie: %s is not correctly written\n", species );
-              return false;
+              return 0;
             }
           // Store multiplier and position to next non numeric char
           mass_multiplier = strtol( specie_pt, &specie_pt, 10 );
@@ -555,7 +555,7 @@ bool get_species_mass_and_charge( char* species, double* mass, int* charge )
               break;
             default:
               fprintf (stderr, "astrochem: error: this specie: %s is not correctly written\n", species );
-              return false;
+              return 0;
               break;
             }
           break;
@@ -566,7 +566,7 @@ bool get_species_mass_and_charge( char* species, double* mass, int* charge )
       else
 	{
 	  fprintf (stderr, "astrochem: error: this specie: %s is not correctly written\n", species );
-	  return false;
+	  return 0;
 	}
     }
   // Specie string have been parsed, but last element still have to be taken in account
@@ -578,12 +578,12 @@ bool get_species_mass_and_charge( char* species, double* mass, int* charge )
       int element_mass = get_element_mass( element );
       if( element_mass == -1 )
         {
-          return false;
+          return 0;
         }
       specie_mass_uma += mass_multiplier * element_mass;
     }
   *mass = specie_mass_uma * UMA;
-  return true;
+  return 1;
 }
 
 /*

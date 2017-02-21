@@ -77,7 +77,7 @@ read_input (const char *input_file, inp_t * input_params,
     }
 
   int n_output_species = 0;
-  bool all_species = false;
+  unsigned int all_species = 0;
   int n_initial_abundances =
    get_nb_active_line_section (input_file, "abundances");
   if( n_initial_abundances == -1 )
@@ -97,7 +97,7 @@ read_input (const char *input_file, inp_t * input_params,
               if ((strncmp( localStr,"ALL", 3 ) == 0 ) ||
 		  (strncmp( localStr,"all", 3 ) == 0))
                 {
-                  all_species = true;
+                  all_species = 1;
                   n_output_species = network->n_species;
                   break;
                 }
@@ -227,12 +227,12 @@ read_input (const char *input_file, inp_t * input_params,
                   else
                     {
                       int k;
-                      bool duplicated = false;
+                      unsigned int duplicated = 0;
                       for( k = 0; k<i; k++ )
                         {
                           if(  input_params->abundances.initial_abundances[k].species_idx == species_idx )
                             {
-                              duplicated = true;
+                              duplicated = 1;
                               fprintf (stderr,"astrochem: warning: duplicated initial abundances, keeping only the first"
                                        "initial abundances of %s.\n", parameter);
                               break;
@@ -321,7 +321,7 @@ read_input (const char *input_file, inp_t * input_params,
                               continue;
                             }
                           int k;
-                          bool duplicated = false;
+                          unsigned int duplicated = 0;
                           for( k=0; k<j; k++ )
                             {
                               if( input_params->output.output_species_idx[k] == species_idx )
@@ -329,7 +329,7 @@ read_input (const char *input_file, inp_t * input_params,
                                   fprintf (stderr,
                                            "astrochem: error: duplicated output species in input file : %s.\n", output_specie );
                                   input_params->output.n_output_species--;
-                                  duplicated = true;
+                                  duplicated = 1;
                                   break;
                                 }
                             }

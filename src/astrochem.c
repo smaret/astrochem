@@ -549,13 +549,13 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
                          structure, we add the current reaction
                          number and rate to that structure. */
 
-                      bool specie_in_products = false;
+                      unsigned int specie_in_products = 0;
                       int p;
                       for( p = 0; p < MAX_PRODUCTS; p++ )
                         {
                           if( network->reactions[k].products[p] ==  input_params->output.output_species_idx[j])
                             {
-                              specie_in_products = true;
+                              specie_in_products = 1;
                               break;
                             }
                         }
@@ -610,13 +610,13 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
 
                       /* If the species is reactant of the reaction
                          then compute the destruction rate. */
-                      bool species_in_reactants = false;
+                      unsigned int species_in_reactants = 0;
                       int r;
                       for ( r = 0; r < MAX_REACTANTS; r++ )
                         {
                           if ( network->reactions[k].reactants[r] == input_params->output.output_species_idx[j])
                             {
-                              species_in_reactants = true;
+                              species_in_reactants = 1;
                               break;
                             }
                         }
