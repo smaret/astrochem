@@ -364,8 +364,9 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
     }
 
 #ifdef HAVE_OPENMP
-  omp_set_lock(&lock);
+              omp_set_lock(&lock);
 #endif
+
 
   // Create the memory dataspace, selecting all output abundances
   hsize_t size = input_params->output.n_output_species;
@@ -387,8 +388,9 @@ full_solve (hid_t fid, hid_t dataset, hid_t* routeDatasets, hid_t dataspace, hid
     }
 
 #ifdef HAVE_OPENMP
-  omp_unset_lock(&lock);
+              omp_unset_lock(&lock);
 #endif
+
 
   // Initializing abundance
 #if 0 //Ultra complicated code
