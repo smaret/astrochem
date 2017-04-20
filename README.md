@@ -1,6 +1,8 @@
 Astrochem
 =========
 
+[![Join the chat at https://gitter.im/astrochem-code/Lobby](https://badges.gitter.im/astrochem-code/Lobby.svg)](https://gitter.im/astrochem-code/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 What is Astrochem?
 ------------------
 
