@@ -1,4 +1,4 @@
-#!@PYTHON@
+#!/usr/bin/env @PYTHON@
 #
 #  astrochem_test - Test the Astrochem results
 #

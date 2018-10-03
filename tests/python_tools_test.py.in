@@ -1,4 +1,4 @@
-#!@PYTHON@
+#!/usr/bin/env @PYTHON@
 #
 #  libastrochem_test - Test the libastrochem.py module
 #

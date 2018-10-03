@@ -1,4 +1,4 @@
-#!@PYTHON@
+#!/usr/bin/env @PYTHON@
 #
 #  plabun - Plot the abundances computed by Astrochem
 #

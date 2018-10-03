@@ -1,4 +1,4 @@
-#!@PYTHON@
+#!/usr/bin/env @PYTHON@
 #
 #  plroute - Plot the destruction/formation routes computed by
 #  astrochem for a given specie
