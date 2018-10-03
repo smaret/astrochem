@@ -36,7 +36,7 @@ astrochem_SOURCES = astrochem.c
 astrochem_CFLAGS = ${HDF5_CFLAGS} ${AM_CFLAGS}
 astrochem_CPPFLAGS = ${HDF5_CPPFLAGS} ${AM_CPPFLAGS}
 astrochem_LDFLAGS = ${HDF5_LDFLAGS} ${AM_LDFLAGS}
-astrochem_LDADD = -lastrochem ${HDF5_LIBS} ${AM_LDFLAGS}
+astrochem_LDADD = libastrochem.la ${HDF5_LIBS} ${AM_LDFLAGS}
 
 chmconvert$(EXEEXT): chmconvert.py
 	cp $? $@
