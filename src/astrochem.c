@@ -184,7 +184,7 @@ main (int argc, char *argv[])
 
       // Create each named route dataset
       routeGroup = H5Gcreate( fid, "Routes", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-      char routeName[6] = "route_";
+      char routeName[7] = "route_";
       char tempName[ MAX_CHAR_SPECIES + sizeof( routeName ) ];
       for( i = 0; i < input_params.output.n_output_species ; i++ )
         {
