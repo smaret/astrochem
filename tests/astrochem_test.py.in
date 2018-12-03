@@ -84,7 +84,7 @@ class TestSequenceFunctions(unittest.TestCase):
         f.close()
 
         args = ['@abs_top_builddir@/src/astrochem', './input.ini']
-        subprocess.call(args)
+        subprocess.check_call(args)
         filename =  "astrochem_output.h5"
         original_species = ["CO","C(+)","C","e(-)","OH","H3O(+)"];
         abun = []
