@@ -24,7 +24,7 @@ AM_CFLAGS += ${OPENMP_CFLAGS} -Wall
 
 lib_LTLIBRARIES = libastrochem.la
 libastrochem_la_SOURCES = network.c rates.c solve.c input.c
-libastrochem_la_LDFLAGS = -version-info 0:0:0
+libastrochem_la_LDFLAGS = -version-info 0:0:0 -lsundials_nvecserial -lsundials_cvode -lm
 include_HEADERS = libastrochem.h
 noinst_HEADERS = astrochem.h input.h libastrochem.h network.h rates.h	\
 	solve.h
@@ -36,7 +36,7 @@ astrochem_SOURCES = astrochem.c
 astrochem_CFLAGS = ${HDF5_CFLAGS} ${AM_CFLAGS}
 astrochem_CPPFLAGS = ${HDF5_CPPFLAGS} ${AM_CPPFLAGS}
 astrochem_LDFLAGS = ${HDF5_LDFLAGS} ${AM_LDFLAGS}
-astrochem_LDADD = libastrochem.la ${HDF5_LIBS} ${AM_LDFLAGS}
+astrochem_LDADD = libastrochem.la ${HDF5_LIBS} ${AM_LDFLAGS} -lsundials_nvecserial -lsundials_cvode -lm
 
 chmconvert$(EXEEXT): chmconvert.py
 	cp $? $@
