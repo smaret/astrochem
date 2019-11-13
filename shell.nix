@@ -1,6 +1,6 @@
 with import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs-channels/archive/nixos-19.03.tar.gz") {};
 let
-  python2Env = pkgs.python2.withPackages (ps: with ps; [ numpy h5py cython ]);
+  python3Env = pkgs.python3.withPackages (ps: with ps; [ numpy h5py cython ]);
   sundials2 = pkgs.sundials.overrideAttrs (oldAttrs: rec {
     name = "sundials-2.7.0";
     src = pkgs.fetchurl {
@@ -11,12 +11,13 @@ let
 in
 pkgs.mkShell rec {
   buildInputs = [
-    python2Env
+    python3Env
     pkgs.gfortran
     pkgs.hdf5
     pkgs.autoconf
     pkgs.automake
     pkgs.libtool
+    pkgs.ncurses
     sundials2
     pkgs.openblas
   ];
