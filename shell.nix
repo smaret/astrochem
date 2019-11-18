@@ -1,6 +1,6 @@
 with import (builtins.fetchTarball "https://github.com/NixOS/nixpkgs-channels/archive/nixos-19.03.tar.gz") {};
 let
-  python3Env = pkgs.python3.withPackages (ps: with ps; [ numpy h5py cython ]);
+  python3Env = pkgs.python3.withPackages (ps: with ps; [ numpy h5py cython matplotlib ]);
   sundials2 = pkgs.sundials.overrideAttrs (oldAttrs: rec {
     name = "sundials-2.7.0";
     src = pkgs.fetchurl {
