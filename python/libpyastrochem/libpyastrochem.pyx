@@ -1,6 +1,4 @@
 from libc.stdlib cimport malloc, free
-from libc.string cimport strcmp
-from cpython.string cimport PyString_AsString
 
 cdef extern from "../../src/astrochem.h":
 
@@ -57,7 +55,7 @@ cdef class Network:
     """
     Chemical Network class
 
-    Network( const char* chem_file, int verbose )
+    Network( chem_file, int verbose )
     Create a chemical network
 
     Arguments:
@@ -66,8 +64,11 @@ cdef class Network:
 
     """
     cdef net_t thisstruct
-    def __cinit__( self, const char* chem_file, int verbose ):
-        if read_network( chem_file, &self.thisstruct, verbose) != 0:
+
+    def __cinit__( self, chem_file, int verbose ):
+        chem_file_byte = chem_file.encode() # str -> byte
+        cdef char* chem_file_str = chem_file_byte
+        if read_network( chem_file_str, &self.thisstruct, 1) != 0:
             raise IOError
 
     def __dealloc__(self):
@@ -182,7 +183,7 @@ cdef class Solver:
     """
     Chemical reaction solver
 
-    Solver( cell , const char* chem_file, phys, abs_err, rel_err, initial_abundances , double density, int verbose )
+    Solver( cell , chem_file, phys, abs_err, rel_err, initial_abundances , double density, int verbose )
     Create a chemical reaction solver
 
     Arguments:
@@ -200,7 +201,7 @@ cdef class Solver:
     cdef Network network
     cdef int verbose
 
-    def __cinit__( self , cell , const char* chem_file, phys, abs_err, rel_err, initial_abundances , double density, int verbose ):
+    def __cinit__( self , cell , chem_file, phys, abs_err, rel_err, initial_abundances , double density, int verbose ):
         self.verbose = verbose
         self.network = Network( chem_file, verbose )
         cdef net_t c_net = self.network.thisstruct
@@ -213,7 +214,8 @@ cdef class Solver:
         cdef double* initial_abundances_val = <double*>malloc(len(initial_abundances) * sizeof(double))
         cdef int j = 0
         for i in initial_abundances:
-            initial_abundances_str[j] = PyString_AsString(i)
+            initial_abundances_byte = i.encode() # str -> byte
+            initial_abundances_str[j] = initial_abundances_byte
             initial_abundances_val[j] = initial_abundances[i]
             j+=1
         set_initial_abundances( < const char** >initial_abundances_str, len(initial_abundances), initial_abundances_val,  &c_net, self.abundances )
@@ -245,9 +247,8 @@ cdef class Solver:
             if solve( &self.astrochemstruct, &c_net , self.abundances, time , &c_new_cell, self.verbose ) != 0:
                 raise ArithmeticError("Solve Error")
         cdef int i
-        cdef bytes py_string
         ret = {}
         for i in range( c_net.n_species ):
-            py_string =  c_net.species[i].name
+            py_string =  c_net.species[i].name.decode() # byte -> str
             ret[py_string] = self.abundances[i]
         return ret
