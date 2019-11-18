@@ -2,7 +2,7 @@
 #
 #  plabun - Plot the abundances computed by Astrochem
 #
-#  Copyright (c) 2006-2016 Sebastien Maret
+#  Copyright (c) 2006-2019 Sebastien Maret
 # 
 #  This file is part of Astrochem.
 #
@@ -24,7 +24,7 @@ sys.path.append("@abs_top_srcdir@/python/") # @REMOVE_INST@
 sys.path.append("@pythondir@")
 import os.path
 import getopt
-import biggles
+from matplotlib import pyplot as plt
 from numpy import *
 try:
     from astrochem.tools import readabun,readabunlegacy, _totex_species, listspecies
@@ -65,7 +65,7 @@ def version():
     """
 
     print("This is plabun, version %s" % PACKAGE_VERSION)
-    print("""Copyright (c) 2006-2016 Sebastien Maret
+    print("""Copyright (c) 2006-2019 Sebastien Maret
 
 This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent
@@ -154,8 +154,8 @@ def main():
         species = args[1:]
         if len(species) == 0:
             try:
-                print "Available species in this file are:"
-                print listspecies( filename )
+                print("Available species in this file are:")
+                print(listspecies( filename ))
                 sys.exit(0)
             except Exception as e:
                 sys.stderr.write("plabun: error: can't read %s. Error : %s\n" % (filename, e) )
@@ -164,23 +164,8 @@ def main():
             sys.stderr.write("plabun: warning: at most 6 species can be plotted, ignoring others.\n")
             species = species[0:5]
 
-    p = biggles.FramedPlot()
-    p.title = "Abundances"
-    p.xtitle = "Time (yr)"
-    p.xlog = 1
-    p.ytitle = "$n(x)/n_{H}$"
-    p.ylog = 1
-    if xrange:
-        p.xrange = xrange
-    if yrange:
-        p.yrange = yrange
-    curves = []
-
-    # Stack for line colors
-    linecolor_stack = ["red", "blue", "green", "yellow", "orange", "cyan"]
-
-    # Plot the abundances in each file
-
+    # Get the abundances
+    abundances = []
     if legacy:
         for filename in filenames:
 
@@ -214,12 +199,7 @@ def main():
                 sys.stderr.write("plabun: warning: found less than two non-zero abundances for %s.\n" % spec)
                 continue
 
-            linecolor = linecolor_stack.pop(0)
-            linecolor_stack.append(linecolor)
-            cu = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
-            cu.label = "$" + _totex_species(spec) + "$"
-            curves.append(cu)
-            p.add(cu)
+            abundances.append([time, abund, spec])
     else:
         for spec in species:
             # Read the abundance file
@@ -249,24 +229,34 @@ def main():
                 sys.stderr.write("plabun: warning: found less than two non-zero abundances for %s.\n" % spec)
                 continue
 
-            linecolor = linecolor_stack.pop(0)
-            linecolor_stack.append(linecolor)
-            cu = biggles.Curve(time, abund, linecolor = linecolor, linewidth = 2)
-            cu.label = "$" + _totex_species(spec) + "$"
-            curves.append(cu)
-            p.add(cu)
-
-    # Draw the plot key
-    p.add(biggles.PlotKey(.1, .90, curves))
+            abundances.append([time, abund, spec])
 
     # Check that we have at least one abundance to plot
-    if len(curves) == 0:
+    if len(abundances) == 0:
         sys.stderr.write("plabun: error: nothing to plot.\n")
         sys.exit(1)
 
+    # Plot the abundances
+    fig = plt.figure("plabun", figsize=(5.5,4.8))
+    fig.subplots_adjust(left=0.15, right=0.92, top = 0.9)
+    ax = fig.add_subplot(1, 1, 1)
+    ax.margins(0) 
+    for time, abund, spec in abundances:
+        ax.plot(time, abund, label="$" + _totex_species(spec) + "$")
+    ax.set(xscale = "log")
+    ax.set(yscale = "log")
+    ax.set(title = "Abundances")
+    ax.set(xlabel = "Time (yr)")
+    ax.set(ylabel = "$\mathrm{n(x)/n_{H}}$")
+    if xrange:
+        ax.set(xlim=(xrange[0], xrange[1]))
+    if yrange:
+        ax.set(ylim=(yrange[0], yrange[1]))
+    ax.legend()
+
     if output:
-        p.write_eps(output)
+        fig.savefig(output, bbox_inches="tight")
     else:
-        p.show()
+        plt.show()
 
 main()
