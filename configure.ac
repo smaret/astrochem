@@ -60,11 +60,11 @@ if test $HAVE_PYMOD_NUMPY = "no"; then
    AC_MSG_ERROR(Could not find Python module Numpy.)
 fi
 
-AC_PYTHON_MODULE(biggles, )
-if test $HAVE_PYMOD_BIGGLES = "no"; then
-   AC_MSG_WARN(Could not find Python module Biggles.)
+AC_PYTHON_MODULE(matplotlib, )
+if test $HAVE_PYMOD_MATPLOTLIB = "no"; then
+   AC_MSG_WARN(Could not find Python module Matplotlib.)
 fi
-AM_CONDITIONAL([HAVE_PYMOD_BIGGLES], [test $HAVE_PYMOD_BIGGLES = "yes"])
+AM_CONDITIONAL([HAVE_PYMOD_MATPLOTLIB], [test $HAVE_PYMOD_MATPLOTLIB = "yes"])
 
 # Checks for typedefs, structures, and compiler characteristics.
 if test x$enable_openmp = "xyes"; then
@@ -151,7 +151,7 @@ if test ${use_lapack} = "yes"; then
 fi
 echo "Python interpreter: ${PYTHON}
 Python version:     ${PYTHON_VERSION}
-Biggles module:     ${HAVE_PYMOD_BIGGLES}
+Matplotlib module:  ${HAVE_PYMOD_MATPLOTLIB}
 H5py module:        ${HAVE_PYMOD_H5PY}
 Python API:         ${HAVE_CYTHON}
 ============================================="

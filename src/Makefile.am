@@ -48,7 +48,7 @@ converttolegacy$(EXEEXT): converttolegacy.py
 
 CLEANFILES = chmconvert chmconvert.py  converttolegacy converttolegacy.py
 
-if HAVE_PYMOD_BIGGLES
+if HAVE_PYMOD_MATPLOTLIB
 
 bin_SCRIPTS += plabun plroute
 
@@ -71,7 +71,7 @@ install-exec-hook:
 	sed -i.bak -e '/@REMOVE_INST@/d' -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/converttolegacy
 	rm $(DESTDIR)$(bindir)/converttolegacy.bak
 	chmod a+x $(DESTDIR)$(bindir)/converttolegacy
-if HAVE_PYMOD_BIGGLES
+if HAVE_PYMOD_MATPLOTLIB
 	sed -i.bak -e '/@REMOVE_INST@/d' -e 's,$${prefix},${prefix},g' $(DESTDIR)$(bindir)/plabun
 	rm $(DESTDIR)$(bindir)/plabun.bak
 	chmod a+x $(DESTDIR)$(bindir)/plabun

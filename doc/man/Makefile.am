@@ -19,7 +19,7 @@
 
 man_MANS = astrochem.1 chmconvert.1 converttolegacy.1
 
-if HAVE_PYMOD_BIGGLES
+if HAVE_PYMOD_MATPLOTLIB
 	man_MANS += plabun.1 plroute.1
 endif
 
