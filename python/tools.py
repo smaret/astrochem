@@ -1020,7 +1020,7 @@ def _totex_species(spec):
     """
 
     if spec in ["cosmic-ray", "uv-photon"]:
-        return spec
+        return "\mathrm{" + spec + "}"
 
     tex_s = ""
     for char in spec:
@@ -1033,4 +1033,4 @@ def _totex_species(spec):
         else:
             tex_s = tex_s + char
 
-    return tex_s
+    return "\mathrm{" + tex_s + "}"
