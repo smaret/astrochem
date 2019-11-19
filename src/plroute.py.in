@@ -25,8 +25,9 @@ sys.path.append("@abs_top_srcdir@/python/") # @REMOVE_INST@
 sys.path.append("@pythondir@")
 import os.path
 import getopt
-import biggles
-from numpy import *
+from matplotlib import pyplot as plt
+from matplotlib import gridspec
+import numpy as np
 try:
     from astrochem.tools import network_reader, readroutlegacy, readrout, _totex_species, listspecies, readfilesattrs
 except ImportError:
@@ -73,47 +74,6 @@ This is free software. You may redistribute copies of it under the terms
 of the GNU General Public License. There is NO WARRANTY, to the extent
 permitted by law.""")
 
-def curveblank(xvalues, yvalues, blanking = 0, linecolor = "black",
-               linetype = "solid"):
-    """
-    Return a list of curves of yvalues vs. xvalues with blank values
-
-    This function returns a list of curves of yvalues vs. xvalues
-    ignoring blanked values. For example, if xvalues = [1,2,3,4,5] and
-    yvalues = [1,2,0,3,4], it will return a list of two curves
-    corresponding to the xvalues [1,2] and [3,4], respectively. These
-    curves can be added to a plot object, so the two closest non
-    blanked value from a blank values (2 and 3 in this example) are
-    not connected.
-
-    Arguments:
-       xvalues:     sequence of x values
-       yvalues:     sequence of y values
-       blanking:    blanking value for y (default 0)
-       linecolor:   curve color (default "black")
-       linetype:    curve type (default "solid")
-
-    """
-
-    x = []
-    y = []
-    c = []
-    for xi, yi in zip(xvalues, yvalues):
-        if yi != blanking:
-            x.append(xi)
-            y.append(yi)
-        else:
-            if len(x) >= 2:
-                c.append(biggles.Curve(x, y, linecolor = linecolor,
-                                       linetype = linetype, linewidth = 2))
-            x = []
-            y = []
-    if len(x) >= 2:
-        c.append(biggles.Curve(x, y, linecolor = linecolor,
-                               linetype = linetype, linewidth = 2))
-
-    return c
-
 def main():
     """
     Main program for plroute
@@ -122,11 +82,9 @@ def main():
 
     # Parse options and arguments
     try:
-	opts, args = getopt.getopt(sys.argv[1:], "hVo:c:s:x:y:m:p:l",
-				   ["help", "version", "output=",
-                                    "cell=", "shell=", "xrange=",
-                                    "yrange=", "chmfile=", "percent",
-                                    "legacy"])
+        opts, args = getopt.getopt(sys.argv[1:], "hVo:c:s:x:y:m:p:l",
+                                   ["help", "version", "output=", "cell=", "shell=",
+                                    "xrange=", "yrange=", "chmfile=", "percent", "legacy"])
     except getopt.GetoptError:
         usage()
         sys.exit(1)
@@ -193,9 +151,10 @@ def main():
         specie = os.path.splitext(os.path.basename(filename))[0]
     else:
         if len(args) == 1:
-            print "Available species in this file are:"
+            filename = args[0]
+            print("Available species in this file are:")
             try:
-                listspecies( args[0] )
+                listspecies(filename)
             except IOError as e:
                 sys.stderr.write("plroute: error: can't open %s. Error : %s\n" % (filename, e) )
             except ValueError as e:
@@ -216,7 +175,7 @@ def main():
                 destruction_rate = readroutlegacy(filename)
         else:
             time, cell, formation_reac, formation_rate, destruction_reac, \
-                destruction_rate = readrout(filename)
+                destruction_rate = readrout(filename, specie)
             chmfile, tmp = readfilesattrs(filename)
     except IOError as e:
         sys.stderr.write("plroute: error: can't open %s.\n" % filename)
@@ -236,47 +195,46 @@ def main():
     # Create arrays containing the destruction/formation routes at
     # each time step and in each cell.
 
-    f_reac = unique(formation_reac[c, :, :])
-    d_reac = unique(destruction_reac[c, :, :])
+    f_reac = np.unique(formation_reac[c, :, :])
+    d_reac = np.unique(destruction_reac[c, :, :])
     f_reac = f_reac[f_reac.nonzero()]
     d_reac = d_reac[d_reac.nonzero()]
-    f_rate = zeros(len(f_reac) * len(time), dtype=float)
-    d_rate = zeros(len(d_reac) * len(time), dtype=float)
+    f_rate = np.empty(len(f_reac) * len(time), dtype=float)
+    d_rate = np.empty(len(d_reac) * len(time), dtype=float)
     f_rate = f_rate.reshape(len(f_reac), len(time))
     d_rate = d_rate.reshape(len(d_reac), len(time))
+    f_rate[:] = np.nan
+    d_rate[:] = np.nan
 
     for i in range(len(time)):
         for j in range(len(f_reac)):
-            index = where(formation_reac[c, i, :] == f_reac[j])[0]
+            index = np.where(formation_reac[c, i, :] == f_reac[j])[0]
             if len(index) > 0:
                 f_rate[j, i] = formation_rate[c, i, index[0]]
-            else:
-                f_rate[j, i] = 0.
         for j in range(len(d_reac)):
-            index = where(destruction_reac[c, i, :] == d_reac[j])[0]
+            index = np.where(destruction_reac[c, i, :] == d_reac[j])[0]
             if len(index) > 0:
                 d_rate[j, i] = destruction_rate[c, i, index[0]]
-            else:
-                d_rate[j, i] = 0.
+    if legacy:
+        d_rate = -d_rate # in legacy format, destruction rate are negative
 
     # Find the most important formation/destruction routes. For
     # this we compute the integral of the formation/destruction
     # rates for each formation/destruction over the time interval.
 
-    int_f_rate = zeros(len(f_reac), dtype=float)
-    int_d_rate = zeros(len(d_reac), dtype=float)
+    int_f_rate = np.zeros(len(f_reac), dtype=float)
+    int_d_rate = np.zeros(len(d_reac), dtype=float)
 
     dtime = time[1:-1] - time[0:-2]
 
     for j in range(len(f_reac)):
-        if (f_rate[j] == 0).all(): continue
-        int_f_rate[j] = sum(f_rate[j, 1:-1] * dtime)
+        int_f_rate[j] = np.nansum(f_rate[j, 1:-1] * dtime)
     for j in range(len(d_reac)):
-        int_d_rate[j] = sum(-d_rate[j, 1:-1] * dtime)
+        int_d_rate[j] = np.nansum(d_rate[j, 1:-1] * dtime)
 
     if percent:
-        int_f_rate_percent = int_f_rate / sum(int_f_rate) * 100.
-        int_d_rate_percent = int_d_rate / sum(int_d_rate) * 100.
+        int_f_rate_percent = int_f_rate / np.sum(int_f_rate) * 100.
+        int_d_rate_percent = int_d_rate / np.sum(int_d_rate) * 100.
 
     index_f = int_f_rate.argsort()[::-1]
     index_d = int_d_rate.argsort()[::-1]
@@ -302,84 +260,61 @@ def main():
                                  % (r, chmfile))
             sys.exit(1)
 
-    # Plot the formation/destruction rates as a function of time or cell
-    # number for the main formation/destruction routes.
+    # Plot the formation/destruction rates as a function of time for the main
+    # formation/destruction routes.
 
-    biggles.configure( 'screen', 'width', 1200 )
-    biggles.configure( 'screen', 'height', 600 )
-    biggles.configure('postscript', 'width', '15.0in')
-    biggles.configure('postscript', 'height', '7.5in')
+    fig = plt.figure("plroute", figsize=(10.5,4.8))
+    fig.subplots_adjust(left=0.1, right=0.95, top = 0.9, wspace=0.25)
+    grs = gridspec.GridSpec(1, 2)
 
-    p1.xtitle = p2.xtitle = "Time (yr)"
-    p1.xlog = p2.xlog = 1
+    ax0 = plt.subplot(grs[0])
+    ax0.set(title = "Main $" + _totex_species(specie) + "$ formation routes")
+    ax0.set(ylabel="Formation rate ($\mathrm{cm^{-3} \, s^{-1}}$)")
+    ax0.set(xlabel="Time (yr)")
+    ax0.set(xscale = "log")
+    ax0.set(yscale = "log")
+    ax0.margins(0)
 
-    t = biggles.Table(1,2)
-    p1 = biggles.FramedPlot()
-    p2 = biggles.FramedPlot()
-    p1.title = "$Main " + _totex_species(specie) + " formation routes$"
-    p2.title = "$Main " + _totex_species(specie) + " destruction routes$"
-    p1.ytitle = "$Formation rate (cm^{-3} s^{-1})$"
-    p2.ytitle = "$Destruction rate (cm^{-3} s^{-1})$"
-    p1.ylog = p2.ylog = 1
+    ax1 = plt.subplot(grs[1])
+    ax1.set(title = "Main $" + _totex_species(specie) + "$ destruction routes")
+    ax1.set(ylabel="Destruction rate ($\mathrm{cm^{-3} \, s^{-1}}$)")
+    ax1.set(xlabel="Time (yr)")
+    ax1.set(xscale = "log")
+    ax1.set(yscale = "log")
+    ax1.margins(0)
+
     if xrange:
-        p1.xrange = p2.xrange = xrange
+        ax0.set(xlim=(xrange[0], xrange[1]))
+        ax1.set(xlim=(xrange[0], xrange[1]))
     if yrange:
-        p1.yrange = p2.yrange = yrange
+        ax0.set(ylim=(yrange[0], yrange[1]))
+        ax1.set(ylim=(yrange[0], yrange[1]))
 
     for j in index_f[0:6]:
-        c = curveblank(time, f_rate[j, :], linecolor = linecolor)
         if chmfile:
-            c[0].label = f_reaction[j]
+            label = f_reaction[j]
         else:
-            c[0].label = "%i" % f_reac[j]
+            label = "%i" % f_reac[j]
         if percent:
-            c[0].label += " (%.0f" % int_f_rate_percent[j] + "%)"
-        curves_f.append(c[0])
-        for ci in c:
-            p1.add(ci)
+            label += " (%.0f" % int_f_rate_percent[j] + "%)"
+        ax0.plot(time, f_rate[j, :], label=label)
+    ax0.plot(time, np.nansum(f_rate, axis = 0), linestyle="dotted", color="black", label="Total")
+    ax0.legend()
 
     for j in index_d[0:6]:
-        linecolor = linecolor_stack.pop(0)
-        c = curveblank(time, -d_rate[j, :], linecolor = linecolor)
         if chmfile:
-            c[0].label = d_reaction[j]
+            label = d_reaction[j]
         else:
-            c[0].label = "%i" % d_reac[j]
+            label = "%i" % d_reac[j]
         if percent:
-            c[0].label += " (%.0f" % int_d_rate_percent[j] + "%)"
-        curves_d.append(c[0])
-        for ci in c:
-            p2.add(ci)
-
-    # Plot the total formation and destruction rates
-
-    c = curveblank(time, sum(f_rate, axis = 0), linetype = "dotted")
-    c[0].label = "Total"
-    curves_f.append(c[0])
-    for ci in c:
-        p1.add(ci)
-
-    c = curveblank(time, sum(-d_rate, axis = 0), linetype = "dotted")
-    c[0].label = "Total"
-    curves_d.append(c[0])
-    for ci in c:
-        p2.add(ci)
-
-    # Draw the plot key.
-
-    if chmfile:
-        xkey, ykey = .25, .4
-    else:
-        xkey, ykey = .65, .4
-    p1.add(biggles.PlotKey(xkey, ykey, curves_f))
-    p2.add(biggles.PlotKey(xkey, ykey, curves_d))
-
-    t[0,0] = p1
-    t[0,1] = p2
+            label += " (%.0f" % int_d_rate_percent[j] + "%)"
+        ax1.plot(time, d_rate[j, :], label=label)
+    ax1.plot(time, np.nansum(d_rate, axis = 0), linestyle="dotted", color="black", label="Total")
+    ax1.legend()
 
     if output:
-        t.write_eps(output)
+        fig.savefig(output, bbox_inches="tight")
     else:
-        t.show()
+        plt.show()
 
 main()
