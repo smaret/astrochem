@@ -82,7 +82,7 @@ def main():
 
     # Parse options and arguments
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVo:c:s:x:y:m:p:l",
+        opts, args = getopt.getopt(sys.argv[1:], "hVo:c:s:x:y:m:pl",
                                    ["help", "version", "output=", "cell=", "shell=",
                                     "xrange=", "yrange=", "chmfile=", "percent", "legacy"])
     except getopt.GetoptError:
