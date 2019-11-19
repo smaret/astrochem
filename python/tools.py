@@ -691,7 +691,7 @@ def listspecies(filename):
     import h5py
     f = h5py.File(filename, "r")
     if "Species" in f:
-        s = f.get("Species").value.tolist()  # byte code string in Python 3k
+        s = f.get("Species")[()].tolist()  # byte code string in Python 3k
         s = list(map(lambda x: x.decode(), s))
     else:
         raise IOError("%s file doest not contain \"Species\" dataset" % filename)
@@ -725,7 +725,7 @@ def readabun(filename, specie):
     else:
         raise IOError("%s file doest not contain \"TimeSteps\" dataset" % filename )
     if "Species" in f:
-        s = f.get("Species").value.tolist()  # byte code string in Python 3k
+        s = f.get("Species")[()].tolist()  # byte code string in Python 3k
         s = list(map(lambda x: x.decode(), s))
     else:
         raise IOError("%s file doest not contain \"Species\" dataset" % filename )
@@ -774,7 +774,7 @@ def readrout(filename, specie):
     else:
         raise IOError("%s file doest not contain \"TimeSteps\" dataset" % filename )
     if "Species" in f:
-        s = f.get("Species").value.tolist()  # byte code string in Python 3k
+        s = f.get("Species")[()].tolist()  # byte code string in Python 3k
         s = list(map(lambda x: x.decode(), s))
     else:
         raise IOError("%s file doest not contain \"Species\" dataset" % filename )
