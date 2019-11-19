@@ -179,7 +179,8 @@ def main():
         usage()
         sys.exit(1)
 
-    # Ignore commands, for backward compatibility
+    # Ignore commands, for backward compatibility.
+
     if args[0] == "time":
         sys.stderr.write("plabun: warning: time command is deprecated, ignoring it.\n")
         args = args[1:]
@@ -188,6 +189,8 @@ def main():
         if len(args) != 1:
             usage()
             sys.exit(1)
+        filename = args[0]
+        specie = os.path.splitext(os.path.basename(filename))[0]
     else:
         if len(args) == 1:
             print "Available species in this file are:"
@@ -202,20 +205,113 @@ def main():
             if len(args) != 2:
                 usage()
                 sys.exit(1)
+            filename = args[0]
+            specie = args[1]
 
-    filename = args[0]
-    if not legacy:
-        specie = args[1]
-        chmfile, tmp = readfilesattrs( filename )
+    # Read the formation/destruction routes.
+
+    try:
+        if legacy:
+            time, cell, formation_reac, formation_rate, destruction_reac, \
+                destruction_rate = readroutlegacy(filename)
+        else:
+            time, cell, formation_reac, formation_rate, destruction_reac, \
+                destruction_rate = readrout(filename)
+            chmfile, tmp = readfilesattrs(filename)
+    except IOError as e:
+        sys.stderr.write("plroute: error: can't open %s.\n" % filename)
+        sys.exit(1)
+    except ValueError:
+        sys.stderr.write("plroute: error: can't read %s.\n" % filename)
+        sys.exit(1)
+
+    # Check that the cell index is valid.
+
+    try:
+        temp = formation_reac[c, 0, 0]
+    except IndexError:
+        sys.stderr.write("plroute: error: cell index is out of bounds.\n")
+        sys.exit(1)
+
+    # Create arrays containing the destruction/formation routes at
+    # each time step and in each cell.
+
+    f_reac = unique(formation_reac[c, :, :])
+    d_reac = unique(destruction_reac[c, :, :])
+    f_reac = f_reac[f_reac.nonzero()]
+    d_reac = d_reac[d_reac.nonzero()]
+    f_rate = zeros(len(f_reac) * len(time), dtype=float)
+    d_rate = zeros(len(d_reac) * len(time), dtype=float)
+    f_rate = f_rate.reshape(len(f_reac), len(time))
+    d_rate = d_rate.reshape(len(d_reac), len(time))
+
+    for i in range(len(time)):
+        for j in range(len(f_reac)):
+            index = where(formation_reac[c, i, :] == f_reac[j])[0]
+            if len(index) > 0:
+                f_rate[j, i] = formation_rate[c, i, index[0]]
+            else:
+                f_rate[j, i] = 0.
+        for j in range(len(d_reac)):
+            index = where(destruction_reac[c, i, :] == d_reac[j])[0]
+            if len(index) > 0:
+                d_rate[j, i] = destruction_rate[c, i, index[0]]
+            else:
+                d_rate[j, i] = 0.
+
+    # Find the most important formation/destruction routes. For
+    # this we compute the integral of the formation/destruction
+    # rates for each formation/destruction over the time interval.
+
+    int_f_rate = zeros(len(f_reac), dtype=float)
+    int_d_rate = zeros(len(d_reac), dtype=float)
+
+    dtime = time[1:-1] - time[0:-2]
+
+    for j in range(len(f_reac)):
+        if (f_rate[j] == 0).all(): continue
+        int_f_rate[j] = sum(f_rate[j, 1:-1] * dtime)
+    for j in range(len(d_reac)):
+        int_d_rate[j] = sum(-d_rate[j, 1:-1] * dtime)
+
+    if percent:
+        int_f_rate_percent = int_f_rate / sum(int_f_rate) * 100.
+        int_d_rate_percent = int_d_rate / sum(int_d_rate) * 100.
+
+    index_f = int_f_rate.argsort()[::-1]
+    index_d = int_d_rate.argsort()[::-1]
+
+    # Find the reaction corresponding to the reaction numbers.
+
+    if chmfile:
+        try:
+            f = open(chmfile)
+            net = network_reader.fromfile(f, fileformat = "chm")
+            f.close()
+        except:
+            sys.stderr.write("plroute: error: can't read %s.\n" % chmfile)
+            sys.exit(1)
+        try:
+            f_reaction, d_reaction = [], []
+            for r in f_reac:
+                f_reaction.append(net.getreact(r).totex())
+            for r in d_reac:
+                d_reaction.append(net.getreact(r).totex())
+        except ValueError:
+            sys.stderr.write("plroute: error: can't find reaction %i in %s.\n" \
+                                 % (r, chmfile))
+            sys.exit(1)
+
+    # Plot the formation/destruction rates as a function of time or cell
+    # number for the main formation/destruction routes.
 
     biggles.configure( 'screen', 'width', 1200 )
     biggles.configure( 'screen', 'height', 600 )
     biggles.configure('postscript', 'width', '15.0in')
     biggles.configure('postscript', 'height', '7.5in')
 
-    if legacy:
-        # Get species name from the filename
-        specie = os.path.splitext(os.path.basename(filename))[0]
+    p1.xtitle = p2.xtitle = "Time (yr)"
+    p1.xlog = p2.xlog = 1
 
     t = biggles.Table(1,2)
     p1 = biggles.FramedPlot()
@@ -229,288 +325,48 @@ def main():
         p1.xrange = p2.xrange = xrange
     if yrange:
         p1.yrange = p2.yrange = yrange
-    curves_f = []
-    curves_d = []
 
-    # Stack for line colors
-    linecolor_stack = ["red", "blue", "green", "yellow", "orange", "cyan"]
-    
-    # Plot formation/destruction rates as a function of time or cell
-    # number for the main formation/destruction routes
-
-    # legacy code
-    if legacy:
-        try:
-            time, cell, formation_reac, formation_rate, destruction_reac, \
-                destruction_rate = readroutlegacy(filename)
-        except IOError as e:
-            sys.stderr.write("plroute: error: can't open %s.\n" % filename)
-            sys.exit(1)
-        except ValueError:
-            sys.stderr.write("plroute: error: can't read %s.\n" % filename)
-            sys.exit(1)
-
-        p1.xtitle = p2.xtitle = "Time (yr)"
-        p1.xlog = p2.xlog = 1
-
-        # Check that the cell index is valid
-        try:
-            temp = formation_reac[c, 0, 0]
-        except IndexError:
-            sys.stderr.write("plroute: error: cell index is out of bounds.\n")
-            sys.exit(1)
-
-        # Create arrays containing the destruction/formation routes at
-        # each time step and in each cell
-
-        f_reac = unique(formation_reac[c, :, :])
-        d_reac = unique(destruction_reac[c, :, :])
-        f_reac = f_reac[f_reac.nonzero()]
-        d_reac = d_reac[d_reac.nonzero()]
-        f_rate = zeros(len(f_reac) * len(time), dtype=float)
-        d_rate = zeros(len(d_reac) * len(time), dtype=float)
-        f_rate = f_rate.reshape(len(f_reac), len(time))
-        d_rate = d_rate.reshape(len(d_reac), len(time))
-
-        for i in range(len(time)):
-            for j in range(len(f_reac)):
-                index = where(formation_reac[c, i, :] == f_reac[j])[0]
-                if len(index) > 0:
-                    f_rate[j, i] = formation_rate[c, i, index[0]]
-                else:
-                    f_rate[j, i] = 0.
-            for j in range(len(d_reac)):
-                index = where(destruction_reac[c, i, :] == d_reac[j])[0]
-                if len(index) > 0:
-                    d_rate[j, i] = destruction_rate[c, i, index[0]]
-                else:
-                    d_rate[j, i] = 0.
-
-        # Find the most important formation/destruction routes. For
-        # this we compute the integral of the formation/destruction
-        # rates for each formation/destruction over the time interval.
-
-        int_f_rate = zeros(len(f_reac), dtype=float)
-        int_d_rate = zeros(len(d_reac), dtype=float)
-
-        dtime = time[1:-1] - time[0:-2]
-
-        for j in range(len(f_reac)):
-            if (f_rate[j] == 0).all(): continue
-            int_f_rate[j] = sum(f_rate[j, 1:-1] * dtime)
-        for j in range(len(d_reac)):
-            int_d_rate[j] = sum(-d_rate[j, 1:-1] * dtime)
-
-        if percent:
-            int_f_rate_percent = int_f_rate / sum(int_f_rate) * 100.
-            int_d_rate_percent = int_d_rate / sum(int_d_rate) * 100.
-
-        index_f = int_f_rate.argsort()[::-1]
-        index_d = int_d_rate.argsort()[::-1]
-        # FixMe: drop values containing only zeros
-
-        # Find the reaction corresponding to the reaction numbers
-
+    for j in index_f[0:6]:
+        c = curveblank(time, f_rate[j, :], linecolor = linecolor)
         if chmfile:
-            try:
-                f = open(chmfile)
-                net = network_reader.fromfile(f, fileformat = "chm")
-                f.close()
-            except:
-                sys.stderr.write("plroute: error: can't read %s.\n" % chmfile)
-                sys.exit(1)
-            try:
-                f_reaction, d_reaction = [], []
-                for r in f_reac:
-                    f_reaction.append(net.getreact(r).totex())
-                for r in d_reac:
-                    d_reaction.append(net.getreact(r).totex())
-            except ValueError:
-                sys.stderr.write("plroute: error: can't find reaction %i in %s.\n" \
-                                     % (r, chmfile))
-                sys.exit(1)
-
-        # Plot them, ignoring blanked values
-
-        for j in index_f[0:6]:
-            linecolor = linecolor_stack.pop(0)
-            linecolor_stack.append(linecolor)
-
-            c = curveblank(time, f_rate[j, :], linecolor = linecolor)
-            if chmfile:
-                c[0].label = f_reaction[j]
-            else:
-                c[0].label = "%i" % f_reac[j]
-            if percent:
-                c[0].label += " (%.0f" % int_f_rate_percent[j] + "%)"
-            curves_f.append(c[0])
-            for ci in c:
-                p1.add(ci)
-
-        for j in index_d[0:6]:
-            linecolor = linecolor_stack.pop(0)
-            c = curveblank(time, -d_rate[j, :], linecolor = linecolor)
-            if chmfile:
-                c[0].label = d_reaction[j]
-            else:
-                c[0].label = "%i" % d_reac[j]
-            if percent:
-                c[0].label += " (%.0f" % int_d_rate_percent[j] + "%)"
-            curves_d.append(c[0])
-            for ci in c:
-                p2.add(ci)
-
-        # Plot the total formation and destruction rates
-
-        c = curveblank(time, sum(f_rate, axis = 0), linetype = "dotted")
-        c[0].label = "Total"
+            c[0].label = f_reaction[j]
+        else:
+            c[0].label = "%i" % f_reac[j]
+        if percent:
+            c[0].label += " (%.0f" % int_f_rate_percent[j] + "%)"
         curves_f.append(c[0])
         for ci in c:
             p1.add(ci)
 
-        c = curveblank(time, sum(-d_rate, axis = 0), linetype = "dotted")
-        c[0].label = "Total"
-        curves_d.append(c[0])
-        for ci in c:
-            p2.add(ci)
-    else:
-        try:
-            time, shell, formation_reac, formation_rate, destruction_reac, \
-                destruction_rate = readrout(filename,specie)
-        except IOError as e:
-            sys.stderr.write("plroute: error: can't open %s. Error : %s\n" % (filename, e) )
-            sys.exit(1)
-        except ValueError as e:
-            sys.stderr.write("plroute: error: can't read %s. Error : %s\n" % (filename, e) )
-            sys.exit(1)
-
-        p1.xtitle = p2.xtitle = "Time (yr)"
-        p1.xlog = p2.xlog = 1
-
-        # Check that the shell index is valid
-        try:
-            temp = formation_reac[c, 0, 0]
-        except IndexError:
-            sys.stderr.write("plroute: error: shell index is out of bounds.\n")
-            sys.exit(1)
-
-        # Create arrays containing the destruction/formation routes at
-        # each time step and in each shell
-
-        f_reac = unique(formation_reac[c, :, :])
-        d_reac = unique(destruction_reac[c, :, :])
-        f_reac = f_reac[f_reac.nonzero()]
-        d_reac = d_reac[d_reac.nonzero()]
-        f_rate = zeros(len(f_reac) * len(time), dtype=float)
-        d_rate = zeros(len(d_reac) * len(time), dtype=float)
-        f_rate = f_rate.reshape(len(f_reac), len(time))
-        d_rate = d_rate.reshape(len(d_reac), len(time))
-
-        for i in range(len(time)):
-            for j in range(len(f_reac)):
-                index = where(formation_reac[c, i, :] == f_reac[j])[0]
-                if len(index) > 0:
-                    f_rate[j, i] = formation_rate[c, i, index[0]]
-                else:
-                    f_rate[j, i] = 0.
-            for j in range(len(d_reac)):
-                index = where(destruction_reac[c, i, :] == d_reac[j])[0]
-                if len(index) > 0:
-                    d_rate[j, i] = destruction_rate[c, i, index[0]]
-                else:
-                    d_rate[j, i] = 0.
-
-        # Find the most important formation/destruction routes. For
-        # this we compute the integral of the formation/destruction
-        # rates for each formation/destruction over the time interval.
-
-        int_f_rate = zeros(len(f_reac), dtype=float)
-        int_d_rate = zeros(len(d_reac), dtype=float)
-
-        dtime = time[1:-1] - time[0:-2]
-
-        for j in range(len(f_reac)):
-            if (f_rate[j] == 0).all(): continue
-            int_f_rate[j] = sum(f_rate[j, 1:-1] * dtime)
-        for j in range(len(d_reac)):
-    #        if (d_rate[j] == 0).all(): continue
-            int_d_rate[j] = sum(d_rate[j, 1:-1] * dtime)
-
-        if percent:
-            int_f_rate_percent = int_f_rate / sum(int_f_rate) * 100.
-            int_d_rate_percent = int_d_rate / sum(int_d_rate) * 100.
-
-        index_f = int_f_rate.argsort()[::-1]
-        index_d = int_d_rate.argsort()[::-1]
-        # FixMe: drop values containing only zeros
-
-        # Find the reaction corresponding to the reaction numbers
-
+    for j in index_d[0:6]:
+        linecolor = linecolor_stack.pop(0)
+        c = curveblank(time, -d_rate[j, :], linecolor = linecolor)
         if chmfile:
-            try:
-                f = open(chmfile)
-                net = network_reader.fromfile(f, fileformat = "chm")
-                f.close()
-            except:
-                sys.stderr.write("plroute: error: can't read %s.\n" % chmfile)
-                sys.exit(1)
-            try:
-                f_reaction, d_reaction = [], []
-                for r in f_reac:
-                    f_reaction.append(net.getreact(r).totex())
-                for r in d_reac:
-                    d_reaction.append(net.getreact(r).totex())
-            except ValueError:
-                sys.stderr.write("plroute: error: can't find reaction %i in %s.\n" \
-                                     % (r, chmfile))
-                sys.exit(1)
-
-        # Plot them, ignoring blanked values
-
-        for j in index_f[0:6]:
-            linecolor = linecolor_stack.pop(0)
-            linecolor_stack.append(linecolor)
-
-            c = curveblank(time, f_rate[j, :], linecolor = linecolor)
-            if chmfile:
-                c[0].label = f_reaction[j]
-            else:
-                c[0].label = "%i" % f_reac[j]
-            if percent:
-                c[0].label += " (%.0f" % int_f_rate_percent[j] + "%)"
-            curves_f.append(c[0])
-            for ci in c:
-                p1.add(ci)
-
-        for j in index_d[0:6]:
-            linecolor = linecolor_stack.pop(0)
-
-            c = curveblank(time, d_rate[j, :], linecolor = linecolor)
-            if chmfile:
-                c[0].label = d_reaction[j]
-            else:
-                c[0].label = "%i" % d_reac[j]
-            if percent:
-                c[0].label += " (%.0f" % int_d_rate_percent[j] + "%)"
-            curves_d.append(c[0])
-            for ci in c:
-                p2.add(ci)
-
-        # Plot the total formation and destruction rates
-
-        c = curveblank(time, sum(f_rate, axis = 0), linetype = "dotted")
-        c[0].label = "Total"
-        curves_f.append(c[0])
-        for ci in c:
-            p1.add(ci)
-
-        c = curveblank(time, sum(d_rate, axis = 0), linetype = "dotted")
-        c[0].label = "Total"
+            c[0].label = d_reaction[j]
+        else:
+            c[0].label = "%i" % d_reac[j]
+        if percent:
+            c[0].label += " (%.0f" % int_d_rate_percent[j] + "%)"
         curves_d.append(c[0])
         for ci in c:
             p2.add(ci)
 
-    # Draw the plot key
+    # Plot the total formation and destruction rates
+
+    c = curveblank(time, sum(f_rate, axis = 0), linetype = "dotted")
+    c[0].label = "Total"
+    curves_f.append(c[0])
+    for ci in c:
+        p1.add(ci)
+
+    c = curveblank(time, sum(-d_rate, axis = 0), linetype = "dotted")
+    c[0].label = "Total"
+    curves_d.append(c[0])
+    for ci in c:
+        p2.add(ci)
+
+    # Draw the plot key.
+
     if chmfile:
         xkey, ykey = .25, .4
     else:
