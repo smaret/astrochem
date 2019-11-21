@@ -519,6 +519,7 @@ parameters in input files and their default value, see
     # Output
     [output]
     abundances = H3(+),e(-),CO,HCO(+)
+    time_steps = 128
     trace_routes = 1
 
 The various sections of the file are indicated by keywords within
@@ -527,17 +528,19 @@ brackets. Lines starting with ``#`` are comments. The first section
 (``source``), and the chemical network to use (``chem``). The
 following section (``[phys]``) sets the physical parameters of the
 source. Here we set the UV radiation field in Draine units (``chi``)
-to 1.0, and the cosmic ionization rate (``cosmic``) to :math:`\mathrm{1.3
-\times 10^{-17} \, s^{-1}}`. The solver parameters are set in following
-section (``[solver]``). ``ti`` and ``tf`` are the initial and final
-time for the calculation respectively. Both are expressed in
-years. The ``[abundance]`` section sets the initial abundances;
-abundances that are not specified are set to zero. The last section
-(``[output]``) sets parameters relative to the output of the code.
-``abundances`` sets the name of the species for which we want to
-create output containing the abundances as a function of
-time.. ``trace_route`` is an optional parameter that allow to trace
-the various formation and destruction routes of these species.
+to 1.0, and the cosmic ionization rate (``cosmic``) to
+:math:`\mathrm{1.3 \times 10^{-17} \, s^{-1}}`. The solver parameters
+are set in following section (``[solver]``). ``ti`` and ``tf`` are the
+initial and final time for the calculation respectively. Both are
+expressed in years. The ``[abundance]`` section sets the initial
+abundances; abundances that are not specified are set to zero. The
+last section (``[output]``) sets parameters relative to the output of
+the code.  ``abundances`` sets the name of the species for which we
+want to create output containing the abundances as a function of
+time. ``time_steps`` is an optional parameter that sets the number of
+time intervals in the output files. ``trace_route`` is another
+optional parameter that allow to trace the various formation and
+destruction routes of these species.
 
 In addition to the input file, we need to provide a file describing
 our source. The file corresponding to our problem looks like this (for

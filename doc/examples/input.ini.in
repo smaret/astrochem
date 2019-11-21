@@ -28,4 +28,5 @@ e(-)    = 7.31012e-5
 # Output
 [output]
 abundances = H3(+),e(-),C(+),CO,HCO(+)
+time_steps = 128
 trace_routes = 1
