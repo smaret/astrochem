@@ -605,7 +605,7 @@ and :math:`\mathrm{HCO^{+}}` abundances:
 
 ::
 
-    % plabun --xrange=1,1e7 --yrange=1e-12,1e-4 astrochem_output.h5 CO H3(+) e(-) HCO
+    % plabun --xrange=1,1e7 --yrange=1e-12,1e-4 astrochem_output.h5 "CO" "H3(+)" "e(-)" "HCO(+)"
 
 In the example above, we have set the x-axis range from :math:`1` to :math:`\mathrm{10^{7} \, yr}`
 
@@ -648,7 +648,7 @@ commands and options):
 
 ::
 
-    % plroute astrochem_output.h5 HCO(+)
+    % plroute astrochem_output.h5 "HCO(+)"
 
 .. _fig-example-routes:
     
