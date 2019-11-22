@@ -26,6 +26,12 @@
 #define _LIBASTROCHEM_H_
 
 #include <nvector/nvector_serial.h>
+#include <sunmatrix/sunmatrix_dense.h>
+#ifdef USE_LAPACK
+#include <sunlinsol/sunlinsol_lapackdense.h>
+#else
+#include <sunlinsol/sunlinsol_dense.h>
+#endif
 #include <string.h>
 
 #define MAX_CHAR_SPECIES 32   /* Maximum number of characters in a specie name */
@@ -100,6 +106,8 @@ typedef struct
 typedef struct
 {
   void* cvode_mem;
+  SUNMatrix a;
+  SUNLinearSolver ls;
   N_Vector y;
   params_t params;
   double density;

@@ -15,7 +15,7 @@ To compile Astrochem you will need:
 
 2. The [SUNDIALS (SUite of Nonlinear and DIfferential/ALgebraic
    equation Solvers) library](http://computation.llnl.gov/casc/sundials/).
-   You will need at least version 2.4.0 of the library installed on
+   You will need at least version 4.1.0 of the library installed on
    your computer.
 
 3. The [HDF 5 (Hierarchical Data Format) library](http://www.hdfgroup.org/HDF5)

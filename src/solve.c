@@ -30,19 +30,22 @@
 #include <math.h>
 
 #include <cvode/cvode.h>
+#include <nvector/nvector_serial.h>
+#include <sunmatrix/sunmatrix_dense.h>
 #ifdef USE_LAPACK
-#include <cvode/cvode_lapack.h>
+#include <sunlinsol/sunlinsol_lapackdense.h>
 #else
-#include <cvode/cvode_dense.h>
+#include <sunlinsol/sunlinsol_dense.h>
 #endif
+#include <sundials/sundials_types.h>
 
 #include "astrochem.h"
 #include "rates.h"
 
 static int f (realtype t, N_Vector y, N_Vector ydot, void *params);
 
-static int jacobian (long int N, realtype t, N_Vector y, N_Vector fy,
-                     DlsMat J, void *params, N_Vector tmp1,
+static int jacobian (realtype t, N_Vector y, N_Vector fy,
+                     SUNMatrix J, void *params, N_Vector tmp1,
                      N_Vector tmp2, N_Vector tmp3);
 
 /*
@@ -148,10 +151,9 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
    */
 
 static int
-jacobian (long int N __attribute__ ((unused)),
-          realtype t __attribute__ ((unused)), N_Vector y,
+jacobian (realtype t __attribute__ ((unused)), N_Vector y,
           N_Vector fy __attribute__ ((unused)),
-          DlsMat J, void *params,
+          SUNMatrix J, void *params,
           N_Vector tmp1 __attribute__ ((unused)),
           N_Vector tmp2 __attribute__ ((unused)),
           N_Vector tmp3 __attribute__ ((unused)))
@@ -176,7 +178,7 @@ jacobian (long int N __attribute__ ((unused)),
     {
       for (j = 0; j < n_species; j++)
         {
-          DENSE_ELEM (J, i, j) = 0;
+          SM_ELEMENT_D (J, i, j) = 0;
         }
     }
 
@@ -192,9 +194,9 @@ jacobian (long int N __attribute__ ((unused)),
         {
           /* H2 formation on grains */
 
-          DENSE_ELEM (J, reactions[i].reactants[0], reactions[i].reactants[0]) -=
+          SM_ELEMENT_D (J, reactions[i].reactants[0], reactions[i].reactants[0]) -=
            2 * reac_rates[i];
-          DENSE_ELEM (J, reactions[i].products[0], reactions[i].reactants[0]) +=
+          SM_ELEMENT_D (J, reactions[i].products[0], reactions[i].reactants[0]) +=
            reac_rates[i];
         }
       else if (reactions[i].reaction_type == 23)
@@ -212,9 +214,9 @@ jacobian (long int N __attribute__ ((unused)),
 		     (GRAIN_SITES_PER_CM2 * M_PI * pow (grain_size, 2) *
 		      grain_abundance * nh * reactions[i].gamma));
 
-	      DENSE_ELEM (J, reactions[i].reactants[0], reactions[i].reactants[0]) -=
+	      SM_ELEMENT_D (J, reactions[i].reactants[0], reactions[i].reactants[0]) -=
 		jac_elem;
-	      DENSE_ELEM (J, reactions[i].products[0], reactions[i].reactants[0]) +=
+	      SM_ELEMENT_D (J, reactions[i].products[0], reactions[i].reactants[0]) +=
 		jac_elem;
 	    }
         }
@@ -244,13 +246,13 @@ jacobian (long int N __attribute__ ((unused)),
 
               for( r2 = 0; r2 < nreactants; r2++ )
                 {
-                  DENSE_ELEM (J, reactions[i].reactants[r2], reactions[i].reactants[r]) -= y_product;
+                  SM_ELEMENT_D (J, reactions[i].reactants[r2], reactions[i].reactants[r]) -= y_product;
                 }
               for( p = 0; p < MAX_PRODUCTS; p++ )
                 {
                   if(  reactions[i].products[p] != -1 )
                     {
-                      DENSE_ELEM (J, reactions[i].products[p], reactions[i].reactants[r]) += y_product;
+                      SM_ELEMENT_D (J, reactions[i].products[p], reactions[i].reactants[r]) += y_product;
                     }
                 }
             }
@@ -331,7 +333,13 @@ int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
      absolute error is multiplied by the density, because we compute
      concentrations and not abundances. */
 
-  if (( astrochem_mem->cvode_mem = CVodeCreate (CV_BDF, CV_NEWTON)) == NULL)
+  if (((astrochem_mem->cvode_mem = CVodeCreate (CV_BDF)) == NULL)
+      || ((astrochem_mem->a = SUNDenseMatrix (network->n_species, network->n_species)) == NULL)
+#ifdef USE_LAPACK
+      || ((astrochem_mem->ls = SUNLinSol_LapackDense (astrochem_mem->y, astrochem_mem->a)) == NULL))
+#else
+      || ((astrochem_mem->ls = SUNLinSol_Dense (astrochem_mem->y, astrochem_mem->a)) == NULL))
+#endif
     {
       fprintf (stderr, "astrochem: %s:%d: solver memory allocation failed.\n",
                __FILE__, __LINE__);
@@ -339,17 +347,10 @@ int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
     }
 
   astrochem_mem->t = 0.0;
-  if ((CVodeInit ( astrochem_mem->cvode_mem, f, astrochem_mem->t,  astrochem_mem->y ) != CV_SUCCESS)
-      ||
-      (CVodeSStolerances
-       ( astrochem_mem->cvode_mem, rel_err,
-         abs_err * density ) != CV_SUCCESS)
-#ifdef USE_LAPACK
-      || ((CVLapackDense ( astrochem_mem->cvode_mem, network->n_species) != CV_SUCCESS))
-#else
-      || ((CVDense ( astrochem_mem->cvode_mem, network->n_species) != CV_SUCCESS))
-#endif
-      || ((CVDlsSetDenseJacFn (  astrochem_mem->cvode_mem, jacobian) != CV_SUCCESS))
+  if ((CVodeInit ( astrochem_mem->cvode_mem, f, astrochem_mem->t, astrochem_mem->y ) != CV_SUCCESS)
+      || (CVodeSStolerances ( astrochem_mem->cvode_mem, rel_err, abs_err * density ) != CV_SUCCESS)
+      || ((CVodeSetLinearSolver ( astrochem_mem->cvode_mem, astrochem_mem->ls, astrochem_mem->a) != CV_SUCCESS))
+      || ((CVodeSetJacFn ( astrochem_mem->cvode_mem, jacobian) != CV_SUCCESS))
       || (CVodeSetUserData ( astrochem_mem->cvode_mem, &astrochem_mem->params) != CV_SUCCESS)
       || (CVodeSetMaxNumSteps (astrochem_mem->cvode_mem, CVODE_MXSTEPS) != CV_SUCCESS))
     {
@@ -442,6 +443,14 @@ void solver_close( astrochem_mem_t* astrochem_mem )
   if( astrochem_mem->cvode_mem != NULL )
     {
       CVodeFree (&astrochem_mem->cvode_mem);
+    }
+  if( astrochem_mem->ls != NULL )
+    {
+      SUNLinSolFree (astrochem_mem->ls);
+    }
+  if( astrochem_mem->a != NULL )
+    {
+      SUNMatDestroy (astrochem_mem->a);
     }
 }
 
