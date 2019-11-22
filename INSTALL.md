@@ -25,9 +25,9 @@ To compile Astrochem you will need:
 
 5. The
    [NumPy](http://numpy.scipy.org/),
-   [Biggles](http://biggles.sourceforge.net/)
+   [Matplotlib](https://matplotlib.org)
    and [H5py](http://www.h5py.org) Python modules.  Numpy is
-   mandatory, but Biggles and H5py are optional. However, Biggles and
+   mandatory, but Matplotlib and H5py are optional. However, Matplotlib and
    H5py are required to use the plotting tools provided with
    Astrochem. Note that H5Py 2.6.0 has a bug which causes the
    formation/destructions routes computed by Astrochem to be
