@@ -94,6 +94,15 @@ in this directory will require root privileges on most systems (use
 Optional features
 -----------------
 
+Astrochem can use the LAPACK library together with SUNDIALS, which
+usually results in better performance than when using SUNDIALS
+alone. This can be turned on by specifying the `--enable-lapack` option to
+configure, e.g.
+
+```
+./configure --enable-lapack
+```
+
 Astrochem can be run in parallel on multi CPU (or core)
 computers. For this it uses OpenMP compilation directives. If your
 compiler supports OpenMP, compilation of the parallel version of

@@ -28,6 +28,7 @@ AC_CONFIG_MACRO_DIR([m4])
 
 # Set package options
 AC_ARG_ENABLE([openmp],	AC_HELP_STRING([--enable-openmp], [enable openmp (default is no)]))
+AC_ARG_ENABLE([lapack],	AC_HELP_STRING([--enable-lapack], [enable LAPACK (default is no)]))
 
 # Check for programs
 AC_PROG_CC
@@ -40,10 +41,14 @@ AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(sundials_cvode, main,, AC_MSG_ERROR(Could not find SUNDIALS/CVODE library. Make sure you set CFLAGS to include the include directory and set LDFLAGS to include the library directory.))
 AC_CHECK_LIB(sundials_cvode, CVodeSetLinearSolver,, AC_MSG_ERROR(Could not find the CVodeSetLinearSolver function in SUNDIALS/CVODE  library. Make sure that your SUNDIALS version is >= 4.1.0.))
 AC_CHECK_LIB(sundials_nvecserial, main,, AC_MSG_ERROR(Could not find SUNDIALS/NVECSERIAL library. Make sure you set CFLAGS to include the include directory and set LDFLAGS to include the library directory.))
-AC_CHECK_LIB(sundials_sunlinsollapackdense, main,, AC_MSG_WARN(SUNDIALS was compiled without LAPACK.))
-if test x$ac_cv_lib_sundials_sunlinsollapackdense_main = xyes; then
-   use_lapack="yes"
-   AC_DEFINE([USE_LAPACK], 1, [Define to use LAPACK.])
+if test x$enable_lapack = "xyes"; then
+   AC_CHECK_LIB(sundials_sunlinsollapackdense, main,, AC_MSG_WARN(SUNDIALS was compiled without LAPACK.))
+   if test x$ac_cv_lib_sundials_sunlinsollapackdense_main = xyes; then
+      use_lapack="yes"
+      AC_DEFINE([USE_LAPACK], 1, [Define to use LAPACK.])
+   else
+      use_lapack="no"
+   fi
 else
    use_lapack="no"
 fi
