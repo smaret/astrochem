@@ -1,7 +1,7 @@
 /*
    input.c - Read the input files needed by Astrochem.
 
-   Copyright (c) 2006-2016 Sebastien Maret
+   Copyright (c) 2006-2019 Sebastien Maret
 
    This file is part of Astrochem.
 
