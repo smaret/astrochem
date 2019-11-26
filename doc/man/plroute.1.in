@@ -72,7 +72,7 @@ Specify the chemical network file. Deprecated, used only in legacy mode.
 Written by Sebastien Maret.
 .Sh "REPORTING BUGS"
 Report bugs to
-.Aq sebastien.maret@obs.ujf-grenoble.fr .
+.Aq @PACKAGE_BUGREPORT@ .
 .Sh COPYRIGHT
 Copyright \(co 2006-2019 Sebastien Maret
 .Pp
