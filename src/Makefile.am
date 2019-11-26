@@ -60,7 +60,7 @@ plroute$(EXEEXT): plroute.py
 	cp $? $@
 	chmod a+x $@
 
-CLEANFILES += plabun.py plroute.py
+CLEANFILES += plabun plabun.py plroute plroute.py
 
 endif
 
