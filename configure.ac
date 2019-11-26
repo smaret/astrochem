@@ -32,22 +32,16 @@ AC_ARG_ENABLE([openmp],	AC_HELP_STRING([--enable-openmp], [enable openmp (defaul
 # Check for programs
 AC_PROG_CC
 LT_INIT
-AC_PROG_F77
-AC_F77_WRAPPERS
 AM_PATH_PYTHON([3.4],, AC_MSG_ERROR(Could not find Python >=3.4. Please set PYTHON to Python interpreter path.))
 AX_PYTHON_DEVEL([])
 
 # Checks for libraries.
 AC_CHECK_LIB(m, main)
-AX_LAPACK(, AC_MSG_WARN(Could not find LAPACK library. Make sure you set CFLAGS to include the include directory and set LDFLAGS to include the library directory.))
-if test x$ax_lapack_ok = xyes; then
-   LIBS="$LAPACK_LIBS $BLAS_LIBS $LIBS $FLIBS"
-fi
 AC_CHECK_LIB(sundials_cvode, main,, AC_MSG_ERROR(Could not find SUNDIALS/CVODE library. Make sure you set CFLAGS to include the include directory and set LDFLAGS to include the library directory.))
 AC_CHECK_LIB(sundials_cvode, CVodeSetLinearSolver,, AC_MSG_ERROR(Could not find the CVodeSetLinearSolver function in SUNDIALS/CVODE  library. Make sure that your SUNDIALS version is >= 4.1.0.))
 AC_CHECK_LIB(sundials_nvecserial, main,, AC_MSG_ERROR(Could not find SUNDIALS/NVECSERIAL library. Make sure you set CFLAGS to include the include directory and set LDFLAGS to include the library directory.))
 AC_CHECK_LIB(sundials_sunlinsollapackdense, main,, AC_MSG_WARN(SUNDIALS was compiled without LAPACK.))
-if test x$ac_cv_lib_sundials_sunlinsollapackdense_main = xyes && test x$ax_lapack_ok = xyes; then
+if test x$ac_cv_lib_sundials_sunlinsollapackdense_main = xyes; then
    use_lapack="yes"
    AC_DEFINE([USE_LAPACK], 1, [Define to use LAPACK.])
 else
@@ -146,9 +140,6 @@ if test ${have_openmp} = "yes"; then
    echo "OpenMP flag:        ${OPENMP_CFLAGS}"
 fi
 echo "LAPACK support:     ${use_lapack}"
-if test ${use_lapack} = "yes"; then
-   echo "LAPACK libraries:  ${LAPACK_LIBS} ${BLAS_LIBS}"
-fi
 echo "Python interpreter: ${PYTHON}
 Python version:     ${PYTHON_VERSION}
 Matplotlib module:  ${HAVE_PYMOD_MATPLOTLIB}
