@@ -24,7 +24,7 @@ import os
 
 input_ini = """[files]
 source = source.mdl
-chem = /Users/smaret/Models/astrochem/networks/osu2009.chm
+chem = @abs_top_srcdir@/networks/osu2009.chm
 # Physical paramaters
 [phys]
 chi = 1.0
@@ -86,18 +86,17 @@ def main():
     f.close()
 
     # Run Astrochem serially
-    # We need to start time as a subprocess in a shell, because we need to set the OMP_NUM_THREADS environment variables.
-    env = {}
+    env = os.environ
     env["OMP_NUM_THREADS"] = "1"
-    env["DYLD_LIBRARY_PATH"] = os.getenv("DYLD_LIBRARY_PATH") # why to we need this?
-    p = Popen("time -p /Users/smaret/Models/astrochem/src/astrochem -q input.ini", env = env, shell = True, stderr = PIPE)
+    env["LANG"] = ""
+    p = Popen(["time", "-p", "@abs_top_srcdir@/src/astrochem", "-q", "input.ini"], env = env, stderr = PIPE)
     output = p.communicate()[1]
     real_s, user_s, sys_s = list(map(float, output.split()[1::2]))
     print("[run 1/2] real: %6.3fs user: %6.3fs  sys: %6.3fs" % (real_s, user_s, sys_s))
 
     # Run Astrochem in parallel
-    env["OMP_NUM_THREADS"] = os.getenv("OMP_NUM_THREADS")
-    p = Popen("time -p /Users/smaret/Models/astrochem/src/astrochem -q input.ini", env = env, shell = True, stderr = PIPE)
+    env["OMP_NUM_THREADS"] = "0"
+    p = Popen(["time", "-p", "@abs_top_srcdir@/src/astrochem", "-q", "input.ini"], env = env, stderr = PIPE)
     output = p.communicate()[1]
     real_p, user_p, sys_p = list(map(float, output.split()[1::2]))
     print("[run 2/2] real: %6.3fs user: %6.3fs  sys: %6.3fs" % (real_p, user_p, sys_p))

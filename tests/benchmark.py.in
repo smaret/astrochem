@@ -1,4 +1,4 @@
-#!@PYTHON@
+#!/usr/bin/env @PYTHON@
 #
 #  benchmark - Benckmark Astrochem
 #
@@ -20,6 +20,7 @@
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
 from subprocess import *
+import os
 
 input_ini = """[files]
 source = source.mdl
@@ -86,6 +87,8 @@ def main():
     for i in range(nrun):
 
         # Start time as a subprocess and parse the output
+        env = os.environ
+        env["LANG"] = ""
         p = Popen(["time", "-p", "@abs_top_srcdir@/src/astrochem", "-q", "input.ini"], stderr = PIPE)
         output = p.communicate()[1]
         real, user, sys = list(map(float, output.split()[1::2]))
