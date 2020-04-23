@@ -5,8 +5,8 @@
 PACKAGE_VERSION = "@PACKAGE_VERSION@"
 
 try:
-    import libpyastrochem
-    import wrapper
+    from . import libpyastrochem
+    from . import wrapper
 except ImportError:
     pass
-import tools
+from . import tools
