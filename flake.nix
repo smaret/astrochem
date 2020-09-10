@@ -2,36 +2,40 @@
   description = "A code to compute the abundances of chemical species in the interstellar medium";
 
   inputs.nixpkgs.url = github:NixOS/nixpkgs/nixos-20.03;
+  inputs.flake-utils.url = "github:numtide/flake-utils";
 
-  outputs = { self, nixpkgs }: {
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let pkgs = nixpkgs.legacyPackages.${system}; in
+      rec {
+        packages = flake-utils.lib.flattenTree {
+          astrochem = pkgs.stdenv.mkDerivation {
 
-    # TODO: Support other platforms as well
-    defaultPackage.x86_64-darwin =
-      with import nixpkgs { system = "x86_64-darwin"; };
-      stdenv.mkDerivation {
+            name = "astrochem";
 
-        name = "astrochem";
+            src = self;
 
-        src = self;
+            nativeBuildInputs = [ pkgs.autoconf pkgs.automake pkgs.libtool pkgs.ncurses ];
 
-        nativeBuildInputs = [ autoconf automake libtool ncurses ];
+            buildInputs = [
+              pkgs.python3Packages.python
+              pkgs.hdf5
+              pkgs.sundials
+            ];
 
-        buildInputs = [
-          python3Packages.python
-          hdf5
-          sundials
-        ];
+            propagatedBuildInputs = [
+              pkgs.python3Packages.numpy
+              pkgs.python3Packages.h5py
+              pkgs.python3Packages.cython
+              pkgs.python3Packages.matplotlib
+            ];
 
-        propagatedBuildInputs = [
-          python3Packages.numpy
-          python3Packages.h5py
-          python3Packages.cython
-          python3Packages.matplotlib
-        ];
+            preConfigure = "./bootstrap";
 
-        preConfigure = "./bootstrap";
-
-        doCheck = true;
-      };
-  };
+            doCheck = true;
+          };
+        };
+        defaultPackage = packages.astrochem;
+      }                     
+    );
 }
