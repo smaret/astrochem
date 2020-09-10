@@ -6,6 +6,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: cachix/install-nix-action@v3
-    - run: nix-shell --run "./bootstrap && ./configure CC=gcc FC=gfortran && make && make check"
+    - uses: actions/checkout@v2
+      with:
+        # Nix Flakes doesn't work on shallow clones
+        fetch-depth: 0
+    - uses: cachix/install-nix-action@v10
+      with:
+        install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-3.0pre20200820_4d77513/install
+    # Configure Nix to enable flakes
+    - run: echo "experimental-features = nix-command flakes" | sudo tee -a /etc/nix/nix.conf
+    # Run the general flake checks
+    - run: nix flake check
+    # Verify that the main program builds
+    - run: nix shell -c echo OK
+#    - run: nix-shell --run "./bootstrap && ./configure CC=gcc FC=gfortran && make && make check"
