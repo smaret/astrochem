@@ -6,6 +6,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - uses: cachix/install-nix-action@v3
+    - uses: actions/checkout@v2
+    - uses: cachix/install-nix-action@v12
     - run: nix-shell --run "./bootstrap && ./configure CC=gcc FC=gfortran && make && make check"
