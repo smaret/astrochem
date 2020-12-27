@@ -32,6 +32,7 @@
 
 #include "astrochem.h"
 #include "input.h"
+#include "network.h"
 #include <hdf5.h>
 #include <math.h>
 
