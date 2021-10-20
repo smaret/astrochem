@@ -1470,7 +1470,7 @@ using the ``phys`` object:
 
 .. code-block:: python
 
-    p = phys()
+    p = Phys()
     p.cosmic = 1e-17
     p.chi = 0
 
@@ -1491,7 +1491,7 @@ are set with the ``cell`` object:
     av = 20
     tgas = 10
     tdust = 10
-    c = cell(av , density, tgas,  tdust)
+    c = Cell(av , density, tgas,  tdust)
 
 The next step is to initialize the solver:
 
@@ -1500,7 +1500,7 @@ The next step is to initialize the solver:
     verbose = 0
     abs_err = 1e-15
     rel_err = 1e-6
-    s = solver(c,  "network.chm", p , abs_err, rel_err, initial_abundances, density, verbose)
+    s = Solver(c,  "network.chm", p , abs_err, rel_err, initial_abundances, density, verbose)
 
 Then actual computation can be done by *advancing time,*, which is
 typically done within a loop:

@@ -24,7 +24,7 @@ Python wrapper for libpyastrochem.
 
 import libpyastrochem
 
-class cell:
+class Cell:
     """Cell class.
 
     Attributes
@@ -62,7 +62,7 @@ class cell:
         self.tgas = self.data.tgas
         self.tdust = self.data.tdust
 
-class network:
+class Network:
     """Network class.
 
     Attributes
@@ -88,7 +88,7 @@ class network:
 
         self = libpyastrochem.Network(chem_file, verbose)
 
-class phys:
+class Phys:
     """Physical parameters to use in chemical reaction solver.
 
     Attributes
@@ -115,7 +115,7 @@ class phys:
         self.grain_abundance = self.data.grain_abundance
         self.grain_size = self.data.grain_size
 
-class solver:
+class Solver:
     """Chemical reaction solver.
 
     Attributes

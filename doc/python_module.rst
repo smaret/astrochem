@@ -10,6 +10,11 @@ networks and astrochem output files and :ref:`wrapper package
 from Python. For an example on how to do this, see :ref:`calling
 Astrochem from Python <sec-calling-astrochem-from-python>`
 
+.. warning::
+
+   The Astrochem Python module is recent, and its API is subject to
+   change in future releases.
+
 .. _sec-python-astrochem-tools:
 
 Tools (``astrochem.tools``)
