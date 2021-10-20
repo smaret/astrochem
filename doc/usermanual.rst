@@ -472,6 +472,13 @@ simplicity, we also neglect the freeze-out of molecules on dust
 grains. In the following, we describe the various steps needed to
 vsolve this problem.
 
+.. tip::
+
+   The ``input.ini`` and ``source.mdl`` files described in this
+   section can be found in the ``doc/examples/cli`` directory of the
+   source code.
+
+
 Describing the problem
 ----------------------
 

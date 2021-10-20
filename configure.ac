@@ -109,9 +109,6 @@ fi
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
 		 doc/examples/Makefile
-		 doc/examples/input.ini
-		 doc/examples/dynamic/Makefile
-		 doc/examples/dynamic/input.ini
 		 doc/man/Makefile
 		 doc/man/astrochem.1
 		 doc/man/plabun.1

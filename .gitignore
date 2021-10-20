@@ -38,8 +38,6 @@ test-driver
 .libs
 
 # The following files are also automatically generated from .in
-doc/examples/input.ini
-doc/examples/dynamic/input.ini
 doc/man/astrochem.1
 doc/man/chmconvert.1
 doc/man/converttolegacy.1
@@ -91,8 +89,7 @@ tests/source_dyn_test
 python/libpyastrochem/libpyastrochem.c
 
 # Ignore example files
-doc/examples/*.h5
-doc/examples/dynamic/*.h5
+doc/examples/cli/*.h5
 
 # Test input and result files
 tests/*.ini

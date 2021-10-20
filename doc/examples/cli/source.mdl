@@ -1,0 +1,7 @@
+# Example model for Astrochem, command-line interface version
+# Source file
+# See the "Using Astrochem" section in the documentation manual for details.
+# Source file for the example model
+# shell number, Av [mag], nH [cm^-3], Tgas [K], Tdust [K]
+#
+0	20.0	1e+04	10.0	10.0
