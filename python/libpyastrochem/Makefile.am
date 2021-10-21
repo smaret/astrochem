@@ -20,7 +20,7 @@
 if HAVE_CYTHON
 
 .pyx.c:
-	@CYTHON@ -o $@ $<
+	@CYTHON@ -3 -o $@ $<
 
 CYTHON_CFLAGS = -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing 
 CYTHON_LDFLAGS = -pthread -fPIC -fwrapv -Wall -fno-strict-aliasing -shared 

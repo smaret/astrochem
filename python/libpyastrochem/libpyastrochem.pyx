@@ -1,5 +1,3 @@
-from libc.stdlib cimport malloc, free
-
 cdef extern from "../../src/astrochem.h":
 
     cdef double CHI_DEFAULT
@@ -47,6 +45,7 @@ cdef extern from "../../src/libastrochem.h":
     int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys, const double* abundances , double density, double abs_err, double rel_err, astrochem_mem_t* astrochem_mem )
     int solve( const astrochem_mem_t* astrochem_mem, const net_t* network, double* abundances, double time , const cell_t* new_cell, int verbose )
     void solver_close( astrochem_mem_t* astrochem_mem )
+    int set_initial_abundance( const char* species, const double initial_abundance, const net_t* network, double* abundances )
 
 _ABS_ERR_DEFAULT = ABS_ERR_DEFAULT
 _REL_ERR_DEFAULT = REL_ERR_DEFAULT
@@ -210,18 +209,9 @@ cdef class Solver:
 
         if alloc_abundances( &c_net , &self.abundances ) != 0 :
             raise MemoryError
-        cdef char **initial_abundances_str = <char **>malloc(len(initial_abundances) * sizeof(char *))
-        cdef double* initial_abundances_val = <double*>malloc(len(initial_abundances) * sizeof(double))
-        cdef int j = 0
-        for i in initial_abundances:
-            initial_abundances_byte = i.encode() # str -> byte
-            initial_abundances_str[j] = initial_abundances_byte
-            initial_abundances_val[j] = initial_abundances[i]
-            j+=1
-        set_initial_abundances( < const char** >initial_abundances_str, len(initial_abundances), initial_abundances_val,  &c_net, self.abundances )
-        free( initial_abundances_str )
-        free( initial_abundances_val )
-
+        for spec in initial_abundances:
+            set_initial_abundance(spec.encode(), initial_abundances[spec], &c_net, self.abundances)
+            
         solver_init( &c_cell, &c_net, &c_phys , self.abundances, density, abs_err, rel_err, &self.astrochemstruct )
 
     def __dealloc__(self):
