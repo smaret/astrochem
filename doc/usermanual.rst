@@ -1454,6 +1454,11 @@ From Python
    Python. For a full description of Astrochem Python module, see
    :doc:`Astrochem Python module <python_module>`.
 
+.. tip::
+
+   The complete Python example script described in this section can be
+   found in the ``doc/examples/python`` directory of the source code.
+
 .. Fixme: explain how to change the density, temperature, etc. at each
    timestep
 
