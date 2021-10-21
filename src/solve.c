@@ -494,6 +494,21 @@ int set_initial_abundances( const char** species, int n_initialized_species, con
   return 0;
 }
 
+int set_initial_abundance( const char* species, const double initial_abundance,
+			   const net_t* network, double* abundances )
+{
+  int i;
+  for( i = 0 ; i < network->n_alloc_species ; i++ )
+    {
+      if (strcmp( network->species[i].name , species ) == 0 )
+	{
+	  abundances[i] = initial_abundance;
+	  break;
+	}
+    }
+  return 0;
+}
+
 /**
  * Free the abundances
  */
