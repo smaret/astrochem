@@ -2,7 +2,7 @@
    network.h - private network Function prototypes, various constant and data
    structures for Astrochem.
 
-   Copyright (c) 2006-2019 Sebastien Maret
+   Copyright (c) 2006-2021 Sebastien Maret
 
    This file is part of Astrochem.
 

@@ -1,6 +1,6 @@
 #  Makefile.am - Automake file for Astrochem
 #
-#  Copyright (c) 2006-2019 Sebastien Maret
+#  Copyright (c) 2006-2021 Sebastien Maret
 # 
 #  This file is part of Astrochem.
 #

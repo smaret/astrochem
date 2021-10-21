@@ -60,7 +60,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Astrochem'
-copyright = u'2006-2019, Sébastien Maret'
+copyright = u'2006-2021, Sébastien Maret'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
