@@ -36,7 +36,6 @@ typedef struct
 } elem_t;
 
 
-int find_species (const species_name_t specie, const net_t * network);
 int add_species (char *new_species, net_t * network);
 int alloc_network (net_t * network, int n_species, int n_reactions);
 int realloc_network_species (net_t * network, int n_species);

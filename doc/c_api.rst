@@ -10,10 +10,18 @@ API. These types and functions are defined in the `libastrochem.h`
 header file. For an example of how to use the C API, see
 :ref:`calling Astrochem from C <sec-calling-astrochem-from-c>`.
 
+.. warning::
+
+   Astrochem C API is recent and it is subject to change in future releases.
+
 .. _sec-c-types:
 
 Types
 =====
+
+.. c:type:: species_name_t
+
+   Character array containing the species name
 
 .. c:type:: astrochem_mem_t
 
@@ -110,6 +118,15 @@ Functions
    Free the array containing the abundances
 
    :param double** abundances: Pointer on the abundance array
+
+.. c:function:: int find_species (const species_name_t specie, const net_t * network)
+
+   Find the index of a species
+
+   :param const species_name_t species: The species name
+   :param const net_t network: The network
+   :returns: -1 if the species is "", -2 if the species is not found, or the species index.
+   
    
 .. c:function:: int set_initial_abundances(const char** species, int n_initialized_abundances, const double* initial_abundances, const net_t* network, double* abundances)
 
