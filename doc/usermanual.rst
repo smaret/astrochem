@@ -1324,6 +1324,11 @@ From C
    library from a C code. For a full description of the API, see
    :doc:`Astrochem C API reference <c_api>`.
 
+.. tip::
+
+   The complete C program described in this section can be found in
+   the ``doc/examples/c`` directory of the source code.
+
 A typical call of Astrochem library can be decomposed in several
 steps. First, one must select a chemical network file, which is done
 as follows:
@@ -1350,9 +1355,8 @@ setting the different elements of this structure:
 .. code-block:: c
 
     phys_t phys;
-    phys.cosmic = 1e-17;
-    phys.chi = 0;
-    phys.grain_abundance = 0;
+    phys.cosmic = 1.3e-17;
+    phys.chi = 1.0;
 
 The parameters are the same than in input file. Please refer to
 :ref:`sec-input-file` for details. As for input files, parameters that
@@ -1378,7 +1382,7 @@ temperature of the gas cell:
 
 .. code-block:: c
 
-    double density = 1000;
+    double density = 1e4;
     double av = 20;
     double temperature = 10;
 
@@ -1393,8 +1397,8 @@ relative error:
 
 .. code-block:: c
 
-    double abs_err = ABS_ERR_DEFAULT;
-    double rel_err = REL_ERR_DEFAULT;
+    double abs_err = 1e-15;
+    double rel_err = 1e-6;
     astrochem_mem_t astrochem_mem;
 
     solver_init (&cell, &network, &phys, abundances , density, abs_err, rel_err, &astrochem_mem );
@@ -1476,8 +1480,8 @@ using the ``phys`` object:
 .. code-block:: python
 
     p = Phys()
-    p.cosmic = 1e-17
-    p.chi = 0
+    p.cosmic = 1.3e-17
+    p.chi = 1.0
 
 Note that parameters that are not set explicitly are set to their
 default value. Initial abundances are set with a dictionary.
@@ -1492,7 +1496,7 @@ are set with the ``cell`` object:
 
 .. code-block:: python
 
-    density = 1000
+    density = 1e4
     av = 20
     tgas = 10
     tdust = 10
