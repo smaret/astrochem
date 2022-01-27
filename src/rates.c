@@ -1,3 +1,4 @@
+
 /*
    rates.c - Compute the reaction rates.
 
@@ -158,8 +159,12 @@ rate (double alpha, double beta, double gamm, int reaction_type,
 	double thermal_veloc = pow (8 * CONST_CGSM_BOLTZMANN * tgas
                                     / (M_PI * CONST_CGSM_MASS_ELECTRON),
                                     0.5);
+	double polarization_factor = 1 + pow (M_PI * CONST_CGSE_ELECTRON_CHARGE
+					      * CONST_CGSE_ELECTRON_CHARGE
+					      / (2 * grain_size * CONST_CGSM_BOLTZMANN * tgas),
+					      0.5);
 	double sticking_electron = 1.3290 * exp (-tdust / 20);
-        k = M_PI * pow (grain_size, 2) * thermal_veloc * sticking_electron;
+        k = M_PI * pow (grain_size, 2) * thermal_veloc * sticking_electron * polarization_factor;
 	break;
       }
 
@@ -172,9 +177,15 @@ rate (double alpha, double beta, double gamm, int reaction_type,
 	double coulomb_factor = 1 + CONST_CGSE_ELECTRON_CHARGE
 	  * CONST_CGSE_ELECTRON_CHARGE / CONST_CGSM_BOLTZMANN / grain_size
 	  / tgas;
+	double polarization_factor = 1 + pow (2
+					      / (2 + (grain_size
+						      * CONST_CGSM_BOLTZMANN * tgas
+						      / CONST_CGSE_ELECTRON_CHARGE
+						      / CONST_CGSE_ELECTRON_CHARGE)),
+					      0.5);
 	double sticking_electron = 1.3290 * exp (-tdust / 20);
         k = M_PI * pow (grain_size, 2) * thermal_veloc * sticking_electron
-	  * coulomb_factor;
+	  * coulomb_factor * polarization_factor;
 	break;
       }
 
@@ -187,7 +198,13 @@ rate (double alpha, double beta, double gamm, int reaction_type,
 	double coulomb_factor = 1 + CONST_CGSE_ELECTRON_CHARGE
 	  * CONST_CGSE_ELECTRON_CHARGE / CONST_CGSM_BOLTZMANN / grain_size
 	  / tgas;
-        k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc * coulomb_factor;
+	double polarization_factor = 1 + pow (2
+					      / (2 + (grain_size
+						      * CONST_CGSM_BOLTZMANN * tgas
+						      / CONST_CGSE_ELECTRON_CHARGE
+						      / CONST_CGSE_ELECTRON_CHARGE)),
+					      0.5);
+        k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc * coulomb_factor * polarization_factor;
         break;
       }
 
@@ -197,7 +214,11 @@ rate (double alpha, double beta, double gamm, int reaction_type,
         double thermal_veloc = pow (8 * CONST_CGSM_BOLTZMANN * tgas
                                     / (M_PI * beta * CONST_CGSM_MASS_PROTON),
                                     0.5);
-        k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc;
+	double polarization_factor = 1 + pow (M_PI * CONST_CGSE_ELECTRON_CHARGE
+					      * CONST_CGSE_ELECTRON_CHARGE
+					      / (2 * grain_size * CONST_CGSM_BOLTZMANN * tgas),
+					      0.5);
+        k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc * polarization_factor;
         break;
       }
 
