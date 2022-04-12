@@ -50,6 +50,7 @@ static const elem_t elems[] = {
     {"S",30},
     {"P",31},
     {"Cl",35},
+    {"K", 39},
     {"Fe",56},
     {"grain",0},
     {"X",1},
