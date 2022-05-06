@@ -1,4 +1,5 @@
 
+
 /*
    rates.c - Compute the reaction rates.
 
@@ -163,7 +164,8 @@ rate (double alpha, double beta, double gamm, int reaction_type,
 					      * CONST_CGSE_ELECTRON_CHARGE
 					      / (2 * grain_size * CONST_CGSM_BOLTZMANN * tgas),
 					      0.5);
-	double sticking_electron = 1.3290 * exp (-tdust / 20);
+	/* DEBUG: Assume a sticking probability of 1. */
+	double sticking_electron = 1.;
         k = M_PI * pow (grain_size, 2) * thermal_veloc * sticking_electron * polarization_factor;
 	break;
       }
@@ -183,7 +185,8 @@ rate (double alpha, double beta, double gamm, int reaction_type,
 						      / CONST_CGSE_ELECTRON_CHARGE
 						      / CONST_CGSE_ELECTRON_CHARGE)),
 					      0.5);
-	double sticking_electron = 1.3290 * exp (-tdust / 20);
+	/* DEBUG: Assume a sticking probability of 1. */
+	double sticking_electron = 1.;
         k = M_PI * pow (grain_size, 2) * thermal_veloc * sticking_electron
 	  * coulomb_factor * polarization_factor;
 	break;
