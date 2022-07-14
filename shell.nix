@@ -1,9 +1,9 @@
 with import
   (fetchTarball {
     # Get the revision by choosing a version from https://github.com/nixos/nixpkgs/commits/master
-    url = "https://github.com/nixos/nixpkgs/archive/171144eb2850979d3841949df5a14f048da5d83e.tar.gz";
+    url = "https://github.com/nixos/nixpkgs/archive/22.05.tar.gz";
     # Get the hash by running `nix-prefetch-url --unpack <url>` on the above url
-    sha256 = "0hm78p3avq9khd97x3x1aziribsz0mnrrssanq982yn5kz2jfj6s";
+    sha256 = "0d643wp3l77hv2pmg2fi7vyxn4rwy0iyr8djcw1h5x72315ck9ik";
   })
 { };
 let
