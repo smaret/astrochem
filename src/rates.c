@@ -147,6 +147,82 @@ rate (double alpha, double beta, double gamm, int reaction_type,
 	break;
       }
 
+    case 24:
+      /* Electron attachement on neutral grains */
+
+      /* Note: reactions 24 and 25 differs only by a Coulomb
+	 factor. It would be better to determine the grain charge and
+	 to compute this factor accordingly. Same thing for reactions
+	 26 and 27.*/
+      {
+	double thermal_veloc = pow (8 * CONST_CGSM_BOLTZMANN * tgas
+                                    / (M_PI * CONST_CGSM_MASS_ELECTRON),
+                                    0.5);
+	double polarization_factor = 1 + pow (M_PI * CONST_CGSE_ELECTRON_CHARGE
+					      * CONST_CGSE_ELECTRON_CHARGE
+					      / (2 * grain_size * CONST_CGSM_BOLTZMANN * tgas),
+					      0.5);
+	/* DEBUG: Assume a sticking probability of 0.6 */
+	double sticking_electron = 0.6;
+        k = M_PI * pow (grain_size, 2) * thermal_veloc * sticking_electron * polarization_factor;
+	break;
+      }
+
+    case 25:
+      /* Electron attachment on positively charged grains */
+      {
+	double thermal_veloc = pow (8 * CONST_CGSM_BOLTZMANN * tgas
+                                    / (M_PI * CONST_CGSM_MASS_ELECTRON),
+                                    0.5);
+	double coulomb_factor = 1 + CONST_CGSE_ELECTRON_CHARGE
+	  * CONST_CGSE_ELECTRON_CHARGE / CONST_CGSM_BOLTZMANN / grain_size
+	  / tgas;
+	double polarization_factor = 1 + pow (2
+					      / (2 + (grain_size
+						      * CONST_CGSM_BOLTZMANN * tgas
+						      / CONST_CGSE_ELECTRON_CHARGE
+						      / CONST_CGSE_ELECTRON_CHARGE)),
+					      0.5);
+	/* DEBUG: Assume a sticking probability of 0.6 */
+	double sticking_electron = 0.6;
+        k = M_PI * pow (grain_size, 2) * thermal_veloc * sticking_electron
+	  * coulomb_factor * polarization_factor;
+	break;
+      }
+
+    case 26:
+      /* Cation recombination on negatively charged grains. */
+      {
+        double thermal_veloc = pow (8 * CONST_CGSM_BOLTZMANN * tgas
+                                    / (M_PI * beta * CONST_CGSM_MASS_PROTON),
+                                    0.5);
+	double coulomb_factor = 1 + CONST_CGSE_ELECTRON_CHARGE
+	  * CONST_CGSE_ELECTRON_CHARGE / CONST_CGSM_BOLTZMANN / grain_size
+	  / tgas;
+	double polarization_factor = 1 + pow (2
+					      / (2 + (grain_size
+						      * CONST_CGSM_BOLTZMANN * tgas
+						      / CONST_CGSE_ELECTRON_CHARGE
+						      / CONST_CGSE_ELECTRON_CHARGE)),
+					      0.5);
+        k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc * coulomb_factor * polarization_factor;
+        break;
+      }
+
+    case 27:
+      /* Cation recombination on neutral grains. */
+      {
+        double thermal_veloc = pow (8 * CONST_CGSM_BOLTZMANN * tgas
+                                    / (M_PI * beta * CONST_CGSM_MASS_PROTON),
+                                    0.5);
+	double polarization_factor = 1 + pow (M_PI * CONST_CGSE_ELECTRON_CHARGE
+					      * CONST_CGSE_ELECTRON_CHARGE
+					      / (2 * grain_size * CONST_CGSM_BOLTZMANN * tgas),
+					      0.5);
+        k = M_PI * pow (grain_size, 2) * alpha * thermal_veloc * polarization_factor;
+        break;
+      }
+
     default:
       fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__,
                "unknown reaction type.\n");
