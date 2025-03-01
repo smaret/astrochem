@@ -106,6 +106,7 @@ typedef struct
 typedef struct
 {
   void* cvode_mem;
+  SUNContext sunctx;
   SUNMatrix a;
   SUNLinearSolver ls;
   N_Vector y;

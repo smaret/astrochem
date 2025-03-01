@@ -37,14 +37,13 @@
 #else
 #include <sunlinsol/sunlinsol_dense.h>
 #endif
-#include <sundials/sundials_types.h>
 
 #include "astrochem.h"
 #include "rates.h"
 
-static int f (realtype t, N_Vector y, N_Vector ydot, void *params);
+static int f (sunrealtype t, N_Vector y, N_Vector ydot, void *params);
 
-static int jacobian (realtype t, N_Vector y, N_Vector fy,
+static int jacobian (sunrealtype t, N_Vector y, N_Vector fy,
                      SUNMatrix J, void *params, N_Vector tmp1,
                      N_Vector tmp2, N_Vector tmp3);
 
@@ -53,7 +52,7 @@ static int jacobian (realtype t, N_Vector y, N_Vector fy,
 */
 
 static int
-f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
+f (sunrealtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
    void *params)
 {
   int i;
@@ -151,7 +150,7 @@ f (realtype t __attribute__ ((unused)), N_Vector y, N_Vector ydot,
    */
 
 static int
-jacobian (realtype t __attribute__ ((unused)), N_Vector y,
+jacobian (sunrealtype t __attribute__ ((unused)), N_Vector y,
           N_Vector fy __attribute__ ((unused)),
           SUNMatrix J, void *params,
           N_Vector tmp1 __attribute__ ((unused)),
@@ -273,11 +272,20 @@ int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
 {
   astrochem_mem->density = density;
 
+  /* Create the SUNDIALS context. */
+
+  if (SUNContext_Create(SUN_COMM_NULL, &astrochem_mem->sunctx))
+    {
+      fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__,
+	       "array allocation failed.\n");
+      return -1;
+    }
+
   /* Allocate the work array and fill it with the initial
      concentrations. Ignore species that are not in the
      network. */
 
-  if (( astrochem_mem->y = N_VNew_Serial (network->n_species)) == NULL)
+  if (( astrochem_mem->y = N_VNew_Serial (network->n_species, astrochem_mem->sunctx)) == NULL)
     {
       fprintf (stderr, "astrochem: %s:%d: %s\n", __FILE__, __LINE__,
                "array allocation failed.\n");
@@ -333,12 +341,12 @@ int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
      absolute error is multiplied by the density, because we compute
      concentrations and not abundances. */
 
-  if (((astrochem_mem->cvode_mem = CVodeCreate (CV_BDF)) == NULL)
-      || ((astrochem_mem->a = SUNDenseMatrix (network->n_species, network->n_species)) == NULL)
+  if (((astrochem_mem->cvode_mem = CVodeCreate (CV_BDF, astrochem_mem->sunctx)) == NULL)
+      || ((astrochem_mem->a = SUNDenseMatrix (network->n_species, network->n_species, astrochem_mem->sunctx)) == NULL)
 #ifdef USE_LAPACK
-      || ((astrochem_mem->ls = SUNLinSol_LapackDense (astrochem_mem->y, astrochem_mem->a)) == NULL))
+      || ((astrochem_mem->ls = SUNLinSol_LapackDense (astrochem_mem->y, astrochem_mem->a, astrochem_mem->sunctx)) == NULL))
 #else
-      || ((astrochem_mem->ls = SUNLinSol_Dense (astrochem_mem->y, astrochem_mem->a)) == NULL))
+    || ((astrochem_mem->ls = SUNLinSol_Dense (astrochem_mem->y, astrochem_mem->a, astrochem_mem->sunctx)) == NULL))
 #endif
     {
       fprintf (stderr, "astrochem: %s:%d: solver memory allocation failed.\n",
@@ -367,7 +375,7 @@ int solver_init( const cell_t* cell, const net_t* network, const phys_t* phys,
 
 int solve( astrochem_mem_t* astrochem_mem, const net_t* network, double* abundances, double time , const cell_t* new_cell, int verbose )
 {
-  realtype t; /* Current time */
+  sunrealtype t; /* Current time */
 
   /* Computing new reac rate and abundance if cell parameter have evolved
      since last call */
@@ -405,14 +413,14 @@ int solve( astrochem_mem_t* astrochem_mem, const net_t* network, double* abundan
       CVodeReInit (astrochem_mem->cvode_mem, astrochem_mem->t, astrochem_mem->y);
     }
 
-  CVode ( astrochem_mem->cvode_mem, (realtype) time, astrochem_mem->y, &t, CV_NORMAL);
+  CVode ( astrochem_mem->cvode_mem, (sunrealtype) time, astrochem_mem->y, &t, CV_NORMAL);
   astrochem_mem->t = time;
     
   /* Print the cell number, time and time step after each call. */
 
   if (verbose >= 2)
     {
-      realtype h;
+      sunrealtype h;
 
       CVodeGetLastStep (astrochem_mem->cvode_mem, &h);
       fprintf (stdout, "t = %8.2e  delta_t = %8.2e\n",
@@ -451,6 +459,10 @@ void solver_close( astrochem_mem_t* astrochem_mem )
   if( astrochem_mem->a != NULL )
     {
       SUNMatDestroy (astrochem_mem->a);
+    }
+  if( astrochem_mem->sunctx != NULL )
+    {
+      SUNContext_Free (&astrochem_mem->sunctx);
     }
 }
 
