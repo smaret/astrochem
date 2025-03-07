@@ -1,7 +1,7 @@
 /*
    abundances_test.c - Test the  set_initial_abundances() function
 
-   Copyright (c) 2006-2021 Sebastien Maret
+   Copyright (c) 2006-2025 Sebastien Maret
 
    This file is part of Astrochem.
 
