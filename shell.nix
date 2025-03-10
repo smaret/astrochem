@@ -1,10 +1,17 @@
-with import
-  (fetchTarball {
-    url= "https://github.com/nixos/nixpkgs/archive/refs/heads/nixos-24.11.tar.gz";
-  })
-{ };
+with import (fetchTarball {
+  url = "https://github.com/nixos/nixpkgs/archive/refs/heads/nixos-24.11.tar.gz";
+}) { };
 let
-  python3Env = pkgs.python3.withPackages (ps: with ps; [ numpy h5py cython matplotlib ]);
+  python3Env = pkgs.python3.withPackages (
+    ps: with ps; [
+      numpy
+      h5py
+      cython
+      matplotlib
+      sphinx
+      sphinx-rtd-theme
+    ]
+  );
 in
 pkgs.mkShell rec {
   buildInputs = [
