@@ -68,5 +68,5 @@ More information
 For more information on Astrochem and its development, please see the
 [project page on GitHub.](http://github.com/smaret/astrochem)
 
-[![Actions Status](https://github.com/smaret/astrochem/workflows/Build/badge.svg)](https://github.com/smaret/astrochem/actions)
-[![Documentation Status](https://readthedocs.org/projects/astrochem/badge/?version=latest)](https://readthedocs.org/projects/astrochem/?badge=latest)
+[![Build the source code](https://github.com/smaret/astrochem/actions/workflows/build.yml/badge.svg)](https://github.com/smaret/astrochem/actions/workflows/build.yml)
+[![Build and deploy documentation](https://github.com/smaret/astrochem/actions/workflows/documentation.yaml/badge.svg)](https://github.com/smaret/astrochem/actions/workflows/documentation.yaml)
