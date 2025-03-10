@@ -18,7 +18,7 @@
 #  along with Astrochem.  If not, see <http://www.gnu.org/licenses/>.
 
 AC_PREREQ(2.59)
-AC_INIT(astrochem, 0.10, http://github.com/smaret/astrochem/issues)
+AC_INIT(astrochem, 0.11-dev, http://github.com/smaret/astrochem/issues)
 RELEASE_DATE="Not released yet"
 AC_SUBST([RELEASE_DATE])
 AM_INIT_AUTOMAKE([foreign])
