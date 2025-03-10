@@ -39,7 +39,7 @@ Documentation
 -------------
 
 Astrochem comes with a comprehensive
-[documentation](http://astrochem.readthedocs.org/). Each command also
+[documentation](https://www.sebastienmaret.net/astrochem/). Each command also
 has a man page.
 
 Reporting bugs
