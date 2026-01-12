@@ -1,7 +1,7 @@
 /*
    rates.c - Compute the reaction rates.
 
-   Copyright (c) 2006-2021 Sebastien Maret
+   Copyright (c) 2006-2025 Sebastien Maret
 
    This file is part of Astrochem.
 

@@ -1,4 +1,6 @@
-name: build
+# Build the source code
+
+name: Build the source code
 on:
   pull_request:
   push:
@@ -6,6 +8,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v12
-    - run: nix-shell --run "./bootstrap && ./configure CC=gcc FC=gfortran && make && make check"
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+      - name: Build the code
+        run: nix-shell --run "./bootstrap && ./configure CC=gcc FC=gfortran && make && make check"

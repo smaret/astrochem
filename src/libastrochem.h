@@ -2,7 +2,7 @@
    libastrochem.h - Function prototypes, various constant and data
    structures for Astrochem library.
 
-   Copyright (c) 2006-2021 Sebastien Maret
+   Copyright (c) 2006-2025 Sebastien Maret
 
    This file is part of Astrochem.
 
@@ -106,6 +106,7 @@ typedef struct
 typedef struct
 {
   void* cvode_mem;
+  SUNContext sunctx;
   SUNMatrix a;
   SUNLinearSolver ls;
   N_Vector y;
