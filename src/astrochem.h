@@ -49,10 +49,12 @@
 #define M_PI  3.14159265358979323846264338327950288
 #endif
 
-#define CONST_MKSA_YEAR 3.1536e7                /* Number of seconds in a year */
-#define CONST_CGSM_BOLTZMANN (1.3806503e-16)    /* Boltzmann constant */
-#define CONST_CGSM_MASS_PROTON (1.67262158e-24) /* Proton Mass */
-#define MASS_PROTON       1.672621777e-27       /* Proton Mass */
+#define CONST_MKSA_YEAR 3.1536e7                    /* Number of seconds in a year */
+#define CONST_CGSM_BOLTZMANN (1.3806503e-16)        /* Boltzmann constant */
+#define CONST_CGSM_MASS_PROTON (1.67262158e-24)     /* Proton mass */
+#define CONST_CGSM_MASS_ELECTRON (9.10938291e-28)   /* Electron mass */
+#define CONST_CGSE_ELECTRON_CHARGE (4.80320425e-10) /* Electron charge (in statCoulombs) */
+#define MASS_PROTON       1.672621777e-27           /* Proton Mass */
 
 #define MIN_ABUNDANCE 1e-20   /* Minimum abundance to write in output files */
 
